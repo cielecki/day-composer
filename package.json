@@ -18,18 +18,18 @@
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
 		"builtin-modules": "3.3.0",
-		"esbuild": "0.17.3",
+		"esbuild": "^0.25.4",
 		"obsidian": "latest",
 		"tslib": "2.4.0",
-		"typescript": "4.7.4"
+		"typescript": "^5.8.3"
 	},
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.39.0",
-		"@anysphere/priompt": "^0.2.1",
 		"@types/js-yaml": "^4.0.9",
+		"axios": "^1.9.0",
 		"i18next": "^25.1.2",
 		"js-yaml": "^4.1.0",
-		"openai": "^4.89.1",
+		"openai": "^4.98.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"react-markdown": "^10.1.0",
