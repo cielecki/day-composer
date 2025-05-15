@@ -4,13 +4,23 @@ const fs = require('fs');
 const { execSync } = require('child_process');
 const path = require('path');
 
-// Get version from command line argument
-const newVersion = process.argv[2];
+// Function to bump the last number of version
+function bumpVersion(version) {
+    const parts = version.split('.');
+    parts[2] = (parseInt(parts[2]) + 1).toString();
+    return parts.join('.');
+}
 
+// Get current version from package.json
+const packageJsonPath = path.join(__dirname, '..', 'package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+const currentVersion = packageJson.version;
+
+// Get version from command line argument or bump current version
+let newVersion = process.argv[2];
 if (!newVersion) {
-    console.error('Please provide a version number');
-    console.error('Usage: node scripts/version.js <version>');
-    process.exit(1);
+    newVersion = bumpVersion(currentVersion);
+    console.log(`No version specified. Bumping current version ${currentVersion} to ${newVersion}`);
 }
 
 // Validate version format (simple check)
@@ -21,8 +31,6 @@ if (!/^\d+\.\d+\.\d+$/.test(newVersion)) {
 
 try {
     // Update package.json
-    const packageJsonPath = path.join(__dirname, '..', 'package.json');
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
     packageJson.version = newVersion;
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
 
