@@ -1,6 +1,6 @@
 {
   "name": "day-composer",
-  "version": "0.5.8",
+  "version": "0.5.9",
   "description": "Day Composer for Obsidian",
   "main": "src/main.js",
   "scripts": {
