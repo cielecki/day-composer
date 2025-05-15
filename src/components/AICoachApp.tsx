@@ -275,7 +275,7 @@ export const AICoachApp: React.FC = () => {
 									if (window.app) {
 										// @ts-ignore - Using the Obsidian command API
 										window.app.commands.executeCommandById(
-											"mc-tools-obsidian:create-starter-pack",
+											"day-composer:create-starter-pack",
 										);
 									}
 								}}
@@ -584,7 +584,7 @@ export const AICoachApp: React.FC = () => {
 								onClick={() => {
 									if (window.app) {
 										// @ts-ignore - Using the Obsidian command API
-										window.app.commands.executeCommandById("mc-tools-obsidian:create-single-mode");
+										window.app.commands.executeCommandById("day-composer:create-single-mode");
 									}
 									setDropdownOpen(false);
 								}}

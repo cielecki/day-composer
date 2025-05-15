@@ -1,7 +1,7 @@
 {
   "settings": {
-    "title": "MC Tools Settings",
-    "description": "Configure your MC Tools plugin settings here",
+    "title": "Day Composer Settings",
+    "description": "Configure your Day Composer plugin settings here",
     "apiKeys": {
       "anthropic": "Anthropic API Key",
       "anthropicDesc": "Your Anthropic API key for Claude functionality",

@@ -1,7 +1,7 @@
 {
   "settings": {
-    "title": "Ustawienia MC Tools",
-    "description": "Skonfiguruj ustawienia wtyczki MC Tools",
+    "title": "Ustawienia Day Composer",
+    "description": "Skonfiguruj ustawienia wtyczki Day Composer",
     "apiKeys": {
       "anthropic": "Klucz API Anthropic",
       "anthropicDesc": "Twój klucz API Anthropic dla funkcji Claude",

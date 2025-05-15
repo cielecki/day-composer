@@ -253,7 +253,7 @@ export const showTodosTool: ObsidianTool<ShowTodosToolInput> = {
 					console.log(`Checking off todo: ${description}`);
 					// Cast to any to access plugins
 					const app = window.app as any;
-					const plugin = app.plugins.plugins["mc-tools-obsidian"];
+					const plugin = app.plugins.plugins["day-composer"];
 
 					if (!plugin) {
 						console.error("Plugin not found");
@@ -286,7 +286,7 @@ export const showTodosTool: ObsidianTool<ShowTodosToolInput> = {
 					console.log(`Unchecking todo: ${description}`);
 					// Cast to any to access plugins
 					const app = window.app as any;
-					const plugin = app.plugins.plugins["mc-tools-obsidian"];
+					const plugin = app.plugins.plugins["day-composer"];
 
 					if (!plugin) {
 						console.error("Plugin not found");
@@ -319,7 +319,7 @@ export const showTodosTool: ObsidianTool<ShowTodosToolInput> = {
 					console.log(`Abandoning todo: ${description}`);
 					// Cast to any to access plugins
 					const app = window.app as any;
-					const plugin = app.plugins.plugins["mc-tools-obsidian"];
+					const plugin = app.plugins.plugins["day-composer"];
 
 					if (!plugin) {
 						console.error("Plugin not found");
