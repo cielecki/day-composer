@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"name": "day-composer",
+	"version": "0.5.1",
+	"description": "Day Composer for Obsidian",
 	"main": "src/main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
