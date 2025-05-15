@@ -168,11 +168,73 @@ export default class MyPlugin extends Plugin {
 			}
 		});
 
+		// Compare versions helper
+		function compareVersions(a: string, b: string): number {
+			const pa = a.split('.').map(Number);
+			const pb = b.split('.').map(Number);
+			for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+				const na = pa[i] || 0, nb = pb[i] || 0;
+				if (na > nb) return 1;
+				if (na < nb) return -1;
+			}
+			return 0;
+		}
+
+		// Add command to update the plugin from the latest GitHub release with version checks
+		this.addCommand({
+			id: "update-plugin-from-github",
+			name: "Update Plugin from Latest GitHub Release",
+			callback: async () => {
+				const repo = "cielecki/day-composer";
+				const apiUrl = `https://api.github.com/repos/${repo}/releases/latest`;
+				new Notice("Checking for updates...");
+
+				try {
+					// Read current version from manifest.json
+					const manifestPath = this.app.vault.configDir + "/plugins/day-composer/manifest.json";
+					// @ts-ignore
+					const manifestContent = await this.app.vault.adapter.read(manifestPath);
+					const manifest = JSON.parse(manifestContent);
+					const currentVersion = manifest.version;
+
+					// Get latest release info
+					const release = await fetch(apiUrl).then(res => res.json());
+					const assets = release.assets;
+					const latestVersion = release.tag_name.startsWith('v') ? release.tag_name.slice(1) : release.tag_name;
+
+					const cmp = compareVersions(latestVersion, currentVersion);
+					if (cmp <= 0) {
+						new Notice(`Plugin is already up to date (version ${currentVersion}).`);
+						return;
+					}
+
+					// Helper to download and save an asset
+					const saveAsset = async (assetName: string) => {
+						const asset = assets.find((a: any) => a.name === assetName);
+						if (!asset) return;
+						const data = await fetch(asset.browser_download_url).then(res => res.arrayBuffer());
+						// @ts-ignore
+						await this.app.vault.adapter.writeBinary(
+							this.app.vault.configDir + `/plugins/day-composer/${assetName}`,
+							data
+						);
+					};
+
+					// Download and save each asset
+					await saveAsset("main.js");
+					await saveAsset("manifest.json");
+					await saveAsset("styles.css"); // If it exists
+
+					new Notice(`Plugin updated from version ${currentVersion} to ${latestVersion}! Please reload Obsidian to apply the update.`);
+				} catch (e) {
+					new Notice("Failed to update plugin: " + e);
+				}
+			}
+		});
+
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 	}
-
-
 
 	onunload() {
 		console.log("Unloading AI Coach plugin");
