@@ -1,7 +1,7 @@
 {
   "id": "day-composer",
   "name": "Day Composer",
-  "version": "0.5.10",
+  "version": "0.5.11",
   "minAppVersion": "0.15.0",
   "description": "Meet Day Composer, your AI-powered daily co-pilot for Obsidian. Streamline journal management, leverage a customizable AI Coach, and connect ideas with innovative dynamic day note links. Boost productivity and unlock deeper insights daily.",
   "author": "Maciej Cielecki",
