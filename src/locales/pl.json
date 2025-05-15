@@ -1,0 +1,316 @@
+{
+  "settings": {
+    "title": "Ustawienia MC Tools",
+    "description": "Skonfiguruj ustawienia wtyczki MC Tools",
+    "tts": {
+      "title": "Ustawienia syntezy mowy",
+      "enable": "Włącz syntezę mowy",
+      "enableDesc": "Włącz lub wyłącz funkcję syntezy mowy"
+    },
+    "apiKeys": {
+      "anthropic": "Klucz API Anthropic",
+      "anthropicDesc": "Twój klucz API Anthropic dla funkcji Claude",
+      "openai": "Klucz API OpenAI",
+      "openaiDesc": "Twój klucz API OpenAI dla funkcji syntezy mowy",
+      "enterAnthropicKey": "Wprowadź swój klucz API Anthropic",
+      "enterOpenAIKey": "Wprowadź swój klucz API OpenAI",
+      "loadFromSmartComposer": "Załaduj z Smart Composer",
+      "securityNote": "Ważne: Twój klucz API jest przechowywany w folderze konfiguracyjnym Obsidian. Nie udostępniaj swojego skarbca ani folderu konfiguracyjnego innym, jeśli przechowujesz tutaj swój klucz API."
+    }
+  },
+  "tools": {
+    "title": "Narzędzia",
+    "description": "Dostępne narzędzia i funkcje",
+    "createStarterPack": "Utwórz pakiet startowy",
+    "createSingleMode": "Utwórz pojedynczy tryb",
+    "aiCoach": "Asystent AI",
+    "tasks": {
+      "single": "zadanie",
+      "plural": "zadania"
+    },
+    "position": {
+      "after": "po \"{{task}}\"",
+      "at": "w pozycji {{position}}"
+    },
+    "actions": {
+      "move": {
+        "failed": "Nie udało się przenieść zadania {{task}}",
+        "success": "Przeniesiono zadanie {{task}}",
+        "inProgress": "Przenoszenie zadania {{task}}..."
+      },
+      "complete": {
+        "failed": "Nie udało się dodać zakończonego zadania",
+        "success": "Dodano zakończone zadanie: \"{{content}}\"",
+        "inProgress": "Dodawanie zakończonego zadania..."
+      },
+      "check": {
+        "failed": "Nie udało się oznaczyć zadania {{task}} jako zakończone",
+        "success": "Oznaczono zadanie {{task}} jako zakończone",
+        "inProgress": "Oznaczanie zadania {{task}} jako zakończone..."
+      },
+      "uncheck": {
+        "failed": "Nie udało się cofnąć oznaczenia zadania {{task}} jako zakończone",
+        "success": "Cofnięto oznaczenie zadania {{task}} jako zakończone",
+        "inProgress": "Cofanie oznaczenia zadania {{task}} jako zakończone..."
+      },
+      "abandon": {
+        "failed": "Nie udało się porzucić zadania {{task}}",
+        "success": "Porzucono zadanie {{task}}",
+        "inProgress": "Porzucanie zadania {{task}}..."
+      }
+    },
+    "success": {
+      "move": "✓ Przeniesiono zadanie {{task}} z {{source}} do {{target}} {{position}}",
+      "complete": "✓ Dodano zakończone zadanie \"{{task}}\"{{time}} do {{path}}",
+      "check": "✓ Oznaczono {{task}} jako zakończone w {{path}} ({{time}})",
+      "uncheck": "✓ Cofnięto oznaczenie \"{{task}}\" jako zakończone w {{path}}",
+      "abandon": "✓ Oznaczono {{task}} jako porzucone w {{path}}"
+    }
+  },
+  "errors": {
+    "general": "Wystąpił błąd",
+    "notFound": "Nie znaleziono zasobu",
+    "invalidInput": "Nieprawidłowe dane wejściowe",
+    "creatingStarterPack": "Błąd podczas tworzenia pakietu startowego",
+    "creatingNewMode": "Błąd podczas tworzenia nowego trybu",
+    "startingAICoach": "Błąd podczas uruchamiania asystenta AI",
+    "setup": "Błąd konfiguracji: {{error}}",
+    "tools": {
+      "noName": "Nie podano nazwy narzędzia",
+      "unknown": "Nieznane narzędzie \"{{tool}}\"",
+      "execution": "Błąd wykonania narzędzia {{tool}}: {{error}}"
+    },
+    "tts": {
+      "noApiKey": "Nie znaleziono klucza API OpenAI dla syntezy mowy. Skonfiguruj go w ustawieniach.",
+      "invalidVoice": "Nieprawidłowy głos: {{voice}}",
+      "transcriptionFailed": "Transkrypcja nie powiodła się: {{error}}",
+      "microphone": {
+        "accessDenied": "Odmowa dostępu do mikrofonu. Zezwól na dostęp do mikrofonu w ustawieniach przeglądarki.",
+        "notFound": "Nie znaleziono mikrofonu. Podłącz mikrofon i spróbuj ponownie.",
+        "inUse": "Nie można uzyskać dostępu do mikrofonu. Może być używany przez inną aplikację.",
+        "general": "Nie można uzyskać dostępu do mikrofonu"
+      }
+    },
+    "clipboard": {
+      "read": "Nie udało się odczytać ze schowka: {{error}}",
+      "paste": {
+        "success": "Zawartość wklejona ze schowka",
+        "noTarget": "Brak aktywnego pola wprowadzania lub edytora do wklejenia"
+      }
+    },
+    "context": {
+      "save": "Kontekst zapisany w {{path}}",
+      "saveError": "Błąd podczas zapisywania kontekstu w {{path}}"
+    },
+    "audio": {
+      "playback": "Nie można odtworzyć dźwięku. Spróbuj ponownie.",
+      "noData": "Nie otrzymano danych audio. Spróbuj ponownie.",
+      "playbackError": "Błąd odtwarzania audio: {{error}}"
+    },
+    "notes": {
+      "multipleFound": "Znaleziono wiele notatek dziennych dla daty: {{date}}",
+      "notFound": "Nie znaleziono notatki dziennej dla daty: {{date}}",
+      "noContent": "Uwaga: Nie znaleziono notatki dziennej dla daty: {{date}}"
+    },
+    "todos": {
+      "check": "Nie udało się odznaczyć zadania: {{error}}",
+      "uncheck": "Nie udało się zaznaczyć zadania: {{error}}",
+      "abandon": "Nie udało się porzucić zadania: {{error}}",
+      "display": "Błąd wyświetlania zadań: {{error}}",
+      "invalidData": "Nieprawidłowe dane",
+      "createError": "Błąd tworzenia zakończonego zadania: {{error}}"
+    },
+    "files": {
+      "notFound": "Nie znaleziono pliku w {{path}}",
+      "getFailed": "Nie udało się pobrać pliku z {{path}}",
+      "formatFailed": "Nie udało się sformatować dokumentu po operacji na zadaniu",
+      "sourceNotFound": "Nie znaleziono pliku źródłowego w {{path}}",
+      "createFailed": "Nie można utworzyć pliku docelowego w {{path}}: {{error}}",
+      "todayNotExists": "Notatka na dzisiaj jeszcze nie istnieje."
+    },
+    "voice": {
+      "invalid": "Nieprawidłowy głos: {{voice}}, powrót do domyślnego"
+    },
+    "config": {
+      "dailyNotes": "Błąd odczytu konfiguracji notatek dziennych: {{error}}"
+    },
+    "plugin": {
+      "notFound": "Nie znaleziono wtyczki"
+    },
+    "tasks": {
+      "notFound": "Nie znaleziono zadania \"{{task}}\" w {{path}}. Jeśli zadanie znajduje się w innym pliku, określ go w parametrze file_path.",
+      "multipleFound": "Znaleziono wiele zadań z opisem \"{{task}}\" w {{path}}. Proszę podać bardziej szczegółowy opis zadania.",
+      "insertOutOfBounds": "Nie można wstawić zadania w indeksie {{index}}: Indeks poza zakresem (dokument ma {{total}} elementów)",
+      "removeNotFound": "Nie znaleziono zadania \"{{task}}\" w dokumencie",
+      "invalidState": "Nie można odznaczyć \"{{task}}\", ponieważ nie jest w stanie oczekującym. Jego obecny stan to '{{state}}'. Proszę najpierw odznaczyć, jeśli jest już zakończone, porzucone lub przeniesione."
+    },
+    "documents": {
+      "notFound": "Nie znaleziono pliku w {{path}}",
+      "readError": "Błąd odczytu dokumentu: {{error}}"
+    }
+  },
+  "buttons": {
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "apply": "Zastosuj",
+    "reset": "Resetuj"
+  },
+  "messages": {
+    "settingsSaved": "Ustawienia zostały zapisane",
+    "settingsReset": "Ustawienia zostały zresetowane do domyślnych",
+    "creatingStarterPack": "Tworzenie pakietu startowego..."
+  },
+  "voice": {
+    "instructions": {
+      "default": "Głos: Ciepły, empatyczny i profesjonalny, zapewniający klienta, że jego problem jest zrozumiany i zostanie rozwiązany.\n\nInterpunkcja: Dobrze skonstruowana z naturalnymi pauzami, zapewniająca jasność i płynny, uspokajający przekaz.\n\nPrezentacja: Spokojna i cierpliwa, z pomocnym i zrozumiałym tonem, który uspokaja słuchacza.\n\nFrazeologia: Jasna i zwięzła, używająca przyjaznego dla klienta języka, unikająca żargonu przy zachowaniu profesjonalizmu.\n\nTon: Empatyczny i zorientowany na rozwiązania, podkreślający zarówno zrozumienie, jak i proaktywną pomoc."
+    }
+  },
+  "modes": {
+    "default": {
+      "name": "Asystent AI",
+      "description": "## Witaj w Asystencie AI\n\nTo jest domyślny tryb Asystenta AI. Możesz tworzyć własne tryby i oznaczać je tagiem _#aic-mode_, aby ich używać.",
+      "systemPrompt": "Jesteś asystentem AI, który pomaga użytkownikom w refleksji nad ich dniem, przestrzeganiem nawyków i zadaniami. Bądź empatyczny, wnikliwy i skup się na pomaganiu użytkownikowi w zdobyciu perspektywy.\n\nMasz dostęp do narzędzi, które pozwalają na interakcję ze skarbcem Obsidian użytkownika.\nMożesz tworzyć notatki, wyszukiwać notatki, czytać notatki i dodawać do notatek.\nUżywaj tych narzędzi, gdy jest to odpowiednie, aby pomóc użytkownikowi.\nUżywaj narzędzi tylko wtedy, gdy użytkownik wyraźnie o to poprosi lub gdy byłoby to wyraźnie pomocne w kontekście.\nUżytkownik może powiedzieć coś w rodzaju \"utwórz notatkę o X\" lub \"zrób nową notatkę z Y\".\nPodczas używania narzędzi, pokaż użytkownikowi, co robisz, wyjaśniając swoje działania przed i po użyciu narzędzia."
+    },
+    "builtIn": {
+      "createDailyNote": {
+        "name": "Utwórz notatkę dzienną",
+        "description": "Tryb do tworzenia i zarządzania notatkami dziennymi z zadaniami i celami",
+        "exampleUsage": "Czy możesz utworzyć notatkę dzienną na dzisiaj z celem bycia bardziej produktywnym i zadaniem przejrzenia mojego zaległego backlogu?",
+        "voiceInstructions": "Jesteś zachęcającym asystentem głosowym. Mów z entuzjazmem i pozytywną energią."
+      },
+      "searchNotes": {
+        "name": "Wyszukaj notatki",
+        "description": "Tryb dedykowany do znajdowania informacji w całym skarbcu",
+        "voiceInstructions": "Mów wyraźnie i precyzyjnie podczas prezentowania wyników wyszukiwania.",
+        "systemPrompt": "Użyj narzędzia search_notes, aby znaleźć notatki związane z tym, o co pyta użytkownik. Twoim jedynym celem jest wyszukiwanie notatek, niezależnie od tego, o co pyta użytkownik."
+      },
+      "dailyReflection": {
+        "name": "Refleksja dzienna",
+        "description": "Pomaga w codziennej refleksji nad zadaniami, nawykami i celami",
+        "exampleUsage": "Pomóż mi zastanowić się nad tym, co dzisiaj osiągnąłem i co planuję zrobić jutro",
+        "voiceInstructions": "Przyjmij spokojny, refleksyjny ton. Mów powoli i przemyślanie, zachęcając do introspekcji."
+      },
+      "testSearch": {
+        "name": "Test narzędzia wyszukiwania",
+        "description": "Demonstruje możliwości wyszukiwania Asystenta AI",
+        "exampleUsage": "Proszę wyszukaj notatki zawierające słowo 'test' używając narzędzia search_notes",
+        "voiceInstructions": "Komunikuj informacje techniczne jasno i zwięźle."
+      },
+      "addGoals": {
+        "name": "Dodaj cele do dzisiejszej notatki",
+        "description": "Pomaga dodawać cele do Twojej notatki dziennej",
+        "exampleUsage": "Chciałbym dodać kilka celów do dzisiejszej notatki dziennej. Moje cele to: 1) Dokończyć prezentację projektu 2) Wyjść na 30-minutowy spacer 3) Przeczytać przynajmniej jeden rozdział mojej książki",
+        "voiceInstructions": "Mów z motywacją i energią. Używaj optymistycznego tonu, aby inspirować do osiągania celów."
+      },
+      "addReflection": {
+        "name": "Dodaj refleksję do wczorajszej notatki",
+        "description": "Pomaga dodawać refleksje do notatek z poprzedniego dnia",
+        "exampleUsage": "Proszę dodaj refleksję do wczorajszej notatki dziennej. Dowiedziałem się, że regularne przerwy zwiększają moją ogólną produktywność. Zauważyłem też, że nowy system organizacji zadań działa dobrze.",
+        "voiceInstructions": "Używaj kontemplacyjnego tonu. Dodawaj krótkie pauzy między myślami dla refleksji."
+      },
+      "createTomorrowNote": {
+        "name": "Utwórz notatkę na jutro",
+        "description": "Pomaga przygotować się na nadchodzące dni, ustalając zadania z wyprzedzeniem",
+        "exampleUsage": "Chcę przygotować się na jutro. Czy możesz utworzyć notatkę dzienną na jutro z tymi zadaniami: 1) Spotkanie zespołu o 10:00 2) Praca nad arkuszem budżetu 3) Rozmowa z klientem o 15:00",
+        "voiceInstructions": "Mów profesjonalnym, zorganizowanym tonem. Wyraźnie podkreślaj kluczowe daty i godziny."
+      },
+      "searchProjectPlanning": {
+        "name": "Wyszukaj planowanie projektu",
+        "description": "Wykonuje wyszukiwania związane z planowaniem projektu w Twoim skarbcu",
+        "exampleUsage": "Czy możesz przeszukać moje notatki pod kątem informacji związanych z 'planowaniem projektu'?",
+        "voiceInstructions": "Prezentuj informacje w uporządkowany sposób. Kategoryzuj znalezione informacje dla lepszego zrozumienia."
+      }
+    }
+  },
+  "view": {
+    "title": "Asystent AI"
+  },
+  "logs": {
+    "view": {
+      "closing": "Zamykanie widoku, czyszczenie zasobów",
+      "rendering": "Renderowanie komponentu AICoachView z konwersacją: {{count}} wiadomości"
+    }
+  },
+  "ui": {
+    "recording": {
+      "start": "Rozpocznij nagrywanie",
+      "stop": "Zatrzymaj",
+      "cancel": "Anuluj nagrywanie",
+      "transcribing": "Transkrybowanie"
+    },
+    "chat": {
+      "new": "Nowa rozmowa",
+      "history": "Historia rozmów"
+    },
+    "input": {
+      "placeholder": "Napisz wiadomość...",
+      "send": "Wyślij",
+      "cancel": "Anuluj",
+      "stop": "Zatrzymaj",
+      "addFile": "Dodaj plik",
+      "attachImage": "Załącz obraz",
+      "removeFile": "Usuń {{filename}}",
+      "notImplemented": "Jeszcze nie zaimplementowano"
+    },
+    "todo": {
+      "clickToChange": "Kliknij, aby zmienić status",
+      "readOnly": "Tylko do odczytu",
+      "abandon": "Porzuć zadanie",
+      "noTodos": "Nie znaleziono pasujących zadań w {{filename}}",
+      "selectedFrom": "Wybrane zadania z {{filename}}",
+      "showMore": "Pokaż {{count}} więcej elementów"
+    },
+    "thinking": {
+      "inProgress": "Myślę...",
+      "completed": "Przemyślałem przez chwilę",
+      "redacted": "[Rozumowanie asystenta automatycznie ukryte ze względów bezpieczeństwa]"
+    },
+    "mode": {
+      "openInEditor": "Otwórz w edytorze",
+      "viewSettings": "Pokaż ustawienia trybu",
+      "viewSystemPrompt": "Pokaż prompt systemowy",
+      "switchTo": "Przełącz na:",
+      "createStarterPack": "Utwórz pakiet startowy",
+      "newMode": "Nowy tryb",
+      "createdSuccess": "Pomyślnie utworzono nowy tryb",
+      "createdError": "Błąd podczas tworzenia nowego trybu: {{error}}",
+      "defaultDescription": "Nowy tryb asystenta AI",
+      "defaultVoiceInstructions": "Mów wyraźnie i profesjonalnie",
+      "files": {
+        "noFrontmatter": "Plik {{filename}} nie ma frontmattera, używam wartości domyślnych z treścią pliku jako prompt systemowy",
+        "loadedCount": "Załadowano {{count}} trybów z tagiem #aic-mode",
+        "skippingEmpty": "Pomijam pusty plik: {{filename}}"
+      }
+    },
+    "attachments": {
+      "notImplemented": "Załączanie plików nie jest jeszcze w pełni zaimplementowane",
+      "imageNotImplemented": "Załączanie obrazów nie jest jeszcze w pełni zaimplementowane",
+      "imagePasted": "Obraz został wklejony pomyślnie",
+      "imagesAttached": "{{count}} załączonych obrazów: {{filenames}}",
+      "pastedImage": "Wklejony obraz"
+    },
+    "modal": {
+      "copyToClipboard": "Kopiuj do schowka",
+      "copied": "Skopiowano!",
+      "modeSettings": "Ustawienia trybu {{modeName}}",
+      "systemPrompt": "Prompt systemowy dla \"{{modeName}}\""
+    },
+    "starterPack": {
+      "createdSuccess": "Pomyślnie utworzono pakiet startowy",
+      "createdError": "Błąd podczas tworzenia pakietu startowego: {{error}}"
+    },
+    "status": {
+      "recording": "Nagrywanie...",
+      "transcribing": "Transkrypcja...",
+      "thinking": "Myślę...",
+      "speaking": "Mówię..."
+    }
+  },
+  "tasks": {
+    "format": {
+      "completionTime": " ({{time}})",
+      "movedTo": " → {{target}}",
+      "movedFrom": " (z {{source}})"
+    }
+  }
+} 

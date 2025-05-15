@@ -1,0 +1,324 @@
+{
+  "settings": {
+    "title": "MC Tools Settings",
+    "description": "Configure your MC Tools plugin settings here",
+    "tts": {
+      "title": "Text-to-Speech Settings",
+      "enable": "Enable Text-to-Speech",
+      "enableDesc": "Enable or disable text-to-speech functionality"
+    },
+    "apiKeys": {
+      "anthropic": "Anthropic API Key",
+      "anthropicDesc": "Your Anthropic API key for Claude functionality",
+      "openai": "OpenAI API Key",
+      "openaiDesc": "Your OpenAI API key for text-to-speech functionality",
+      "enterAnthropicKey": "Enter your Anthropic API key",
+      "enterOpenAIKey": "Enter your OpenAI API key",
+      "loadFromSmartComposer": "Load from Smart Composer",
+      "securityNote": "Important: Your API key is stored in your Obsidian config folder. Do not share your vault or config folder with others if you store your API key here."
+    }
+  },
+  "tools": {
+    "title": "Tools",
+    "description": "Available tools and utilities",
+    "createStarterPack": "Create a Starter Pack",
+    "createSingleMode": "Create a Single Mode",
+    "aiCoach": "AI Coach",
+    "tasks": {
+      "single": "task",
+      "plural": "tasks"
+    },
+    "position": {
+      "after": "after \"{{task}}\"",
+      "at": "at {{position}} position"
+    },
+    "actions": {
+      "move": {
+        "failed": "Failed to move todo {{task}}",
+        "success": "Moved todo {{task}}",
+        "inProgress": "Moving todo {{task}}..."
+      },
+      "complete": {
+        "failed": "Failed to add completed todo",
+        "success": "Added completed todo: \"{{content}}\"",
+        "inProgress": "Adding completed todo..."
+      },
+      "check": {
+        "failed": "Failed to check off todo {{task}}",
+        "success": "Checked off todo {{task}}",
+        "inProgress": "Checking off todo {{task}}..."
+      },
+      "uncheck": {
+        "failed": "Failed to uncheck todo {{task}}",
+        "success": "Unchecked todo {{task}}",
+        "inProgress": "Unchecking todo {{task}}..."
+      },
+      "abandon": {
+        "failed": "Failed to abandon todo {{task}}",
+        "success": "Abandoned todo {{task}}",
+        "inProgress": "Abandoning todo {{task}}..."
+      }
+    },
+    "success": {
+      "move": "✓ Moved to-do {{task}} from {{source}} to {{target}} {{position}}",
+      "complete": "✓ Added completed todo \"{{task}}\"{{time}} to {{path}}",
+      "check": "✓ Checked off {{task}} in {{path}} ({{time}})",
+      "uncheck": "✓ Unchecked \"{{task}}\" in {{path}}",
+      "abandon": "✓ Marked {{task}} as abandoned in {{path}}"
+    }
+  },
+  "errors": {
+    "general": "An error occurred",
+    "notFound": "Resource not found",
+    "invalidInput": "Invalid input provided",
+    "creatingStarterPack": "Error creating a Starter Pack",
+    "creatingNewMode": "Error creating a new mode",
+    "startingAICoach": "Error starting AI Coach",
+    "setup": "Setup Error: {{error}}",
+    "tools": {
+      "noName": "No tool name provided",
+      "unknown": "Unknown tool \"{{tool}}\"",
+      "execution": "Error executing tool {{tool}}: {{error}}"
+    },
+    "tts": {
+      "noApiKey": "OpenAI API key not found for text-to-speech. Please configure it in settings.",
+      "invalidVoice": "Invalid voice selected: {{voice}}",
+      "transcriptionFailed": "Transcription failed: {{error}}",
+      "microphone": {
+        "accessDenied": "Microphone access denied. Please allow microphone access in your browser settings.",
+        "notFound": "No microphone found. Please connect a microphone and try again.",
+        "inUse": "Cannot access microphone. It may be in use by another application.",
+        "general": "Could not access microphone"
+      }
+    },
+    "clipboard": {
+      "read": "Failed to read from clipboard: {{error}}",
+      "paste": {
+        "success": "Content pasted from clipboard",
+        "noTarget": "No active input or editor to paste into"
+      }
+    },
+    "context": {
+      "save": "Context saved to {{path}}",
+      "saveError": "Error saving context to {{path}}"
+    },
+    "audio": {
+      "playback": "Unable to play audio. Please try again.",
+      "noData": "No audio data received. Please try again.",
+      "playbackError": "Error playing audio: {{error}}"
+    },
+    "notes": {
+      "multipleFound": "Multiple daily notes found for date: {{date}}",
+      "notFound": "Daily note not found for date: {{date}}",
+      "noContent": "Note: No daily note found for date: {{date}}"
+    },
+    "todos": {
+      "check": "Failed to check off todo: {{error}}",
+      "uncheck": "Failed to uncheck todo: {{error}}",
+      "abandon": "Failed to abandon todo: {{error}}",
+      "display": "Error displaying todos: {{error}}",
+      "invalidData": "Invalid data",
+      "createError": "Error creating completed todo: {{error}}"
+    },
+    "files": {
+      "notFound": "File not found at {{path}}",
+      "getFailed": "Failed to get file at {{path}}",
+      "formatFailed": "Failed to format document after task operation",
+      "sourceNotFound": "Source file not found at {{path}}",
+      "createFailed": "Could not create target file at {{path}}: {{error}}",
+      "todayNotExists": "Today's note doesn't exist yet."
+    },
+    "voice": {
+      "invalid": "Invalid voice selected: {{voice}}, falling back to default"
+    },
+    "config": {
+      "dailyNotes": "Error reading daily notes config: {{error}}"
+    },
+    "plugin": {
+      "notFound": "Plugin not found"
+    },
+    "tasks": {
+      "notFound": "To-do item \"{{task}}\" not found in {{path}}. If the task is in another file, please specify it in the file_path parameter.",
+      "multipleFound": "Multiple tasks found with description \"{{task}}\" in {{path}}. Please make your task description more specific.",
+      "insertOutOfBounds": "Cannot insert task at index {{index}}: Index out of bounds (document has {{total}} items)",
+      "removeNotFound": "Task \"{{task}}\" not found in document",
+      "invalidState": "Cannot check off \"{{task}}\" because it is not in a pending state. Its current state is '{{state}}'. Please uncheck it first if it's already completed, abandoned, or moved."
+    },
+    "documents": {
+      "notFound": "File not found at {{path}}",
+      "readError": "Error reading document: {{error}}"
+    }
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "reset": "Reset"
+  },
+  "messages": {
+    "settingsSaved": "Settings saved successfully",
+    "settingsReset": "Settings have been reset to defaults",
+    "creatingStarterPack": "Creating a Starter Pack..."
+  },
+  "voice": {
+    "instructions": {
+      "default": "Voice: Warm, empathetic, and professional, reassuring the customer that their issue is understood and will be resolved.\n\nPunctuation: Well-structured with natural pauses, allowing for clarity and a steady, calming flow.\n\nDelivery: Calm and patient, with a supportive and understanding tone that reassures the listener.\n\nPhrasing: Clear and concise, using customer-friendly language that avoids jargon while maintaining professionalism.\n\nTone: Empathetic and solution-focused, emphasizing both understanding and proactive assistance."
+    }
+  },
+  "modes": {
+    "default": {
+      "name": "AI Coach",
+      "description": "## Welcome to AI Coach\n\nThis is the default mode for AI Coach. You can create your own modes and tag them with _#aic-mode_ to use them.",
+      "systemPrompt": "You are an AI coach who helps users reflect on their day, their adherence to habits and their tasks. Be empathetic, insightful, and focus on helping the user gain perspective.\n\nYou have access to tools that allow you to interact with the user's Obsidian vault.\nYou can create notes, search for notes, read notes, and append to notes.\nUse these tools whenever appropriate to help the user.\nOnly use the tools when explicitly requested by the user or when it would clearly be helpful in context.\nThe user might say things like \"create a note about X\" or \"make a new note with Y\".\nWhen using tools, show the user what you're doing by explaining your actions before and after using the tool."
+    },
+    "builtIn": {
+      "createDailyNote": {
+        "name": "Create Daily Note",
+        "description": "Mode for creating and managing daily notes with to-dos and goals",
+        "exampleUsage": "Could you create a daily note for today with a goal to be more productive and a task to review my backlog?",
+        "voiceInstructions": "You're an encouraging voice assistant. Speak with enthusiasm and positive energy."
+      },
+      "searchNotes": {
+        "name": "Search Notes",
+        "description": "Mode dedicated to finding information throughout your vault",
+        "voiceInstructions": "Speak clearly and precisely when presenting search results.",
+        "systemPrompt": "Use the search_notes tool to find notes related to what the user asks for. Your sole purpose is to search for notes, whatever the user asks for."
+      },
+      "dailyReflection": {
+        "name": "Daily Reflection",
+        "description": "Assists with daily reflection on tasks, habits, and goals",
+        "exampleUsage": "Help me reflect on what I accomplished today and what I plan to do tomorrow",
+        "voiceInstructions": "Adopt a calm, reflective tone. Speak slowly and thoughtfully to encourage introspection."
+      },
+      "testSearch": {
+        "name": "Test Search Tool",
+        "description": "Demonstrates using the search capabilities of the AI Coach",
+        "exampleUsage": "Please search for notes containing the word 'test' using the search_notes tool",
+        "voiceInstructions": "Communicate technical information clearly and concisely."
+      },
+      "addGoals": {
+        "name": "Add Goals to Today's Note",
+        "description": "Helps add goals to your daily note",
+        "exampleUsage": "I'd like to add some goals to today's daily note. My goals are: 1) Finish the project presentation 2) Go for a 30 minute walk 3) Read at least one chapter of my book",
+        "voiceInstructions": "Speak with motivation and energy. Use an upbeat tone to inspire goal achievement."
+      },
+      "addReflection": {
+        "name": "Add Reflection to Yesterday's Note",
+        "description": "Helps add reflections to previous day's notes",
+        "exampleUsage": "Please add a reflection to yesterday's daily note. I learned that taking regular breaks makes me more productive overall. I also found that the new task organization system is working well for me.",
+        "voiceInstructions": "Use a contemplative tone. Add brief pauses between thoughts for reflection."
+      },
+      "createTomorrowNote": {
+        "name": "Create Note for Tomorrow",
+        "description": "Helps prepare for upcoming days by setting tasks in advance",
+        "exampleUsage": "I want to prepare for tomorrow. Can you create a daily note for tomorrow with these tasks: 1) Team meeting at 10am 2) Work on budget spreadsheet 3) Call with client at 3pm",
+        "voiceInstructions": "Speak with a professional, organized tone. Emphasize key dates and times clearly."
+      },
+      "searchProjectPlanning": {
+        "name": "Search Project Planning",
+        "description": "Performs project planning related searches in your vault",
+        "exampleUsage": "Could you search my notes for anything related to 'project planning'?",
+        "voiceInstructions": "Present information in a structured manner. Categorize findings for better comprehension."
+      }
+    }
+  },
+  "view": {
+    "title": "AI Coach"
+  },
+  "logs": {
+    "view": {
+      "closing": "View closing, cleaning up resources",
+      "rendering": "Rendering AICoachView component with conversation: {{count}} messages"
+    }
+  },
+  "ui": {
+    "recording": {
+      "start": "Start Recording",
+      "stop": "Stop",
+      "cancel": "Cancel Recording",
+      "transcribing": "Transcribing"
+    },
+    "chat": {
+      "new": "New chat",
+      "history": "Chat history"
+    },
+    "input": {
+      "placeholder": "Type here...",
+      "send": "Send",
+      "cancel": "Cancel",
+      "stop": "Stop",
+      "attachImage": "Attach Image",
+      "addFile": "Add File",
+      "removeFile": "Remove {{filename}}",
+      "tooLarge": "File too large",
+      "invalidType": "Invalid file type"
+    },
+    "message": {
+      "edit": "Edit message",
+      "copy": "Copy message",
+      "speak": "Speak message",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "todo": {
+      "clickToChange": "Click to change status",
+      "readOnly": "Read-only",
+      "abandon": "Abandon todo",
+      "noTodos": "No matching todos found in {{filename}}",
+      "selectedFrom": "Selected todos from {{filename}}",
+      "showMore": "Show {{count}} more items"
+    },
+    "thinking": {
+      "inProgress": "Thinking...",
+      "completed": "Thought for some time",
+      "redacted": "[Assistant reasoning automatically redacted for safety]"
+    },
+    "mode": {
+      "openInEditor": "Open in Editor",
+      "viewSettings": "View Mode Settings",
+      "viewSystemPrompt": "View System Prompt",
+      "switchTo": "Switch to:",
+      "createStarterPack": "Create a Starter Pack",
+      "newMode": "New Mode",
+      "createdSuccess": "Created a new mode successfully",
+      "createdError": "Error creating a new mode: {{error}}",
+      "defaultDescription": "A new AI Coach mode",
+      "defaultVoiceInstructions": "Speak clearly and professionally",
+      "files": {
+        "noFrontmatter": "File {{filename}} doesn't have frontmatter, using default values with file content as system prompt",
+        "loadedCount": "Loaded {{count}} AIC modes with #aic-mode tag",
+        "skippingEmpty": "Skipping empty file: {{filename}}"
+      }
+    },
+    "attachments": {
+      "notImplemented": "File attachment is not fully implemented yet",
+      "imageNotImplemented": "Images are now supported and will be displayed in the chat",
+      "imagePasted": "Image pasted successfully",
+      "imagesAttached": "{{count}} image(s) attached: {{filenames}}",
+      "pastedImage": "Pasted image"
+    },
+    "modal": {
+      "copyToClipboard": "Copy to Clipboard",
+      "copied": "Copied!",
+      "modeSettings": "{{modeName}} Mode Settings",
+      "systemPrompt": "System Prompt for \"{{modeName}}\""
+    },
+    "starterPack": {
+      "createdSuccess": "Created a Starter Pack successfully",
+      "createdError": "Error creating a Starter Pack: {{error}}"
+    },
+    "status": {
+      "recording": "Recording...",
+      "transcribing": "Transcribing...",
+      "thinking": "Thinking...",
+      "speaking": "Speaking..."
+    }
+  },
+  "tasks": {
+    "format": {
+      "completionTime": " ({{time}})",
+      "movedTo": " → {{target}}",
+      "movedFrom": " (from {{source}})"
+    }
+  }
+} 
