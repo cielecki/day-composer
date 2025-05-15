@@ -5,6 +5,10 @@ on:
     tags:
       - '*.*.*' # Match semantic version tags (no 'v' prefix)
 
+permissions:
+  contents: write
+  pull-requests: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -39,7 +43,7 @@ jobs:
 
       - name: Create release
         id: create_release
-        uses: comnoco/create-release@v2
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
