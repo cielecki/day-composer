@@ -2,11 +2,6 @@
   "settings": {
     "title": "Ustawienia MC Tools",
     "description": "Skonfiguruj ustawienia wtyczki MC Tools",
-    "tts": {
-      "title": "Ustawienia syntezy mowy",
-      "enable": "Włącz syntezę mowy",
-      "enableDesc": "Włącz lub wyłącz funkcję syntezy mowy"
-    },
     "apiKeys": {
       "anthropic": "Klucz API Anthropic",
       "anthropicDesc": "Twój klucz API Anthropic dla funkcji Claude",
@@ -14,7 +9,6 @@
       "openaiDesc": "Twój klucz API OpenAI dla funkcji syntezy mowy",
       "enterAnthropicKey": "Wprowadź swój klucz API Anthropic",
       "enterOpenAIKey": "Wprowadź swój klucz API OpenAI",
-      "loadFromSmartComposer": "Załaduj z Smart Composer",
       "securityNote": "Ważne: Twój klucz API jest przechowywany w folderze konfiguracyjnym Obsidian. Nie udostępniaj swojego skarbca ani folderu konfiguracyjnego innym, jeśli przechowujesz tutaj swój klucz API."
     }
   },

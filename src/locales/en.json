@@ -2,11 +2,6 @@
   "settings": {
     "title": "MC Tools Settings",
     "description": "Configure your MC Tools plugin settings here",
-    "tts": {
-      "title": "Text-to-Speech Settings",
-      "enable": "Enable Text-to-Speech",
-      "enableDesc": "Enable or disable text-to-speech functionality"
-    },
     "apiKeys": {
       "anthropic": "Anthropic API Key",
       "anthropicDesc": "Your Anthropic API key for Claude functionality",
@@ -14,7 +9,6 @@
       "openaiDesc": "Your OpenAI API key for text-to-speech functionality",
       "enterAnthropicKey": "Enter your Anthropic API key",
       "enterOpenAIKey": "Enter your OpenAI API key",
-      "loadFromSmartComposer": "Load from Smart Composer",
       "securityNote": "Important: Your API key is stored in your Obsidian config folder. Do not share your vault or config folder with others if you store your API key here."
     }
   },

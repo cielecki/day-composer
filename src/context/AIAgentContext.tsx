@@ -693,7 +693,7 @@ ${context}`.trim();
 			const autoplayEnabled = activeMode?.aic_voice_autoplay || DEFAULT_AIC_MODE.aic_voice_autoplay;
 			
 			// Only auto-play if both the global setting and the mode-specific autoplay are enabled
-			if (settings.enableTextToSpeech && autoplayEnabled && textForTTS.trim().length > 0) {
+			if (autoplayEnabled && textForTTS.trim().length > 0) {
 				console.log(
 					"🗣️ Starting TTS after generation has completed...",
 				);

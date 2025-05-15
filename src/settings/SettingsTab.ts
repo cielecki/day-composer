@@ -16,9 +16,6 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 		
-		// Text-to-Speech Settings Section
-		containerEl.createEl('h3', { text: t('settings.tts.title') });
-		
 		// Anthropic API Key setting
 		new Setting(containerEl)
 			.setName(t('settings.apiKeys.anthropic'))
@@ -42,24 +39,6 @@ export class SampleSettingTab extends PluginSettingTab {
 					getPluginSettings().openAIApiKey = value;
 					await getPluginSettings().saveSettings();
 				}))
-			.addButton(button => button
-				.setButtonText(t('settings.apiKeys.loadFromSmartComposer'))
-				.onClick(async () => {
-					await getPluginSettings().loadOpenAIApiKeyFromSmartComposer();
-					// Update the display after loading
-					this.display();
-				}));
-		
-		// Enable Text-to-Speech toggle
-		new Setting(containerEl)
-			.setName(t('settings.tts.enable'))
-			.setDesc(t('settings.tts.enableDesc'))
-			.addToggle(toggle => toggle
-				.setValue(getPluginSettings().enableTextToSpeech)
-				.onChange(async (value) => {
-					getPluginSettings().enableTextToSpeech = value;
-					await getPluginSettings().saveSettings();
-				}));
 
 		// Add a note about API key security
 		const securityNoteEl = containerEl.createEl('div', { 
