@@ -1,4 +1,4 @@
-import { Notice, Plugin } from "obsidian";
+import { Notice, Plugin, requestUrl } from "obsidian";
 import { SampleSettingTab } from "./settings/SettingsTab";
 import { ContextCollector } from "./context-collector";
 import {
@@ -198,7 +198,14 @@ export default class MyPlugin extends Plugin {
 					const currentVersion = manifest.version;
 
 					// Get latest release info
-					const release = await fetch(apiUrl).then(res => res.json());
+					const release = await fetch(apiUrl, {
+						headers: {
+							'Accept': 'application/vnd.github+json',
+							'User-Agent': 'Obsidian-Day-Composer'
+						}
+					}).then(res => res.json());
+					
+					console.log("Latest release info:", release);
 					const assets = release.assets;
 					const latestVersion = release.tag_name.startsWith('v') ? release.tag_name.slice(1) : release.tag_name;
 
@@ -210,20 +217,48 @@ export default class MyPlugin extends Plugin {
 
 					// Helper to download and save an asset
 					const saveAsset = async (assetName: string) => {
-						const asset = assets.find((a: any) => a.name === assetName);
-						if (!asset) return;
-						const data = await fetch(asset.browser_download_url).then(res => res.arrayBuffer());
-						// @ts-ignore
-						await this.app.vault.adapter.writeBinary(
-							this.app.vault.configDir + `/plugins/day-composer/${assetName}`,
-							data
-						);
+						const asset = assets.find((a: { name: string }) => a.name === assetName);
+						if (!asset) {
+							console.log(`Asset ${assetName} not found in release`);
+							return;
+						}
+						
+						console.log(`Downloading asset ${assetName}`);
+						
+						try {
+							// Direct download with requestUrl - this method is working successfully
+							console.log(`Using requestUrl with ${asset.browser_download_url}`);
+							const response = await requestUrl({
+								url: asset.browser_download_url,
+								method: 'GET',
+								headers: {
+									'User-Agent': 'Obsidian-Day-Composer',
+								},
+								throw: false
+							});
+							
+							if (response.status >= 200 && response.status < 300 && response.arrayBuffer) {
+								const targetPath = this.app.vault.configDir + `/plugins/day-composer/${assetName}`;
+								console.log(`Saving asset to ${targetPath}`);
+								
+								// @ts-ignore
+								await this.app.vault.adapter.writeBinary(targetPath, response.arrayBuffer);
+								console.log(`Successfully saved ${assetName}`);
+							} else {
+								throw new Error(`Failed to download ${assetName}: HTTP ${response.status}`);
+							}
+						} catch (error) {
+							console.error(`Error downloading ${assetName}:`, error);
+							throw error;
+						}
 					};
 
 					// Download and save each asset
+					console.log("Starting asset downloads...");
 					await saveAsset("main.js");
 					await saveAsset("manifest.json");
 					await saveAsset("styles.css"); // If it exists
+					console.log("All assets downloaded successfully");
 
 					new Notice(`Plugin updated from version ${currentVersion} to ${latestVersion}! Please reload Obsidian to apply the update.`);
 				} catch (e) {
