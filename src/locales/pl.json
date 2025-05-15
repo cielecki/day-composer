@@ -17,7 +17,7 @@
     "description": "Dostępne narzędzia i funkcje",
     "createStarterPack": "Utwórz pakiet startowy",
     "createSingleMode": "Utwórz pojedynczy tryb",
-    "aiCoach": "Asystent AI",
+    "aiCoach": "Day Composer",
     "tasks": {
       "single": "zadanie",
       "plural": "zadania"

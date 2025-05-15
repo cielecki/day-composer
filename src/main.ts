@@ -17,7 +17,7 @@ export default class MyPlugin extends Plugin {
 	view: AICoachView | null = null;
 
 	async onload() {
-		console.log("Loading AI Coach plugin");
+		console.log("Loading Day Composer plugin");
 
 		// Initialize i18n
 		await initI18n(this.app);

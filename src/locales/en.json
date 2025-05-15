@@ -17,7 +17,7 @@
     "description": "Available tools and utilities",
     "createStarterPack": "Create a Starter Pack",
     "createSingleMode": "Create a Single Mode",
-    "aiCoach": "AI Coach",
+    "aiCoach": "Day Composer",
     "tasks": {
       "single": "task",
       "plural": "tasks"
