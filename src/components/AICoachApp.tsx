@@ -87,7 +87,7 @@ export const AICoachApp: React.FC = () => {
 
 	const conversationContainerRef = useRef<HTMLDivElement>(null);
 
-	const { isPlayingAudio } = useTextToSpeech();
+	const { isPlayingAudio, stopAudio } = useTextToSpeech();
 
 	// Build a map of tool results (tool_use_id -> result content)
 	const toolResultsMap = useMemo(() => {
@@ -165,10 +165,14 @@ export const AICoachApp: React.FC = () => {
 
 	const abort = useCallback(() => {
 		if (abortController) {
+			console.log("Aborting in-progress operations while preserving conversation history");
+			// Abort the controller but do NOT clear the conversation
 			abortController.abort();
 			setAbortController(null);
 		}
-	}, [abortController, setAbortController]);
+		// Also stop any playing audio
+		stopAudio();
+	}, [abortController, setAbortController, stopAudio]);
 
 	// Function to handle AIC mode selection
 	const handleModeSelect = useCallback(
@@ -644,6 +648,8 @@ export const AICoachApp: React.FC = () => {
 						messageIndex={index}
 						isLastMessage={index === filteredConversation.length - 1}
 						isGeneratingResponse={isGeneratingResponse}
+						newAbortController={newAbortController}
+						abort={abort}
 					/>
 				))}
 

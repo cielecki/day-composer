@@ -230,7 +230,8 @@
       "start": "Start Recording",
       "stop": "Stop",
       "cancel": "Cancel Recording",
-      "transcribing": "Transcribing"
+      "transcribing": "Transcribing",
+      "confirm": "Confirm Recording"
     },
     "chat": {
       "new": "New chat",

@@ -60,41 +60,59 @@ export const UnifiedInputArea: React.FC<{
       !isTranscribing &&
       lastTranscription
     ) {
-      // Insert the transcription into the text input rather than sending it directly
-      setMessage((prev) => {
-        const newMessage = prev.trim()
-          ? `${prev} ${lastTranscription}`
+      // If nothing is being generated, send the transcription immediately
+      if (!isGeneratingResponse && !isRecording) {
+        // Add the transcription to the message (in case there's already text in the input)
+        const newMessage = message.trim()
+          ? `${message} ${lastTranscription}`
           : lastTranscription;
-        // Resize the textarea without focusing it
-        if (textareaRef.current) {
-          // Delay a bit to ensure DOM updates have completed
-          setTimeout(() => {
-            const textarea = textareaRef.current;
-            if (textarea) {
-              //textarea.focus();
-              textarea.style.height = "auto";
-              textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
+        
+        // Set the message and then send it in the next tick
+        setMessage(newMessage);
+        setTimeout(() => {
+          // Create a local copy to ensure we use the updated message
+          const messageToSend = newMessage;
+          
+          // Reset the message first to clear the input box
+          setMessage("");
+          
+          // Send the message
+          if (messageToSend.trim()) {
+            addUserMessage(messageToSend, newAbortController().signal);
+          }
+        }, 10);
+      } else {
+        // Otherwise, insert the transcription into the text input
+        setMessage((prev) => {
+          const newMessage = prev.trim()
+            ? `${prev} ${lastTranscription}`
+            : lastTranscription;
+          // Resize the textarea without focusing it
+          if (textareaRef.current) {
+            // Delay a bit to ensure DOM updates have completed
+            setTimeout(() => {
+              const textarea = textareaRef.current;
+              if (textarea) {
+                textarea.style.height = "auto";
+                textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
 
-              // Trigger a fake input event to ensure any native resizing behaviors are triggered
-              //const inputEvent = new Event('input', { bubbles: true });
-              //textarea.dispatchEvent(inputEvent);
-
-              // Second resize attempt with longer delay to ensure rendering is complete
-              setTimeout(() => {
-                if (textarea) {
-                  textarea.style.height = "auto";
-                  textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
-                }
-              }, 100);
-            }
-          }, 10);
-        }
-        return newMessage;
-      });
+                // Second resize attempt with longer delay to ensure rendering is complete
+                setTimeout(() => {
+                  if (textarea) {
+                    textarea.style.height = "auto";
+                    textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
+                  }
+                }, 100);
+              }
+            }, 10);
+          }
+          return newMessage;
+        });
+      }
     }
     // Update ref with current value for next comparison
     prevIsTranscribingRef.current = isTranscribing;
-  }, [isTranscribing, lastTranscription]);
+  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, message, addUserMessage, newAbortController]);
 
   // Add ResizeObserver to ensure textarea is properly sized
   useEffect(() => {
@@ -400,15 +418,6 @@ export const UnifiedInputArea: React.FC<{
     abort();
   };
 
-  // Handle send/stop button click
-  const handleSendStopClick = () => {
-    if (isGeneratingResponse || isPlayingAudio) {
-      abort();
-    } else {
-      handleSendMessage();
-    }
-  };
-
   // Reset the volume after a short duration of silence
   useEffect(() => {
     if (!isRecording) return;
@@ -523,40 +532,66 @@ export const UnifiedInputArea: React.FC<{
         <div className="input-controls-bottom">
           {/* Left-aligned controls */}
           <div className="input-controls-left">
-            {/* Image attach button */}
-            <button
-              className="input-control-button image-button"
-              aria-label={t("ui.input.attachImage")}
-              onClick={() => {
-                if (fileInputRef.current) {
-                  fileInputRef.current.click();
-                }
-              }}
-              disabled={isRecording || isTranscribing}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            {/* Image attach button - hidden during recording */}
+            {!isRecording && (
+              <button
+                className="input-control-button image-button"
+                aria-label={t("ui.input.attachImage")}
+                onClick={() => {
+                  if (fileInputRef.current) {
+                    fileInputRef.current.click();
+                  }
+                }}
+                disabled={isTranscribing}
               >
-                <rect
-                  x="3"
-                  y="3"
-                  width="18"
-                  height="18"
-                  rx="2"
-                  ry="2"
-                ></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <polyline points="21 15 16 10 5 21"></polyline>
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect
+                    x="3"
+                    y="3"
+                    width="18"
+                    height="18"
+                    rx="2"
+                    ry="2"
+                  ></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+              </button>
+            )}
+            
+            {/* Cancel recording button - visible during recording */}
+            {isRecording && (
+              <button
+                className="input-control-button cancel-button"
+                onClick={handleCancelRecording}
+                aria-label={t("ui.recording.cancel")}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            )}
           </div>
 
           {/* Right-aligned controls */}
@@ -604,89 +639,25 @@ export const UnifiedInputArea: React.FC<{
               </button>
             )}
 
-            {/* Buttons visible DURING recording */}
+            {/* Buttons visible DURING recording - only the Stop/Finish Recording button */}
             {isRecording && (
-              <>
-                <button
-                  className="input-control-button cancel-button"
-                  onClick={handleCancelRecording}
-                  aria-label={t("ui.recording.cancel")}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-                <button // This is the "Finish Recording" button
-                  className={`input-control-button mic-button recording ${isTranscribing ? "transcribing" : ""}`}
-                  onClick={handleMicrophoneClick} // Calls finalizeRecording when isRecording is true
-                  disabled={isTranscribing || isPlayingAudio}
-                  aria-label={
-                    isTranscribing
-                      ? t("ui.recording.transcribing")
-                      : t("ui.recording.stop") // Label for "Finish Recording"
-                  }
-                >
-                  {isTranscribing ? (
-                    <LucideIcon
-                      name="loader"
-                      className="spinner"
-                      size={20}
-                    />
-                  ) : ( // Stop icon for "Finish Recording"
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      stroke="none"
-                    >
-                      <rect x="6" y="6" width="12" height="12" />
-                    </svg>
-                  )}
-                </button>
-              </>
-            )}
-
-            {/* Send button - visible when there's a message or image, AND not recording */}
-            {(message.trim() !== "" || attachedImages.length > 0) && !isRecording && (
-              <button
-                className={`input-control-button send-button ${isGeneratingResponse || isPlayingAudio ? "working" : ""}`}
-                onClick={handleSendStopClick}
-                disabled={
-                  message.trim() === "" &&
-                  attachedImages.length === 0 &&
-                  !(isGeneratingResponse || isPlayingAudio)
-                }
+              <button // This is the "Finish Recording" button
+                className={`input-control-button mic-button confirm ${isTranscribing ? "transcribing" : ""}`}
+                onClick={handleMicrophoneClick} // Calls finalizeRecording when isRecording is true
+                disabled={isTranscribing || isPlayingAudio}
                 aria-label={
-                  isGeneratingResponse || isPlayingAudio
-                    ? t("ui.recording.stop")
-                    : t("ui.input.send")
+                  isTranscribing
+                    ? t("ui.recording.transcribing")
+                    : t("ui.recording.confirm") // Label for "Confirm Recording"
                 }
               >
-                {isGeneratingResponse || isPlayingAudio ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    stroke="none"
-                  >
-                    <rect x="6" y="6" width="12" height="12" />
-                  </svg>
-                ) : (
+                {isTranscribing ? (
+                  <LucideIcon
+                    name="loader"
+                    className="spinner"
+                    size={20}
+                  />
+                ) : ( // Check mark icon for "Confirm Recording"
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="20"
@@ -698,10 +669,53 @@ export const UnifiedInputArea: React.FC<{
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M22 2L11 13"></path>
-                    <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+                    <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 )}
+              </button>
+            )}
+
+            {/* Stop button - visible whenever a response is being generated or audio is playing */}
+            {(isGeneratingResponse || isPlayingAudio) && !isRecording && (
+              <button
+                className="input-control-button stop-button"
+                onClick={abort}
+                aria-label={t("ui.recording.stop")}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="none"
+                >
+                  <rect x="6" y="6" width="12" height="12" />
+                </svg>
+              </button>
+            )}
+
+            {/* Send button - visible when there's a message or image, AND not recording, AND nothing is being generated */}
+            {(message.trim() !== "" || attachedImages.length > 0) && !isRecording && !(isGeneratingResponse || isPlayingAudio) && (
+              <button
+                className="input-control-button send-button"
+                onClick={handleSendMessage}
+                aria-label={t("ui.input.send")}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M22 2L11 13"></path>
+                  <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+                </svg>
               </button>
             )}
           </div>

@@ -33,6 +33,7 @@ export interface AIAgentContextType {
 	conversation: Message[];
 	clearConversation: () => void;
 	addUserMessage: (userMessage: string, signal: AbortSignal, images?: any[]) => Promise<void>;
+	editUserMessage: (messageIndex: number, newContent: string, signal: AbortSignal) => Promise<void>;
 	getContext: () => Promise<string>;
 	reset: () => void;
 	isGeneratingResponse: boolean;
@@ -97,6 +98,19 @@ export const AIAgentProvider: React.FC<{
 					? [{ type: "text", text: content }]
 					: ensureContentBlocks(content);
 			const newMessage: Message = { role, content: contentBlocks };
+			
+			// For assistant messages, ensure we update correctly to avoid duplicates when rebuilding conversation
+			if (role === "assistant") {
+				// Check if this is a continuation of an existing assistant message
+				const lastMessage = conversationRef.current[conversationRef.current.length - 1];
+				if (lastMessage && lastMessage.role === "assistant") {
+					// Update the existing message instead of adding a new one
+					lastMessage.content = contentBlocks;
+					setForceUpdate((prev) => prev + 1);
+					return;
+				}
+			}
+			
 			conversationRef.current = [...conversationRef.current, newMessage];
 			setForceUpdate((prev) => prev + 1);
 		},
@@ -454,17 +468,6 @@ ${context}`.trim();
 		} catch (error) {
 			console.error("Error processing Anthropic stream:", error);
 			aborted = true;
-
-			// If aborted with error and we have a partial message, remove it
-			if (
-				localMessage &&
-				conversationRef.current.length > 0 &&
-				conversationRef.current[conversationRef.current.length - 1] ===
-					localMessage
-			) {
-				conversationRef.current.pop();
-				setForceUpdate((prev) => prev + 1);
-			}
 		}
 
 		return {
@@ -684,7 +687,6 @@ ${context}`.trim();
 			signal: AbortSignal,
 		) => {
 			if (!finalAssistantMessageForTTS) return;
-			const settings = getPluginSettings();
 			const textForTTS = extractTextForTTS(
 				finalAssistantMessageForTTS.content as ContentBlock[],
 			);
@@ -709,7 +711,7 @@ ${context}`.trim();
 				}
 			}
 		},
-		[extractTextForTTS, getPluginSettings, textToSpeech, activeMode],
+		[extractTextForTTS, textToSpeech, activeMode],
 	);
 
 	const addUserMessage = useCallback(
@@ -817,10 +819,89 @@ ${context}`.trim();
 		],
 	);
 
+	const editUserMessage = useCallback(
+		async (messageIndex: number, newContent: string, signal: AbortSignal): Promise<void> => {
+			// Check if index is valid and is a user message
+			if (messageIndex < 0 || messageIndex >= conversationRef.current.length) {
+				console.error("Invalid message index for editing");
+				return;
+			}
+
+			const targetMessage = conversationRef.current[messageIndex];
+			if (targetMessage.role !== "user") {
+				console.error("Can only edit user messages");
+				return;
+			}
+
+			// If currently generating, abort first
+			if (isGeneratingResponse) {
+				console.log("Aborting current generation before editing message");
+				setIsGeneratingResponse(false);
+			}
+
+			// Create a copy of the conversation up to the edited message
+			const conversationUpToEdit = conversationRef.current.slice(0, messageIndex + 1);
+			
+			// Update the edited message with new content
+			conversationUpToEdit[messageIndex] = {
+				role: "user",
+				content: [{ type: "text", text: newContent }]
+			};
+			
+			// Replace the entire conversation reference with the truncated version
+			conversationRef.current = conversationUpToEdit;
+			setForceUpdate(prev => prev + 1);
+			
+			// Now generate a new response for the edited message
+			try {
+				setIsGeneratingResponse(true);
+
+				// Prepare context, prompt, and tools
+				const systemPrompt = await getContext();
+				const obsidianTools = getObsidianTools(plugin);
+				const tools = obsidianTools.getTools() as any;
+
+				console.log("Generating new response after message edit");
+
+				// Call the conversation turn function to generate a new response
+				const finalAssistantMessageForTTS = await runConversationTurn(
+					systemPrompt,
+					tools,
+					signal
+				);
+				
+				await handleTTS(finalAssistantMessageForTTS, signal);
+
+				// Log completion/abort status
+				if (signal.aborted) {
+					console.log("Message edit processing was aborted");
+				} else {
+					console.log("Message edit processing completed");
+				}
+			} catch (error) {
+				console.error("Error during message edit processing:", error);
+				if (!(error instanceof APIUserAbortError)) {
+					new Notice(
+						t('errors.setup').replace('{{error}}', error instanceof Error ? error.message : "Unknown error")
+					);
+				}
+				setIsGeneratingResponse(false);
+			}
+		},
+		[
+			getContext,
+			plugin,
+			runConversationTurn,
+			handleTTS,
+			isGeneratingResponse
+		]
+	);
+
 	const value: AIAgentContextType = {
 		conversation: conversationRef.current,
 		clearConversation,
 		addUserMessage,
+		editUserMessage,
 		getContext,
 		reset: clearConversation,
 		isGeneratingResponse,

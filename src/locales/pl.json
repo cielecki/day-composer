@@ -230,7 +230,8 @@
       "start": "Rozpocznij nagrywanie",
       "stop": "Zatrzymaj",
       "cancel": "Anuluj nagrywanie",
-      "transcribing": "Transkrybowanie"
+      "transcribing": "Transkrybowanie",
+      "confirm": "Potwierdź nagranie"
     },
     "chat": {
       "new": "Nowa rozmowa",

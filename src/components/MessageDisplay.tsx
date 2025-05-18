@@ -16,6 +16,8 @@ interface MessageDisplayProps {
   messageIndex?: number;
   isLastMessage?: boolean;
   isGeneratingResponse?: boolean;
+  newAbortController?: () => AbortController;
+  abort?: () => void;
 }
 
 // Helper to ensure content is always ContentBlock[]
@@ -36,8 +38,10 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   messageIndex,
   isLastMessage = false,
   isGeneratingResponse = false,
+  newAbortController,
+  abort,
 }) => {
-  const { addUserMessage, conversation, clearConversation } = useAIAgent();
+  const { editUserMessage } = useAIAgent();
   const { speakText, isPlayingAudio, stopAudio } = useTextToSpeech();
   const [isEditing, setIsEditing] = useState(false);
   const [editedMessage, setEditedMessage] = useState('');
@@ -75,46 +79,13 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   // Handle save edited message
   const handleSaveEdit = () => {
     if (editedMessage.trim() && messageIndex !== undefined) {
-      // Get the current conversation from the context
-      const currentConversation = [...conversation];
+      // Create a new abort controller to allow stopping the operation
+      const controller = newAbortController ? newAbortController() : new AbortController();
       
-      // Clear the conversation to rebuild it
-      clearConversation();
+      // Use the new editUserMessage function that handles history preservation
+      editUserMessage(messageIndex, editedMessage.trim(), controller.signal);
       
-      if (messageIndex < currentConversation.length - 1) {
-        // For messages in the middle of conversation:
-        // Add messages up to the edited one
-        for (let i = 0; i < messageIndex; i++) {
-          // Add all messages before the edited one back to the conversation
-          if (currentConversation[i].role === 'user') {
-            // Use signal that won't be aborted for non-edited messages
-            addUserMessage(
-              getPlainTextContent(ensureContentBlocksForDisplay(currentConversation[i].content)), 
-              new AbortController().signal
-            );
-          }
-        }
-        
-        // Add the edited message and trigger a new response
-        const abortController = new AbortController();
-        addUserMessage(editedMessage.trim(), abortController.signal);
-      } else {
-        // For last message:
-        // Add all messages except the last one
-        for (let i = 0; i < currentConversation.length - 1; i++) {
-          if (currentConversation[i].role === 'user') {
-            // Use signal that won't be aborted for non-edited messages
-            addUserMessage(
-              getPlainTextContent(ensureContentBlocksForDisplay(currentConversation[i].content)), 
-              new AbortController().signal
-            );
-          }
-        }
-        
-        // Add the edited message as the last message
-        addUserMessage(editedMessage.trim(), new AbortController().signal);
-      }
-      
+      // Reset editing state
       setIsEditing(false);
     }
   };

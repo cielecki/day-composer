@@ -1437,30 +1437,7 @@ If your plugin does not need CSS, delete this file.
   gap: 12px;
 }
 
-/* Button styles */
-.input-control-button {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: none;
-  background-color: rgba(70, 70, 70, 0.7);
-  color: rgba(255, 255, 255, 0.85);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
 
-.input-control-button:hover:not(:disabled) {
-  background-color: rgba(80, 80, 80, 0.8);
-}
-
-.input-control-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
 
 /* Action buttons */
 .action-button {
@@ -1494,10 +1471,6 @@ If your plugin does not need CSS, delete this file.
 .send-button:hover:not(:disabled) {
   background-color: rgba(80, 140, 200, 0.9);
 }
-
-
-
-
 
 .send-button.working {
   background-color: rgba(190, 50, 50, 0.8); 
@@ -1941,3 +1914,81 @@ If your plugin does not need CSS, delete this file.
   border-radius: 4px;
   margin: 0.5rem 0;
 }
+
+/* Button styles */
+.ai-coach-view .input-control-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.ai-coach-view .input-control-button:hover:not(:disabled) {
+  background-color: rgba(80, 80, 80, 0.8);
+}
+
+.ai-coach-view .input-control-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Input Controls */
+.ai-coach-view .input-controls-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ai-coach-view .input-control-button:hover {
+  background-color: var(--interactive-hover);
+  color: var(--text-normal);
+}
+
+.ai-coach-view .input-control-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ai-coach-view .input-control-button.mic-button.recording {
+  background-color: var(--background-modifier-error);
+  color: var(--text-on-accent);
+}
+
+.ai-coach-view .input-control-button.mic-button.confirm {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.ai-coach-view .input-control-button.send-button {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.ai-coach-view .input-control-button.stop-button {
+  background-color: var(--background-modifier-error);
+  color: var(--text-on-accent);
+}
+
+.ai-coach-view .input-control-button.cancel-button {
+  background-color: var(--background-secondary-alt);
+  color: var(--text-normal);
+}
+
+.ai-coach-view .input-control-button.send-button:hover,
+.ai-coach-view .input-control-button.mic-button.recording:hover,
+.ai-coach-view .input-control-button.mic-button.confirm:hover {
+  transform: scale(1.05);
+}
+
+.ai-coach-view .input-control-button.send-button.working {
+  background-color: var(--background-modifier-error);
+  color: var(--text-on-accent);
+} 
