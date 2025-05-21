@@ -2,8 +2,8 @@ import React, { createContext, useContext, useState, ReactNode, useCallback, use
 import { Notice } from 'obsidian';
 import { getPluginSettings } from '../settings/PluginSettings';
 import OpenAI from 'openai';
-import { useLNMode } from './LNModeContext';
 import { t } from '../i18n';
+import { useAIAgent } from './AIAgentContext';
 
 const MAX_AUDIO_PROMPT_LENGTH = 5000;
 
@@ -25,8 +25,8 @@ export const SpeechToTextProvider: React.FC<{
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [lastTranscription, setLastTranscription] = useState<string | null>(null);
-  const { activeModeId, lnModes } = useLNMode();
-  const activeMode = lnModes[activeModeId];
+
+  const { getContext } = useAIAgent();
 
 
   const startRecording = async (signal: AbortSignal): Promise<void> => {
@@ -178,7 +178,7 @@ export const SpeechToTextProvider: React.FC<{
       const transcription = await openai.audio.transcriptions.create({
         file: file,
         model: 'gpt-4o-transcribe',
-        prompt: activeMode.ln_system_prompt.substring(0, MAX_AUDIO_PROMPT_LENGTH),
+        prompt: (await getContext()).substring(0, MAX_AUDIO_PROMPT_LENGTH),
         language: 'pl',
       }, {
         signal: signal,

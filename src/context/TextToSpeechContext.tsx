@@ -4,18 +4,7 @@ import OpenAI from 'openai';
 import { getPluginSettings, TTSVoice } from "../settings/PluginSettings";
 import { TTS_VOICES } from "../settings/PluginSettings";
 import { t } from '../i18n';
-
-const VOICE_INSTRUCTIONS = `
-Voice: Warm, empathetic, and professional, reassuring the customer that their issue is understood and will be resolved.
-
-Punctuation: Well-structured with natural pauses, allowing for clarity and a steady, calming flow.
-
-Delivery: Calm and patient, with a supportive and understanding tone that reassures the listener.
-
-Phrasing: Clear and concise, using customer-friendly language that avoids jargon while maintaining professionalism.
-
-Tone: Empathetic and solution-focused, emphasizing both understanding and proactive assistance.
-`;
+import { DEFAULT_VOICE_INSTRUCTIONS } from 'src/defaults/ln-mode-defaults';
 
 interface TTSSettings {
 	enabled: boolean;
@@ -41,7 +30,7 @@ export const TextToSpeechProvider: React.FC<{
 	const [ttsSettings, setTTSSettings] = useState<TTSSettings>({
 		enabled: true,
 		voice: 'alloy',
-		instructions: VOICE_INSTRUCTIONS,
+		instructions: DEFAULT_VOICE_INSTRUCTIONS,
 		speed: 1.0
 	});
 	

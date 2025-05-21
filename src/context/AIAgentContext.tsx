@@ -25,6 +25,7 @@ import { useLNMode } from "./LNModeContext";
 import { MessageCreateParamsStreaming } from "@anthropic-ai/sdk/resources/messages/messages";
 import { t } from '../i18n';
 import { getDefaultLNMode } from "src/defaults/ln-mode-defaults";
+import { ContextCollector } from "src/context-collector";
 
 export interface AIAgentContextType {
 	conversation: Message[];
@@ -71,7 +72,7 @@ export const AIAgentProvider: React.FC<{
 	const textToSpeech = useTextToSpeech();
 	const { activeModeId, lnModes } = useLNMode();
 	const activeMode = lnModes[activeModeId];
-
+	const app = plugin.app;
 	const clearConversation = useCallback(() => {
 		conversationRef.current = [];
 		setForceUpdate((prev) => prev + 1);
@@ -103,23 +104,9 @@ export const AIAgentProvider: React.FC<{
 		},
 		[],
 	);
-
-	const buildSystemPrompt = useCallback(
-		(context: string): string => {
-			return `
-${activeMode.ln_system_prompt}
-
-${context}`.trim();
-		},
-		[activeMode],
-	);
-
 	const getContext = useCallback(async (): Promise<string> => {
-		// The context is now built through link expansion in the system prompt
-		// No need to explicitly generate it as it's handled by expandLinks
-		const systemPrompt = buildSystemPrompt("");
-		return systemPrompt;
-	}, [buildSystemPrompt]);
+		return (await new ContextCollector(app).expandLinks(activeMode.ln_system_prompt)).trim();
+	}, [activeMode, app]);
 
 	const extractTextForTTS = useCallback(
 		(contentBlocks: ContentBlock[]): string => {

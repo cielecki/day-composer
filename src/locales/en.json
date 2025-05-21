@@ -154,11 +154,6 @@
     "settingsReset": "Settings have been reset to defaults",
     "creatingStarterPack": "Creating a Starter Pack..."
   },
-  "voice": {
-    "instructions": {
-      "default": "Voice: Warm, empathetic, and professional, reassuring the customer that their issue is understood and will be resolved.\n\nPunctuation: Well-structured with natural pauses, allowing for clarity and a steady, calming flow.\n\nDelivery: Calm and patient, with a supportive and understanding tone that reassures the listener.\n\nPhrasing: Clear and concise, using customer-friendly language that avoids jargon while maintaining professionalism.\n\nTone: Empathetic and solution-focused, emphasizing both understanding and proactive assistance."
-    }
-  },
   "modes": {
     "builtIn": {
       "createDailyNote": {

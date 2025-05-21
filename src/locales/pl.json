@@ -154,11 +154,6 @@
     "settingsReset": "Ustawienia zostały zresetowane do domyślnych",
     "creatingStarterPack": "Tworzenie pakietu startowego..."
   },
-  "voice": {
-    "instructions": {
-      "default": "Głos: Ciepły, empatyczny i profesjonalny, zapewniający klienta, że jego problem jest zrozumiany i zostanie rozwiązany.\n\nInterpunkcja: Dobrze skonstruowana z naturalnymi pauzami, zapewniająca jasność i płynny, uspokajający przekaz.\n\nPrezentacja: Spokojna i cierpliwa, z pomocnym i zrozumiałym tonem, który uspokaja słuchacza.\n\nFrazeologia: Jasna i zwięzła, używająca przyjaznego dla klienta języka, unikająca żargonu przy zachowaniu profesjonalizmu.\n\nTon: Empatyczny i zorientowany na rozwiązania, podkreślający zarówno zrozumienie, jak i proaktywną pomoc."
-    }
-  },
   "modes": {
     "builtIn": {
       "createDailyNote": {

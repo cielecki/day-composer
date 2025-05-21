@@ -14,7 +14,6 @@ import {
 	getDefaultLNMode,
 } from "../defaults/ln-mode-defaults";
 import * as yaml from "js-yaml";
-import { ContextCollector } from "src/context-collector";
 import { useTextToSpeech } from "./TextToSpeechContext";
 import { t } from '../i18n';
 
@@ -154,11 +153,7 @@ export const LNModeProvider: React.FC<{
 						: undefined,
 			};
 
-			//expand links in contentStr
-			partialMode.ln_system_prompt = await new ContextCollector(
-				app,
-			).expandLinks(contentStr);
-
+			partialMode.ln_system_prompt = contentStr;
 
 			// Merge with defaults and return
 			return mergeWithDefaultMode(partialMode);
