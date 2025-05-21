@@ -123,8 +123,8 @@ export class ContextCollector {
 				[linkPath, linkText] = linkText.split("|", 2);
 			}
 
-			// Handle day-note-(X) format for relative date notes
-			dayNoteMatch = linkPath.match(/^day-note-\(([+-]?\d+)\)$/);
+			// Handle ln-date-note-(X) format for relative date notes
+			dayNoteMatch = linkPath.match(/^ln-date-note-\(([+-]?\d+)\)$/);
 			if (dayNoteMatch) {
 				const daysOffset = parseInt(dayNoteMatch[1]);
 				// Calculate the date
@@ -235,7 +235,7 @@ export class ContextCollector {
 
 				// Replace the wikilink with the expanded content in a special block
 				if (dayNoteMatch) {
-					// For day-note links, use the exact same daily_note tag format as in buildContext
+					// For ln-date-note links, use the exact same daily_note tag format as in buildContext
 					result = result.replace(
 						match[0],
 						`<daily_note date="${formattedDate}" file="${linkFile.path}" label="${descriptiveLabel}" >\n\n${tabbedContent}\n\n</daily_note>\n`

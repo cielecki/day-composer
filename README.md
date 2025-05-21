@@ -27,13 +27,13 @@ This will include the full content of "Note Title" in your query context.
 You can now use a special format to reference daily notes relative to the current date:
 
 ```
-[[day-note-(X)]] 🔎
+[[ln-day-note-(X)]] 🔎
 ```
 
 Where `X` is a number representing how many days to offset from today:
-- Negative numbers represent past days: `[[day-note-(-3)]] 🔎` refers to the note from 3 days ago
-- Positive numbers represent future days: `[[day-note-(2)]] 🔎` refers to the note 2 days from now
-- Zero represents today: `[[day-note-(0)]] 🔎` refers to today's note
+- Negative numbers represent past days: `[[ln-day-note-(-3)]] 🔎` refers to the note from 3 days ago
+- Positive numbers represent future days: `[[ln-day-note-(2)]] 🔎` refers to the note 2 days from now
+- Zero represents today: `[[ln-day-note-(0)]] 🔎` refers to today's note
 
 This uses the same format as the daily note range feature in the context building for LN modes.
 
