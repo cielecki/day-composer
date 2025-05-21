@@ -22,10 +22,10 @@ import {
 	ToolUseBlock,
 	ToolResultBlock,
 } from "src/types/types";
-import { useAICMode } from "./LNModeContext";
+import { useLNMode } from "./LNModeContext";
 import { MessageCreateParamsStreaming } from "@anthropic-ai/sdk/resources/messages/messages";
 import { t } from '../i18n';
-import { getDefaultAICMode } from "src/defaults/ln-mode-defaults";
+import { getDefaultLNMode } from "src/defaults/ln-mode-defaults";
 
 export interface AIAgentContextType {
 	conversation: Message[];
@@ -73,8 +73,8 @@ export const AIAgentProvider: React.FC<{
 	/* trunk-ignore(eslint/@typescript-eslint/no-unused-vars) */
 	const [_, setForceUpdate] = useState(0);
 	const textToSpeech = useTextToSpeech();
-	const { activeModeId, aicModes } = useAICMode();
-	const activeMode = aicModes[activeModeId];
+	const { activeModeId, lnModes } = useLNMode();
+	const activeMode = lnModes[activeModeId];
 
 	useEffect(() => {
 		initAnthropicClient();
@@ -504,7 +504,7 @@ ${context}`.trim();
 						const messagesForAPI =
 							formatMessagesForAPI(currentHistory);
 
-						const defaultMode = getDefaultAICMode();
+						const defaultMode = getDefaultLNMode();
 
 						// Get API parameters from active mode or defaults
 						const model = "claude-3-7-sonnet-20250219"; // hardcoded model for now
@@ -692,7 +692,7 @@ ${context}`.trim();
 			);
 			
 			// Use activeMode directly instead of getActiveMode
-			const defaultMode = getDefaultAICMode();
+			const defaultMode = getDefaultLNMode();
 			const autoplayEnabled = activeMode?.ln_voice_autoplay || defaultMode.ln_voice_autoplay;
 			
 			// Only auto-play if both the global setting and the mode-specific autoplay are enabled

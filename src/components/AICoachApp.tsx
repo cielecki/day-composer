@@ -8,7 +8,7 @@ import React, {
 import { MessageDisplay } from "./MessageDisplay";
 import { useTextToSpeech } from "../context/TextToSpeechContext";
 import { ThinkingMessage } from "./ThinkingMessage";
-import { useAICMode } from "../context/LNModeContext";
+import { useLNMode } from "../context/LNModeContext";
 import {
 	ToolResultBlock,
 	ContentBlock,
@@ -81,9 +81,9 @@ export const AICoachApp: React.FC = () => {
 		getContext
 	} = useAIAgent();
 
-	// Use AICModes context
-	const { aicModes, activeModeId,setActiveMode } = useAICMode();
-	const activeMode = aicModes[activeModeId];
+	// Use LNModes context
+	const { lnModes, activeModeId,setActiveMode } = useLNMode();
+	const activeMode = lnModes[activeModeId];
 
 	const conversationContainerRef = useRef<HTMLDivElement>(null);
 
@@ -174,16 +174,16 @@ export const AICoachApp: React.FC = () => {
 		stopAudio();
 	}, [abortController, setAbortController, stopAudio]);
 
-	// Function to handle AIC mode selection
+	// Function to handle LN mode selection
 	const handleModeSelect = useCallback(
 		(modeId: string): void => {
 			// Set the active mode using the ID
-			const mode = aicModes[modeId];
+			const mode = lnModes[modeId];
 			if (mode) {
 				setActiveMode(mode);
 			}
 		},
-		[aicModes, setActiveMode],
+		[lnModes, setActiveMode],
 	);
 
 	const toggleDropdown = useCallback(() => {
@@ -272,7 +272,7 @@ export const AICoachApp: React.FC = () => {
 						</ReactMarkdown>
 					</div>
 
-						{Object.keys(aicModes).length === 0 && (
+						{Object.keys(lnModes).length === 0 && (
 							<button
 								className="mod-cta"
 								onClick={() => {
@@ -513,9 +513,9 @@ export const AICoachApp: React.FC = () => {
 							</div>
 
 							{/* Mode list */}
-							{Object.keys(aicModes).length > 0 && (
+							{Object.keys(lnModes).length > 0 && (
 								<>
-									{Object.values(aicModes).map((mode, index) => (
+									{Object.values(lnModes).map((mode, index) => (
 										<div
 											key={index}
 											style={{

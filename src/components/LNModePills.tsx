@@ -1,8 +1,8 @@
 import React from 'react';
-import { AICMode } from '../types/types';
+import { LNMode } from '../types/types';
 import { LucideIcon } from './LucideIcon';
 
-interface AICModePillProps {
+interface LNModePillProps {
   id: string;
   icon?: string;
   iconColor?: string;
@@ -10,7 +10,7 @@ interface AICModePillProps {
   onClick: (id: string) => void;
 }
 
-export const LNModePill: React.FC<AICModePillProps> = ({ id, icon, iconColor, name, onClick }) => {
+export const LNModePill: React.FC<LNModePillProps> = ({ id, icon, iconColor, name, onClick }) => {
   return (
     <button
       className="ln-mode-pill"
@@ -36,16 +36,16 @@ export const LNModePill: React.FC<AICModePillProps> = ({ id, icon, iconColor, na
   );
 };
 
-interface AICModePillsProps {
-  aicModes: Record<string, AICMode>;
+interface LNModePillsProps {
+  lnModes: Record<string, LNMode>;
   onModeSelect: (id: string) => void;
 }
 
-export const AICModePills: React.FC<AICModePillsProps> = ({ aicModes, onModeSelect }) => {
+export const LNModePills: React.FC<LNModePillsProps> = ({ lnModes, onModeSelect }) => {
   // User has modes, so display them
   return (
     <div className="ln-mode-pills-container">
-      {Object.values(aicModes).map((mode, index) => (
+      {Object.values(lnModes).map((mode, index) => (
         <LNModePill
           key={index}
           id={mode.ln_path}

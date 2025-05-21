@@ -1,4 +1,4 @@
-import { AICMode } from '../types/types';
+import { LNMode } from '../types/types';
 import * as yaml from 'js-yaml';
 
 // Define a type for frontmatter properties to avoid using 'any'
@@ -6,11 +6,11 @@ type FrontmatterValue = string | number | boolean | string[] | undefined;
 type Frontmatter = Record<string, FrontmatterValue>;
 
 /**
- * Converts an AICMode object to a markdown note string with frontmatter
- * @param mode The AICMode to convert to note content
+ * Converts an LNMode object to a markdown note string with frontmatter
+ * @param mode The LNMode to convert to note content
  * @returns String containing the formatted note content with frontmatter
  */
-export function modeToNoteContent(mode: AICMode): string {
+export function modeToNoteContent(mode: LNMode): string {
   // Extract the system prompt content (not in frontmatter)
   const systemPrompt = mode.ln_system_prompt || '';
   

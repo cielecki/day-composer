@@ -75,7 +75,7 @@ export interface ToolUseResult {
 	error?: string;
 }
 
-export interface AICMode {
+export interface LNMode {
 	// Core identification
 	ln_name: string;
 	ln_path: string;

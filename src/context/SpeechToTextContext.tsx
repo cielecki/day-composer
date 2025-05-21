@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, ReactNode, useCallback, use
 import { Notice } from 'obsidian';
 import { getPluginSettings } from '../settings/PluginSettings';
 import OpenAI from 'openai';
-import { useAICMode } from './LNModeContext';
+import { useLNMode } from './LNModeContext';
 import { t } from '../i18n';
 
 const MAX_AUDIO_PROMPT_LENGTH = 5000;
@@ -25,8 +25,8 @@ export const SpeechToTextProvider: React.FC<{
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [lastTranscription, setLastTranscription] = useState<string | null>(null);
-  const { activeModeId, aicModes } = useAICMode();
-  const activeMode = aicModes[activeModeId];
+  const { activeModeId, lnModes } = useLNMode();
+  const activeMode = lnModes[activeModeId];
 
 
   const startRecording = async (signal: AbortSignal): Promise<void> => {

@@ -275,7 +275,7 @@
       "defaultVoiceInstructions": "Speak clearly and professionally",
       "files": {
         "noFrontmatter": "File {{filename}} doesn't have frontmatter, using default values with file content as system prompt",
-        "loadedCount": "Loaded {{count}} AIC modes with #ln-mode tag"
+        "loadedCount": "Loaded {{count}} modes with #ln-mode tag"
       }
     },
     "attachments": {

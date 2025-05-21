@@ -1,14 +1,14 @@
-import { AICMode } from "../types/types";
+import { LNMode } from "../types/types";
 import { TTS_VOICES, TTSVoice } from "../settings/PluginSettings";
 import { t } from '../i18n';
 import { modeToNoteContent } from "src/utils/mode-utils";
 import path from "path";
 
 /**
- * Default configuration for AIC modes.
+ * Default configuration for LN modes.
  * These values will be used when a mode doesn't specify certain parameters.
  */
-export function getDefaultAICMode(): AICMode {
+export function getDefaultLNMode(): LNMode {
   return {
     // UI defaults
     ln_name: t('modes.default.name'),
@@ -34,20 +34,20 @@ export function getDefaultAICMode(): AICMode {
 }
 
 /**
- * Merge user-defined AIC mode with default values
- * @param userMode The user-defined AIC mode
- * @returns Complete AIC mode with all required fields
+ * Merge user-defined LN mode with default values
+ * @param userMode The user-defined LN mode
+ * @returns Complete LN mode with all required fields
  */
-export function mergeWithDefaultMode(userMode: Partial<AICMode>): AICMode {
+export function mergeWithDefaultMode(userMode: Partial<LNMode>): LNMode {
   return {
-    ...getDefaultAICMode(),
+    ...getDefaultLNMode(),
     ...userMode,
-  } as AICMode;
+  } as LNMode;
 }
 
-export function validateModeSettings(mode: AICMode): AICMode {
+export function validateModeSettings(mode: LNMode): LNMode {
   const validatedMode = { ...mode };
-  const defaultMode = getDefaultAICMode();
+  const defaultMode = getDefaultLNMode();
   
   // Validate voice if present
   if (mode.ln_voice && !TTS_VOICES.includes(mode.ln_voice as TTSVoice)) {
@@ -77,7 +77,7 @@ interface StarterPackFile {
   content: string;
 }
 export function getStarterPackContents(): StarterPackFile[] {
-  const defaultMode = getDefaultAICMode();
+  const defaultMode = getDefaultLNMode();
   const modes = [
     mergeWithDefaultMode({
       ln_name: t('modes.builtIn.createDailyNote.name'),

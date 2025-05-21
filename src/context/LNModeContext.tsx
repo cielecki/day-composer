@@ -6,12 +6,12 @@ import React, {
 	ReactNode,
 	useCallback,
 } from "react";
-import { AICMode } from "../types/types";
+import { LNMode } from "../types/types";
 import { App, TFile, EventRef } from "obsidian";
 import {
 	mergeWithDefaultMode,
 	validateModeSettings,
-	getDefaultAICMode,
+	getDefaultLNMode,
 } from "../defaults/ln-mode-defaults";
 import * as yaml from "js-yaml";
 import { ContextCollector } from "src/context-collector";
@@ -21,11 +21,11 @@ import { t } from '../i18n';
 
 
 export interface LNModeContextType {
-	aicModes: Record<string, AICMode>;
+	lnModes: Record<string, LNMode>;
 	activeModeId: string;
-	setActiveMode: (mode: AICMode | null) => void;
-	loadAICModes: () => Promise<void>;
-	defaultAICMode: Partial<AICMode>;
+	setActiveMode: (mode: LNMode | null) => void;
+	loadLNModes: () => Promise<void>;
+	defaultLNMode: Partial<LNMode>;
 }
 
 const LNModeContext = createContext<LNModeContextType | undefined>(undefined);
@@ -34,8 +34,8 @@ export const LNModeProvider: React.FC<{
 	children: ReactNode;
 	app: App;
 }> = ({ children, app }) => {
-	const defaultMode = getDefaultAICMode();
-	const [aicModes, setAICModes] = useState<Record<string, AICMode>>({
+	const defaultMode = getDefaultLNMode();
+	const [lnModes, setLNModes] = useState<Record<string, LNMode>>({
 		default: defaultMode,
 	});
 	const [activeModeId, setActiveModeId] = useState<string>("default");
@@ -43,10 +43,10 @@ export const LNModeProvider: React.FC<{
 	const [modeFilePaths, setModeFilePaths] = useState<Set<string>>(new Set());
 	const textToSpeech = useTextToSpeech();
 
-	// Function to extract an AIC mode from a file with the #ln-mode tag
-	const extractAICModeFromFile = async (
+	// Function to extract an LN mode from a file with the #ln-mode tag
+	const extractLNModeFromFile = async (
 		file: TFile,
-	): Promise<AICMode | null> => {
+	): Promise<LNMode | null> => {
 		try {
 			const content = await app.vault.read(file);
 
@@ -66,11 +66,11 @@ export const LNModeProvider: React.FC<{
 				: [frontmatterTags];
 
 			// Check if the file has the #ln-mode tag
-			const hasAicModeTag =
+			const hasModeTag =
 				tags.includes("#ln-mode") ||
 				normalizedFrontmatterTags.includes("ln-mode");
 
-			if (!hasAicModeTag) {
+			if (!hasModeTag) {
 				return null;
 			}
 
@@ -84,7 +84,7 @@ export const LNModeProvider: React.FC<{
 					t('ui.mode.files.noFrontmatter').replace('{{filename}}', file.name)
 				);
 				// Create partial mode with only required fields
-				const partialMode: Partial<AICMode> = {
+				const partialMode: Partial<LNMode> = {
 					ln_name: file.basename,
 					ln_path: file.path,
 					ln_system_prompt: content.trim(),
@@ -105,8 +105,8 @@ export const LNModeProvider: React.FC<{
 				console.error(`Error parsing YAML in ${file.path}:`, yamlError);
 				frontmatter = {};
 			}
-			// Create a partial AICMode object
-			const partialMode: Partial<AICMode> = {
+			// Create a partial LNMode object
+			const partialMode: Partial<LNMode> = {
 				// Required fields
 				ln_name: frontmatter.ln_name || file.basename,
 				ln_path: file.path,
@@ -168,20 +168,20 @@ export const LNModeProvider: React.FC<{
 		}
 	};
 
-	const loadAICModes = useCallback(async () => {
+	const loadLNModes = useCallback(async () => {
 		try {
 			// Get all markdown files in the vault
 			const files = app.vault.getMarkdownFiles();
-			const modesMap: Record<string, AICMode> = {};
+			const modesMap: Record<string, LNMode> = {};
 
 			for (const file of files) {
-				const mode = await extractAICModeFromFile(file);
+				const mode = await extractLNModeFromFile(file);
 				if (mode && mode.ln_path) {
 					modesMap[mode.ln_path] = mode;
 				}
 			}
 
-			setAICModes(modesMap);
+			setLNModes(modesMap);
 			console.log(
 				t('ui.mode.files.loadedCount').replace('{{count}}', (Object.keys(modesMap).length - 1).toString())
 			);
@@ -192,16 +192,16 @@ export const LNModeProvider: React.FC<{
 				setActiveModeId(firstModeId);
 			}
 		} catch (error) {
-			console.error("Error loading AIC modes:", error);
+			console.error("Error loading LN modes:", error);
 		}
 	}, [app, activeModeId]);
 
 	// Update mode file paths when modes change
 	useEffect(() => {
 		setModeFilePaths(
-			new Set(Object.keys(aicModes).filter((path) => path !== "default")),
+			new Set(Object.keys(lnModes).filter((path) => path !== "default")),
 		);
-	}, [aicModes]);
+	}, [lnModes]);
 
 	// Setup vault event listeners
 	useEffect(() => {
@@ -212,7 +212,7 @@ export const LNModeProvider: React.FC<{
 	}, [app, fileEventRefs]);
 
 	// Helper to check if file has or had the #ln-mode tag
-	const hasAICModeTag = (file: TFile): boolean => {
+	const hasModeTag = (file: TFile): boolean => {
 		const cache = app.metadataCache.getFileCache(file);
 		const tags = cache?.tags?.map((tag) => tag.tag) || [];
 		const frontmatterTags = cache?.frontmatter?.tags || [];
@@ -238,8 +238,8 @@ export const LNModeProvider: React.FC<{
 				console.log("File created:", file.path);
 				// Wait for metadata to be indexed
 				setTimeout(() => {
-					if (hasAICModeTag(file)) {
-						loadAICModes();
+					if (hasModeTag(file)) {
+						loadLNModes();
 					}
 				}, 100);
 			}
@@ -254,9 +254,9 @@ export const LNModeProvider: React.FC<{
 
 				// Wait for metadata to be indexed
 				setTimeout(() => {
-					const hasTag = hasAICModeTag(file);
+					const hasTag = hasModeTag(file);
 					if (hadTag || hasTag) {
-						loadAICModes();
+						loadLNModes();
 					}
 				}, 100);
 			}
@@ -268,7 +268,7 @@ export const LNModeProvider: React.FC<{
 			if (file instanceof TFile && file.extension === "md") {
 				// If this was a mode file, reload modes
 				if (modeFilePaths.has(file.path)) {
-					loadAICModes();
+					loadLNModes();
 				}
 			}
 		});
@@ -279,12 +279,12 @@ export const LNModeProvider: React.FC<{
 			if (file instanceof TFile && file.extension === "md") {
 				// If this was a mode file, reload modes
 				if (modeFilePaths.has(oldPath)) {
-					loadAICModes();
+					loadLNModes();
 				} else {
 					// Wait for metadata to be indexed
 					setTimeout(() => {
-						if (hasAICModeTag(file)) {
-							loadAICModes();
+						if (hasModeTag(file)) {
+							loadLNModes();
 						}
 					}, 100);
 				}
@@ -297,11 +297,11 @@ export const LNModeProvider: React.FC<{
 			if (file instanceof TFile && file.extension === "md") {
 				// Check if this file had the tag before
 				const hadTag = modeFilePaths.has(file.path);
-				const hasTag = hasAICModeTag(file);
+				const hasTag = hasModeTag(file);
 
 				// Only reload if tag status changed
 				if (hadTag !== hasTag) {
-					loadAICModes();
+					loadLNModes();
 				}
 			}
 		});
@@ -312,26 +312,21 @@ export const LNModeProvider: React.FC<{
 		return () => {
 			refs.forEach((ref) => app.vault.offref(ref));
 		};
-	}, [app, loadAICModes, modeFilePaths]);
+	}, [app, loadLNModes, modeFilePaths]);
 
 	// Load modes when component mounts
 	useEffect(() => {
-		loadAICModes();
-	}, [loadAICModes]);
-
-	// Create a new function to create initial AIC modes
-	
-
-	
+		loadLNModes();
+	}, [loadLNModes]);
 
 	// Helper to set the active mode
 	const setActiveMode = useCallback(
-		(mode: AICMode | null) => {
+		(mode: LNMode | null) => {
 			if (!mode) {
 				setActiveModeId("default");
 
 				// Update text-to-speech settings for the default mode
-				const defaultMode = getDefaultAICMode();
+				const defaultMode = getDefaultLNMode();
 				textToSpeech.setTTSSettings({
 					enabled: defaultMode.ln_voice_autoplay,
 					voice: defaultMode.ln_voice,
@@ -348,8 +343,8 @@ export const LNModeProvider: React.FC<{
 			);
 
 			// Save in modes if not already there (shouldn't usually happen)
-			if (completeMode.ln_path && !aicModes[completeMode.ln_path]) {
-				setAICModes((prev) => ({
+			if (completeMode.ln_path && !lnModes[completeMode.ln_path]) {
+				setLNModes((prev) => ({
 					...prev,
 					[completeMode.ln_path]: completeMode,
 				}));
@@ -366,16 +361,16 @@ export const LNModeProvider: React.FC<{
 				speed: completeMode.ln_voice_speed,
 			});
 		},
-		[aicModes, textToSpeech],
+		[lnModes, textToSpeech],
 	);
 
 	// Context value that provides the modes and functionality
 	const contextValue: LNModeContextType = {
-		aicModes,
+		lnModes: lnModes,
 		activeModeId,
 		setActiveMode,
-		loadAICModes,
-		defaultAICMode: getDefaultAICMode(),
+		loadLNModes: loadLNModes,
+		defaultLNMode: getDefaultLNMode(),
 	};
 
 	return (
@@ -385,11 +380,11 @@ export const LNModeProvider: React.FC<{
 	);
 };
 
-// Custom hook for using the AIC Mode context
-export const useAICMode = () => {
+// Custom hook for using the LN Mode context
+export const useLNMode = () => {
 	const context = useContext(LNModeContext);
 	if (context === undefined) {
-		throw new Error("useAICMode must be used within an AICModeProvider");
+		throw new Error("useLNMode must be used within an LNModeProvider");
 	}
 	return context;
 };

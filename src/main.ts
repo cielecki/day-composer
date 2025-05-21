@@ -1,4 +1,4 @@
-import { App, Notice, Plugin, requestUrl, TFolder } from "obsidian";
+import { App, Notice, Plugin, requestUrl } from "obsidian";
 import { SampleSettingTab } from "./settings/SettingsTab";
 import { ContextCollector } from "./context-collector";
 import {
@@ -9,18 +9,16 @@ import { resetObsidianTools } from "./obsidian-tools";
 import { AI_COACH_VIEW_TYPE, AICoachView } from "./ai-coach-view";
 import { getObsidianTools } from "./obsidian-tools";
 import { initI18n, t } from "./i18n";
-import { getStarterPackContents } from "./defaults/ln-mode-defaults";
-import { mergeWithDefaultMode } from "./defaults/ln-mode-defaults";
-import { getDefaultAICMode } from "./defaults/ln-mode-defaults";
-import { AICMode } from "./types/types";
+import { LNMode } from "./types/types";
 import { modeToNoteContent } from "./utils/mode-utils";
 import path from "path";
+import { getDefaultLNMode, mergeWithDefaultMode, getStarterPackContents } from "./defaults/ln-mode-defaults";
 
 
 
 const createStarterPack = async (app: App) => {
 	try {
-		// Create an AIC Modes folder if it doesn't exist
+		// Create an LN Modes folder if it doesn't exist
 		const starterPackDirName = t('ui.starterPack.directoryName') + " v0.1";
 		for (const { name, content } of getStarterPackContents()) {
 			const filePath = path.join(starterPackDirName, name);
@@ -96,8 +94,8 @@ const createSingleMode = async (app: App) => {
 		const randomColor = AVAILABLE_COLORS[Math.floor(Math.random() * AVAILABLE_COLORS.length)];
 
 		// Create a new mode with default values
-		const defaultMode = getDefaultAICMode();
-		const newMode: Partial<AICMode> = {
+		const defaultMode = getDefaultLNMode();
+		const newMode: Partial<LNMode> = {
 			ln_name: t('ui.mode.newMode'),
 			ln_description: t('ui.mode.defaultDescription'),
 			ln_icon: randomIcon,
@@ -126,7 +124,7 @@ const createSingleMode = async (app: App) => {
 		}
 
 		// Create a complete mode object by merging with defaults
-		const completeMode: AICMode = {
+		const completeMode: LNMode = {
 			...mergeWithDefaultMode(newMode),
 			ln_path: filePath,
 			ln_name: fileName.replace(".md", ""), // Update the name to match the file name
