@@ -7,10 +7,12 @@
 - [x] Starter kit translations
 - [x] Add task backlog to stater kit
 - [x] Removed ln_voice_speed from starter kit as mini tts does not support it
+- [x] fixed example usages so more of them are visible
+- [x] Is the domain free? no
 
-- [ ] Napisałem na ten temat, co mam, do Bartka, Natalii i Trenera
-- [ ] coś nie tak jest z tym jak przykłady są robione
-- [ ] Is the domain free?
+- [ ] Test z N
+- [ ] Test z B
+- [ ] Test z Piotrkiem
 
 - [ ] More relaxed todo format in the plugin
 
@@ -19,7 +21,6 @@
 - [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
 - [ ] Working daily planning and habits
 - [ ] Choose licence
-
 - [ ] Add plugin to obsidian repository
 - [ ] Create discord server
 - [ ] Create a presentation for AI breakfast

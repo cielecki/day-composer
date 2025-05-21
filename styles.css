@@ -988,7 +988,7 @@ If your plugin does not need CSS, delete this file.
   display: flex;
   align-items: center;
   gap: 6px;
-  max-width: 180px;
+  max-width: 100%;
   padding: 6px 10px;
   border-radius: 20px;
   background-color: var(--background-secondary);
