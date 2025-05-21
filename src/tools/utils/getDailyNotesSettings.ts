@@ -8,7 +8,7 @@ import { App } from "obsidian";
 
 export async function getDailyNotesSettings(app: App): Promise<DailyNotesSettings> {
   // Default settings
-  let settings: DailyNotesSettings = { folder: 'Daily Notes', format: 'YYYY-MM-DD' };
+  let settings: DailyNotesSettings = { folder: '', format: 'YYYY-MM-DD' };
 
   try {
     const dailyNotesConfigPath = '.obsidian/daily-notes.json';
@@ -16,7 +16,7 @@ export async function getDailyNotesSettings(app: App): Promise<DailyNotesSetting
       const configContent = await app.vault.adapter.read(dailyNotesConfigPath);
       const config = JSON.parse(configContent);
       settings = {
-        folder: config.folder || 'Daily Notes',
+        folder: config.folder || '',
         format: config.format || 'YYYY-MM-DD'
       };
     }
