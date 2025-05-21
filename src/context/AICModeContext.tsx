@@ -10,127 +10,15 @@ import { AICMode } from "../types/types";
 import { App, TFile, TFolder, EventRef, Notice } from "obsidian";
 import {
 	mergeWithDefaultMode,
-	DEFAULT_AIC_MODE,
 	validateModeSettings,
+	getDefaultAICMode,
+	getBuiltInAICModes,
 } from "../defaults/aic-mode-defaults";
 import { modeToNoteContent } from "../utils/mode-utils";
 import * as yaml from "js-yaml";
 import { ContextCollector } from "src/context-collector";
 import { useTextToSpeech } from "../context/TextToSpeechContext";
 import { t } from '../i18n';
-
-// Define the built-in AIC modes that can be used to create initial modes
-export const builtInAICModes: (Partial<AICMode> & { aic_name: string })[] = [
-	{
-		aic_name: t('modes.builtIn.createDailyNote.name'),
-		aic_example_usages: [
-			t('modes.builtIn.createDailyNote.exampleUsage'),
-		],
-		aic_voice_autoplay: true,
-		aic_voice: "alloy",
-		aic_voice_instructions: t('modes.builtIn.createDailyNote.voiceInstructions'),
-		aic_voice_speed: 1.1,
-		aic_icon: "calendar-with-checkmark",
-		aic_icon_color: "#4caf50",
-		aic_description: t('modes.builtIn.createDailyNote.description'),
-		aic_system_prompt: DEFAULT_AIC_MODE.aic_system_prompt,
-	},
-	{
-		aic_name: t('modes.builtIn.searchNotes.name'),
-		aic_voice_autoplay: false,
-		aic_voice: "echo",
-		aic_voice_instructions: t('modes.builtIn.searchNotes.voiceInstructions'),
-		aic_voice_speed: 0.9,
-		aic_icon: "search",
-		aic_icon_color: "#2196f3",
-		aic_description: t('modes.builtIn.searchNotes.description'),
-		aic_system_prompt: t('modes.builtIn.searchNotes.systemPrompt'),
-	},
-	{
-		aic_name: t('modes.builtIn.dailyReflection.name'),
-		aic_example_usages: [
-			t('modes.builtIn.dailyReflection.exampleUsage'),
-		],
-		aic_voice_autoplay: true,
-		aic_voice: "nova",
-		aic_voice_instructions: t('modes.builtIn.dailyReflection.voiceInstructions'),
-		aic_voice_speed: 0.85,
-		aic_icon: "lucide-sun-moon",
-		aic_icon_color: "#ff9800",
-		aic_description: t('modes.builtIn.dailyReflection.description'),
-		aic_system_prompt: DEFAULT_AIC_MODE.aic_system_prompt,
-	},
-	{
-		aic_name: t('modes.builtIn.testSearch.name'),
-		aic_example_usages: [
-			t('modes.builtIn.testSearch.exampleUsage'),
-		],
-		aic_voice_autoplay: true,
-		aic_voice: "shimmer",
-		aic_voice_instructions: t('modes.builtIn.testSearch.voiceInstructions'),
-		aic_voice_speed: 1.0,
-		aic_icon: "magnifying-glass",
-		aic_icon_color: "#ff5722",
-		aic_description: t('modes.builtIn.testSearch.description'),
-		aic_system_prompt: DEFAULT_AIC_MODE.aic_system_prompt,
-	},
-	{
-		aic_name: t('modes.builtIn.addGoals.name'),
-		aic_example_usages: [
-			t('modes.builtIn.addGoals.exampleUsage'),
-		],
-		aic_voice_autoplay: true,
-		aic_voice: "fable",
-		aic_voice_instructions: t('modes.builtIn.addGoals.voiceInstructions'),
-		aic_voice_speed: 1.15,
-		aic_icon: "target",
-		aic_icon_color: "#9c27b0",
-		aic_description: t('modes.builtIn.addGoals.description'),
-		aic_system_prompt: DEFAULT_AIC_MODE.aic_system_prompt,
-	},
-	{
-		aic_name: t('modes.builtIn.addReflection.name'),
-		aic_example_usages: [
-			t('modes.builtIn.addReflection.exampleUsage'),
-		],
-		aic_voice_autoplay: true,
-		aic_voice: "onyx",
-		aic_voice_instructions: t('modes.builtIn.addReflection.voiceInstructions'),
-		aic_voice_speed: 0.95,
-		aic_icon: "lucide-history",
-		aic_icon_color: "#673ab7",
-		aic_description: t('modes.builtIn.addReflection.description'),
-		aic_system_prompt: DEFAULT_AIC_MODE.aic_system_prompt,
-	},
-	{
-		aic_name: t('modes.builtIn.createTomorrowNote.name'),
-		aic_example_usages: [
-			t('modes.builtIn.createTomorrowNote.exampleUsage'),
-		],
-		aic_voice_autoplay: true,
-		aic_voice: "alloy",
-		aic_voice_instructions: t('modes.builtIn.createTomorrowNote.voiceInstructions'),
-		aic_voice_speed: 1.05,
-		aic_icon: "lucide-calendar-plus",
-		aic_icon_color: "#3f51b5",
-		aic_description: t('modes.builtIn.createTomorrowNote.description'),
-		aic_system_prompt: DEFAULT_AIC_MODE.aic_system_prompt,
-	},
-	{
-		aic_name: t('modes.builtIn.searchProjectPlanning.name'),
-		aic_example_usages: [
-			t('modes.builtIn.searchProjectPlanning.exampleUsage'),
-		],
-		aic_voice_autoplay: true,
-		aic_voice: "echo",
-		aic_voice_instructions: t('modes.builtIn.searchProjectPlanning.voiceInstructions'),
-		aic_voice_speed: 1.0,
-		aic_icon: "lucide-file-search",
-		aic_icon_color: "#00bcd4",
-		aic_description: t('modes.builtIn.searchProjectPlanning.description'),
-		aic_system_prompt: DEFAULT_AIC_MODE.aic_system_prompt,
-	},
-];
 
 // List of available Lucide icons used in the plugin
 const AVAILABLE_ICONS = [
@@ -192,8 +80,9 @@ export const AICModeProvider: React.FC<{
 	children: ReactNode;
 	app: App;
 }> = ({ children, app }) => {
+	const defaultMode = getDefaultAICMode();
 	const [aicModes, setAICModes] = useState<Record<string, AICMode>>({
-		default: DEFAULT_AIC_MODE,
+		default: defaultMode,
 	});
 	const [activeModeId, setActiveModeId] = useState<string>("default");
 	const [fileEventRefs, setFileEventRefs] = useState<EventRef[]>([]);
@@ -210,7 +99,6 @@ export const AICModeProvider: React.FC<{
 
 			// Check if content is valid
 			if (content.trim().length === 0) {
-				console.warn(t('ui.mode.files.skippingEmpty').replace('{{filename}}', file.path));
 				return null;
 			}
 
@@ -338,11 +226,6 @@ export const AICModeProvider: React.FC<{
 				if (mode && mode.aic_path) {
 					modesMap[mode.aic_path] = mode;
 				}
-			}
-
-			// Add default mode to the map
-			if (Object.keys(modesMap).length === 0) {
-				modesMap["default"] = DEFAULT_AIC_MODE;
 			}
 
 			setAICModes(modesMap);
@@ -501,7 +384,7 @@ export const AICModeProvider: React.FC<{
 			// Create a mode file for each built-in mode
 			const newModesMap: Record<string, AICMode> = { ...aicModes };
 
-			for (const mode of builtInAICModes) {
+			for (const mode of getBuiltInAICModes()) {
 				const fileName = `${mode.aic_name.replace(/[^a-zA-Z0-9 ]/g, "")}.md`;
 				const filePath = `${modesFolder.path}/${fileName}`;
 
@@ -547,12 +430,13 @@ export const AICModeProvider: React.FC<{
 			const randomColor = AVAILABLE_COLORS[Math.floor(Math.random() * AVAILABLE_COLORS.length)];
 
 			// Create a new mode with default values
+			const defaultMode = getDefaultAICMode();
 			const newMode: Partial<AICMode> = {
 				aic_name: t('ui.mode.newMode'),
 				aic_description: t('ui.mode.defaultDescription'),
 				aic_icon: randomIcon,
 				aic_icon_color: randomColor,
-				aic_system_prompt: DEFAULT_AIC_MODE.aic_system_prompt,
+				aic_system_prompt: defaultMode.aic_system_prompt,
 				aic_example_usages: [],
 				aic_voice_autoplay: true,
 				aic_voice: "alloy",
@@ -619,11 +503,12 @@ export const AICModeProvider: React.FC<{
 				setActiveModeId("default");
 
 				// Update text-to-speech settings for the default mode
+				const defaultMode = getDefaultAICMode();
 				textToSpeech.setTTSSettings({
-					enabled: DEFAULT_AIC_MODE.aic_voice_autoplay,
-					voice: DEFAULT_AIC_MODE.aic_voice,
-					instructions: DEFAULT_AIC_MODE.aic_voice_instructions,
-					speed: DEFAULT_AIC_MODE.aic_voice_speed,
+					enabled: defaultMode.aic_voice_autoplay,
+					voice: defaultMode.aic_voice,
+					instructions: defaultMode.aic_voice_instructions,
+					speed: defaultMode.aic_voice_speed,
 				});
 
 				return;
@@ -665,7 +550,7 @@ export const AICModeProvider: React.FC<{
 		createInitialAICModes,
 		createSingleMode,
 		isCreatingAICModes,
-		defaultAICMode: DEFAULT_AIC_MODE,
+		defaultAICMode: getDefaultAICMode(),
 	};
 
 	return (

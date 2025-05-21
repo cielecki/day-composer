@@ -160,11 +160,6 @@
     }
   },
   "modes": {
-    "default": {
-      "name": "Asystent AI",
-      "description": "## Witaj w Asystencie AI\n\nTo jest domyślny tryb Asystenta AI. Możesz tworzyć własne tryby i oznaczać je tagiem _#aic-mode_, aby ich używać.",
-      "systemPrompt": "Jesteś asystentem AI, który pomaga użytkownikom w refleksji nad ich dniem, przestrzeganiem nawyków i zadaniami. Bądź empatyczny, wnikliwy i skup się na pomaganiu użytkownikowi w zdobyciu perspektywy.\n\nMasz dostęp do narzędzi, które pozwalają na interakcję ze skarbcem Obsidian użytkownika.\nMożesz tworzyć notatki, wyszukiwać notatki, czytać notatki i dodawać do notatek.\nUżywaj tych narzędzi, gdy jest to odpowiednie, aby pomóc użytkownikowi.\nUżywaj narzędzi tylko wtedy, gdy użytkownik wyraźnie o to poprosi lub gdy byłoby to wyraźnie pomocne w kontekście.\nUżytkownik może powiedzieć coś w rodzaju \"utwórz notatkę o X\" lub \"zrób nową notatkę z Y\".\nPodczas używania narzędzi, pokaż użytkownikowi, co robisz, wyjaśniając swoje działania przed i po użyciu narzędzia."
-    },
     "builtIn": {
       "createDailyNote": {
         "name": "Utwórz notatkę dzienną",
@@ -217,7 +212,7 @@
     }
   },
   "view": {
-    "title": "Asystent AI"
+    "title": "Life Navigator"
   },
   "logs": {
     "view": {
@@ -273,8 +268,7 @@
       "defaultVoiceInstructions": "Mów wyraźnie i profesjonalnie",
       "files": {
         "noFrontmatter": "Plik {{filename}} nie ma frontmattera, używam wartości domyślnych z treścią pliku jako prompt systemowy",
-        "loadedCount": "Załadowano {{count}} trybów z tagiem #aic-mode",
-        "skippingEmpty": "Pomijam pusty plik: {{filename}}"
+        "loadedCount": "Załadowano {{count}} trybów z tagiem #aic-mode"
       }
     },
     "attachments": {
@@ -291,6 +285,7 @@
       "systemPrompt": "Prompt systemowy dla \"{{modeName}}\""
     },
     "starterPack": {
+      "noModes": "## Witaj w Life Navigator\n\nAby rozpocząć, utwórz pakiet startowy zawierający podstawowe tryby z tagiem _#aic-mode_.",
       "createdSuccess": "Pomyślnie utworzono pakiet startowy",
       "createdError": "Błąd podczas tworzenia pakietu startowego: {{error}}"
     },

@@ -22,12 +22,10 @@ import {
 	ToolUseBlock,
 	ToolResultBlock,
 } from "src/types/types";
-import {
-	DEFAULT_AIC_MODE,
-} from "../defaults/aic-mode-defaults";
 import { useAICMode } from "./AICModeContext";
 import { MessageCreateParamsStreaming } from "@anthropic-ai/sdk/resources/messages/messages";
 import { t } from '../i18n';
+import { getDefaultAICMode } from "src/defaults/aic-mode-defaults";
 
 export interface AIAgentContextType {
 	conversation: Message[];
@@ -506,14 +504,16 @@ ${context}`.trim();
 						const messagesForAPI =
 							formatMessagesForAPI(currentHistory);
 
+						const defaultMode = getDefaultAICMode();
+
 						// Get API parameters from active mode or defaults
 						const model = "claude-3-7-sonnet-20250219"; // hardcoded model for now
 						const maxTokens =
 							activeMode.aic_max_tokens ??
-							DEFAULT_AIC_MODE.aic_max_tokens;
+							defaultMode.aic_max_tokens;
 						const thinkingBudgetTokens =
 							activeMode.aic_thinking_budget_tokens ??
-							DEFAULT_AIC_MODE.aic_thinking_budget_tokens;
+							defaultMode.aic_thinking_budget_tokens;
 
 						
 
@@ -692,7 +692,8 @@ ${context}`.trim();
 			);
 			
 			// Use activeMode directly instead of getActiveMode
-			const autoplayEnabled = activeMode?.aic_voice_autoplay || DEFAULT_AIC_MODE.aic_voice_autoplay;
+			const defaultMode = getDefaultAICMode();
+			const autoplayEnabled = activeMode?.aic_voice_autoplay || defaultMode.aic_voice_autoplay;
 			
 			// Only auto-play if both the global setting and the mode-specific autoplay are enabled
 			if (autoplayEnabled && textForTTS.trim().length > 0) {

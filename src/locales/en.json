@@ -160,11 +160,6 @@
     }
   },
   "modes": {
-    "default": {
-      "name": "AI Coach",
-      "description": "## Welcome to AI Coach\n\nThis is the default mode for AI Coach. You can create your own modes and tag them with _#aic-mode_ to use them.",
-      "systemPrompt": "You are an AI coach who helps users reflect on their day, their adherence to habits and their tasks. Be empathetic, insightful, and focus on helping the user gain perspective.\n\nYou have access to tools that allow you to interact with the user's Obsidian vault.\nYou can create notes, search for notes, read notes, and append to notes.\nUse these tools whenever appropriate to help the user.\nOnly use the tools when explicitly requested by the user or when it would clearly be helpful in context.\nThe user might say things like \"create a note about X\" or \"make a new note with Y\".\nWhen using tools, show the user what you're doing by explaining your actions before and after using the tool."
-    },
     "builtIn": {
       "createDailyNote": {
         "name": "Create Daily Note",
@@ -217,7 +212,7 @@
     }
   },
   "view": {
-    "title": "AI Coach"
+    "title": "Life Navigator"
   },
   "logs": {
     "view": {
@@ -281,8 +276,7 @@
       "defaultVoiceInstructions": "Speak clearly and professionally",
       "files": {
         "noFrontmatter": "File {{filename}} doesn't have frontmatter, using default values with file content as system prompt",
-        "loadedCount": "Loaded {{count}} AIC modes with #aic-mode tag",
-        "skippingEmpty": "Skipping empty file: {{filename}}"
+        "loadedCount": "Loaded {{count}} AIC modes with #aic-mode tag"
       }
     },
     "attachments": {
@@ -299,6 +293,7 @@
       "systemPrompt": "System Prompt for \"{{modeName}}\""
     },
     "starterPack": {
+      "noModes": "## Welcome to Life Navigator\n\nTo get started, create a starter pack containing basic modes with the _#aic-mode_ tag",
       "createdSuccess": "Created a Starter Pack successfully",
       "createdError": "Error creating a Starter Pack: {{error}}"
     },

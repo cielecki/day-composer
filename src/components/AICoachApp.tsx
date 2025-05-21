@@ -268,11 +268,11 @@ export const AICoachApp: React.FC = () => {
 								},
 							}}
 						>
-							{activeMode.aic_description}
+							{activeMode ? activeMode.aic_description : t('ui.starterPack.noModes')}
 						</ReactMarkdown>
 					</div>
 
-						{Object.keys(aicModes).length === 1 && (
+						{Object.keys(aicModes).length === 0 && (
 							<button
 								className="mod-cta"
 								onClick={() => {
@@ -288,7 +288,7 @@ export const AICoachApp: React.FC = () => {
 							</button>
 						)}
 
-					{activeMode.aic_example_usages.length > 0 && (
+					{activeMode && activeMode.aic_example_usages.length > 0 && (
 						<div className="aic-mode-pills-container">
 							{activeMode.aic_example_usages.map((usage, index) => (
 								<AICModePill
@@ -333,7 +333,7 @@ export const AICoachApp: React.FC = () => {
 				>
 					{/* Flex row for dropdown and menu button */}
 					<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-						<div
+						{activeMode && <div
 							className="active-mode-indicator"
 							onClick={toggleDropdown}
 							style={{
@@ -397,7 +397,7 @@ export const AICoachApp: React.FC = () => {
 									<polyline points="6 9 12 15 18 9"></polyline>
 								</svg>
 							</span>
-						</div>
+						</div> }
 					</div>
 
 					{/* Mode selection dropdown */}
@@ -656,14 +656,14 @@ export const AICoachApp: React.FC = () => {
 				{isGeneratingResponse && <ThinkingMessage status="thinking" />}
 			</div>
 
-			<div className="controls-container">
+			{activeMode && <div className="controls-container">
 				<div className="button-container">
 					<UnifiedInputArea
 						newAbortController={newAbortController}
 						abort={abort}
 					/>
 				</div>
-			</div>
+			</div> }
 		</div>
 	);
 };
