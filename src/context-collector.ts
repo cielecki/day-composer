@@ -185,6 +185,26 @@ export class ContextCollector {
 				}
 			}
 
+			// Handle ln-current-date-and-time format
+			if (linkPath === 'ln-current-date-and-time') {
+				const now = new Date();
+				const moment = window.moment;
+				moment.locale(moment.locale());
+				
+				// Format date and time according to the user's locale with full written format
+				const formattedDate = moment(now).format('LLLL'); // Full date and time format (e.g., "Monday, March 18, 2024 2:30 PM")
+				
+				// Get the translated tag name and convert it to a valid XML tag name
+				const translatedTagName = this.convertToValidTagName(t('dateTime.current'));
+				
+				// Replace the link with the formatted date and time in XML format using self-closing tag
+				result = result.replace(
+					match[0],
+					`<${translatedTagName}>${formattedDate}</${translatedTagName}>\n`
+				);
+				continue;
+			}
+
 			// Try to resolve the link
 			const linkFile = this.getLinkpathDest(linkPath);
 

@@ -298,5 +298,10 @@
       "movedTo": " → {{target}}",
       "movedFrom": " (z {{source}})"
     }
+  },
+  "dateTime": {
+    "current": "Aktualna data i czas",
+    "date": "data",
+    "time": "czas"
   }
 } 
