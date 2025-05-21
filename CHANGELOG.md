@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the Day Composer plugin will be documented in this file.
+All notable changes to the Life Navigator plugin will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - YYYY-MM-DD
 ### Added
-- Initial release of the Day Composer plugin
+- Initial release of the Life Navigator plugin
 - AI Coach feature
 - Link Extensions
 - Dynamic Day Note Links 

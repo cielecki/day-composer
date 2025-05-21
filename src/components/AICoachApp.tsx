@@ -279,7 +279,7 @@ export const AICoachApp: React.FC = () => {
 									if (window.app) {
 										// @ts-ignore - Using the Obsidian command API
 										window.app.commands.executeCommandById(
-											"day-composer:create-starter-pack",
+											"life-navigator:create-starter-pack",
 										);
 									}
 								}}
@@ -588,7 +588,7 @@ export const AICoachApp: React.FC = () => {
 								onClick={() => {
 									if (window.app) {
 										// @ts-ignore - Using the Obsidian command API
-										window.app.commands.executeCommandById("day-composer:create-single-mode");
+										window.app.commands.executeCommandById("life-navigator:create-single-mode");
 									}
 									setDropdownOpen(false);
 								}}

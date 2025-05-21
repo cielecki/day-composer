@@ -17,7 +17,7 @@ export default class MyPlugin extends Plugin {
 	view: AICoachView | null = null;
 
 	async onload() {
-		console.log("Loading Day Composer plugin");
+		console.log("Loading Life Navigator plugin");
 
 		// Initialize i18n
 		await initI18n(this.app);
@@ -185,13 +185,13 @@ export default class MyPlugin extends Plugin {
 			id: "update-plugin-from-github",
 			name: "Update Plugin from Latest GitHub Release",
 			callback: async () => {
-				const repo = "cielecki/day-composer";
+				const repo = "cielecki/life-navigator";
 				const apiUrl = `https://api.github.com/repos/${repo}/releases/latest`;
 				new Notice("Checking for updates...");
 
 				try {
 					// Read current version from manifest.json
-					const manifestPath = this.app.vault.configDir + "/plugins/day-composer/manifest.json";
+					const manifestPath = this.app.vault.configDir + "/plugins/life-navigator/manifest.json";
 					// @ts-ignore
 					const manifestContent = await this.app.vault.adapter.read(manifestPath);
 					const manifest = JSON.parse(manifestContent);
@@ -238,7 +238,7 @@ export default class MyPlugin extends Plugin {
 							});
 							
 							if (response.status >= 200 && response.status < 300 && response.arrayBuffer) {
-								const targetPath = this.app.vault.configDir + `/plugins/day-composer/${assetName}`;
+								const targetPath = this.app.vault.configDir + `/plugins/life-navigator/${assetName}`;
 								console.log(`Saving asset to ${targetPath}`);
 								
 								// @ts-ignore

@@ -1,7 +1,7 @@
 {
   "settings": {
-    "title": "Ustawienia Day Composer",
-    "description": "Skonfiguruj ustawienia wtyczki Day Composer",
+    "title": "Ustawienia Life Navigator",
+    "description": "Skonfiguruj ustawienia wtyczki Life Navigator",
     "apiKeys": {
       "anthropic": "Klucz API Anthropic",
       "anthropicDesc": "Twój klucz API Anthropic dla funkcji Claude",
@@ -17,7 +17,7 @@
     "description": "Dostępne narzędzia i funkcje",
     "createStarterPack": "Utwórz pakiet startowy",
     "createSingleMode": "Utwórz pojedynczy tryb",
-    "aiCoach": "Day Composer",
+    "aiCoach": "Life Navigator",
     "tasks": {
       "single": "zadanie",
       "plural": "zadania"

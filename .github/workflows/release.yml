@@ -52,13 +52,13 @@ jobs:
                   draft: false
                   prerelease: false
                   body: |
-                      ## Day Composer ${{ github.ref_name }}
+                      ## Life Navigator ${{ github.ref_name }}
 
                       Please refer to the [changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
 
                       ### Installation
-                      - From Obsidian: Open Settings > Community Plugins > Browse and search for "Day Composer"
-                      - Manual: Download the files from this release and place them in your vault's `.obsidian/plugins/day-composer` folder
+                      - From Obsidian: Open Settings > Community Plugins > Browse and search for "Life Navigator"
+                      - Manual: Download the files from this release and place them in your vault's `.obsidian/plugins/life-navigator` folder
 
             - name: Upload main.js
               uses: actions/upload-release-asset@v1

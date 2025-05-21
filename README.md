@@ -1,4 +1,4 @@
-# Day Composer for Obsidian
+# Life Navigator for Obsidian
 
 This plugin provides a set of tools for enhancing your experience with Obsidian, with a focus on AI assistance and journal management.
 
@@ -53,7 +53,7 @@ This uses the same format as the daily note range feature in the context buildin
 ### First time developing plugins?
 
 - Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Clone this repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/day-composer` folder.
+- Clone this repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/life-navigator` folder.
 - Install NodeJS, then run `npm i` in the command line under your repo folder.
 - Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
 - Make changes to source files. Those changes should be automatically compiled into `main.js`.

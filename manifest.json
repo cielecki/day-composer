@@ -1,9 +1,9 @@
 {
-  "id": "day-composer",
-  "name": "Day Composer",
+  "id": "life-navigator",
+  "name": "Life Navigator",
   "version": "0.5.13",
   "minAppVersion": "0.15.0",
-  "description": "Meet Day Composer, your AI-powered daily co-pilot for Obsidian. Streamline journal management, leverage a customizable AI Coach, and connect ideas with innovative dynamic day note links. Boost productivity and unlock deeper insights daily.",
+  "description": "Meet Life Navigator, your AI-powered daily co-pilot for Obsidian. Streamline journal management, leverage a customizable AI Coach, and connect ideas with innovative dynamic day note links. Boost productivity and unlock deeper insights daily.",
   "author": "Maciej Cielecki",
   "authorUrl": "https://github.com/cielecki",
   "fundingUrl": "",
