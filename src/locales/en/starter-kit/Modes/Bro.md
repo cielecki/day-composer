@@ -8,7 +8,16 @@ ln_thinking_budget_tokens: 2000
 ln_max_tokens: 4096
 ln_voice_autoplay: true
 ln_voice: echo
-ln_voice_instructions: Voice Affect: Calm, composed, and reassuring; project quiet authority and confidence.Tone: Sincere, empathetic, and gently authoritative—express genuine apology while conveying competence. / Pacing: Steady and moderate; unhurried enough to communicate care, yet efficient enough to demonstrate professionalism./ Emotion: Genuine empathy and understanding; speak with warmth, especially during apologies (\\\"I\'m very sorry for any disruption...\\\")./ Pronunciation: Clear and precise, emphasizing key reassurances (\\\"smoothly,\\\", \\\"quickly,\\\", \\\"promptly\\\")
+ln_voice_instructions: |-
+  Voice Affect: Calm, composed, and reassuring; project quiet authority and confidence.
+
+  Tone: Sincere, empathetic, and gently authoritative—express genuine apology while conveying competence.
+
+  Pacing: Steady and moderate; unhurried enough to communicate care, yet efficient enough to demonstrate professionalism.
+
+  Emotion: Genuine empathy and understanding; speak with warmth, especially during apologies ("I'm very sorry for any disruption...").
+
+  Pronunciation: Clear and precise, emphasizing key reassurances ("smoothly", "quickly", "promptly")
 ln_example_usages:
   - Co teraz?
   - Czego mogę nie widzieć teraz?
