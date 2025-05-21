@@ -2,18 +2,21 @@
 
 ## Release to familiy and friends
 - [x] rename date-note to ln-date-note ...
-- [ ] Dodać backlog do starter kita
-- [ ] ln-current-date-and-time link that generates information about current time
-- [ ] Take few days off to release this
+- [x] Take few days off to release this
+- [x] ln-current-date-and-time link that generates information about current time
+- [x] Starter kit translations
+- [x] Add task backlog to stater kit
+
+- [ ] Support for ln_voice_speed
 - [ ] Napisałem na ten temat, co mam, do Bartka, Natalii i Trenera
 - [ ] coś nie tak jest z tym jak przykłady są robione
-- [ ] More relaxed todo format in the plugin
 - [ ] Is the domain free?
+
+- [ ] More relaxed todo format in the plugin
 
 ## AI breakfast release
 - [ ] 🔧 Dodać funkcję edycji todo itemów
 - [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
-- [ ] Translacje dla starter kita
 - [ ] Working daily planning and habits
 - [ ] Choose licence
 
@@ -38,14 +41,7 @@
 ❌ Nie znaleziono zadania ""🍳 10:30 Śniadanie z Michałem"" w {{path}}. Jeśli zadanie znajduje się w innym pliku, określ go w parametrze file_path.
 ```
 
-- [ ] Zrobilem plan projektu Vibe Living
-	- [ ] Twitter following research
-	- [ ] Youtube following and research
-	- [ ] Linkedin following and research
-	- [ ] Facebook following and research
-	- [ ] instagram following and research
-	- [ ] Gryn albo inne podjac kwestie mojego media presence jak to ogarnac?
-	- [ ] Moja strona
+- [ ] I made a marketing plan of the Vibe Living project
 
 ## Nice to haves
 - [ ] Life navigator: comments jak sa multiline to zle sie formatuja po dodaniu do notatki przez AI
@@ -54,6 +50,7 @@
 - [ ] abandoning powinien przenosić zadania na początek notatki dla lepszej widoczności
 - [ ] Bug gdy zastopuje generowanego tool calla
 - [ ] Dodać możliwość konfiguracjii tooli w trybach
+- [ ] Distinct animation for when speach is being generated vs when it's playing
 
 ```markdown
 conversation turn processing: BadRequestError: 400 {"type":"error","error":{"type":"invalid_request_error","message":"messages.4: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_016aY9VAzzsaK6mWENg3JN8L. Each `tool_use` block must have a corresponding `tool_result` block in the next message."}}

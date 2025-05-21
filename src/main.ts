@@ -12,24 +12,62 @@ import { initI18n, t } from "./i18n";
 import { LNMode } from "./types/types";
 import { modeToNoteContent } from "./utils/mode-utils";
 import path from "path";
-import { getDefaultLNMode, mergeWithDefaultMode, getStarterPackContents } from "./defaults/ln-mode-defaults";
+import { getDefaultLNMode, mergeWithDefaultMode } from "./defaults/ln-mode-defaults";
+import { STARTER_KIT_DATA } from "./generated/starter-kit-data";
 
 
 
 const createStarterPack = async (app: App) => {
 	try {
-		// Create an LN Modes folder if it doesn't exist
-		const starterPackDirName = t('ui.starterPack.directoryName') + " v0.1";
-		for (const { name, content } of getStarterPackContents()) {
-			const filePath = path.join(starterPackDirName, name);
+		const currentLanguage = window.localStorage.getItem('language') || 'en';
+		const fallbackLanguage = 'en';
 
+		const starterPackDirNameKey = 'ui.starterPack.directoryName';
+		let starterPackDirName = t(starterPackDirNameKey);
+
+		starterPackDirName = starterPackDirName + " v0.2";
+
+		// Check if we have files for the current language
+		if (!STARTER_KIT_DATA[currentLanguage]) {
+			console.warn(`No starter kit files defined for language: ${currentLanguage}. Falling back to ${fallbackLanguage}.`);
+			
+			// If fallback language also doesn't exist, show error and exit
+			if (!STARTER_KIT_DATA[fallbackLanguage]) {
+				new Notice(`Error: No starter kit files defined for current language (${currentLanguage}) or fallback (${fallbackLanguage}).`);
+				console.error(`Starter Pack: No files for language ${currentLanguage} or fallback ${fallbackLanguage}.`);
+				return;
+			}
+		}
+
+		// Use current language files if available, otherwise fallback
+		const starterFiles = STARTER_KIT_DATA[currentLanguage] || STARTER_KIT_DATA[fallbackLanguage];
+
+		for (const item of starterFiles) { 
+			// Get file details directly
+			const { subPath, filename, content } = item;
+
+			if (!filename) {
+				new Notice(`Skipping file: missing filename.`);
+				console.error(`Starter Pack: Critical - Missing filename for a file. Skipping.`);
+				continue;
+			}
+
+			if (!content) {
+				new Notice(`Skipping file '${filename}': missing content.`);
+				console.error(`Starter Pack: Critical - Missing content for file ${filename}. Skipping.`);
+				continue;
+			}
+
+			const filePath = path.join(starterPackDirName, subPath, filename);
 			const directory = path.dirname(filePath);
+
 			if (!app.vault.getAbstractFileByPath(directory)) {
 				await app.vault.createFolder(directory);
 			}
 
 			// Check if file already exists
 			if (app.vault.getAbstractFileByPath(filePath)) {
+				new Notice(`File ${filePath} already exists, skipping.`);
 				continue; // Skip if file already exists
 			}
 
@@ -180,6 +218,7 @@ export default class MyPlugin extends Plugin {
 			});
 
 			return this.view;
+
 		});
 
 
@@ -350,3 +389,7 @@ export default class MyPlugin extends Plugin {
 		resetPluginSettings();
 	}
 }
+
+
+
+

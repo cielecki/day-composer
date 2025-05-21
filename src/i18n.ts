@@ -1,8 +1,9 @@
 import i18next from 'i18next';
 import en from './locales/en.json';
 import pl from './locales/pl.json';
+import { App } from 'obsidian';
 
-export const initI18n = async (app: any) => {
+export const initI18n = async (app: App) => {
   // Get Obsidian's language setting from localStorage
   const obsidianLang = window.localStorage.getItem('language') || 'en';
   console.log('Obsidian language setting from localStorage:', obsidianLang);
