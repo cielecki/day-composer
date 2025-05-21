@@ -6,7 +6,7 @@ import { AIAgentProvider } from "./context/AIAgentContext";
 import { SpeechToTextProvider } from "./context/SpeechToTextContext";
 import MyPlugin from "./main";
 import { TextToSpeechProvider } from "./context/TextToSpeechContext";
-import { AICModeProvider } from "./context/AICModeContext";
+import { LNModeProvider } from "./context/LNModeContext";
 import { t } from './i18n';
 
 export interface AICoachViewProps {
@@ -71,13 +71,13 @@ export class AICoachView extends ItemView {
 
 		this.reactRoot.render(
 			<TextToSpeechProvider>
-				<AICModeProvider app={this.app}>
+				<LNModeProvider app={this.app}>
 					<AIAgentProvider plugin={this.props.plugin}>
 						<SpeechToTextProvider>
 							<AICoachApp />
 						</SpeechToTextProvider>
 					</AIAgentProvider>
-				</AICModeProvider>
+				</LNModeProvider>
 			</TextToSpeechProvider>,
 		);
 	}

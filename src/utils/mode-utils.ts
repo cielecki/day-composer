@@ -12,16 +12,16 @@ type Frontmatter = Record<string, FrontmatterValue>;
  */
 export function modeToNoteContent(mode: AICMode): string {
   // Extract the system prompt content (not in frontmatter)
-  const systemPrompt = mode.aic_system_prompt || '';
+  const systemPrompt = mode.ln_system_prompt || '';
   
   // Create a clean object for frontmatter, removing undefined values and the system prompt
   const frontmatterObj: Frontmatter = {
-    tags: 'aic-mode',
+    tags: 'ln-mode',
   };
   
-  // Add all properties except system prompt and aic_path (which is determined at load time)
+  // Add all properties except system prompt and ln_path (which is determined at load time)
   Object.entries(mode).forEach(([key, value]) => {
-    if (key !== 'aic_system_prompt' && key !== 'aic_path' && value !== undefined) {
+    if (key !== 'ln_system_prompt' && key !== 'ln_path' && value !== undefined) {
       frontmatterObj[key] = value;
     }
   });

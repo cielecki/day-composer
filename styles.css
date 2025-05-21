@@ -973,10 +973,10 @@ If your plugin does not need CSS, delete this file.
   margin-right: 4px;
 }
 
-/* Add styles for AIC Mode components */
+/* Add styles for LN Mode components */
 
-/* AIC Mode Pills */
-.aic-mode-pills-container {
+/* LN Mode Pills */
+.ln-mode-pills-container {
   margin-top: 1rem;
   display: flex;
   flex-wrap: wrap;
@@ -984,7 +984,7 @@ If your plugin does not need CSS, delete this file.
   align-items: center;
 }
 
-.aic-mode-pill {
+.ln-mode-pill {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -997,18 +997,18 @@ If your plugin does not need CSS, delete this file.
   transition: background-color 0.2s ease;
 }
 
-.aic-mode-pill:hover {
+.ln-mode-pill:hover {
   background-color: var(--background-modifier-hover);
 }
 
-.aic-mode-icon-container {
+.ln-mode-icon-container {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.aic-mode-name {
+.ln-mode-name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

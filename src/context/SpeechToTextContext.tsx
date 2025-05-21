@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, ReactNode, useCallback, use
 import { Notice } from 'obsidian';
 import { getPluginSettings } from '../settings/PluginSettings';
 import OpenAI from 'openai';
-import { useAICMode } from './AICModeContext';
+import { useAICMode } from './LNModeContext';
 import { t } from '../i18n';
 
 const MAX_AUDIO_PROMPT_LENGTH = 5000;
@@ -178,7 +178,7 @@ export const SpeechToTextProvider: React.FC<{
       const transcription = await openai.audio.transcriptions.create({
         file: file,
         model: 'gpt-4o-transcribe',
-        prompt: activeMode.aic_system_prompt.substring(0, MAX_AUDIO_PROMPT_LENGTH),
+        prompt: activeMode.ln_system_prompt.substring(0, MAX_AUDIO_PROMPT_LENGTH),
         language: 'pl',
       }, {
         signal: signal,

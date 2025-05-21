@@ -9,9 +9,9 @@ import { resetObsidianTools } from "./obsidian-tools";
 import { AI_COACH_VIEW_TYPE, AICoachView } from "./ai-coach-view";
 import { getObsidianTools } from "./obsidian-tools";
 import { initI18n, t } from "./i18n";
-import { getStarterPackContents } from "./defaults/aic-mode-defaults";
-import { mergeWithDefaultMode } from "./defaults/aic-mode-defaults";
-import { getDefaultAICMode } from "./defaults/aic-mode-defaults";
+import { getStarterPackContents } from "./defaults/ln-mode-defaults";
+import { mergeWithDefaultMode } from "./defaults/ln-mode-defaults";
+import { getDefaultAICMode } from "./defaults/ln-mode-defaults";
 import { AICMode } from "./types/types";
 import { modeToNoteContent } from "./utils/mode-utils";
 import path from "path";
@@ -98,20 +98,20 @@ const createSingleMode = async (app: App) => {
 		// Create a new mode with default values
 		const defaultMode = getDefaultAICMode();
 		const newMode: Partial<AICMode> = {
-			aic_name: t('ui.mode.newMode'),
-			aic_description: t('ui.mode.defaultDescription'),
-			aic_icon: randomIcon,
-			aic_icon_color: randomColor,
-			aic_system_prompt: defaultMode.aic_system_prompt,
-			aic_example_usages: [],
-			aic_voice_autoplay: true,
-			aic_voice: "alloy",
-			aic_voice_instructions: t('ui.mode.defaultVoiceInstructions'),
-			aic_voice_speed: 1.0,
+			ln_name: t('ui.mode.newMode'),
+			ln_description: t('ui.mode.defaultDescription'),
+			ln_icon: randomIcon,
+			ln_icon_color: randomColor,
+			ln_system_prompt: defaultMode.ln_system_prompt,
+			ln_example_usages: [],
+			ln_voice_autoplay: true,
+			ln_voice: "alloy",
+			ln_voice_instructions: t('ui.mode.defaultVoiceInstructions'),
+			ln_voice_speed: 1.0,
 		};
 
-		// Ensure aic_name is defined
-		const baseModeName = newMode.aic_name || t('ui.mode.newMode');
+		// Ensure ln_name is defined
+		const baseModeName = newMode.ln_name || t('ui.mode.newMode');
 		const sanitizedBaseName = baseModeName.replace(/[^a-zA-Z0-9 ]/g, "");
 
 		// Find a unique filename by incrementing a number if needed
@@ -128,8 +128,8 @@ const createSingleMode = async (app: App) => {
 		// Create a complete mode object by merging with defaults
 		const completeMode: AICMode = {
 			...mergeWithDefaultMode(newMode),
-			aic_path: filePath,
-			aic_name: fileName.replace(".md", ""), // Update the name to match the file name
+			ln_path: filePath,
+			ln_name: fileName.replace(".md", ""), // Update the name to match the file name
 		};
 
 		// Convert mode to note content using the utility function

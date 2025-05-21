@@ -275,7 +275,7 @@
       "defaultVoiceInstructions": "Speak clearly and professionally",
       "files": {
         "noFrontmatter": "File {{filename}} doesn't have frontmatter, using default values with file content as system prompt",
-        "loadedCount": "Loaded {{count}} AIC modes with #aic-mode tag"
+        "loadedCount": "Loaded {{count}} AIC modes with #ln-mode tag"
       }
     },
     "attachments": {
@@ -292,7 +292,7 @@
       "systemPrompt": "System Prompt for \"{{modeName}}\""
     },
     "starterPack": {
-      "noModes": "## Welcome to Life Navigator\n\nTo get started, create a starter pack containing basic modes with the _#aic-mode_ tag",
+      "noModes": "## Welcome to Life Navigator\n\nTo get started, create a starter pack containing basic modes with the _#ln-mode_ tag",
       "createdSuccess": "Created a Starter Pack successfully",
       "createdError": "Error creating a Starter Pack: {{error}}",
       "directoryName": "Starter Pack"

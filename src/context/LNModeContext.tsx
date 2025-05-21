@@ -12,15 +12,15 @@ import {
 	mergeWithDefaultMode,
 	validateModeSettings,
 	getDefaultAICMode,
-} from "../defaults/aic-mode-defaults";
+} from "../defaults/ln-mode-defaults";
 import * as yaml from "js-yaml";
 import { ContextCollector } from "src/context-collector";
-import { useTextToSpeech } from "../context/TextToSpeechContext";
+import { useTextToSpeech } from "./TextToSpeechContext";
 import { t } from '../i18n';
 
 
 
-export interface AICModeContextType {
+export interface LNModeContextType {
 	aicModes: Record<string, AICMode>;
 	activeModeId: string;
 	setActiveMode: (mode: AICMode | null) => void;
@@ -28,9 +28,9 @@ export interface AICModeContextType {
 	defaultAICMode: Partial<AICMode>;
 }
 
-const AICModeContext = createContext<AICModeContextType | undefined>(undefined);
+const LNModeContext = createContext<LNModeContextType | undefined>(undefined);
 
-export const AICModeProvider: React.FC<{
+export const LNModeProvider: React.FC<{
 	children: ReactNode;
 	app: App;
 }> = ({ children, app }) => {
@@ -43,7 +43,7 @@ export const AICModeProvider: React.FC<{
 	const [modeFilePaths, setModeFilePaths] = useState<Set<string>>(new Set());
 	const textToSpeech = useTextToSpeech();
 
-	// Function to extract an AIC mode from a file with the #aic-mode tag
+	// Function to extract an AIC mode from a file with the #ln-mode tag
 	const extractAICModeFromFile = async (
 		file: TFile,
 	): Promise<AICMode | null> => {
@@ -55,7 +55,7 @@ export const AICModeProvider: React.FC<{
 				return null;
 			}
 
-			// Check if file has #aic-mode tag
+			// Check if file has #ln-mode tag
 			const cache = app.metadataCache.getFileCache(file);
 			const tags = cache?.tags?.map((tag) => tag.tag) || [];
 			const frontmatterTags = cache?.frontmatter?.tags || [];
@@ -65,10 +65,10 @@ export const AICModeProvider: React.FC<{
 				? frontmatterTags
 				: [frontmatterTags];
 
-			// Check if the file has the #aic-mode tag
+			// Check if the file has the #ln-mode tag
 			const hasAicModeTag =
-				tags.includes("#aic-mode") ||
-				normalizedFrontmatterTags.includes("aic-mode");
+				tags.includes("#ln-mode") ||
+				normalizedFrontmatterTags.includes("ln-mode");
 
 			if (!hasAicModeTag) {
 				return null;
@@ -85,9 +85,9 @@ export const AICModeProvider: React.FC<{
 				);
 				// Create partial mode with only required fields
 				const partialMode: Partial<AICMode> = {
-					aic_name: file.basename,
-					aic_path: file.path,
-					aic_system_prompt: content.trim(),
+					ln_name: file.basename,
+					ln_path: file.path,
+					ln_system_prompt: content.trim(),
 				};
 
 				// Merge with defaults
@@ -108,54 +108,54 @@ export const AICModeProvider: React.FC<{
 			// Create a partial AICMode object
 			const partialMode: Partial<AICMode> = {
 				// Required fields
-				aic_name: frontmatter.aic_name || file.basename,
-				aic_path: file.path,
+				ln_name: frontmatter.ln_name || file.basename,
+				ln_path: file.path,
 
 				// UI elements
-				aic_icon: frontmatter.aic_icon,
-				aic_icon_color: frontmatter.aic_icon_color,
-				aic_description: frontmatter.aic_description,
+				ln_icon: frontmatter.ln_icon,
+				ln_icon_color: frontmatter.ln_icon_color,
+				ln_description: frontmatter.ln_description,
 
 				// Behavior
-				aic_example_usages: Array.isArray(
-					frontmatter.aic_example_usages,
+				ln_example_usages: Array.isArray(
+					frontmatter.ln_example_usages,
 				)
-					? frontmatter.aic_example_usages
-					: frontmatter.aic_example_usages
-						? [frontmatter.aic_example_usages]
+					? frontmatter.ln_example_usages
+					: frontmatter.ln_example_usages
+						? [frontmatter.ln_example_usages]
 						: [],
 
 
 
 				// API parameters
-				aic_thinking_budget_tokens:
-					frontmatter.aic_thinking_budget_tokens !== undefined
+				ln_thinking_budget_tokens:
+					frontmatter.ln_thinking_budget_tokens !== undefined
 						? parseInt(
-								String(frontmatter.aic_thinking_budget_tokens),
+								String(frontmatter.ln_thinking_budget_tokens),
 							)
 						: undefined,
-				aic_max_tokens:
-					frontmatter.aic_max_tokens !== undefined
-						? parseInt(String(frontmatter.aic_max_tokens))
+				ln_max_tokens:
+					frontmatter.ln_max_tokens !== undefined
+						? parseInt(String(frontmatter.ln_max_tokens))
 						: undefined,
 
 				// TTS settings
-				aic_voice_autoplay:
-					frontmatter.aic_voice_autoplay !== undefined
+				ln_voice_autoplay:
+					frontmatter.ln_voice_autoplay !== undefined
 						? String(
-								frontmatter.aic_voice_autoplay,
+								frontmatter.ln_voice_autoplay,
 							).toLowerCase() === "true"
 						: undefined,
-				aic_voice: frontmatter.aic_voice,
-				aic_voice_instructions: frontmatter.aic_voice_instructions,
-				aic_voice_speed:
-					frontmatter.aic_voice_speed !== undefined
-						? parseFloat(String(frontmatter.aic_voice_speed))
+				ln_voice: frontmatter.ln_voice,
+				ln_voice_instructions: frontmatter.ln_voice_instructions,
+				ln_voice_speed:
+					frontmatter.ln_voice_speed !== undefined
+						? parseFloat(String(frontmatter.ln_voice_speed))
 						: undefined,
 			};
 
 			//expand links in contentStr
-			partialMode.aic_system_prompt = await new ContextCollector(
+			partialMode.ln_system_prompt = await new ContextCollector(
 				app,
 			).expandLinks(contentStr);
 
@@ -176,8 +176,8 @@ export const AICModeProvider: React.FC<{
 
 			for (const file of files) {
 				const mode = await extractAICModeFromFile(file);
-				if (mode && mode.aic_path) {
-					modesMap[mode.aic_path] = mode;
+				if (mode && mode.ln_path) {
+					modesMap[mode.ln_path] = mode;
 				}
 			}
 
@@ -211,7 +211,7 @@ export const AICModeProvider: React.FC<{
 		};
 	}, [app, fileEventRefs]);
 
-	// Helper to check if file has or had the #aic-mode tag
+	// Helper to check if file has or had the #ln-mode tag
 	const hasAICModeTag = (file: TFile): boolean => {
 		const cache = app.metadataCache.getFileCache(file);
 		const tags = cache?.tags?.map((tag) => tag.tag) || [];
@@ -223,8 +223,8 @@ export const AICModeProvider: React.FC<{
 			: [frontmatterTags];
 
 		return (
-			tags.includes("#aic-mode") ||
-			normalizedFrontmatterTags.includes("aic-mode")
+			tags.includes("#ln-mode") ||
+			normalizedFrontmatterTags.includes("ln-mode")
 		);
 	};
 
@@ -333,10 +333,10 @@ export const AICModeProvider: React.FC<{
 				// Update text-to-speech settings for the default mode
 				const defaultMode = getDefaultAICMode();
 				textToSpeech.setTTSSettings({
-					enabled: defaultMode.aic_voice_autoplay,
-					voice: defaultMode.aic_voice,
-					instructions: defaultMode.aic_voice_instructions,
-					speed: defaultMode.aic_voice_speed,
+					enabled: defaultMode.ln_voice_autoplay,
+					voice: defaultMode.ln_voice,
+					instructions: defaultMode.ln_voice_instructions,
+					speed: defaultMode.ln_voice_speed,
 				});
 
 				return;
@@ -348,29 +348,29 @@ export const AICModeProvider: React.FC<{
 			);
 
 			// Save in modes if not already there (shouldn't usually happen)
-			if (completeMode.aic_path && !aicModes[completeMode.aic_path]) {
+			if (completeMode.ln_path && !aicModes[completeMode.ln_path]) {
 				setAICModes((prev) => ({
 					...prev,
-					[completeMode.aic_path]: completeMode,
+					[completeMode.ln_path]: completeMode,
 				}));
 			}
 
 			// Set active mode ID
-			setActiveModeId(completeMode.aic_path);
+			setActiveModeId(completeMode.ln_path);
 
 			// Update text-to-speech settings for the new mode
 			textToSpeech.setTTSSettings({
-				enabled: completeMode.aic_voice_autoplay,
-				voice: completeMode.aic_voice,
-				instructions: completeMode.aic_voice_instructions,
-				speed: completeMode.aic_voice_speed,
+				enabled: completeMode.ln_voice_autoplay,
+				voice: completeMode.ln_voice,
+				instructions: completeMode.ln_voice_instructions,
+				speed: completeMode.ln_voice_speed,
 			});
 		},
 		[aicModes, textToSpeech],
 	);
 
 	// Context value that provides the modes and functionality
-	const contextValue: AICModeContextType = {
+	const contextValue: LNModeContextType = {
 		aicModes,
 		activeModeId,
 		setActiveMode,
@@ -379,15 +379,15 @@ export const AICModeProvider: React.FC<{
 	};
 
 	return (
-		<AICModeContext.Provider value={contextValue}>
+		<LNModeContext.Provider value={contextValue}>
 			{children}
-		</AICModeContext.Provider>
+		</LNModeContext.Provider>
 	);
 };
 
 // Custom hook for using the AIC Mode context
 export const useAICMode = () => {
-	const context = useContext(AICModeContext);
+	const context = useContext(LNModeContext);
 	if (context === undefined) {
 		throw new Error("useAICMode must be used within an AICModeProvider");
 	}

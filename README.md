@@ -14,7 +14,7 @@ The plugin supports special link formats that enhance your note-taking experienc
 
 #### Regular Link Expansion
 
-Links followed by a magnifying glass emoji will be expanded when used in AIC modes:
+Links followed by a magnifying glass emoji will be expanded when used in LN modes:
 
 ```
 [[Note Title]] 🔎
@@ -35,7 +35,7 @@ Where `X` is a number representing how many days to offset from today:
 - Positive numbers represent future days: `[[day-note-(2)]] 🔎` refers to the note 2 days from now
 - Zero represents today: `[[day-note-(0)]] 🔎` refers to today's note
 
-This uses the same format as the daily note range feature in the context building for AIC modes.
+This uses the same format as the daily note range feature in the context building for LN modes.
 
 ## Installation
 

@@ -8,7 +8,7 @@ import React, {
 import { MessageDisplay } from "./MessageDisplay";
 import { useTextToSpeech } from "../context/TextToSpeechContext";
 import { ThinkingMessage } from "./ThinkingMessage";
-import { useAICMode } from "../context/AICModeContext";
+import { useAICMode } from "../context/LNModeContext";
 import {
 	ToolResultBlock,
 	ContentBlock,
@@ -17,7 +17,7 @@ import { useAIAgent } from "src/context/AIAgentContext";
 import { LucideIcon } from "./LucideIcon";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { AICModePill } from "./AICModePills";
+import { LNModePill } from "./LNModePills";
 import { TFile } from "obsidian";
 import { Modal } from "obsidian";
 import { t } from '../i18n';
@@ -268,7 +268,7 @@ export const AICoachApp: React.FC = () => {
 								},
 							}}
 						>
-							{activeMode ? activeMode.aic_description : t('ui.starterPack.noModes')}
+							{activeMode ? activeMode.ln_description : t('ui.starterPack.noModes')}
 						</ReactMarkdown>
 					</div>
 
@@ -288,10 +288,10 @@ export const AICoachApp: React.FC = () => {
 							</button>
 						)}
 
-					{activeMode && activeMode.aic_example_usages.length > 0 && (
-						<div className="aic-mode-pills-container">
-							{activeMode.aic_example_usages.map((usage, index) => (
-								<AICModePill
+					{activeMode && activeMode.ln_example_usages.length > 0 && (
+						<div className="ln-mode-pills-container">
+							{activeMode.ln_example_usages.map((usage, index) => (
+								<LNModePill
 									key={index}
 									id={`${index}`}
 									name={usage}
@@ -299,7 +299,7 @@ export const AICoachApp: React.FC = () => {
 										// If the mode has an auto-trigger message, send it
 										if (usage) {
 											console.log(
-												`Auto-triggering message for mode ${activeMode.aic_name}: "${usage}"`,
+												`Auto-triggering message for mode ${activeMode.ln_name}: "${usage}"`,
 											);
 
 											// Need to create a new abort controller here
@@ -351,7 +351,7 @@ export const AICoachApp: React.FC = () => {
 							}}
 							ref={modeIndicatorRef}
 						>
-							{activeMode.aic_icon && (
+							{activeMode.ln_icon && (
 								<span
 									style={{
 										display: "flex",
@@ -360,17 +360,17 @@ export const AICoachApp: React.FC = () => {
 									}}
 								>
 									<LucideIcon
-										name={activeMode.aic_icon}
+										name={activeMode.ln_icon}
 										size={18}
 										color={
-											activeMode.aic_icon_color ||
+											activeMode.ln_icon_color ||
 											"var(--text-normal)"
 										}
 									/>
 								</span>
 							)}
 							<span style={{ fontWeight: 500 }}>
-								{activeMode.aic_name}
+								{activeMode.ln_name}
 							</span>
 							<span
 								style={{
@@ -436,8 +436,8 @@ export const AICoachApp: React.FC = () => {
 									wordBreak: "break-word",
 								}}
 								onClick={() => {
-									if (window.app && activeMode.aic_path) {
-										const file = window.app.vault.getAbstractFileByPath(activeMode.aic_path);
+									if (window.app && activeMode.ln_path) {
+										const file = window.app.vault.getAbstractFileByPath(activeMode.ln_path);
 										if (file) {
 											window.app.workspace.getLeaf().openFile(file as TFile);
 										}
@@ -465,7 +465,7 @@ export const AICoachApp: React.FC = () => {
 								onClick={() => {
 									openSimpleObsidianModal(
 										window.app,
-										t('ui.modal.modeSettings').replace('{{modeName}}', activeMode.aic_name),
+										t('ui.modal.modeSettings').replace('{{modeName}}', activeMode.ln_name),
 										JSON.stringify(activeMode, null, 2)
 									);
 									setDropdownOpen(false);
@@ -492,7 +492,7 @@ export const AICoachApp: React.FC = () => {
 									const systemPrompt = await getContext();
 									openSimpleObsidianModal(
 										window.app,
-										t('ui.modal.systemPrompt').replace('{{modeName}}', activeMode.aic_name),
+										t('ui.modal.systemPrompt').replace('{{modeName}}', activeMode.ln_name),
 										systemPrompt || ""
 									);
 									setDropdownOpen(false);
@@ -525,22 +525,22 @@ export const AICoachApp: React.FC = () => {
 												padding: "8px 12px",
 												cursor: "pointer",
 												backgroundColor:
-													mode.aic_path === activeMode.aic_path
+													mode.ln_path === activeMode.ln_path
 														? "var(--background-modifier-hover)"
 														: "transparent",
 												position: "relative",
-												fontWeight: mode.aic_path === activeMode.aic_path ? 500 : "normal",
+												fontWeight: mode.ln_path === activeMode.ln_path ? 500 : "normal",
 												whiteSpace: "normal",
 												wordBreak: "break-word",
 											}}
 											onClick={() => {
-												handleModeSelect(mode.aic_path);
+												handleModeSelect(mode.ln_path);
 												setDropdownOpen(false);
 											}}
 											onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
-											onMouseOut={e => (e.currentTarget.style.backgroundColor = mode.aic_path === activeMode.aic_path ? "var(--background-modifier-hover)" : "transparent")}
+											onMouseOut={e => (e.currentTarget.style.backgroundColor = mode.ln_path === activeMode.ln_path ? "var(--background-modifier-hover)" : "transparent")}
 										>
-											{mode.aic_icon && (
+											{mode.ln_icon && (
 												<span
 													style={{
 														display: "flex",
@@ -549,9 +549,9 @@ export const AICoachApp: React.FC = () => {
 													}}
 												>
 													<LucideIcon
-														name={mode.aic_icon}
+														name={mode.ln_icon}
 														size={16}
-														color={mode.aic_icon_color || "var(--text-normal)"}
+														color={mode.ln_icon_color || "var(--text-normal)"}
 													/>
 												</span>
 											)}
@@ -561,10 +561,10 @@ export const AICoachApp: React.FC = () => {
 													whiteSpace: "nowrap",
 													overflow: "hidden",
 													textOverflow: "ellipsis",
-													fontWeight: mode.aic_path === activeMode.aic_path ? 500 : "normal",
+													fontWeight: mode.ln_path === activeMode.ln_path ? 500 : "normal",
 												}}
 											>
-												{mode.aic_name}
+												{mode.ln_name}
 											</span>
 										</div>
 									))}

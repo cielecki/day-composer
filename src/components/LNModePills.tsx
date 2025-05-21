@@ -10,10 +10,10 @@ interface AICModePillProps {
   onClick: (id: string) => void;
 }
 
-export const AICModePill: React.FC<AICModePillProps> = ({ id, icon, iconColor, name, onClick }) => {
+export const LNModePill: React.FC<AICModePillProps> = ({ id, icon, iconColor, name, onClick }) => {
   return (
     <button
-      className="aic-mode-pill"
+      className="ln-mode-pill"
       onClick={() => onClick(id)}
       title={name}
       data-icon-color={iconColor || 'var(--text-normal)'}
@@ -22,16 +22,16 @@ export const AICModePill: React.FC<AICModePillProps> = ({ id, icon, iconColor, n
       } as React.CSSProperties}
     >
       {icon && (
-        <div className="aic-mode-icon-container">
+        <div className="ln-mode-icon-container">
           <LucideIcon 
             name={icon} 
             size={16}
-            className="aic-mode-icon"
+            className="ln-mode-icon"
             color={iconColor}
           />
         </div>
       )}
-      <span className="aic-mode-name">{name}</span>
+      <span className="ln-mode-name">{name}</span>
     </button>
   );
 };
@@ -44,14 +44,14 @@ interface AICModePillsProps {
 export const AICModePills: React.FC<AICModePillsProps> = ({ aicModes, onModeSelect }) => {
   // User has modes, so display them
   return (
-    <div className="aic-mode-pills-container">
+    <div className="ln-mode-pills-container">
       {Object.values(aicModes).map((mode, index) => (
-        <AICModePill
+        <LNModePill
           key={index}
-          id={mode.aic_path}
-          icon={mode.aic_icon}
-          iconColor={mode.aic_icon_color}
-          name={mode.aic_name}
+          id={mode.ln_path}
+          icon={mode.ln_icon}
+          iconColor={mode.ln_icon_color}
+          name={mode.ln_name}
           onClick={onModeSelect}
         />
       ))}

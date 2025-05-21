@@ -77,25 +77,25 @@ export interface ToolUseResult {
 
 export interface AICMode {
 	// Core identification
-	aic_name: string;
-	aic_path: string;
+	ln_name: string;
+	ln_path: string;
 
 	// UI elements
-	aic_icon: string;
-	aic_icon_color: string;
-	aic_description: string; // Used in UI to show what this mode does
+	ln_icon: string;
+	ln_icon_color: string;
+	ln_description: string; // Used in UI to show what this mode does
 
 	// Behavior
-	aic_system_prompt: string; // The main content becomes this
-	aic_example_usages: string[]; // Message to automatically send when mode is activated
+	ln_system_prompt: string; // The main content becomes this
+	ln_example_usages: string[]; // Message to automatically send when mode is activated
 
 	// API parameters
-	aic_thinking_budget_tokens: number;
-	aic_max_tokens: number;
+	ln_thinking_budget_tokens: number;
+	ln_max_tokens: number;
 
 	// TTS settings
-	aic_voice_autoplay: boolean;
-	aic_voice: string;
-	aic_voice_instructions: string;
-	aic_voice_speed: number;
+	ln_voice_autoplay: boolean;
+	ln_voice: string;
+	ln_voice_instructions: string;
+	ln_voice_speed: number;
 }

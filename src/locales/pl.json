@@ -267,7 +267,7 @@
       "defaultVoiceInstructions": "Mów wyraźnie i profesjonalnie",
       "files": {
         "noFrontmatter": "Plik {{filename}} nie ma frontmattera, używam wartości domyślnych z treścią pliku jako prompt systemowy",
-        "loadedCount": "Załadowano {{count}} trybów z tagiem #aic-mode"
+        "loadedCount": "Załadowano {{count}} trybów z tagiem #ln-mode"
       }
     },
     "attachments": {
@@ -284,7 +284,7 @@
       "systemPrompt": "Prompt systemowy dla \"{{modeName}}\""
     },
     "starterPack": {
-      "noModes": "## Witaj w Life Navigator\n\nAby rozpocząć, utwórz pakiet startowy zawierający podstawowe tryby z tagiem _#aic-mode_.",
+      "noModes": "## Witaj w Life Navigator\n\nAby rozpocząć, utwórz pakiet startowy zawierający podstawowe tryby z tagiem _#ln-mode_.",
       "createdSuccess": "Pomyślnie utworzono pakiet startowy",
       "createdError": "Błąd podczas tworzenia pakietu startowego: {{error}}",
       "directoryName": "Pakiet startowy"
