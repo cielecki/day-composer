@@ -19,7 +19,6 @@ ln_voice_instructions: |-
 
   Pronunciation: Clear and precise, emphasizing key reassurances ("smoothly", "quickly", "promptly")
 
-ln_voice_speed: 2
 ln_example_usages:
   - Co teraz?
   - Czego mogę nie widzieć teraz?

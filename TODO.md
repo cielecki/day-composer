@@ -1,13 +1,13 @@
 # TODO
 
 ## Release to familiy and friends
-- [x] rename date-note to ln-date-note ...
+- [x] rename day-note to ln-day-note ...
 - [x] Take few days off to release this
 - [x] ln-current-date-and-time link that generates information about current time
 - [x] Starter kit translations
 - [x] Add task backlog to stater kit
+- [x] Removed ln_voice_speed from starter kit as mini tts does not support it
 
-- [ ] Support for ln_voice_speed
 - [ ] Napisałem na ten temat, co mam, do Bartka, Natalii i Trenera
 - [ ] coś nie tak jest z tym jak przykłady są robione
 - [ ] Is the domain free?

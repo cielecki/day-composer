@@ -18,7 +18,6 @@ ln_voice_instructions: |-
   Emotion: Genuine empathy and understanding; speak with warmth, especially during apologies ("I'm very sorry for any disruption...").
 
   Pronunciation: Clear and precise, emphasizing key reassurances ("smoothly", "quickly", "promptly")
-ln_voice_speed: 2
 ln_example_usages:
   - Zaplanuj dzisiejszy dzień
   - Zaplanuj jutrzejszy dzień

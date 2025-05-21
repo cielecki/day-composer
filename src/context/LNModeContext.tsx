@@ -40,7 +40,7 @@ export const LNModeProvider: React.FC<{
 	const [activeModeId, setActiveModeId] = useState<string>("default");
 	const [fileEventRefs, setFileEventRefs] = useState<EventRef[]>([]);
 	const [modeFilePaths, setModeFilePaths] = useState<Set<string>>(new Set());
-	const textToSpeech = useTextToSpeech();
+	const { setTTSSettings } = useTextToSpeech();
 
 	// Function to extract an LN mode from a file with the #ln-mode tag
 	const extractLNModeFromFile = async (
@@ -317,12 +317,14 @@ export const LNModeProvider: React.FC<{
 	// Helper to set the active mode
 	const setActiveMode = useCallback(
 		(mode: LNMode | null) => {
+
+			console.log("Setting active mode:", mode);
 			if (!mode) {
 				setActiveModeId("default");
 
 				// Update text-to-speech settings for the default mode
 				const defaultMode = getDefaultLNMode();
-				textToSpeech.setTTSSettings({
+				setTTSSettings({
 					enabled: defaultMode.ln_voice_autoplay,
 					voice: defaultMode.ln_voice,
 					instructions: defaultMode.ln_voice_instructions,
@@ -349,14 +351,14 @@ export const LNModeProvider: React.FC<{
 			setActiveModeId(completeMode.ln_path);
 
 			// Update text-to-speech settings for the new mode
-			textToSpeech.setTTSSettings({
+			setTTSSettings({
 				enabled: completeMode.ln_voice_autoplay,
 				voice: completeMode.ln_voice,
 				instructions: completeMode.ln_voice_instructions,
 				speed: completeMode.ln_voice_speed,
 			});
 		},
-		[lnModes, textToSpeech],
+		[lnModes, setTTSSettings],
 	);
 
 	// Context value that provides the modes and functionality
