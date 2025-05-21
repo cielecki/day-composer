@@ -68,6 +68,7 @@
     "creatingNewMode": "Błąd podczas tworzenia nowego trybu",
     "startingAICoach": "Błąd podczas uruchamiania asystenta AI",
     "setup": "Błąd konfiguracji: {{error}}",
+    "conversationTurn": "Błąd podczas konwersacji: {{error}}",
     "tools": {
       "noName": "Nie podano nazwy narzędzia",
       "unknown": "Nieznane narzędzie \"{{tool}}\"",

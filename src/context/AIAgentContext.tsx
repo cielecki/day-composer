@@ -2,7 +2,6 @@ import React, {
 	createContext,
 	useContext,
 	useState,
-	useEffect,
 	ReactNode,
 	useCallback,
 	useRef,
@@ -66,22 +65,12 @@ export const AIAgentProvider: React.FC<{
 }> = ({ children, plugin }) => {
 	const conversationRef = useRef<Message[]>([]);
 	const partialJsonRef = useRef<Record<number, string>>({});
-	const [anthropicClient, setAnthropicClient] = useState<Anthropic | null>(
-		null,
-	);
 	const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);
 	/* trunk-ignore(eslint/@typescript-eslint/no-unused-vars) */
 	const [_, setForceUpdate] = useState(0);
 	const textToSpeech = useTextToSpeech();
 	const { activeModeId, lnModes } = useLNMode();
 	const activeMode = lnModes[activeModeId];
-
-	useEffect(() => {
-		initAnthropicClient();
-		return () => {
-			setAnthropicClient(null);
-		};
-	}, []);
 
 	const clearConversation = useCallback(() => {
 		conversationRef.current = [];
@@ -114,14 +103,6 @@ export const AIAgentProvider: React.FC<{
 		},
 		[],
 	);
-
-	const initAnthropicClient = useCallback(() => {
-		const apiKey = getPluginSettings().anthropicApiKey;
-		if (!apiKey) return false;
-		const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-		setAnthropicClient(client);
-		return true;
-	}, []);
 
 	const buildSystemPrompt = useCallback(
 		(context: string): string => {
@@ -496,9 +477,8 @@ ${context}`.trim();
 					let assistantMessage: Message | null = null;
 
 					try {
-						// Inner try for API call, stream processing, and tool handling
-						if (!anthropicClient)
-							throw new Error("Anthropic client not initialized");
+						const apiKey = getPluginSettings().anthropicApiKey;
+						const anthropicClient = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
 
 						const currentHistory = conversationRef.current;
 						const messagesForAPI =
@@ -672,7 +652,6 @@ ${context}`.trim();
 			}
 		},
 		[
-			anthropicClient,
 			formatMessagesForAPI,
 			processAnthropicStream,
 			plugin,
@@ -718,17 +697,6 @@ ${context}`.trim();
 	const addUserMessage = useCallback(
 		async (userMessage: string, signal: AbortSignal, images?: any[]): Promise<void> => {
 			try {
-				// Only start if we have the Anthropic client
-				if (!anthropicClient) {
-					if (!initAnthropicClient()) {
-						console.error(
-							"Failed to create Anthropic client for message: " +
-								userMessage,
-						);
-						return;
-					}
-				}
-
 				// Create content with text and optional images
 				let contentBlocks: ContentBlock[] = [];
 				
@@ -811,8 +779,6 @@ ${context}`.trim();
 			console.log("addUserMessage function finished.");
 		},
 		[
-			anthropicClient,
-			initAnthropicClient,
 			getContext,
 			plugin,
 			runConversationTurn,

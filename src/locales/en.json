@@ -68,6 +68,7 @@
     "creatingNewMode": "Error creating a new mode",
     "startingAICoach": "Error starting AI Coach",
     "setup": "Setup Error: {{error}}",
+    "conversationTurn": "Error during conversation: {{error}}",
     "tools": {
       "noName": "No tool name provided",
       "unknown": "Unknown tool \"{{tool}}\"",
