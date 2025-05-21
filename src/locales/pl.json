@@ -65,7 +65,6 @@
     "general": "Wystąpił błąd",
     "notFound": "Nie znaleziono zasobu",
     "invalidInput": "Nieprawidłowe dane wejściowe",
-    "creatingStarterPack": "Błąd podczas tworzenia pakietu startowego",
     "creatingNewMode": "Błąd podczas tworzenia nowego trybu",
     "startingAICoach": "Błąd podczas uruchamiania asystenta AI",
     "setup": "Błąd konfiguracji: {{error}}",
@@ -287,7 +286,8 @@
     "starterPack": {
       "noModes": "## Witaj w Life Navigator\n\nAby rozpocząć, utwórz pakiet startowy zawierający podstawowe tryby z tagiem _#aic-mode_.",
       "createdSuccess": "Pomyślnie utworzono pakiet startowy",
-      "createdError": "Błąd podczas tworzenia pakietu startowego: {{error}}"
+      "createdError": "Błąd podczas tworzenia pakietu startowego: {{error}}",
+      "directoryName": "Pakiet startowy"
     },
     "status": {
       "recording": "Nagrywanie...",

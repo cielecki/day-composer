@@ -1,4 +1,4 @@
-import { Notice, Plugin, requestUrl } from "obsidian";
+import { App, Notice, Plugin, requestUrl, TFolder } from "obsidian";
 import { SampleSettingTab } from "./settings/SettingsTab";
 import { ContextCollector } from "./context-collector";
 import {
@@ -6,11 +6,152 @@ import {
 	resetPluginSettings,
 } from "./settings/PluginSettings";
 import { resetObsidianTools } from "./obsidian-tools";
-import * as ReactDOM from "react-dom/client";
 import { AI_COACH_VIEW_TYPE, AICoachView } from "./ai-coach-view";
 import { getObsidianTools } from "./obsidian-tools";
-import * as React from "react";
 import { initI18n, t } from "./i18n";
+import { getStarterPackContents } from "./defaults/aic-mode-defaults";
+import { mergeWithDefaultMode } from "./defaults/aic-mode-defaults";
+import { getDefaultAICMode } from "./defaults/aic-mode-defaults";
+import { AICMode } from "./types/types";
+import { modeToNoteContent } from "./utils/mode-utils";
+import path from "path";
+
+
+
+const createStarterPack = async (app: App) => {
+	try {
+		// Create an AIC Modes folder if it doesn't exist
+		const starterPackDirName = t('ui.starterPack.directoryName') + " v0.1";
+		for (const { name, content } of getStarterPackContents()) {
+			const filePath = path.join(starterPackDirName, name);
+
+			const directory = path.dirname(filePath);
+			if (!app.vault.getAbstractFileByPath(directory)) {
+				await app.vault.createFolder(directory);
+			}
+
+			// Check if file already exists
+			if (app.vault.getAbstractFileByPath(filePath)) {
+				continue; // Skip if file already exists
+			}
+
+			await app.vault.create(filePath, content);
+		}
+
+		new Notice(t('ui.starterPack.createdSuccess'));
+	} catch (error) {
+		new Notice(t('ui.starterPack.createdError').replace('{{error}}', String(error)));
+		console.error("Error creating a Starter Pack:", error);
+	}
+};
+
+// List of available Lucide icons used in the plugin
+const AVAILABLE_ICONS = [
+	"sparkles",
+	"calendar-with-checkmark",
+	"search",
+	"lucide-sun-moon",
+	"magnifying-glass",
+	"target",
+	"lucide-history",
+	"lucide-calendar-plus",
+	"lucide-file-search",
+	"brain",
+	"lock",
+	"settings",
+	"terminal",
+	"plus",
+	"list-checks",
+	"square",
+	"check-square",
+	"x-square",
+	"arrow-right-square",
+	"info"
+];
+
+// List of available colors used in the plugin
+const AVAILABLE_COLORS = [
+	"#4caf50", // green
+	"#2196f3", // blue
+	"#ff9800", // orange
+	"#ff5722", // deep orange
+	"#9c27b0", // purple
+	"#673ab7", // deep purple
+	"#3f51b5", // indigo
+	"#00bcd4", // cyan
+	"#e91e63", // pink
+	"#f44336", // red
+	"#8bc34a", // light green
+	"#cddc39", // lime
+	"#ffc107", // amber
+	"#795548", // brown
+	"#607d8b"  // blue grey
+];
+
+// Create a new function to create a single mode
+const createSingleMode = async (app: App) => {
+	try {
+		// Randomly select an icon and color
+		const randomIcon = AVAILABLE_ICONS[Math.floor(Math.random() * AVAILABLE_ICONS.length)];
+		const randomColor = AVAILABLE_COLORS[Math.floor(Math.random() * AVAILABLE_COLORS.length)];
+
+		// Create a new mode with default values
+		const defaultMode = getDefaultAICMode();
+		const newMode: Partial<AICMode> = {
+			aic_name: t('ui.mode.newMode'),
+			aic_description: t('ui.mode.defaultDescription'),
+			aic_icon: randomIcon,
+			aic_icon_color: randomColor,
+			aic_system_prompt: defaultMode.aic_system_prompt,
+			aic_example_usages: [],
+			aic_voice_autoplay: true,
+			aic_voice: "alloy",
+			aic_voice_instructions: t('ui.mode.defaultVoiceInstructions'),
+			aic_voice_speed: 1.0,
+		};
+
+		// Ensure aic_name is defined
+		const baseModeName = newMode.aic_name || t('ui.mode.newMode');
+		const sanitizedBaseName = baseModeName.replace(/[^a-zA-Z0-9 ]/g, "");
+
+		// Find a unique filename by incrementing a number if needed
+		let counter = 1;
+		let fileName = `${sanitizedBaseName}.md`;
+		let filePath = fileName;
+
+		while (app.vault.getAbstractFileByPath(filePath)) {
+			fileName = `${sanitizedBaseName} ${counter}.md`;
+			filePath = fileName;
+			counter++;
+		}
+
+		// Create a complete mode object by merging with defaults
+		const completeMode: AICMode = {
+			...mergeWithDefaultMode(newMode),
+			aic_path: filePath,
+			aic_name: fileName.replace(".md", ""), // Update the name to match the file name
+		};
+
+		// Convert mode to note content using the utility function
+		const fileContent = modeToNoteContent(completeMode);
+
+		// Create the file
+		const newFile = await app.vault.create(filePath, fileContent);
+		
+		// Show a single notification
+		new Notice(t('ui.mode.createdSuccess'));
+		
+		// Open the file in a new leaf
+		if (newFile) {
+			const leaf = app.workspace.getLeaf();
+			await leaf.openFile(newFile);
+		}
+	} catch (error) {
+		// Only show error notification if there's a problem
+		new Notice(t('ui.mode.createdError').replace('{{error}}', String(error)));
+		console.error("Error creating a new mode:", error);
+	}
+}
 
 export default class MyPlugin extends Plugin {
 	contextCollector: ContextCollector;
@@ -43,66 +184,6 @@ export default class MyPlugin extends Plugin {
 			return this.view;
 		});
 
-		// Helper function to create a React component with providers
-		const createReactComponent = async (
-			action: (context: any) => Promise<void>,
-			errorMessage: string
-		): Promise<void> => {
-			try {
-				// Import required modules
-				const aicModeContextModule = await import("./context/AICModeContext");
-				const textToSpeechModule = await import("./context/TextToSpeechContext");
-
-				// Create a temporary container
-				const container = document.createElement("div");
-				const root = ReactDOM.createRoot(container);
-
-				// Create a promise that will be resolved when the action is complete
-				const actionPromise = new Promise<void>((resolve, reject) => {
-					try {
-						// Render the component with providers
-						root.render(
-							React.createElement(
-								textToSpeechModule.TextToSpeechProvider,
-								{
-									children: React.createElement(
-										aicModeContextModule.AICModeProvider,
-										{
-											app: this.app,
-											children: React.createElement(() => {
-												const context = aicModeContextModule.useAICMode();
-
-												React.useEffect(() => {
-													action(context)
-														.then(() => {
-															resolve();
-															// Unmount after completion
-															setTimeout(() => root.unmount(), 100);
-														})
-														.catch(reject);
-												}, []);
-
-												return React.createElement("div");
-											}),
-										},
-									),
-								},
-							),
-						);
-					} catch (error) {
-						reject(error);
-					}
-				});
-
-				// Wait for the action to complete
-				await actionPromise;
-			} catch (error) {
-				console.error(errorMessage, error);
-				new Notice(
-					`${t(errorMessage)}: ${error instanceof Error ? error.message : String(error)}`,
-				);
-			}
-		};
 
 		// Add command to create a Starter Pack
 		this.addCommand({
@@ -110,10 +191,7 @@ export default class MyPlugin extends Plugin {
 			name: t("tools.createStarterPack"),
 			callback: async () => {
 				new Notice(t("messages.creatingStarterPack"));
-				await createReactComponent(
-					(context) => context.createInitialAICModes(),
-					"errors.creatingStarterPack"
-				);
+				await createStarterPack(this.app);
 			},
 		});
 
@@ -122,10 +200,7 @@ export default class MyPlugin extends Plugin {
 			id: "create-single-mode",
 			name: t("tools.createSingleMode"),
 			callback: async () => {
-				await createReactComponent(
-					(context) => context.createSingleMode(),
-					"errors.creatingNewMode"
-				);
+				await createSingleMode(this.app);
 			},
 		});
 

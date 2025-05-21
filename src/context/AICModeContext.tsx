@@ -7,70 +7,24 @@ import React, {
 	useCallback,
 } from "react";
 import { AICMode } from "../types/types";
-import { App, TFile, TFolder, EventRef, Notice } from "obsidian";
+import { App, TFile, EventRef } from "obsidian";
 import {
 	mergeWithDefaultMode,
 	validateModeSettings,
 	getDefaultAICMode,
-	getBuiltInAICModes,
 } from "../defaults/aic-mode-defaults";
-import { modeToNoteContent } from "../utils/mode-utils";
 import * as yaml from "js-yaml";
 import { ContextCollector } from "src/context-collector";
 import { useTextToSpeech } from "../context/TextToSpeechContext";
 import { t } from '../i18n';
 
-// List of available Lucide icons used in the plugin
-const AVAILABLE_ICONS = [
-	"sparkles",
-	"calendar-with-checkmark",
-	"search",
-	"lucide-sun-moon",
-	"magnifying-glass",
-	"target",
-	"lucide-history",
-	"lucide-calendar-plus",
-	"lucide-file-search",
-	"brain",
-	"lock",
-	"settings",
-	"terminal",
-	"plus",
-	"list-checks",
-	"square",
-	"check-square",
-	"x-square",
-	"arrow-right-square",
-	"info"
-];
 
-// List of available colors used in the plugin
-const AVAILABLE_COLORS = [
-	"#4caf50", // green
-	"#2196f3", // blue
-	"#ff9800", // orange
-	"#ff5722", // deep orange
-	"#9c27b0", // purple
-	"#673ab7", // deep purple
-	"#3f51b5", // indigo
-	"#00bcd4", // cyan
-	"#e91e63", // pink
-	"#f44336", // red
-	"#8bc34a", // light green
-	"#cddc39", // lime
-	"#ffc107", // amber
-	"#795548", // brown
-	"#607d8b"  // blue grey
-];
 
 export interface AICModeContextType {
 	aicModes: Record<string, AICMode>;
 	activeModeId: string;
 	setActiveMode: (mode: AICMode | null) => void;
 	loadAICModes: () => Promise<void>;
-	createInitialAICModes: () => Promise<void>;
-	createSingleMode: () => Promise<void>;
-	isCreatingAICModes: boolean;
 	defaultAICMode: Partial<AICMode>;
 }
 
@@ -87,7 +41,6 @@ export const AICModeProvider: React.FC<{
 	const [activeModeId, setActiveModeId] = useState<string>("default");
 	const [fileEventRefs, setFileEventRefs] = useState<EventRef[]>([]);
 	const [modeFilePaths, setModeFilePaths] = useState<Set<string>>(new Set());
-	const [isCreatingAICModes, setIsCreatingAICModes] = useState(false);
 	const textToSpeech = useTextToSpeech();
 
 	// Function to extract an AIC mode from a file with the #aic-mode tag
@@ -367,134 +320,9 @@ export const AICModeProvider: React.FC<{
 	}, [loadAICModes]);
 
 	// Create a new function to create initial AIC modes
-	const createInitialAICModes = useCallback(async () => {
-		try {
-			setIsCreatingAICModes(true);
+	
 
-			// Create an AIC Modes folder if it doesn't exist
-			let modesFolder: TFolder;
-			if (!app.vault.getAbstractFileByPath("Starter Pack")) {
-				modesFolder = await app.vault.createFolder("Starter Pack");
-			} else {
-				modesFolder = app.vault.getAbstractFileByPath(
-					"Starter Pack",
-				) as TFolder;
-			}
-
-			// Create a mode file for each built-in mode
-			const newModesMap: Record<string, AICMode> = { ...aicModes };
-
-			for (const mode of getBuiltInAICModes()) {
-				const fileName = `${mode.aic_name.replace(/[^a-zA-Z0-9 ]/g, "")}.md`;
-				const filePath = `${modesFolder.path}/${fileName}`;
-
-				// Check if file already exists
-				if (app.vault.getAbstractFileByPath(filePath)) {
-					continue; // Skip if file already exists
-				}
-
-				// Create a complete mode object by merging with defaults
-				const completeMode: AICMode = {
-					...mergeWithDefaultMode(mode),
-					aic_path: filePath,
-				};
-
-				// Convert mode to note content using the utility function
-				const fileContent = modeToNoteContent(completeMode);
-
-				await app.vault.create(filePath, fileContent);
-
-				// Add to our map
-				newModesMap[filePath] = completeMode;
-			}
-
-			// Update modes
-			setAICModes(newModesMap);
-
-			setIsCreatingAICModes(false);
-			new Notice(t('ui.starterPack.createdSuccess'));
-		} catch (error) {
-			new Notice(t('ui.starterPack.createdError').replace('{{error}}', String(error)));
-			console.error("Error creating a Starter Pack:", error);
-			setIsCreatingAICModes(false);
-		}
-	}, [app, aicModes]);
-
-	// Create a new function to create a single mode
-	const createSingleMode = useCallback(async () => {
-		try {
-			setIsCreatingAICModes(true);
-
-			// Randomly select an icon and color
-			const randomIcon = AVAILABLE_ICONS[Math.floor(Math.random() * AVAILABLE_ICONS.length)];
-			const randomColor = AVAILABLE_COLORS[Math.floor(Math.random() * AVAILABLE_COLORS.length)];
-
-			// Create a new mode with default values
-			const defaultMode = getDefaultAICMode();
-			const newMode: Partial<AICMode> = {
-				aic_name: t('ui.mode.newMode'),
-				aic_description: t('ui.mode.defaultDescription'),
-				aic_icon: randomIcon,
-				aic_icon_color: randomColor,
-				aic_system_prompt: defaultMode.aic_system_prompt,
-				aic_example_usages: [],
-				aic_voice_autoplay: true,
-				aic_voice: "alloy",
-				aic_voice_instructions: t('ui.mode.defaultVoiceInstructions'),
-				aic_voice_speed: 1.0,
-			};
-
-			// Ensure aic_name is defined
-			const baseModeName = newMode.aic_name || t('ui.mode.newMode');
-			const sanitizedBaseName = baseModeName.replace(/[^a-zA-Z0-9 ]/g, "");
-
-			// Find a unique filename by incrementing a number if needed
-			let counter = 1;
-			let fileName = `${sanitizedBaseName}.md`;
-			let filePath = fileName;
-
-			while (app.vault.getAbstractFileByPath(filePath)) {
-				fileName = `${sanitizedBaseName} ${counter}.md`;
-				filePath = fileName;
-				counter++;
-			}
-
-			// Create a complete mode object by merging with defaults
-			const completeMode: AICMode = {
-				...mergeWithDefaultMode(newMode),
-				aic_path: filePath,
-				aic_name: fileName.replace(".md", ""), // Update the name to match the file name
-			};
-
-			// Convert mode to note content using the utility function
-			const fileContent = modeToNoteContent(completeMode);
-
-			// Create the file
-			const newFile = await app.vault.create(filePath, fileContent);
-
-			// Update modes
-			setAICModes((prev) => ({
-				...prev,
-				[filePath]: completeMode,
-			}));
-
-			setIsCreatingAICModes(false);
-			
-			// Show a single notification
-			new Notice(t('ui.mode.createdSuccess'));
-			
-			// Open the file in a new leaf
-			if (newFile) {
-				const leaf = app.workspace.getLeaf();
-				await leaf.openFile(newFile);
-			}
-		} catch (error) {
-			// Only show error notification if there's a problem
-			new Notice(t('ui.mode.createdError').replace('{{error}}', String(error)));
-			console.error("Error creating a new mode:", error);
-			setIsCreatingAICModes(false);
-		}
-	}, [app]);
+	
 
 	// Helper to set the active mode
 	const setActiveMode = useCallback(
@@ -547,9 +375,6 @@ export const AICModeProvider: React.FC<{
 		activeModeId,
 		setActiveMode,
 		loadAICModes,
-		createInitialAICModes,
-		createSingleMode,
-		isCreatingAICModes,
 		defaultAICMode: getDefaultAICMode(),
 	};
 

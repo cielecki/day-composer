@@ -65,7 +65,6 @@
     "general": "An error occurred",
     "notFound": "Resource not found",
     "invalidInput": "Invalid input provided",
-    "creatingStarterPack": "Error creating a Starter Pack",
     "creatingNewMode": "Error creating a new mode",
     "startingAICoach": "Error starting AI Coach",
     "setup": "Setup Error: {{error}}",
@@ -295,7 +294,8 @@
     "starterPack": {
       "noModes": "## Welcome to Life Navigator\n\nTo get started, create a starter pack containing basic modes with the _#aic-mode_ tag",
       "createdSuccess": "Created a Starter Pack successfully",
-      "createdError": "Error creating a Starter Pack: {{error}}"
+      "createdError": "Error creating a Starter Pack: {{error}}",
+      "directoryName": "Starter Pack"
     },
     "status": {
       "recording": "Recording...",
