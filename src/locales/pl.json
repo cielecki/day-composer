@@ -24,9 +24,19 @@
     "createNewMode": "Utwórz nowy tryb",
     "checkForUpdates": "Sprawdź aktualizacje",
     "aiCoach": "Life Navigator",
+    "readDocument": "Czytanie dokumentu",
+    "createDocument": "Tworzenie dokumentu",
+    "appendToDocument": "Dodawanie do dokumentu",
+    "addTodo": "Dodawanie zadania",
     "tasks": {
       "single": "zadanie",
-      "plural": "zadania"
+      "plural": "zadania",
+      "count": {
+        "one": "{{count}} zadanie",
+        "few": "{{count}} zadania",
+        "many": "{{count}} zadań",
+        "zero": "brak zadań"
+      }
     },
     "position": {
       "after": "po \"{{task}}\"",
@@ -57,6 +67,11 @@
         "failed": "Nie udało się porzucić zadania {{task}}",
         "success": "Porzucono zadanie {{task}}",
         "inProgress": "Porzucanie zadania {{task}}..."
+      },
+      "add": {
+        "failed": "Nie udało się dodać zadania {{task}}",
+        "success": "Dodano zadanie {{task}}",
+        "inProgress": "Dodawanie zadania..."
       }
     },
     "success": {
@@ -149,7 +164,7 @@
       "invalidState": "Nie można odznaczyć \"{{task}}\", ponieważ nie jest w stanie oczekującym. Jego obecny stan to '{{state}}'. Proszę najpierw odznaczyć, jeśli jest już zakończone, porzucone lub przeniesione."
     },
     "documents": {
-      "notFound": "Nie znaleziono pliku w {{path}}",
+      "notFound": "Nie znaleziono pliku: {{path}}",
       "readError": "Błąd odczytu dokumentu: {{error}}"
     }
   },

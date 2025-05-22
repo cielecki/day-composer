@@ -474,7 +474,7 @@ export const AIAgentProvider: React.FC<{
 						const defaultMode = getDefaultLNMode();
 
 						// Get API parameters from active mode or defaults
-						const model = "claude-3-7-sonnet-20250219"; // hardcoded model for now
+						const model = "claude-4-sonnet-20250514"; // upgraded from claude-3-7-sonnet-20250219
 						const maxTokens =
 							activeMode.ln_max_tokens ??
 							defaultMode.ln_max_tokens;

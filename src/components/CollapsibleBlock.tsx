@@ -2,6 +2,7 @@ import React from 'react';
 import { LucideIcon } from './LucideIcon';
 import { getObsidianTools } from '../obsidian-tools';
 import { t } from '../i18n';
+import { ToolInputDisplay } from './ToolInputDisplay';
 
 interface CollapsibleBlockProps {
   summary: React.ReactNode;
@@ -98,7 +99,7 @@ export const ToolBlock: React.FC<ToolBlockProps> = ({
       }}
     >
       <div className="tool-input-params">
-        <pre className="tool-input-content"><code>{JSON.stringify(toolInput, null, 2)}</code></pre>
+        <ToolInputDisplay toolName={toolName} toolInput={toolInput} />
       </div>
       
       {!hasResult ? (

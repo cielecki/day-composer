@@ -1986,4 +1986,74 @@ If your plugin does not need CSS, delete this file.
 .ai-coach-view .input-control-button.send-button.working {
   background-color: var(--background-modifier-error);
   color: var(--text-on-accent);
+}
+
+/* Tool Input Display Styles */
+.ln-tool-input {
+  font-family: var(--font-monospace);
+  line-height: 1.3;
+  margin: 0;
+  padding: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.ln-tool-input__field {
+  margin-bottom: 0.25rem;
+  padding-left: 0.25rem;
+}
+
+.ln-tool-input__field-name {
+  font-weight: bold;
+  color: var(--text-normal);
+  margin-right: 0.25rem;
+}
+
+.ln-tool-input__array {
+  display: flex;
+  flex-direction: column;
+  margin-left: 0.75rem;
+  gap: 0.15rem;
+}
+
+.ln-tool-input__array-item {
+  position: relative;
+  padding-left: 0.75rem;
+}
+
+.ln-tool-input__array-item:before {
+  content: "-";
+  position: absolute;
+  left: 0;
+  color: var(--text-muted);
+}
+
+.ln-tool-input__object {
+  margin-left: 0.75rem;
+  margin-top: 0.1rem;
+}
+
+.ln-tool-input__object-item {
+  margin-bottom: 0.15rem;
+}
+
+.ln-tool-input__value {
+  word-break: break-word;
+}
+
+.ln-tool-input__value--string {
+  color: var(--text-accent);
+}
+
+.ln-tool-input__value--number {
+  color: var(--text-accent);
+}
+
+.ln-tool-input__value--boolean {
+  color: var(--text-accent-hover);
+}
+
+.ln-tool-input__value--null,
+.ln-tool-input__value--empty {
+  font-style: italic;
 } 

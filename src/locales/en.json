@@ -24,9 +24,19 @@
     "createNewMode": "Create a New Mode",
     "checkForUpdates": "Check for updates",
     "aiCoach": "Life Navigator",
+    "readDocument": "Reading document",
+    "createDocument": "Creating document",
+    "appendToDocument": "Appending to document",
+    "addTodo": "Adding task",
     "tasks": {
       "single": "task",
-      "plural": "tasks"
+      "plural": "tasks",
+      "count": {
+        "one": "{{count}} task",
+        "few": "{{count}} tasks",
+        "many": "{{count}} tasks",
+        "zero": "no tasks"
+      }
     },
     "position": {
       "after": "after \"{{task}}\"",
@@ -57,6 +67,11 @@
         "failed": "Failed to abandon todo {{task}}",
         "success": "Abandoned todo {{task}}",
         "inProgress": "Abandoning todo {{task}}..."
+      },
+      "add": {
+        "failed": "Failed to add todo {{task}}",
+        "success": "Added todo {{task}}",
+        "inProgress": "Adding todo..."
       }
     },
     "success": {
@@ -149,7 +164,7 @@
       "invalidState": "Cannot check off \"{{task}}\" because it is not in a pending state. Its current state is '{{state}}'. Please uncheck it first if it's already completed, abandoned, or moved."
     },
     "documents": {
-      "notFound": "File not found at {{path}}",
+      "notFound": "File not found: {{path}}",
       "readError": "Error reading document: {{error}}"
     }
   },

@@ -11,6 +11,7 @@ import {
 } from "./utils/note-utils";
 import { getDailyNotePath } from "./utils/getDailyNotePath";
 import { insertTaskAtPosition } from "./utils/task-utils";
+import { t } from "../i18n";
 
 const schema = {
 	name: "add_todo",
@@ -86,20 +87,36 @@ export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
 		hasResult: boolean,
 		hasError: boolean,
 	) => {
-		let actionText = "";
-		if (!input || typeof input !== "object") actionText = "";
-		const todoCount = input.todos?.length || 0;
-		actionText =
-			todoCount === 1
-				? `"${input.todos[0].todo_text}"`
-				: `${todoCount} todos`;
-
 		if (hasResult) {
+			// Only process task text for completed operations
+			let actionText = "";
+			if (!input || typeof input !== "object") actionText = "";
+			const todoCount = input.todos?.length || 0;
+			
+			if (todoCount === 1) {
+				actionText = `"${input.todos[0].todo_text}"`;
+			} else {
+				// Use proper pluralization based on count
+				const countKey = todoCount === 0 ? 'zero' :
+									todoCount === 1 ? 'one' :
+									todoCount % 10 >= 2 && todoCount % 10 <= 4 && (todoCount % 100 < 10 || todoCount % 100 >= 20) ? 'few' : 'many';
+				
+				// Check if the translation key exists
+				try {
+					const translation = t(`tools.tasks.count.${countKey}`, { count: todoCount });
+					actionText = translation !== `tools.tasks.count.${countKey}` ? translation : `${todoCount} ${t('tools.tasks.plural')}`;
+				} catch (e) {
+					// Fallback to simple pluralization
+					actionText = `${todoCount} ${t('tools.tasks.plural')}`;
+				}
+			}
+
 			return hasError
-				? `Failed to add ${actionText}`
-				: `Added ${actionText}`;
+				? t('tools.actions.add.failed', { defaultValue: `Failed to add ${actionText}` }).replace('{{task}}', actionText)
+				: t('tools.actions.add.success', { defaultValue: `Added ${actionText}` }).replace('{{task}}', actionText);
 		} else {
-			return `Adding ...`;
+			// For in-progress operations, don't show task details
+			return t('tools.actions.add.inProgress', { defaultValue: 'Adding todo...' }).replace('{{task}}', '');
 		}
 	},
 	execute: async (

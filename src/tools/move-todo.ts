@@ -69,19 +69,36 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
   specification: schema,
   icon: "move",
   getActionText: (input: MoveTodoToolInput, output: string, hasResult: boolean, hasError: boolean) => {
-    let actionText = '';
-    if (!input || typeof input !== 'object') actionText = '';
-    const todoCount = input.todos?.length || 0;
-    actionText = todoCount === 1 
-      ? `"${input.todos[0].todo_text}"`
-      : `${todoCount} ${t('tools.tasks.plural')}`;
-      
     if (hasResult) {
+      // Only process task text for completed operations
+      let actionText = '';
+      if (!input || typeof input !== 'object') actionText = '';
+      const todoCount = input.todos?.length || 0;
+      
+      if (todoCount === 1) {
+        actionText = `"${input.todos[0].todo_text}"`;
+      } else {
+        // Use proper pluralization based on count
+        const countKey = todoCount === 0 ? 'zero' :
+                         todoCount === 1 ? 'one' :
+                         todoCount % 10 >= 2 && todoCount % 10 <= 4 && (todoCount % 100 < 10 || todoCount % 100 >= 20) ? 'few' : 'many';
+        
+        // Check if the translation key exists
+        try {
+          const translation = t(`tools.tasks.count.${countKey}`, { count: todoCount });
+          actionText = translation !== `tools.tasks.count.${countKey}` ? translation : `${todoCount} ${t('tools.tasks.plural')}`;
+        } catch (e) {
+          // Fallback to simple pluralization if the count format is not available
+          actionText = `${todoCount} ${t('tools.tasks.plural')}`;
+        }
+      }
+      
       return hasError
         ? t('tools.actions.move.failed').replace('{{task}}', actionText)
         : t('tools.actions.move.success').replace('{{task}}', actionText);
     } else {
-      return t('tools.actions.move.inProgress').replace('{{task}}', actionText);
+      // For in-progress operations, don't show task details
+      return t('tools.actions.move.inProgress').replace('{{task}}', '');
     }
   },
   execute: async (plugin: MyPlugin, params: MoveTodoToolInput): Promise<string> => {
