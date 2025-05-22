@@ -1,0 +1,1 @@
+- When performing fixes also modify CHANGELOG.md (add to unreleased section), TODO.md (check off done tasks) and .git/COMMIT_EDITMSG (add or create the commit message)
