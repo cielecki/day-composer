@@ -33,7 +33,8 @@
 - [ ] Write down the obsidian bullet journal md format that the plugin uses
 - [ ] Create tool documentation in README or MODE_GUIDE or smth
 - [ ] More relaxed todo format in the plugin
-
+- [ ] Styling for non dark mode users is off
+- [ ] Why are mobile styles completely different and there's a contrast issue?
 
 ## Initial release
 - [ ] Bug: checking off 0 zadan as it's beeing generatred
@@ -72,19 +73,4 @@ conversation turn processing: BadRequestError: 400 {"type":"error","error":{"typ
 - [ ] handover tool do innych trybów 
 
 ## After initial testing release
-- [ ] Yearly and monthly notes from the other plugin
-- [ ] Chat history (as markdown files?)
 - [ ] point of insertion should be after the last completed task, not before the first uncompleted one
-- [ ] How to load extra tools? Some eval? Some Jsony? Mcp?
-- [ ] Add support for Gemini model from Google, and add a model selection option
-- [ ] Readd a function to show the list of tasks as a toolcall - a tool that the user can open
-
-## Someday / Maybe
-- [ ] 🔄 Rethink the concept of creating a new chat for each voice message without automatically switching to it
-- [ ] Weather fetching tool
-- [ ] Why are mobile styles completely different and there's a contrast issue?
-- [ ] Could we create an agent that activates at random moments?
-- [ ] Passive listening agent
-- [ ] Advanced tools for comparing and applying differences (diff apply)
-- [ ] Google Calendar integration - Create a system to extract calendar information about upcoming events so the system can include this data in my daily tasks (today plus next 7 days)
-- [ ] Habits editing
