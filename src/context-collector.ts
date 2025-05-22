@@ -67,16 +67,16 @@ export class ContextCollector {
 		// Replace any remaining non-alphanumeric characters with underscores
 		result = result.replace(/[^a-z0-9]/g, '_');
 
-		// Ensure the tag name starts with a letter
-		if (!/^[a-z]/.test(result)) {
-			result = 'tag_' + result;
-		}
-
 		// Remove consecutive underscores
 		result = result.replace(/_+/g, '_');
 
 		// Remove leading and trailing underscores
 		result = result.replace(/^_+|_+$/g, '');
+		
+		// Ensure the tag name starts with a valid XML NameStartChar (letter or underscore)
+		if (!/^[a-z_]/.test(result)) {
+			result = '_' + result;
+		}
 
 		return result;
 	}
