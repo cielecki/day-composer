@@ -9,17 +9,22 @@
 - [x] Removed ln_voice_speed from starter kit as mini tts does not support it
 - [x] fixed example usages so more of them are visible
 - [x] Is the domain free? no
+- [x] Test with N
+- [x] Update checker should refresh obsidian
 
-- [ ] Test z N
-- [ ] Test z B
-- [ ] Test z Piotrkiem
+- [ ] Fix transcription issues
+- [ ] Name of the modes should come from file name not ln_name
+- [ ] Working daily planning and habits in the starter kit
 
-- [ ] More relaxed todo format in the plugin
+- [ ] Test with B
+- [ ] Test with Piotr
+
+- [ ] Modes are not translated to english
 
 ## AI breakfast release
 - [ ] 🔧 Dodać funkcję edycji todo itemów
 - [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
-- [ ] Working daily planning and habits
+
 - [ ] Choose licence
 - [ ] Add plugin to obsidian repository
 - [ ] Create discord server
@@ -27,6 +32,8 @@
 - [ ] Write a draft blog post for people to read through and give feedback on
 - [ ] Write down the obsidian bullet journal md format that the plugin uses
 - [ ] Create tool documentation in README or MODE_GUIDE or smth
+- [ ] More relaxed todo format in the plugin
+
 
 ## Initial release
 - [ ] Bug: checking off 0 zadan as it's beeing generatred

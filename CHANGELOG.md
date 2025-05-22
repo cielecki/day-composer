@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the Life Navigator plugin will be documented in this file.
+All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -8,11 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial GitHub Actions automation for releases
+- Check for updates modal for reloading the plugin
 
-## [1.0.0] - YYYY-MM-DD
-### Added
-- Initial release of the Life Navigator plugin
-- AI Coach feature
-- Link Extensions
-- Dynamic Day Note Links 
+### Fixed
+- Check for updates is now translated and is properly named
+- Styling issue that broke all mod-cta buttons in obsidian
+
+## [0.6.5] - 2025-05-22
+...
