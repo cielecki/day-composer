@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.6] - 2025-05-22
+
 ### Added
 - Check for updates now asks for reloading obsidian using a dedicated dialog
 - Customizable prompt for transcriptions
