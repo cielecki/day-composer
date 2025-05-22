@@ -110,15 +110,22 @@ If your plugin does not need CSS, delete this file.
   align-self: flex-end;
   margin-bottom: 30px;
   max-width: 80%;
+  background-color: var(--background-secondary);
+  color: var(--text-normal);
+  padding: 10px;
+  border: 1px solid var(--background-modifier-border);
 }
 
 .ai-coach-view .message.assistant {
   align-self: flex-start;
-  padding: 0px;
+  padding: 10px;
   margin-right: 10px;
   margin-left: 10px;
   margin-bottom: 30px;
   border-radius: 12px 12px 12px 0;
+  color: var(--text-normal);
+  border: none;
+  background-color: transparent;
 }
 
 .ai-coach-view .message-header {
@@ -145,7 +152,9 @@ If your plugin does not need CSS, delete this file.
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 0 40px;
+  padding: 10px 40px;
+  background-color: var(--background-primary-alt);
+  border-radius: 8px;
 }
 
 .record-button {
@@ -161,7 +170,7 @@ If your plugin does not need CSS, delete this file.
   align-items: center;
   justify-content: center;
   position: relative;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--input-shadow);
   overflow: hidden;
 }
 
@@ -467,10 +476,11 @@ If your plugin does not need CSS, delete this file.
   padding: 0.5rem;
   max-height: 300px;
   overflow-y: auto;
-  background-color: var(--background-secondary);
+  background-color: var(--code-background);
   font-family: var(--font-monospace);
   font-size: 0.85rem;
   white-space: pre-wrap;
+  color: var(--code-text);
 }
 
 
@@ -646,6 +656,8 @@ If your plugin does not need CSS, delete this file.
 .tool-use-block {
   margin: 0.5em 0;
   border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background-color: var(--background-secondary-alt);
 }
 
 .tool-use-summary {
@@ -656,6 +668,7 @@ If your plugin does not need CSS, delete this file.
   cursor: pointer;
   user-select: none;
   list-style: none;
+  color: var(--text-normal);
 }
 
 .tool-use-summary::-webkit-details-marker {
@@ -702,7 +715,7 @@ If your plugin does not need CSS, delete this file.
   justify-content: center;
   align-items: center;
   padding: 12px;
-  background-color: var(--background-secondary);
+  background-color: var(--tool-block-bg);
 }
 
 .tool-use-result {
@@ -749,7 +762,7 @@ If your plugin does not need CSS, delete this file.
 
 /* User message background styling */
 .message.user .content-blocks {
-  background-color: var(--background-secondary-alt);
+  background-color: var(--background-secondary);
   border-radius: 12px 12px 0 12px;
   padding: 10px;
 }
@@ -757,6 +770,9 @@ If your plugin does not need CSS, delete this file.
 /* Assistant message background styling */
 .message.assistant .content-blocks {
   width: 100%;
+  background-color: transparent;
+  border-radius: 12px 12px 12px 0;
+  padding: 10px;
 }
 
 /* Fix excessive spacing in ReactMarkdown content */
@@ -872,7 +888,7 @@ If your plugin does not need CSS, delete this file.
   justify-content: center;
   align-items: center;
   padding: 12px;
-  background-color: var(--background-secondary);
+  background-color: var(--tool-block-bg);
 }
 
 .tool-use-result {
@@ -918,7 +934,6 @@ If your plugin does not need CSS, delete this file.
   display: flex;
   align-items: center;
   font-size: 0.9rem;
-  border-left: 3px solid var(--color-red);
 }
 
 .redacted-icon {
@@ -1127,14 +1142,14 @@ If your plugin does not need CSS, delete this file.
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--input-shadow);
   transition: all 0.2s ease;
   z-index: 10;
 }
 
 .input-mode-toggle-button:hover {
   transform: translateY(-50%) scale(1.1);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-2);
 }
 
 /* Ensure the toggle button doesn't interfere with the centered microphone */
@@ -1148,6 +1163,9 @@ If your plugin does not need CSS, delete this file.
   margin: 0 auto;
   padding: 0 40px;
   position: relative;
+  background-color: var(--background-primary-alt);
+  border-radius: 8px;
+  padding: 10px;
 }
 
 .text-input-area {
@@ -1157,7 +1175,7 @@ If your plugin does not need CSS, delete this file.
   border: 1px solid var(--background-modifier-border);
   border-radius: 24px;
   padding: 4px 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--input-shadow);
   transition: all 0.2s ease;
   position: relative;
   outline: none;
@@ -1222,9 +1240,9 @@ If your plugin does not need CSS, delete this file.
 
 /* Send button in working state */
 .text-input-button.send-button.working {
-  background-color: rgba(190, 50, 50, 0.8);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(170, 40, 40, 0.9);
+  background-color: var(--background-modifier-error);
+  box-shadow: 0 2px 4px var(--background-modifier-border);
+  border: 1px solid var(--background-modifier-error-hover);
 }
 
 .text-input-button.send-button.working:hover {
@@ -1305,7 +1323,7 @@ If your plugin does not need CSS, delete this file.
 
 .tool-result-error {
   border-left: 3px solid var(--color-red);
-  background-color: rgba(var(--color-red-rgb, 220, 50, 47), 0.05);
+  background-color: var(--background-modifier-error-hover);
 }
 
 .tool-result-error pre code {
@@ -1330,6 +1348,7 @@ If your plugin does not need CSS, delete this file.
   margin: 0 auto;
   background-color: transparent;
   border-radius: 8px;
+  padding: 10px;
 }
 
 .unified-input-area {
@@ -1338,8 +1357,8 @@ If your plugin does not need CSS, delete this file.
   padding: 12px;
   width: 100%;
   gap: 12px;
-  background-color: rgba(50, 50, 50, 0.5);
-  border: 1px solid rgba(140, 140, 140, 0.3);
+  background-color: var(--background-primary-alt);
+  border: 1px solid var(--background-modifier-border);
   border-radius: 16px;
 }
 
@@ -1353,7 +1372,7 @@ If your plugin does not need CSS, delete this file.
   width: 100%;
   resize: none;
   background-color: transparent;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-normal);
   font-size: 15px;
   font-family: var(--font-text);
   line-height: 1.5;
@@ -1367,7 +1386,7 @@ If your plugin does not need CSS, delete this file.
 }
 
 .unified-input-textarea::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
 }
 
 .unified-input-textarea:focus {
@@ -1408,7 +1427,7 @@ If your plugin does not need CSS, delete this file.
 
 .waveform-bar {
   flex: 1;
-  background-color: rgba(120, 100, 255, 0.7);
+  background-color: var(--interactive-accent);
   border-radius: 1px;
   width: 2px;
   min-height: 2px;
@@ -1423,6 +1442,8 @@ If your plugin does not need CSS, delete this file.
   width: 100%;
   padding: 0;
   margin-top: 8px;
+  background-color: var(--background-primary-alt);
+  border-radius: 8px;
 }
 
 /* Left and right control groups */
@@ -1436,22 +1457,19 @@ If your plugin does not need CSS, delete this file.
 
 /* Action buttons */
 .action-button {
-  background-color: rgba(60, 60, 60, 0.7);
+  background-color: var(--background-modifier-form-field);
+  color: var(--text-normal);
 }
 
 .action-button:hover {
-  background-color: rgba(80, 80, 80, 0.8);
+  background-color: var(--background-modifier-hover);
 }
 
 .mic-button.recording {
-  background-color: rgba(220, 50, 50, 0.8);
-  color: white;
+  background-color: var(--background-modifier-error);
+  color: var(--text-on-accent);
 }
 
-.mic-button.transcribing {
-  background-color: rgba(70, 130, 180, 0.8);
-  color: white;
-}
 
 .mic-button .spinner {
   animation: spin 1.5s linear infinite;
@@ -1459,16 +1477,16 @@ If your plugin does not need CSS, delete this file.
 
 
 .send-button {
-  background-color: rgba(70, 130, 180, 0.8);
-  color: white;
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
 }
 
 .send-button:hover:not(:disabled) {
-  background-color: rgba(80, 140, 200, 0.9);
+  background-color: var(--interactive-accent-hover);
 }
 
 .send-button.working {
-  background-color: rgba(190, 50, 50, 0.8); 
+  background-color: var(--background-modifier-error);
 }
 
 /* Attached images preview */
@@ -1592,8 +1610,8 @@ If your plugin does not need CSS, delete this file.
 }
 
 .message-content.editing .unified-input-area {
-  background-color: rgba(50, 50, 50, 0.5);
-  border: 1px solid rgba(140, 140, 140, 0.3);
+  background-color: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
   border-radius: 16px;
   width: 100%;
 }
@@ -1601,7 +1619,7 @@ If your plugin does not need CSS, delete this file.
 .message-content.editing .unified-input-textarea {
   width: 100%;
   min-height: 40px;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-normal);
   font-size: 15px;
   background-color: transparent;
 }
@@ -1633,7 +1651,7 @@ If your plugin does not need CSS, delete this file.
 
 .ai-coach-view .image-content img {
   border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--input-shadow);
 }
 
 /* Thumbnails in attached images */
@@ -1647,7 +1665,7 @@ If your plugin does not need CSS, delete this file.
 
 .attached-image-thumbnail .thumbnail {
   border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--input-shadow);
 }
 
 /* Add position relative to messages to anchor the actions */
@@ -1672,7 +1690,7 @@ If your plugin does not need CSS, delete this file.
   border-radius: 6px;
   overflow: hidden;
   background-color: var(--background-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--input-shadow);
 }
 
 .todo-list-header {
@@ -1927,7 +1945,7 @@ If your plugin does not need CSS, delete this file.
 }
 
 .ai-coach-view .input-control-button:hover:not(:disabled) {
-  background-color: rgba(80, 80, 80, 0.8);
+  background-color: var(--background-modifier-hover);
 }
 
 .ai-coach-view .input-control-button:disabled {

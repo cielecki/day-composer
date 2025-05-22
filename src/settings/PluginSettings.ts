@@ -7,6 +7,7 @@ export class PluginSettings {
 	openAIApiKey = '';
 	anthropicApiKey = '';
 	speechToTextPrompt = '';
+	activeModeId = '';
     plugin: MyPlugin;
 
     constructor() {}
@@ -19,6 +20,7 @@ export class PluginSettings {
         this.openAIApiKey = data?.openAIApiKey ?? '';
         this.anthropicApiKey = data?.anthropicApiKey ?? '';
         this.speechToTextPrompt = data?.speechToTextPrompt ?? '';
+        this.activeModeId = data?.activeModeId ?? '';
     }
 
     async saveSettings() {
@@ -26,6 +28,7 @@ export class PluginSettings {
             openAIApiKey: this.openAIApiKey,
             anthropicApiKey: this.anthropicApiKey,
             speechToTextPrompt: this.speechToTextPrompt,
+            activeModeId: this.activeModeId,
         };
         await this.plugin.saveData(settingsToSave);
     }

@@ -16,6 +16,7 @@ import {
 import * as yaml from "js-yaml";
 import { useTextToSpeech } from "./TextToSpeechContext";
 import { t } from '../i18n';
+import { getPluginSettings } from "../settings/PluginSettings";
 
 
 
@@ -34,10 +35,11 @@ export const LNModeProvider: React.FC<{
 	app: App;
 }> = ({ children, app }) => {
 	const defaultMode = getDefaultLNMode();
+	const settings = getPluginSettings();
 	const [lnModes, setLNModes] = useState<Record<string, LNMode>>({
 		default: defaultMode,
 	});
-	const [activeModeId, setActiveModeId] = useState<string>("default");
+	const [activeModeId, setActiveModeId] = useState<string>(settings.activeModeId);
 	const [fileEventRefs, setFileEventRefs] = useState<EventRef[]>([]);
 	const [modeFilePaths, setModeFilePaths] = useState<Set<string>>(new Set());
 	const { setTTSSettings } = useTextToSpeech();
@@ -178,23 +180,24 @@ export const LNModeProvider: React.FC<{
 
 			setLNModes(modesMap);
 			console.log(
-				t('ui.mode.files.loadedCount').replace('{{count}}', (Object.keys(modesMap).length - 1).toString())
+				`Loaded ${Object.keys(modesMap).length - 1} modes with #ln-mode tag`
 			);
-
 			// If active mode no longer exists, set it to the first available mode
-			if (activeModeId && !modesMap[activeModeId]) {
-				const firstModeId = Object.keys(modesMap)[0] || "default";
+			if (!modesMap[activeModeId] && Object.keys(modesMap).length > 0) {
+				const firstModeId = Object.keys(modesMap)[0] || "";
 				setActiveModeId(firstModeId);
+				settings.activeModeId = firstModeId;
+				await settings.saveSettings();
 			}
 		} catch (error) {
 			console.error("Error loading LN modes:", error);
 		}
-	}, [app, activeModeId]);
+	}, [app, activeModeId, settings]);
 
 	// Update mode file paths when modes change
 	useEffect(() => {
 		setModeFilePaths(
-			new Set(Object.keys(lnModes).filter((path) => path !== "default")),
+			new Set(Object.keys(lnModes).filter((path) => path !== "")),
 		);
 	}, [lnModes]);
 
@@ -316,11 +319,12 @@ export const LNModeProvider: React.FC<{
 
 	// Helper to set the active mode
 	const setActiveMode = useCallback(
-		(mode: LNMode | null) => {
-
+		async (mode: LNMode | null) => {
 			console.log("Setting active mode:", mode);
 			if (!mode) {
-				setActiveModeId("default");
+				setActiveModeId("");
+				settings.activeModeId = "";
+				await settings.saveSettings();
 
 				// Update text-to-speech settings for the default mode
 				const defaultMode = getDefaultLNMode();
@@ -348,7 +352,12 @@ export const LNModeProvider: React.FC<{
 			}
 
 			// Set active mode ID
-			setActiveModeId(completeMode.ln_path);
+			const newActiveId = completeMode.ln_path;
+			setActiveModeId(newActiveId);
+			
+			// Save to plugin settings
+			settings.activeModeId = newActiveId;
+			await settings.saveSettings();
 
 			// Update text-to-speech settings for the new mode
 			setTTSSettings({
@@ -358,7 +367,7 @@ export const LNModeProvider: React.FC<{
 				speed: completeMode.ln_voice_speed,
 			});
 		},
-		[lnModes, setTTSSettings],
+		[lnModes, setTTSSettings, settings],
 	);
 
 	// Context value that provides the modes and functionality

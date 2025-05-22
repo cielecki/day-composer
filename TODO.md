@@ -19,17 +19,13 @@
 - [x] Name of the modes should come from file name not ln_name
 - [x] Bug: checking off 0 zadan as it's beeing generatrd
 - [x] Upgrade from Claude 3.7 Sonnet to Claude 4
+- [x] 🔄 Wprowadź zapamiętywanie aktualnego trybu pomiędzy uruchomieniami w Obsidianie
+- [x] Styling for non dark mode users is off
+- [x] Spinner when transcribing has some opacity or color issue
 
-
-- [ ] 🔄 Wprowadź zapamiętywanie aktualnego trybu pomiędzy uruchomieniami w Obsidianie
-
-- [ ] Styling for non dark mode users is off
 - [ ] Why are mobile styles completely different and there's a contrast issue?
-
 - [ ] AI Coach -> Life Navigator
-
 - [ ] Working daily planning and habits in the starter kit
-
 - [ ] Distinct animation for when speach is being generated vs when it's playing
 
 - [ ] Test with B

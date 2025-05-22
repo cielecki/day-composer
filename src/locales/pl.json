@@ -244,8 +244,7 @@
       "defaultDescription": "Nowy tryb asystenta AI",
       "defaultVoiceInstructions": "Mów wyraźnie i profesjonalnie",
       "files": {
-        "noFrontmatter": "Plik {{filename}} nie ma frontmattera, używam wartości domyślnych z treścią pliku jako prompt systemowy",
-        "loadedCount": "Załadowano {{count}} trybów z tagiem #ln-mode"
+        "noFrontmatter": "Plik {{filename}} nie ma frontmattera, używam wartości domyślnych z treścią pliku jako prompt systemowy"
       }
     },
     "attachments": {
