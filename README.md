@@ -2,6 +2,8 @@
 
 This plugin provides a set of tools for enhancing your experience with Obsidian, with a focus on AI assistance and journal management.
 
+**New to Obsidian?** Check out [why we chose Obsidian](WHY_OBSIDIAN.md) as the foundation for Life Navigator.
+
 ## Features
 
 ### AI Coach
