@@ -5,7 +5,7 @@
 1.  Install Obsidian for desktop from [obsidian.md](https://obsidian.md/).
 2.  Set up a vault. For multi-device access (e.g., Mac and mobile), consider setting it up in a shared drive like iCloud.
 3.  Enter the vault in Obsidian.
-4.  **Language Setting:** It's recommended to set your Obsidian's interface language (Settings -> About -> Language) to your preferred language (e.g., English or Polish) before proceeding. The Life Navigator plugin's content and interactions depend on this setting.
+4.  **Language Setting:** It's recommended to set your Obsidian's interface language (Settings -> About -> Language) to the langue you are going to write your notes in (e.g., English or Polish) before proceeding. The Life Navigator plugin's content, file names and ai interactions depend on this setting.
 5.  Go to **Settings -> Community plugins** and ensure **"Community plugins"** is enabled (toggled on).
 6.  Open your web browser and go to the latest release of the plugin here: [https://github.com/cielecki/life-navigator/releases](https://github.com/cielecki/life-navigator/releases). Download the `main.js`, `manifest.json`, and `styles.css` files from the "Assets" section of that release.
 7.  Open your vault's folder in your computer's file explorer (e.g., Finder on Mac, File Explorer on Windows).
