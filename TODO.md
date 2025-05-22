@@ -15,6 +15,8 @@
 - [ ] Fix transcription issues
 - [ ] Name of the modes should come from file name not ln_name
 - [ ] Working daily planning and habits in the starter kit
+- [ ] ln-current-open-file w speech to text
+- [ ] ln-current-chat in speech to text?
 
 - [ ] Test with B
 - [ ] Test with Piotr
