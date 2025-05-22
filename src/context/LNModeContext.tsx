@@ -107,7 +107,7 @@ export const LNModeProvider: React.FC<{
 			// Create a partial LNMode object
 			const partialMode: Partial<LNMode> = {
 				// Required fields
-				ln_name: frontmatter.ln_name || file.basename,
+				ln_name: file.basename,
 				ln_path: file.path,
 
 				// UI elements

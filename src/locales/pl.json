@@ -20,8 +20,8 @@
   "tools": {
     "title": "Narzędzia",
     "description": "Dostępne narzędzia i funkcje",
-    "createStarterPack": "Utwórz pakiet startowy",
-    "createSingleMode": "Utwórz pojedynczy tryb",
+    "createStarterKit": "Utwórz pakiet startowy",
+    "createNewMode": "Utwórz nowy tryb",
     "checkForUpdates": "Sprawdź aktualizacje",
     "aiCoach": "Life Navigator",
     "tasks": {

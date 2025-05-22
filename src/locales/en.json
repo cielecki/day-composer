@@ -21,7 +21,7 @@
     "title": "Tools",
     "description": "Available tools and utilities",
     "createStarterKit": "Create a Starter Kit",
-    "createSingleMode": "Create a Single Mode",
+    "createNewMode": "Create a New Mode",
     "checkForUpdates": "Check for updates",
     "aiCoach": "Life Navigator",
     "tasks": {

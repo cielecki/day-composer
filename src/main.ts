@@ -126,7 +126,7 @@ const AVAILABLE_COLORS = [
 ];
 
 // Create a new function to create a single mode
-const createSingleMode = async (app: App) => {
+const createNewMode = async (app: App) => {
 	try {
 		// Randomly select an icon and color
 		const randomIcon = AVAILABLE_ICONS[Math.floor(Math.random() * AVAILABLE_ICONS.length)];
@@ -235,10 +235,10 @@ export default class MyPlugin extends Plugin {
 
 		// Add command to create a single mode
 		this.addCommand({
-			id: "create-single-mode",
-			name: t("tools.createSingleMode"),
+			id: "create-new-mode",
+			name: t("tools.createNewMode"),
 			callback: async () => {
-				await createSingleMode(this.app);
+				await createNewMode(this.app);
 			},
 		});
 

@@ -588,7 +588,7 @@ export const AICoachApp: React.FC = () => {
 								onClick={() => {
 									if (window.app) {
 										// @ts-ignore - Using the Obsidian command API
-										window.app.commands.executeCommandById("life-navigator:create-single-mode");
+										window.app.commands.executeCommandById("life-navigator:create-new-mode");
 									}
 									setDropdownOpen(false);
 								}}

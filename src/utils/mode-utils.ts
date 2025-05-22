@@ -19,9 +19,9 @@ export function modeToNoteContent(mode: LNMode): string {
     tags: 'ln-mode',
   };
   
-  // Add all properties except system prompt and ln_path (which is determined at load time)
+  // Add all properties except system prompt, ln_path, and ln_name (which are determined at load time)
   Object.entries(mode).forEach(([key, value]) => {
-    if (key !== 'ln_system_prompt' && key !== 'ln_path' && value !== undefined) {
+    if (key !== 'ln_system_prompt' && key !== 'ln_path' && key !== 'ln_name' && value !== undefined) {
       frontmatterObj[key] = value;
     }
   });

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Renamed "Create a Single Mode" to "Create a New Mode" in UI for better clarity
+- Mode name is now derived from file name rather than ln-name attribute
+
 ## [0.6.7] - 2025-05-22
 
 ### Added
