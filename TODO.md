@@ -14,12 +14,12 @@
 - [x] Fix transcription issues
 - [x] WTF? <tag_indeks file="Info/_Indeks_.md">
 - [x] Standardized naming from "Starter Pack" to "Starter Kit" throughout the codebase
+- [x] ln-currently-open-file w speech to text
+- [x] ln-current-chat in speech to text?
 
 - [ ] AI Coach -> Life Navigator
 - [ ] Name of the modes should come from file name not ln_name
 - [ ] Working daily planning and habits in the starter kit
-- [x] ln-currently-open-file w speech to text
-- [x] ln-current-chat in speech to text?
 
 - [ ] Bug: checking off 0 zadan as it's beeing generatred
 
@@ -33,14 +33,12 @@
 - [ ] 🔧 Dodać funkcję edycji todo itemów
 - [ ] 🔧 Poprawić funkcjonalność przenoszenia zadań (problem z dodawaniem do konkretnych dni)
 - [ ] Life navigator: comments jak sa multiline to zle sie formatuja po dodaniu do notatki przez AI
-
 - [ ] 🔄 Wprowadź zapamiętywanie aktualnego trybu pomiędzy uruchomieniami w Obsidianie
 - [ ] Write down the obsidian bullet journal md format that the plugin uses
 - [ ] Create tool documentation in README or MODE_GUIDE or smth
 - [ ] More relaxed todo format in the plugin
 - [ ] Styling for non dark mode users is off
 - [ ] Why are mobile styles completely different and there's a contrast issue?
-
 
 - [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
 - [ ] User guide requires a cleanup
