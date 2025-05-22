@@ -195,6 +195,12 @@
       "removeFile": "Remove {{filename}}",
       "maxFiles": "Max files attached: {{max}}"
     },
+    "message": {
+      "edit": "Edit message",
+      "copy": "Copy message",
+      "speak": "Speak message",
+      "attachedImage": "Attached image"
+    },
     "todo": {
       "clickToChange": "Click to change status",
       "readOnly": "Read only",
@@ -225,8 +231,6 @@
       }
     },
     "attachments": {
-      "notImplemented": "File attachments are not fully implemented yet",
-      "imageNotImplemented": "Image attachments are not fully implemented yet",
       "imagePasted": "Image pasted successfully",
       "imagesAttached": "{{count}} images attached: {{filenames}}",
       "pastedImage": "Pasted image"

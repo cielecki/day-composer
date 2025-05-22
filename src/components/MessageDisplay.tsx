@@ -147,7 +147,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
           <div key={`block-${index}`} className="image-content">
             <img 
               src={imageUrl} 
-              alt="Attached image" 
+              alt={t('ui.message.attachedImage')}
               className="attached-image-preview"
               style={{ maxWidth: '300px', maxHeight: '200px', objectFit: 'contain' }}
             />
@@ -258,7 +258,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
                   className="input-control-button cancel-button"
                   onClick={handleCancelEdit}
                 >
-                  {t('ui.message.cancel')}
+                  {t('buttons.cancel')}
                 </button>
                 <button 
                   className="input-control-button send-button"
