@@ -1,6 +1,6 @@
-# Usage: Exploring Your Starter Pack
+# Usage: Exploring Your Starter Kit
 
-In the starter package, you have four modes: Songwriter, Reflection, Brawl Assistant, as well as some files in the info directory about me, backlog relationships and index. 
+In the starter kit, you have four modes: Songwriter, Reflection, Brawl Assistant, as well as some files in the info directory about me, backlog relationships and index. 
 
 Let's walk through those files.
 
@@ -16,7 +16,7 @@ You can also create such links in those separate directories, so it's like all o
 
 There is also a very useful backlog file for storing your pending to-do lists which are not added to your daily notes. Feel free to edit that file and just add some stuff that is related to yourself. Remove anything from here. 
 
-After you've clicked "Create Starter Pack" (step 20 in the installation), a new folder will appear in your vault, typically named "Starter Pack vX.X" or similar. This pack is your starting point for using the plugin. Here's what to explore:
+After you've clicked "Create Starter Kit" (step 20 in the installation), a new folder will appear in your vault, typically named "Starter Kit vX.X" or similar. This kit is your starting point for using the plugin. Here's what to explore:
 
 1.  **Core Information Files (usually in an `Info` sub-directory):**
     *   `About Me.md`: This is where you can describe yourself, your preferences, goals, and any context you want the AI to have about you.
@@ -29,7 +29,7 @@ After you've clicked "Create Starter Pack" (step 20 in the installation), a new 
         *   **Delete** the placeholder examples entirely and write your own information from scratch.
         *   **Adapt** the examples, using them as inspiration but replacing the content with your own details.
     *   The more relevant and personal the information you provide, the more effectively the AI can assist you.
-    *   **Note:** If you keep the placeholder text, it will be used in AI and skew it's responses, it's best to delete everything that you don't plan to immediatelly replace. You can always find the [original starter pack files](https://github.com/cielecki/life-navigator/tree/main/src/locales).
+    *   **Note:** If you keep the placeholder text, it will be used in AI and skew it's responses, it's best to delete everything that you don't plan to immediatelly replace. You can always find the [original starter kit files](https://github.com/cielecki/life-navigator/tree/main/src/locales).
 
 3.  **AI Modes (usually in a `Modes` sub-directory):**
     *   You'll find templates for different AI "personalities" or assistants (e.g., `Songwriter.md`, `Reflection.md`, `Brawl Assistant.md`).
@@ -38,7 +38,7 @@ After you've clicked "Create Starter Pack" (step 20 in the installation), a new 
 
 This initial setup and personalization are key to getting the most out of Life Navigator.
 
-## Understanding Your Starter Pack in Detail
+## Understanding Your Starter Kit in Detail
 
 ### The Information Files: Your AI's Knowledge Base
 
@@ -194,7 +194,7 @@ You can switch between modes at any time based on your current needs. Each mode 
 
 ### Working with Example Content
 
-When you first create the starter pack, you might be hesitant to delete the example content right away:
+When you first create the starter kit, you might be hesitant to delete the example content right away:
 
 - It's completely fine to keep the examples initially as you learn how the system works.
 - You can gradually replace sections with your own information as you become more comfortable.

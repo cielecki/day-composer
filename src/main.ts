@@ -18,15 +18,15 @@ import { ConfirmReloadModal } from "./components/ConfirmReloadModal";
 
 
 
-const createStarterPack = async (app: App) => {
+const createStarterKit = async (app: App) => {
 	try {
 		const currentLanguage = window.localStorage.getItem('language') || 'en';
 		const fallbackLanguage = 'en';
 
-		const starterPackDirNameKey = 'ui.starterPack.directoryName';
-		let starterPackDirName = t(starterPackDirNameKey);
+		const starterKitDirNameKey = 'ui.starterKit.directoryName';
+		let starterKitDirName = t(starterKitDirNameKey);
 
-		starterPackDirName = starterPackDirName + " v0.2";
+		starterKitDirName = starterKitDirName + " v0.3";
 
 		// Check if we have files for the current language
 		if (!STARTER_KIT_DATA[currentLanguage]) {
@@ -35,7 +35,7 @@ const createStarterPack = async (app: App) => {
 			// If fallback language also doesn't exist, show error and exit
 			if (!STARTER_KIT_DATA[fallbackLanguage]) {
 				new Notice(`Error: No starter kit files defined for current language (${currentLanguage}) or fallback (${fallbackLanguage}).`);
-				console.error(`Starter Pack: No files for language ${currentLanguage} or fallback ${fallbackLanguage}.`);
+				console.error(`Starter Kit: No files for language ${currentLanguage} or fallback ${fallbackLanguage}.`);
 				return;
 			}
 		}
@@ -49,17 +49,17 @@ const createStarterPack = async (app: App) => {
 
 			if (!filename) {
 				new Notice(`Skipping file: missing filename.`);
-				console.error(`Starter Pack: Critical - Missing filename for a file. Skipping.`);
+				console.error(`Starter Kit: Critical - Missing filename for a file. Skipping.`);
 				continue;
 			}
 
 			if (!content) {
 				new Notice(`Skipping file '${filename}': missing content.`);
-				console.error(`Starter Pack: Critical - Missing content for file ${filename}. Skipping.`);
+				console.error(`Starter Kit: Critical - Missing content for file ${filename}. Skipping.`);
 				continue;
 			}
 
-			const filePath = path.join(starterPackDirName, subPath, filename);
+			const filePath = path.join(starterKitDirName, subPath, filename);
 			const directory = path.dirname(filePath);
 
 			if (!app.vault.getAbstractFileByPath(directory)) {
@@ -75,10 +75,10 @@ const createStarterPack = async (app: App) => {
 			await app.vault.create(filePath, content);
 		}
 
-		new Notice(t('ui.starterPack.createdSuccess'));
+		new Notice(t('ui.starterKit.createdSuccess'));
 	} catch (error) {
-		new Notice(t('ui.starterPack.createdError').replace('{{error}}', String(error)));
-		console.error("Error creating a Starter Pack:", error);
+		new Notice(t('ui.starterKit.createdError').replace('{{error}}', String(error)));
+		console.error("Error creating a Starter Kit:", error);
 	}
 };
 
@@ -223,13 +223,13 @@ export default class MyPlugin extends Plugin {
 		});
 
 
-		// Add command to create a Starter Pack
+		// Add command to create a Starter Kit
 		this.addCommand({
-			id: "create-starter-pack",
-			name: t("tools.createStarterPack"),
+			id: "create-starter-kit",
+			name: t("tools.createStarterKit"),
 			callback: async () => {
-				new Notice(t("messages.creatingStarterPack"));
-				await createStarterPack(this.app);
+				new Notice(t("messages.creatingStarterKit"));
+				await createStarterKit(this.app);
 			},
 		});
 

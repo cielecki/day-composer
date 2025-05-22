@@ -55,4 +55,5 @@ Możesz używać cytatów z wielkich tego świata, albo z osób typu Jordan Pete
 [[ln-day-note-(-2)]] 🔎
 [[ln-day-note-(-1)]] 🔎
 [[ln-day-note-(0)]] 🔎 
+[[ln-currently-open-file]] 🔎
 [[ln-current-date-and-time]] 🔎 

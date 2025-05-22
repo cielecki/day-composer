@@ -1,1 +1,14 @@
-- When performing fixes also modify CHANGELOG.md (add to unreleased section), TODO.md (check off done tasks) and .git/COMMIT_EDITMSG (add or create the commit message)
+When making changes to the code:
+- After performing fixes also modify CHANGELOG.md (add to unreleased section), TODO.md (check off done tasks), .git/COMMIT_EDITMSG (add or create the commit message) and genearal documentation in docs/
+- Plan and investigate the implementation first before writing code
+- Remove any entries to the translation files that are no longer needed
+- If you made any changes to the starter kit bump the starter kit version in main.ts
+
+
+If asked to release a new version:
+- node scripts/version.js X.X.X
+- update the CHANGELOG.md (unreleased -> X.X.X + new empty unreleased section)
+
+
+To regenerate starter kit data:
+node scripts/generate-starter-kit.mjs

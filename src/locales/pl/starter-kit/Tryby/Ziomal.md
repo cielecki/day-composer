@@ -44,4 +44,5 @@ To jest konwersacja telefoniczna więc wypowiadaj się krótko, zwięźle i dosa
 [[ln-day-note-(2)]] 🔎
 [[ln-day-note-(3)]] 🔎
 [[ln-day-note-(4)]] 🔎 
+[[ln-currently-open-file]] 🔎
 [[ln-current-date-and-time]] 🔎 

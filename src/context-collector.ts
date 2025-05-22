@@ -205,6 +205,63 @@ export class ContextCollector {
 				continue;
 			}
 
+			// Handle ln-currently-open-file format
+			if (linkPath === 'ln-currently-open-file') {
+				// Get the active leaf and view
+				const activeLeaf = this.app.workspace.activeLeaf;
+				if (activeLeaf && activeLeaf.view && "file" in activeLeaf.view && activeLeaf.view.file instanceof TFile) {
+					const file = activeLeaf.view.file as TFile;
+					try {
+						// Read the file content
+						const fileContent = await this.app.vault.read(file);
+						
+						// Get the translated tag name and convert it to a valid XML tag name
+						const translatedTagName = this.convertToValidTagName(t('file.currentlyOpen'));
+						
+						// Format the content with proper indentation
+						const tabbedContent = fileContent.split('\n').map((line: string) => '  ' + line).join('\n');
+						
+						// Replace the link with the file content in XML format
+						result = result.replace(
+							match[0],
+							`<${translatedTagName} file="${file.path}">\n\n${tabbedContent}\n\n</${translatedTagName}>\n`
+						);
+					} catch (error) {
+						console.error(`Error reading currently open file: ${file.path}`, error);
+						result = result.replace(match[0], `[Error reading currently open file] 🔎`);
+					}
+				} else {
+					// No file is currently open
+					result = result.replace(match[0], `[No file currently open] 🔎`);
+				}
+				continue;
+			}
+
+			// Handle ln-current-chat format
+			if (linkPath === 'ln-current-chat') {
+				// Access the chat content from the app-level view
+				try {
+					// Get the current chat content from the AICoachView
+					const chatContent = this.getCurrentChatContent();
+					
+					// Get the translated tag name and convert it to a valid XML tag name
+					const translatedTagName = this.convertToValidTagName(t('chat.current'));
+					
+					// Format the content with proper indentation
+					const tabbedContent = chatContent.split('\n').map((line: string) => '  ' + line).join('\n');
+					
+					// Replace the link with the chat content in XML format
+					result = result.replace(
+						match[0],
+						`<${translatedTagName}>\n\n${tabbedContent}\n\n</${translatedTagName}>\n`
+					);
+				} catch (error) {
+					console.error(`Error retrieving current chat content`, error);
+					result = result.replace(match[0], `[Error retrieving chat content] 🔎`);
+				}
+				continue;
+			}
+
 			// Try to resolve the link
 			const linkFile = this.getLinkpathDest(linkPath);
 
@@ -302,5 +359,94 @@ export class ContextCollector {
 						file.path === linkpath || file.basename === linkpath,
 				) || null
 		);
+	}
+
+	/**
+	 * Get the current chat content from the active view
+	 * @returns The formatted chat content or an error message
+	 */
+	private getCurrentChatContent(): string {
+		try {
+			// Find the AICoachView in the workspace leaves
+			const aiCoachViewLeaf = this.app.workspace.getLeavesOfType(
+				"ai-coach-view"
+			)[0];
+
+			if (!aiCoachViewLeaf) {
+				return t('errors.chat.noContent');
+			}
+
+			// Get the view instance
+			const view = aiCoachViewLeaf.view;
+			if (!view || !("conversation" in view)) {
+				return t('errors.chat.noContent');
+			}
+
+			// Extract the conversation from the view
+			// @ts-ignore: We're accessing a property we know exists
+			const conversation = view.conversation;
+			if (!conversation || !Array.isArray(conversation)) {
+				return t('errors.chat.noContent');
+			}
+
+			// Format the conversation into a readable string
+			return this.formatConversationContent(conversation);
+		} catch (error) {
+			console.error("Error getting chat content:", error);
+			return t('errors.chat.noContent');
+		}
+	}
+
+	/**
+	 * Format the conversation into a readable string
+	 * @param conversation The conversation to format
+	 * @returns A formatted string representation of the conversation
+	 */
+	private formatConversationContent(conversation: any[]): string {
+		if (!conversation || conversation.length === 0) {
+			return t('errors.chat.noContent');
+		}
+
+		// Build a formatted representation of the conversation
+		return conversation
+			.map((message) => {
+				// Skip tool result messages
+				if (message.role === "user" && Array.isArray(message.content)) {
+					const isOnlyToolResults = message.content.every(
+						(item: any) =>
+							typeof item === "object" &&
+							item !== null &&
+							"type" in item &&
+							item.type === "tool_result"
+					);
+					if (isOnlyToolResults) {
+						return null;
+					}
+				}
+
+				// Format based on role
+				const rolePrefix = message.role === "user" ? "👤 User: " : "🤖 Assistant: ";
+				
+				// Extract text content
+				let textContent = "";
+				if (typeof message.content === "string") {
+					textContent = message.content;
+				} else if (Array.isArray(message.content)) {
+					// Extract text from content blocks
+					textContent = message.content
+						.filter((block: any) => block.type === "text")
+						.map((block: any) => block.text)
+						.join("\n");
+				}
+
+				// Skip empty messages
+				if (!textContent.trim()) {
+					return null;
+				}
+
+				return `${rolePrefix}\n${textContent}\n`;
+			})
+			.filter(Boolean) // Remove null entries
+			.join("\n");
 	}
 }

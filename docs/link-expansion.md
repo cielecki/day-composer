@@ -27,30 +27,51 @@ Links followed by a magnifying glass emoji will be expanded when used in Life Na
 
 This will include the full content of "Note Title" in your query context.
 
-## Special Link Types
+## Special Links
 
-### Dynamic Day Note Links
+Life Navigator supports several special link types that provide dynamic content:
 
-You can use a special format to reference daily notes relative to the current date:
+### ln-day-note
+
+This special link format allows you to reference daily notes relative to the current date.
 
 ```markdown
-[[ln-day-note-(X)]] 🔎
+[[ln-day-note-(0)]] 🔎  # Today's daily note
+[[ln-day-note-(-1)]] 🔎 # Yesterday's daily note
+[[ln-day-note-(1)]] 🔎  # Tomorrow's daily note
 ```
 
-Where `X` is a number representing how many days to offset from today:
-- Negative numbers represent past days: `[[ln-day-note-(-3)]] 🔎` refers to the note from 3 days ago
-- Positive numbers represent future days: `[[ln-day-note-(2)]] 🔎` refers to the note 2 days from now
-- Zero represents today: `[[ln-day-note-(0)]] 🔎` refers to today's note
+The number in parentheses represents the offset in days from the current date.
 
-This uses the same format as the daily note range feature in the context building for LN modes.
+### ln-current-date-and-time
 
-### Current Date and Time
-
-You can include the current date and time in your expanded content:
+This special link outputs the current date and time:
 
 ```markdown
 [[ln-current-date-and-time]] 🔎
 ```
 
-This will be replaced with the current date and time in your locale's format.
+### ln-currently-open-file
+
+This special link embeds the content of the currently open file in the editor. It's useful for referencing and including the content you're currently working on.
+
+```markdown
+[[ln-currently-open-file]] 🔎
+```
+
+The content will be properly formatted with indentation and wrapped in XML tags with the file path as an attribute.
+
+### ln-current-chat
+
+This special link embeds the current conversation from the Life Navigator. It formats the conversation with clear user and assistant markers.
+
+```markdown
+[[ln-current-chat]] 🔎
+```
+
+This is particularly useful in speech to text prompt.
+
+## Magnifying Glass Requirement
+
+All special links must be followed by a magnifying glass emoji (🔎) to trigger the expansion. This is intentional to prevent accidental expansions.
 

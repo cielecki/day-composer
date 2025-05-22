@@ -173,4 +173,5 @@ Po zebraniu wszystkich informacji, wygeneruj kompletny opis dla Suno i zapisz go
 [[ln-day-note-(2)]] 🔎
 [[ln-day-note-(3)]] 🔎
 [[ln-day-note-(4)]] 🔎 
+[[ln-currently-open-file]] 🔎
 [[ln-current-date-and-time]] 🔎 

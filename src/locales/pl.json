@@ -14,7 +14,7 @@
     "prompts": {
       "speechToTextPrompt": "Prompt dla zamiany mowy na tekst",
       "speechToTextPromptDesc": "Prompt, który zostanie wysłany do silnika zamiany mowy na tekst. Dostarcza kontekstu dla modelu AI. Możesz użyć <a href='https://github.com/cielecki/life-navigator/blob/main/docs/link-expansion.md'>rozszerzania linków</a>.",
-      "defaultPrompt": "# Domena\nKomunikat lub komenda głosowa wydawana przez użytkownika asystentowi AI.\n\n# Przykłady\n- Odfajcz zadanie ... eeee ... wyrzuciłem śmieci\n- Zrobiłem kolację\n- Dodaj na jutro, żebym pamiętał o odezwaniu się do Jana.\n\n# Słowniczek\n[[_Indeks_]] 🔎\n\nPoczątek transkrypcji:"
+      "defaultPrompt": "# Domena\nKomunikat lub komenda głosowa wydawana przez użytkownika asystentowi AI.\n\n# Przykłady\n- Odfajcz zadanie ... eeee ... wyrzuciłem śmieci\n- Zrobiłem kolację\n- Dodaj na jutro, żebym pamiętał o odezwaniu się do Jana.\n\n# Słowniczek\n[[_Indeks_]] 🔎\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nPoczątek transkrypcji:"
     }
   },
   "tools": {
@@ -112,6 +112,9 @@
       "multipleFound": "Znaleziono wiele notatek dziennych dla daty: {{date}}",
       "notFound": "Nie znaleziono notatki dziennej dla daty: {{date}}",
       "noContent": "Uwaga: Nie znaleziono notatki dziennej dla daty: {{date}}"
+    },
+    "chat": {
+      "noContent": "Brak dostępnej zawartości czatu"
     },
     "todos": {
       "check": "Nie udało się odznaczyć zadania: {{error}}",
@@ -266,8 +269,14 @@
     }
   },
   "dateTime": {
-    "current": "Aktualna data i czas",
+    "current": "aktualna data i czas",
     "date": "data",
     "time": "czas"
+  },
+  "file": {
+    "currentlyOpen": "aktualnie otwarty plik"
+  },
+  "chat": {
+    "current": "aktualny czat"
   }
 } 

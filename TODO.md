@@ -5,7 +5,7 @@
 - [x] Take few days off to release this
 - [x] ln-current-date-and-time link that generates information about current time
 - [x] Starter kit translations
-- [x] Add task backlog to stater kit
+- [x] Add task backlog to starter kit
 - [x] Removed ln_voice_speed from starter kit as mini tts does not support it
 - [x] fixed example usages so more of them are visible
 - [x] Is the domain free? no
@@ -13,36 +13,44 @@
 - [x] Update checker should refresh obsidian
 - [x] Fix transcription issues
 - [x] WTF? <tag_indeks file="Info/_Indeks_.md">
+- [x] Standardized naming from "Starter Pack" to "Starter Kit" throughout the codebase
 
 - [ ] Name of the modes should come from file name not ln_name
 - [ ] Working daily planning and habits in the starter kit
-- [ ] ln-current-open-file w speech to text
-- [ ] ln-current-chat in speech to text?
+- [x] ln-currently-open-file w speech to text
+- [x] ln-current-chat in speech to text?
+
+- [ ] Bug: checking off 0 zadan as it's beeing generatred
 
 - [ ] Test with B
 - [ ] Test with Piotr
+- [ ] Acquire as many test users as possible
 
 - [ ] Modes are not translated to english
 
 ## AI breakfast release
 - [ ] 🔧 Dodać funkcję edycji todo itemów
-- [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
+- [ ] 🔧 Poprawić funkcjonalność przenoszenia zadań (problem z dodawaniem do konkretnych dni)
+- [ ] Life navigator: comments jak sa multiline to zle sie formatuja po dodaniu do notatki przez AI
 
-- [ ] Choose licence
-- [ ] Add plugin to obsidian repository
-- [ ] Create discord server
-- [ ] Create a presentation for AI breakfast
-- [ ] Write a draft blog post for people to read through and give feedback on
+- [ ] 🔄 Wprowadź zapamiętywanie aktualnego trybu pomiędzy uruchomieniami w Obsidianie
 - [ ] Write down the obsidian bullet journal md format that the plugin uses
 - [ ] Create tool documentation in README or MODE_GUIDE or smth
 - [ ] More relaxed todo format in the plugin
 - [ ] Styling for non dark mode users is off
 - [ ] Why are mobile styles completely different and there's a contrast issue?
 
+
+- [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
+- [ ] User guide requires a cleanup
+- [ ] Choose licence
+- [ ] Add plugin to obsidian repository
+- [ ] Create discord server
+- [ ] Create a presentation for AI breakfast
+- [ ] Write a draft blog post for people to read through and give feedback on
+
 ## Initial release
-- [ ] Bug: checking off 0 zadan as it's beeing generatred
 - [ ] Lepszy entry level experience
-- [ ] 🔧 Poprawić funkcjonalność przenoszenia zadań (problem z dodawaniem do konkretnych dni)
 - [ ] 📝 Asystentka - Zachowywać dokładnie oryginalne sformułowania użytkownika bez robienia rephrasingów
 - [ ] Pouzupełnianie brakujących translacji
 - [ ] ln-currently-opened-document 
@@ -56,9 +64,9 @@
 - [ ] I made a marketing plan of the Vibe Living project
 
 ## Nice to haves
-- [ ] Life navigator: comments jak sa multiline to zle sie formatuja po dodaniu do notatki przez AI
+
 - [ ] 🐛 Naprawić problem automatycznego dodawania niepotrzebnych komentarzy
-- [ ] 🔄 Wprowadź zapamiętywanie aktualnego trybu pomiędzy uruchomieniami w Obsidianie
+
 - [ ] abandoning powinien przenosić zadania na początek notatki dla lepszej widoczności
 - [ ] Bug gdy zastopuje generowanego tool calla
 - [ ] Dodać możliwość konfiguracjii tooli w trybach

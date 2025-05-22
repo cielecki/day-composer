@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added `ln-currently-open-file` special link to embed content from the currently open file
+- Added `ln-current-chat` special link to embed the current chat content
+
+### Changed
+- Standardized naming from "Starter Pack" to "Starter Kit" throughout the codebase for consistency
+
 ## [0.6.6] - 2025-05-22
 
 ### Added

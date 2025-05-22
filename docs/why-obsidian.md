@@ -16,7 +16,7 @@ The Life Navigator system revolves around daily notes:
 - **Simple task format** - easily track what you've completed with checkboxes
 - **Voice dictation supported** - quickly add thoughts on mobile
 
-## The Starter Pack Gives You Everything You Need
+## The Starter Kit Gives You Everything You Need
 
 As shown during the setup:
 - **About Me file** - stores personal information for AI context

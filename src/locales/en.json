@@ -14,13 +14,13 @@
     "prompts": {
       "speechToTextPrompt": "Speech-to-text Prompt",
       "speechToTextPromptDesc": "The prompt that will be sent to the speech-to-text engine. This provides context to the AI model. You can use <a href='https://github.com/cielecki/life-navigator/blob/main/docs/link-expansion.md'>link expansion</a>.",
-      "defaultPrompt": "# Domain\nA message or voice command issued by the user to the AI assistant.\n\n# Examples\n- Check off task ... umm ... I took out the trash\n- I made dinner\n- Add for tomorrow to remind me to reach out to John.\n\n# Glossary\n[[_Index_]] 🔎\n\nStart of transcription:"
+      "defaultPrompt": "# Domain\nA message or voice command issued by the user to the AI assistant.\n\n# Examples\n- Check off task ... umm ... I took out the trash\n- I made dinner\n- Add for tomorrow to remind me to reach out to John.\n\n# Glossary\n[[_Index_]] 🔎\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nStart of transcription:"
     }
   },
   "tools": {
     "title": "Tools",
     "description": "Available tools and utilities",
-    "createStarterPack": "Create a Starter Pack",
+    "createStarterKit": "Create a Starter Kit",
     "createSingleMode": "Create a Single Mode",
     "checkForUpdates": "Check for updates",
     "aiCoach": "Life Navigator",
@@ -113,6 +113,9 @@
       "notFound": "Daily note not found for date: {{date}}",
       "noContent": "Note: No daily note found for date: {{date}}"
     },
+    "chat": {
+      "noContent": "No chat content available"
+    },
     "todos": {
       "check": "Failed to check off todo: {{error}}",
       "uncheck": "Failed to uncheck todo: {{error}}",
@@ -159,7 +162,7 @@
   "messages": {
     "settingsSaved": "Settings saved successfully",
     "settingsReset": "Settings have been reset to defaults",
-    "creatingStarterPack": "Creating a Starter Pack...",
+    "creatingStarterKit": "Creating a Starter Kit...",
     "checkingForUpdates": "Checking for updates...",
     "pluginUpToDate": "Plugin is already up to date (version {{version}}).",
     "newVersionFoundDownloading": "New version {{latestVersion}} found (you have {{currentVersion}}). Downloading update..."
@@ -219,7 +222,7 @@
       "viewSettings": "View mode settings",
       "viewSystemPrompt": "View system prompt",
       "switchTo": "Switch to:",
-      "createStarterPack": "Create starter pack",
+      "createStarterKit": "Create starter kit",
       "newMode": "New mode",
       "createdSuccess": "Successfully created new mode",
       "createdError": "Error creating new mode: {{error}}",
@@ -245,11 +248,11 @@
       "reloadRequiredMessageWithVersions": "Plugin updated from version {{currentVersion}} to {{latestVersion}}.\nWould you like to restart Obsidian to apply changes?",
       "reloadButton": "Restart Obsidian"
     },
-    "starterPack": {
-      "noModes": "## Welcome to Life Navigator\n\nTo get started, create a starter pack containing basic modes with the _#ln-mode_ tag.",
-      "createdSuccess": "Successfully created starter pack",
-      "createdError": "Error creating starter pack: {{error}}",
-      "directoryName": "Starter Pack"
+    "starterKit": {
+      "noModes": "## Welcome to Life Navigator\n\nTo get started, create a starter kit containing basic modes with the _#ln-mode_ tag.",
+      "createdSuccess": "Successfully created starter kit",
+      "createdError": "Error creating starter kit: {{error}}",
+      "directoryName": "Starter Kit"
     },
     "status": {
       "recording": "Recording...",
@@ -266,8 +269,12 @@
     }
   },
   "dateTime": {
-    "current": "Current date and time",
-    "date": "date",
-    "time": "time"
+    "current": "current date and time"
+  },
+  "file": {
+    "currentlyOpen": "currently open file"
+  },
+  "chat": {
+    "current": "current chat"
   }
 } 
