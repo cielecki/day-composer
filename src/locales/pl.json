@@ -72,7 +72,7 @@
     "notFound": "Nie znaleziono zasobu",
     "invalidInput": "Nieprawidłowe dane wejściowe",
     "creatingNewMode": "Błąd podczas tworzenia nowego trybu",
-    "startingAICoach": "Błąd podczas uruchamiania asystenta AI",
+    "startingAICoach": "Błąd podczas uruchamiania AI Coach",
     "setup": "Błąd konfiguracji: {{error}}",
     "conversationTurn": "Błąd podczas konwersacji: {{error}}",
     "failedToUpdatePlugin": "Nie udało się zaktualizować wtyczki: {{error}}",
@@ -111,7 +111,7 @@
     "notes": {
       "multipleFound": "Znaleziono wiele notatek dziennych dla daty: {{date}}",
       "notFound": "Nie znaleziono notatki dziennej dla daty: {{date}}",
-      "noContent": "Uwaga: Nie znaleziono notatki dziennej dla daty: {{date}}"
+      "noContent": "Nie znaleziono treści notatki dziennej dla {{date}}"
     },
     "chat": {
       "noContent": "Brak dostępnej zawartości czatu"
@@ -269,14 +269,17 @@
     }
   },
   "dateTime": {
-    "current": "aktualna data i czas",
+    "current": "Aktualna Data i Czas",
     "date": "data",
     "time": "czas"
   },
   "file": {
-    "currentlyOpen": "aktualnie otwarty plik"
+    "currentlyOpen": "Aktualnie Otwarty Plik"
   },
   "chat": {
-    "current": "aktualny czat"
+    "empty": "Czat jest pusty. Rozpocznij rozmowę, aby zobaczyć tutaj zawartość.",
+    "current": "Aktualny Czat",
+    "userMessage": "wiadomość użytkownika",
+    "assistantMessage": "wiadomość asystenta"
   }
 } 

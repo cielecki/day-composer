@@ -207,10 +207,9 @@ export class ContextCollector {
 
 			// Handle ln-currently-open-file format
 			if (linkPath === 'ln-currently-open-file') {
-				// Get the active leaf and view
-				const activeLeaf = this.app.workspace.activeLeaf;
-				if (activeLeaf && activeLeaf.view && "file" in activeLeaf.view && activeLeaf.view.file instanceof TFile) {
-					const file = activeLeaf.view.file as TFile;
+				// Get the active file using Obsidian API
+				const file = this.app.workspace.getActiveFile();
+				if (file && file instanceof TFile) {
 					try {
 						// Read the file content
 						const fileContent = await this.app.vault.read(file);
@@ -367,30 +366,179 @@ export class ContextCollector {
 	 */
 	private getCurrentChatContent(): string {
 		try {
-			// Find the AICoachView in the workspace leaves
-			const aiCoachViewLeaf = this.app.workspace.getLeavesOfType(
-				"ai-coach-view"
-			)[0];
-
-			if (!aiCoachViewLeaf) {
+			// Find all AICoachView leaves in the workspace
+			const aiCoachViewLeaves = this.app.workspace.getLeavesOfType("ai-coach-view");
+			
+			// If no leaves found, return error message
+			if (!aiCoachViewLeaves || aiCoachViewLeaves.length === 0) {
+				console.log("No AI Coach view leaves found");
 				return t('errors.chat.noContent');
 			}
-
-			// Get the view instance
+			
+			// Get the view instance from the first leaf
+			const aiCoachViewLeaf = aiCoachViewLeaves[0];
 			const view = aiCoachViewLeaf.view;
-			if (!view || !("conversation" in view)) {
-				return t('errors.chat.noContent');
+			
+			// The conversation is likely stored in the AIAgentContext
+			// Try to access the Life Navigator plugin (this is the proper way to access plugins)
+			// @ts-ignore - Accessing plugins this way requires ignoring TypeScript
+			const plugin = this.app.plugins?.plugins?.["life-navigator"];
+			if (plugin) {
+				console.log("Found Life Navigator plugin:", plugin);
+				
+				// Look for conversation in AIAgentProvider's conversationRef
+				// @ts-ignore - Using internal plugin structure
+				if (plugin.aiAgent && plugin.aiAgent.conversation) {
+					console.log("Found conversation in plugin.aiAgent");
+					return this.formatConversationContent(plugin.aiAgent.conversation);
+				}
 			}
-
-			// Extract the conversation from the view
-			// @ts-ignore: We're accessing a property we know exists
-			const conversation = view.conversation;
-			if (!conversation || !Array.isArray(conversation)) {
-				return t('errors.chat.noContent');
+			
+			// Try to find the conversation via DOM inspection
+			try {
+				// Find the conversation container in the DOM
+				const aiCoachView = this.app.workspace.containerEl.querySelector('.ai-coach-view');
+				if (aiCoachView) {
+					console.log("Found AI Coach view in DOM");
+					
+					// Debug: Log the HTML structure
+					console.log("AI Coach view HTML:", aiCoachView.innerHTML);
+					
+					// Try different selectors for messages
+					const selectors = [
+						'.message', 
+						'.conversation-container > div',
+						'.markdown-content',
+						'[class*="message"]',
+						'[class*="conversation"] > div'
+					];
+					
+					let messageElements: NodeListOf<Element> | null = null;
+					let successfulSelector = '';
+					
+					// Try each selector until we find elements
+					for (const selector of selectors) {
+						const elements = aiCoachView.querySelectorAll(selector);
+						console.log(`Selector "${selector}" found ${elements.length} elements`);
+						
+						if (elements && elements.length > 0) {
+							messageElements = elements;
+							successfulSelector = selector;
+							break;
+						}
+					}
+					
+					if (messageElements && messageElements.length > 0) {
+						console.log(`Found message elements with selector "${successfulSelector}"`);
+						
+						// Extract user and assistant messages
+						const conversation: any[] = [];
+						
+						messageElements.forEach((el, index) => {
+							console.log(`Message element ${index} classes:`, el.className);
+							console.log(`Message element ${index} innerHTML:`, el.innerHTML);
+							
+							// Try to determine if this is a user or assistant message
+							const isUser = 
+								el.classList.contains('user') || 
+								el.innerHTML.includes('User') ||
+								el.textContent?.includes('👤');
+							
+							const isAssistant = 
+								el.classList.contains('assistant') || 
+								el.innerHTML.includes('Assistant') ||
+								el.textContent?.includes('🤖');
+							
+							// If we can't determine the role, skip this element
+							if (!isUser && !isAssistant) return;
+							
+							// Find the content - try different selectors
+							const contentSelectors = ['.message-content', '.markdown-content', 'p', 'div'];
+							let contentEl = null;
+							
+							for (const selector of contentSelectors) {
+								const candidate = el.querySelector(selector);
+								if (candidate && candidate.textContent) {
+									contentEl = candidate;
+									break;
+								}
+							}
+							
+							// If no specific content element found, use the element itself
+							if (!contentEl && el.textContent) {
+								contentEl = el;
+							}
+							
+							if (contentEl) {
+								const textContent = contentEl.textContent || "";
+								const cleanText = textContent
+									.replace(/👤\s*User:\s*/g, '')  // Remove "👤 User:" prefix
+									.replace(/🤖\s*Assistant:\s*/g, '')  // Remove "🤖 Assistant:" prefix
+									.trim();
+								
+								if (cleanText) {
+									conversation.push({
+										role: isUser ? "user" : "assistant",
+										content: [{ type: "text", text: cleanText }]
+									});
+								}
+							}
+						});
+						
+						if (conversation.length > 0) {
+							console.log("Successfully extracted conversation from DOM:", conversation);
+							return this.formatConversationContent(conversation);
+						}
+					}
+					
+					// If we couldn't find messages but the chat is not empty
+					// Return a placeholder conversation
+					if (aiCoachView.textContent && !aiCoachView.textContent.includes('No chat content')) {
+						console.log("Found chat content but couldn't parse messages, returning empty chat message");
+						// Return a clear "chat is empty" message instead of the raw text
+						return t('chat.empty');
+					}
+				}
+			} catch (domError) {
+				console.error("Error extracting conversation from DOM:", domError);
 			}
-
-			// Format the conversation into a readable string
-			return this.formatConversationContent(conversation);
+			
+			// Direct global window access
+			try {
+				// @ts-ignore - Access global objects
+				if (window && window.lifeNavigator && window.lifeNavigator.aiAgent) {
+					// @ts-ignore
+					const conversation = window.lifeNavigator.aiAgent.conversation;
+					if (Array.isArray(conversation) && conversation.length > 0) {
+						console.log("Found conversation in global window.lifeNavigator");
+						return this.formatConversationContent(conversation);
+					}
+				}
+			} catch (windowError) {
+				console.error("Error accessing global objects:", windowError);
+			}
+			
+			// Cast to any to avoid TypeScript errors
+			const aiCoachView = view as any;
+			
+			// Try direct property access as a fallback
+			if (aiCoachView && typeof aiCoachView.conversation !== 'undefined') {
+				const conversation = aiCoachView.conversation;
+				
+				if (Array.isArray(conversation) && conversation.length > 0) {
+					console.log("Successfully retrieved conversation using getter");
+					return this.formatConversationContent(conversation);
+				}
+			}
+			
+			// Fallback to accessing the private _conversation property directly
+			if (aiCoachView && Array.isArray(aiCoachView._conversation) && aiCoachView._conversation.length > 0) {
+				console.log("Successfully retrieved conversation using _conversation property");
+				return this.formatConversationContent(aiCoachView._conversation);
+			}
+			
+			console.log("No conversation found in AICoachView");
+			return t('errors.chat.noContent');
 		} catch (error) {
 			console.error("Error getting chat content:", error);
 			return t('errors.chat.noContent');
@@ -407,8 +555,12 @@ export class ContextCollector {
 			return t('errors.chat.noContent');
 		}
 
-		// Build a formatted representation of the conversation
-		return conversation
+		// Get the translated tag names and convert them to valid XML tags
+		const userTagName = this.convertToValidTagName(t('chat.userMessage'));
+		const assistantTagName = this.convertToValidTagName(t('chat.assistantMessage'));
+		
+		// Build a formatted representation of the conversation with XML tags for each message
+		const conversationContent = conversation
 			.map((message) => {
 				// Skip tool result messages
 				if (message.role === "user" && Array.isArray(message.content)) {
@@ -423,9 +575,6 @@ export class ContextCollector {
 						return null;
 					}
 				}
-
-				// Format based on role
-				const rolePrefix = message.role === "user" ? "👤 User: " : "🤖 Assistant: ";
 				
 				// Extract text content
 				let textContent = "";
@@ -444,9 +593,21 @@ export class ContextCollector {
 					return null;
 				}
 
-				return `${rolePrefix}\n${textContent}\n`;
+				// Format with appropriate tag based on role
+				const tagName = message.role === "user" ? userTagName : assistantTagName;
+				
+				// Indent the content for better readability
+				const indentedContent = textContent
+					.split('\n')
+					.map(line => `    ${line}`)
+					.join('\n');
+				
+				return `  <${tagName}>\n${indentedContent}\n  </${tagName}>`;
 			})
 			.filter(Boolean) // Remove null entries
-			.join("\n");
+			.join("\n\n");
+			
+		// Format the conversation as XML with proper indentation
+		return conversationContent
 	}
 }

@@ -15,6 +15,7 @@
 - [x] WTF? <tag_indeks file="Info/_Indeks_.md">
 - [x] Standardized naming from "Starter Pack" to "Starter Kit" throughout the codebase
 
+- [ ] AI Coach -> Life Navigator
 - [ ] Name of the modes should come from file name not ln_name
 - [ ] Working daily planning and habits in the starter kit
 - [x] ln-currently-open-file w speech to text

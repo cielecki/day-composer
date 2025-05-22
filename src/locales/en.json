@@ -111,7 +111,7 @@
     "notes": {
       "multipleFound": "Multiple daily notes found for date: {{date}}",
       "notFound": "Daily note not found for date: {{date}}",
-      "noContent": "Note: No daily note found for date: {{date}}"
+      "noContent": "No daily note content found for {{date}}"
     },
     "chat": {
       "noContent": "No chat content available"
@@ -269,12 +269,15 @@
     }
   },
   "dateTime": {
-    "current": "current date and time"
+    "current": "Current Date and Time"
   },
   "file": {
-    "currentlyOpen": "currently open file"
+    "currentlyOpen": "Currently Open File"
   },
   "chat": {
-    "current": "current chat"
+    "empty": "Chat is empty. Start a conversation to see content here.",
+    "current": "Current Chat",
+    "userMessage": "user message",
+    "assistantMessage": "assistant message"
   }
 } 
