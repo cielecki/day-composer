@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback, useRef } from 'react';
-import { Notice } from 'obsidian';
+import { Notice, moment } from 'obsidian';
 import { getPluginSettings } from '../settings/PluginSettings';
 import OpenAI from 'openai';
 import { t } from '../i18n';
-import { useAIAgent } from './AIAgentContext';
+import { ContextCollector } from '../context-collector';
 
 const MAX_AUDIO_PROMPT_LENGTH = 5000;
 
@@ -26,30 +26,18 @@ export const SpeechToTextProvider: React.FC<{
   const audioChunksRef = useRef<Blob[]>([]);
   const [lastTranscription, setLastTranscription] = useState<string | null>(null);
 
-  const { getContext } = useAIAgent();
-
-
   const startRecording = async (signal: AbortSignal): Promise<void> => {
     try {
-      // Reset audio chunks in ref only
       audioChunksRef.current = [];
-      
-      // Get microphone access with specific constraints for better audio quality
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
           channelCount: 1,
-          sampleRate: 16000 // Using 16kHz sample rate for better compatibility with speech recognition
+          sampleRate: 16000
         } 
       });
-      
-      // Only use formats definitely supported by OpenAI's API
       let options = {};
-      
-      // Check if we're on iOS Safari
-      
-      // For other platforms, use the original order
       if (MediaRecorder.isTypeSupported('audio/webm')) {
         options = { mimeType: 'audio/webm' };
       } else if (MediaRecorder.isTypeSupported('audio/mp3')) {
@@ -59,55 +47,35 @@ export const SpeechToTextProvider: React.FC<{
       } else if (MediaRecorder.isTypeSupported('audio/m4a')) {
         options = { mimeType: 'audio/m4a' };
       }
-      
       const recorder = new MediaRecorder(stream, options);
       
       console.log('Using audio format:', recorder.mimeType);
 
 
       recorder.addEventListener('dataavailable', (event) => {
-        console.log('dataavailable event', event);
         if (event.data.size > 0) {
-          // Update only the ref
           audioChunksRef.current = [...audioChunksRef.current, event.data];
         }
       });
-
-      signal.addEventListener('abort', () => {
-        console.log('abort event');
-        recorder.stop();
-      });
-      
+      signal.addEventListener('abort', () => recorder.stop());
       recorder.addEventListener('stop', async () => {
         setIsRecording(false);
-        console.log('stop event');
-        // When recording stops, transcribe the audio using the ref value
         if (!signal.aborted) {
           await transcribeAudio(recorder, signal);
         }
-        
-        // Stop all tracks to release the microphone
         stream.getTracks().forEach(track => track.stop());
       });
-      
-      // Start recording as a single chunk to ensure integrity
       recorder.start();
       setMediaRecorder(recorder);
       setIsRecording(true);
     } catch (error) {
       console.error('Error starting recording:', error);
-      
       let errorMessage = t('errors.tts.microphone.general');
       if (error instanceof DOMException) {
-        if (error.name === 'NotAllowedError') {
-          errorMessage = t('errors.tts.microphone.accessDenied');
-        } else if (error.name === 'NotFoundError') {
-          errorMessage = t('errors.tts.microphone.notFound');
-        } else if (error.name === 'NotReadableError') {
-          errorMessage = t('errors.tts.microphone.inUse');
-        }
+        if (error.name === 'NotAllowedError') errorMessage = t('errors.tts.microphone.accessDenied');
+        else if (error.name === 'NotFoundError') errorMessage = t('errors.tts.microphone.notFound');
+        else if (error.name === 'NotReadableError') errorMessage = t('errors.tts.microphone.inUse');
       }
-      
       new Notice(errorMessage);
       setIsRecording(false);
     }
@@ -120,69 +88,63 @@ export const SpeechToTextProvider: React.FC<{
     setIsTranscribing(true);
     
     try {
-      const apiKey = getPluginSettings().openAIApiKey;
-      if (!apiKey) {
+      const pluginSettings = getPluginSettings();
+      if (!pluginSettings.openAIApiKey) {
         throw new Error('OpenAI API key is not configured');
       }
       
-      // Create audio blob from chunks in ref
       const mimeType = recorder.mimeType || 'audio/webm';
       const audioBlob = new Blob(chunks, { type: mimeType });
       
-      console.log('Audio blob size:', audioBlob.size, 'bytes');
-      console.log('Audio blob type:', audioBlob.type);
-      
-      // Don't attempt to transcribe if the audio is too small (likely no speech)
       if (audioBlob.size < 1000) {
         throw new Error('Recording too short or no audio detected');
       }
       
-      // --- END EDIT ---
-      
-      // Initialize OpenAI client
       const openai = new OpenAI({
-        apiKey: apiKey,
+        apiKey: pluginSettings.openAIApiKey,
         dangerouslyAllowBrowser: true,
       });
       
-      // Map mime types to OpenAI-compatible extensions
-      let fileExtension;
-      if (mimeType.includes('webm')) {
-        fileExtension = 'webm';
-      } else if (mimeType.includes('mp3')) {
-        fileExtension = 'mp3';
-      } else if (mimeType.includes('wav')) {
-        fileExtension = 'wav';
-      } else if (mimeType.includes('mp4')) {
-        fileExtension = 'mp4';
-      } else if (mimeType.includes('m4a')) {
-        fileExtension = 'm4a';
-      } else {
-        // Default to webm if we can't determine the type
-        fileExtension = 'webm';
+      let fileExtension = 'webm';
+      if (mimeType.includes('mp3')) fileExtension = 'mp3';
+      else if (mimeType.includes('wav')) fileExtension = 'wav';
+      else if (mimeType.includes('mp4')) fileExtension = 'mp4';
+      else if (mimeType.includes('m4a')) fileExtension = 'm4a';
+      
+      const file = new File([audioBlob], `recording.${fileExtension}`, { type: mimeType });
+      
+      const currentLang = moment.locale(); // e.g., 'en', 'pl'
+      let targetLanguageForApi = currentLang; // Language to tell OpenAI API
+      let promptToUse = pluginSettings.speechToTextPrompt;
+
+      // Fallback logic for prompt
+      if (!promptToUse) {
+        promptToUse = t('settings.prompts.defaultPrompt');
       }
       
-      console.log(`Creating file with extension: .${fileExtension} and type: ${mimeType}`);
+      // Ensure targetLanguageForApi is a 2-letter code if possible, or supported by API
+      // OpenAI Whisper supports many languages, but usually with 2-letter codes for the `language` param.
+      // This might need adjustment if moment.locale() gives longer codes like 'en-US'.
+      if (targetLanguageForApi.includes('-')) {
+        targetLanguageForApi = targetLanguageForApi.split('-')[0];
+      }
+      // List of Whisper supported languages could be checked here if more robustness is needed.
+      // For now, we'll pass the derived targetLanguageForApi.
 
+      const contextCollector = new ContextCollector(window.app);
+      const expandedPrompt = await contextCollector.expandLinks(promptToUse);
+      const trimmedPrompt = expandedPrompt.length > MAX_AUDIO_PROMPT_LENGTH 
+        ? expandedPrompt.substring(0, Math.floor(MAX_AUDIO_PROMPT_LENGTH / 2)) + "..." + expandedPrompt.substring(expandedPrompt.length - Math.floor(MAX_AUDIO_PROMPT_LENGTH / 2))
+        : expandedPrompt;
 
-      // Create a proper File object (which extends Blob) that the OpenAI SDK can use
-      const file = new File(
-        [audioBlob], 
-        `recording.${fileExtension}`, 
-        { type: mimeType }
-      );
+      console.log(`Transcribing audio. Language for API: ${targetLanguageForApi}. Using prompt:`, trimmedPrompt);
       
-      console.log(`Transcribing audio using gpt-4o-transcribe model as recording.${fileExtension}`);
-      
-      // Call OpenAI API for transcription using the SDK
       const transcription = await openai.audio.transcriptions.create({
         file: file,
         model: 'gpt-4o-transcribe',
-        prompt: (await getContext()).substring(0, MAX_AUDIO_PROMPT_LENGTH),
-        language: 'pl',
-      }, {
-        signal: signal,
-      });
+        prompt: trimmedPrompt,
+        language: targetLanguageForApi, // Pass the determined language to API
+      }, { signal });
 
       console.log('Transcribed text:', transcription.text);
       setLastTranscription(transcription.text);

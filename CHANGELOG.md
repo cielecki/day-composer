@@ -8,11 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Check for updates modal for reloading the plugin
+- Check for updates now asks for reloading obsidian using a dedicated dialog
+- Customizable prompt for transcriptions
 
 ### Fixed
 - Check for updates is now translated and is properly named
 - Styling issue that broke all mod-cta buttons in obsidian
+- Transcription issues
 
 ## [0.6.5] - 2025-05-22
 ...

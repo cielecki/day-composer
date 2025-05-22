@@ -11,8 +11,9 @@
 - [x] Is the domain free? no
 - [x] Test with N
 - [x] Update checker should refresh obsidian
+- [x] Fix transcription issues
 
-- [ ] Fix transcription issues
+- [ ] WTF? <tag_indeks file="Info/_Indeks_.md">
 - [ ] Name of the modes should come from file name not ln_name
 - [ ] Working daily planning and habits in the starter kit
 - [ ] ln-current-open-file w speech to text

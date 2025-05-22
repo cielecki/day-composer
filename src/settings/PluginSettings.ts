@@ -1,12 +1,12 @@
 import type MyPlugin from '../main';
 
-
 export type TTSVoice = "alloy" | "ash" | "coral" | "echo" | "fable" | "onyx" | "nova" | "sage" | "shimmer";
 export const TTS_VOICES: TTSVoice[] = ['alloy', 'ash', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer'];
 
 export class PluginSettings {
-	openAIApiKey = ''; // OpenAI API key for text-to-speech
-	anthropicApiKey = ''; // Anthropic API key for text-to-speech
+	openAIApiKey = '';
+	anthropicApiKey = '';
+	speechToTextPrompt = '';
     plugin: MyPlugin;
 
     constructor() {}
@@ -16,15 +16,18 @@ export class PluginSettings {
         
         const data = await plugin.loadData();
 
-        this.openAIApiKey = data.openAIApiKey ?? this.openAIApiKey;
-        this.anthropicApiKey = data.anthropicApiKey ?? this.anthropicApiKey;
+        this.openAIApiKey = data?.openAIApiKey ?? '';
+        this.anthropicApiKey = data?.anthropicApiKey ?? '';
+        this.speechToTextPrompt = data?.speechToTextPrompt ?? '';
     }
 
     async saveSettings() {
-        await this.plugin.saveData({
+        const settingsToSave = {
             openAIApiKey: this.openAIApiKey,
             anthropicApiKey: this.anthropicApiKey,
-        });
+            speechToTextPrompt: this.speechToTextPrompt,
+        };
+        await this.plugin.saveData(settingsToSave);
     }
 }
 

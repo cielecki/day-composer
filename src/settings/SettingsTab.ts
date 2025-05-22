@@ -13,32 +13,54 @@ export class SampleSettingTab extends PluginSettingTab {
 
 	display(): void {
 		const {containerEl} = this;
+		const settings = getPluginSettings();
 
 		containerEl.empty();
 		
 		// Anthropic API Key setting
-		new Setting(containerEl)
+		const anthropicSetting = new Setting(containerEl)
 			.setName(t('settings.apiKeys.anthropic'))
-			.setDesc(t('settings.apiKeys.anthropicDesc'))
 			.addText(text => text
 				.setPlaceholder(t('settings.apiKeys.enterAnthropicKey'))
-				.setValue(getPluginSettings().anthropicApiKey)
+				.setValue(settings.anthropicApiKey)
 				.onChange(async (value) => {
-					getPluginSettings().anthropicApiKey = value;
-					await getPluginSettings().saveSettings();
+					settings.anthropicApiKey = value;
+					await settings.saveSettings();
 				}));
 		
+		// Set HTML description to enable the link
+		anthropicSetting.descEl.innerHTML = t('settings.apiKeys.anthropicDesc');
+		
 		// OpenAI API Key setting
-		new Setting(containerEl)
+		const openAISetting = new Setting(containerEl)
 			.setName(t('settings.apiKeys.openai'))
-			.setDesc(t('settings.apiKeys.openaiDesc'))
 			.addText(text => text
 				.setPlaceholder(t('settings.apiKeys.enterOpenAIKey'))
-				.setValue(getPluginSettings().openAIApiKey)
+				.setValue(settings.openAIApiKey)
 				.onChange(async (value) => {
-					getPluginSettings().openAIApiKey = value;
-					await getPluginSettings().saveSettings();
-				}))
+					settings.openAIApiKey = value;
+					await settings.saveSettings();
+				}));
+
+		// Set HTML description to enable the link
+		openAISetting.descEl.innerHTML = t('settings.apiKeys.openaiDesc');
+
+		// Speech-to-text Prompt setting
+		const promptDesc = new Setting(containerEl)
+			.setName(t('settings.prompts.speechToTextPrompt'))
+			.addTextArea(text => {
+				text.setPlaceholder(t('settings.prompts.defaultPrompt'))
+					.setValue(settings.speechToTextPrompt || '')
+					.onChange(async (value) => {
+						settings.speechToTextPrompt = value;
+						await settings.saveSettings();
+					});
+				text.inputEl.rows = 7;
+				text.inputEl.cols = 50;
+			});
+		
+		// Set HTML description to enable the link
+		promptDesc.descEl.innerHTML = t('settings.prompts.speechToTextPromptDesc');
 
 		// Add a note about API key security
 		const securityNoteEl = containerEl.createEl('div', { 
@@ -46,5 +68,6 @@ export class SampleSettingTab extends PluginSettingTab {
 			attr: { style: 'margin-bottom: 1em; color: var(--text-warning);' }
 		});
 		securityNoteEl.innerHTML = t('settings.apiKeys.securityNote');
+		
 	}
 }

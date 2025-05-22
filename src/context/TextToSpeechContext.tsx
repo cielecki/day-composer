@@ -143,7 +143,7 @@ export const TextToSpeechProvider: React.FC<{
 					const response = await openai.audio.speech.create({
 						model: "gpt-4o-mini-tts",
 						voice: voice,
-						instructions: ttsSettings.instructions || t('voice.instructions.default'),
+						instructions: ttsSettings.instructions || DEFAULT_VOICE_INSTRUCTIONS,
 						input: textToConvert,
 						speed: ttsSettings.speed || 1.0,
 						response_format: "mp3",

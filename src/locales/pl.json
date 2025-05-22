@@ -4,12 +4,17 @@
     "description": "Skonfiguruj ustawienia wtyczki Life Navigator",
     "apiKeys": {
       "anthropic": "Klucz API Anthropic",
-      "anthropicDesc": "Twój klucz API Anthropic dla funkcji Claude",
+      "anthropicDesc": "Twój klucz API Anthropic do głównej funkcjonalności asystenta AI. Zdobądź go z <a href='https://console.anthropic.com/settings/keys'>Konsoli Anthropic</a>.",
       "openai": "Klucz API OpenAI",
-      "openaiDesc": "Twój klucz API OpenAI dla funkcji syntezy mowy",
+      "openaiDesc": "Twój klucz API OpenAI do funkcji zamiany mowy na tekst. Zdobądź go z <a href='https://platform.openai.com/api-keys'>Platformy OpenAI</a>.",
       "enterAnthropicKey": "Wprowadź swój klucz API Anthropic",
       "enterOpenAIKey": "Wprowadź swój klucz API OpenAI",
-      "securityNote": "Ważne: Twój klucz API jest przechowywany w folderze konfiguracyjnym Obsidian. Nie udostępniaj swojego skarbca ani folderu konfiguracyjnego innym, jeśli przechowujesz tutaj swój klucz API."
+      "securityNote": "Ważne: Twój klucz API jest przechowywany w folderze konfiguracyjnym Obsidian. Nie udostępniaj swojego sejfu ani folderu konfiguracyjnego innym osobom, jeśli przechowujesz w nim swój klucz API."
+    },
+    "prompts": {
+      "speechToTextPrompt": "Prompt dla zamiany mowy na tekst",
+      "speechToTextPromptDesc": "Prompt, który zostanie wysłany do silnika zamiany mowy na tekst. Dostarcza kontekstu dla modelu AI. Możesz użyć <a href='https://github.com/cielecki/life-navigator/blob/main/docs/link-expansion.md'>rozszerzania linków</a>.",
+      "defaultPrompt": "# Domena\nKomunikat lub komenda głosowa wydawana przez użytkownika asystentowi AI.\n\n# Przykłady\n- Odfajcz zadanie ... eeee ... wyrzuciłem śmieci\n- Zrobiłem kolację\n- Dodaj na jutro, żebym pamiętał o odezwaniu się do Jana.\n\n# Słowniczek\n[[_Indeks_]] 🔎\n\nPoczątek transkrypcji:"
     }
   },
   "tools": {
@@ -100,8 +105,8 @@
     },
     "audio": {
       "playback": "Nie można odtworzyć dźwięku. Spróbuj ponownie.",
-      "noData": "Nie otrzymano danych audio. Spróbuj ponownie.",
-      "playbackError": "Błąd odtwarzania audio: {{error}}"
+      "playbackError": "Błąd odtwarzania audio: {{error}}",
+      "noData": "Nie otrzymano danych audio. Spróbuj ponownie."
     },
     "notes": {
       "multipleFound": "Znaleziono wiele notatek dziennych dla daty: {{date}}",
@@ -158,58 +163,6 @@
     "checkingForUpdates": "Sprawdzanie aktualizacji...",
     "pluginUpToDate": "Wtyczka jest już aktualna (wersja {{version}}).",
     "newVersionFoundDownloading": "Znaleziono nową wersję {{latestVersion}} (masz {{currentVersion}}). Pobieranie aktualizacji..."
-  },
-  "modes": {
-    "builtIn": {
-      "createDailyNote": {
-        "name": "Utwórz notatkę dzienną",
-        "description": "Tryb do tworzenia i zarządzania notatkami dziennymi z zadaniami i celami",
-        "exampleUsage": "Czy możesz utworzyć notatkę dzienną na dzisiaj z celem bycia bardziej produktywnym i zadaniem przejrzenia mojego zaległego backlogu?",
-        "voiceInstructions": "Jesteś zachęcającym asystentem głosowym. Mów z entuzjazmem i pozytywną energią."
-      },
-      "searchNotes": {
-        "name": "Wyszukaj notatki",
-        "description": "Tryb dedykowany do znajdowania informacji w całym skarbcu",
-        "voiceInstructions": "Mów wyraźnie i precyzyjnie podczas prezentowania wyników wyszukiwania.",
-        "systemPrompt": "Użyj narzędzia search_notes, aby znaleźć notatki związane z tym, o co pyta użytkownik. Twoim jedynym celem jest wyszukiwanie notatek, niezależnie od tego, o co pyta użytkownik."
-      },
-      "dailyReflection": {
-        "name": "Refleksja dzienna",
-        "description": "Pomaga w codziennej refleksji nad zadaniami, nawykami i celami",
-        "exampleUsage": "Pomóż mi zastanowić się nad tym, co dzisiaj osiągnąłem i co planuję zrobić jutro",
-        "voiceInstructions": "Przyjmij spokojny, refleksyjny ton. Mów powoli i przemyślanie, zachęcając do introspekcji."
-      },
-      "testSearch": {
-        "name": "Test narzędzia wyszukiwania",
-        "description": "Demonstruje możliwości wyszukiwania Asystenta AI",
-        "exampleUsage": "Proszę wyszukaj notatki zawierające słowo 'test' używając narzędzia search_notes",
-        "voiceInstructions": "Komunikuj informacje techniczne jasno i zwięźle."
-      },
-      "addGoals": {
-        "name": "Dodaj cele do dzisiejszej notatki",
-        "description": "Pomaga dodawać cele do Twojej notatki dziennej",
-        "exampleUsage": "Chciałbym dodać kilka celów do dzisiejszej notatki dziennej. Moje cele to: 1) Dokończyć prezentację projektu 2) Wyjść na 30-minutowy spacer 3) Przeczytać przynajmniej jeden rozdział mojej książki",
-        "voiceInstructions": "Mów z motywacją i energią. Używaj optymistycznego tonu, aby inspirować do osiągania celów."
-      },
-      "addReflection": {
-        "name": "Dodaj refleksję do wczorajszej notatki",
-        "description": "Pomaga dodawać refleksje do notatek z poprzedniego dnia",
-        "exampleUsage": "Proszę dodaj refleksję do wczorajszej notatki dziennej. Dowiedziałem się, że regularne przerwy zwiększają moją ogólną produktywność. Zauważyłem też, że nowy system organizacji zadań działa dobrze.",
-        "voiceInstructions": "Używaj kontemplacyjnego tonu. Dodawaj krótkie pauzy między myślami dla refleksji."
-      },
-      "createTomorrowNote": {
-        "name": "Utwórz notatkę na jutro",
-        "description": "Pomaga przygotować się na nadchodzące dni, ustalając zadania z wyprzedzeniem",
-        "exampleUsage": "Chcę przygotować się na jutro. Czy możesz utworzyć notatkę dzienną na jutro z tymi zadaniami: 1) Spotkanie zespołu o 10:00 2) Praca nad arkuszem budżetu 3) Rozmowa z klientem o 15:00",
-        "voiceInstructions": "Mów profesjonalnym, zorganizowanym tonem. Wyraźnie podkreślaj kluczowe daty i godziny."
-      },
-      "searchProjectPlanning": {
-        "name": "Wyszukaj planowanie projektu",
-        "description": "Wykonuje wyszukiwania związane z planowaniem projektu w Twoim skarbcu",
-        "exampleUsage": "Czy możesz przeszukać moje notatki pod kątem informacji związanych z 'planowaniem projektu'?",
-        "voiceInstructions": "Prezentuj informacje w uporządkowany sposób. Kategoryzuj znalezione informacje dla lepszego zrozumienia."
-      }
-    }
   },
   "view": {
     "title": "Life Navigator"
