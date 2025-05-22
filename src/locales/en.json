@@ -17,6 +17,7 @@
     "description": "Available tools and utilities",
     "createStarterPack": "Create a Starter Pack",
     "createSingleMode": "Create a Single Mode",
+    "checkForUpdates": "Check for updates",
     "aiCoach": "Life Navigator",
     "tasks": {
       "single": "task",
@@ -69,6 +70,7 @@
     "startingAICoach": "Error starting AI Coach",
     "setup": "Setup Error: {{error}}",
     "conversationTurn": "Error during conversation: {{error}}",
+    "failedToUpdatePlugin": "Failed to update plugin: {{error}}",
     "tools": {
       "noName": "No tool name provided",
       "unknown": "Unknown tool \"{{tool}}\"",
@@ -152,7 +154,10 @@
   "messages": {
     "settingsSaved": "Settings saved successfully",
     "settingsReset": "Settings have been reset to defaults",
-    "creatingStarterPack": "Creating a Starter Pack..."
+    "creatingStarterPack": "Creating a Starter Pack...",
+    "checkingForUpdates": "Checking for updates...",
+    "pluginUpToDate": "Plugin is already up to date (version {{version}}).",
+    "newVersionFoundDownloading": "New version {{latestVersion}} found (you have {{currentVersion}}). Downloading update..."
   },
   "modes": {
     "builtIn": {
@@ -285,7 +290,11 @@
       "copyToClipboard": "Copy to Clipboard",
       "copied": "Copied!",
       "modeSettings": "{{modeName}} Mode Settings",
-      "systemPrompt": "System Prompt for \"{{modeName}}\""
+      "systemPrompt": "System Prompt for \"{{modeName}}\"",
+      "reloadRequiredTitle": "Reload Required",
+      "reloadRequiredMessage": "The plugin has been updated. Please reload Obsidian to apply the changes.",
+      "reloadRequiredMessageWithVersions": "Plugin updated from version {{currentVersion}} to {{latestVersion}}.\n Reload Obsidian to apply changes?",
+      "reloadButton": "Reload Obsidian"
     },
     "starterPack": {
       "noModes": "## Welcome to Life Navigator\n\nTo get started, create a starter pack containing basic modes with the _#ln-mode_ tag",

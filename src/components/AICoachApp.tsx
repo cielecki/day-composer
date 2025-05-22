@@ -48,7 +48,7 @@ function openSimpleObsidianModal(app: import('obsidian').App, title: string, tex
 			pre.style.overflow = "auto";
 			pre.style.whiteSpace = "pre-wrap";
 			pre.innerText = text;
-			const button = contentEl.createEl("button", { text: t('ui.modal.copyToClipboard'), cls: "mod-cta" });
+			const button = contentEl.createEl("button", { text: t('ui.modal.copyToClipboard'), cls: "mod-cta", attr: { style: "margin-top: 20px;" } });
 			button.style.marginTop = "16px";
 			button.onclick = () => {
 				navigator.clipboard.writeText(text);

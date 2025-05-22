@@ -17,6 +17,7 @@
     "description": "Dostępne narzędzia i funkcje",
     "createStarterPack": "Utwórz pakiet startowy",
     "createSingleMode": "Utwórz pojedynczy tryb",
+    "checkForUpdates": "Sprawdź aktualizacje",
     "aiCoach": "Life Navigator",
     "tasks": {
       "single": "zadanie",
@@ -69,6 +70,7 @@
     "startingAICoach": "Błąd podczas uruchamiania asystenta AI",
     "setup": "Błąd konfiguracji: {{error}}",
     "conversationTurn": "Błąd podczas konwersacji: {{error}}",
+    "failedToUpdatePlugin": "Nie udało się zaktualizować wtyczki: {{error}}",
     "tools": {
       "noName": "Nie podano nazwy narzędzia",
       "unknown": "Nieznane narzędzie \"{{tool}}\"",
@@ -152,7 +154,10 @@
   "messages": {
     "settingsSaved": "Ustawienia zostały zapisane",
     "settingsReset": "Ustawienia zostały zresetowane do domyślnych",
-    "creatingStarterPack": "Tworzenie pakietu startowego..."
+    "creatingStarterPack": "Tworzenie pakietu startowego...",
+    "checkingForUpdates": "Sprawdzanie aktualizacji...",
+    "pluginUpToDate": "Wtyczka jest już aktualna (wersja {{version}}).",
+    "newVersionFoundDownloading": "Znaleziono nową wersję {{latestVersion}} (masz {{currentVersion}}). Pobieranie aktualizacji..."
   },
   "modes": {
     "builtIn": {
@@ -277,7 +282,11 @@
       "copyToClipboard": "Kopiuj do schowka",
       "copied": "Skopiowano!",
       "modeSettings": "Ustawienia trybu {{modeName}}",
-      "systemPrompt": "Prompt systemowy dla \"{{modeName}}\""
+      "systemPrompt": "Prompt systemowy dla \"{{modeName}}\"",
+      "reloadRequiredTitle": "Wymagane ponowne uruchomienie",
+      "reloadRequiredMessage": "Wtyczka została zaktualizowana. Uruchom ponownie Obsidian, aby zastosować zmiany.",
+      "reloadRequiredMessageWithVersions": "Wtyczka zaktualizowana z wersji {{currentVersion}} do {{latestVersion}}.\nCzy chcesz ponownie uruchomić Obsidian, aby zastosować zmiany?",
+      "reloadButton": "Uruchom ponownie Obsidian"
     },
     "starterPack": {
       "noModes": "## Witaj w Life Navigator\n\nAby rozpocząć, utwórz pakiet startowy zawierający podstawowe tryby z tagiem _#ln-mode_.",

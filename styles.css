@@ -1094,11 +1094,6 @@ If your plugin does not need CSS, delete this file.
   margin-right: 4px;
 }
 
-
-.mod-cta {
-  margin-top: 20px;
-}
-
 /* Text Input Styles */
 .input-mode-container {
   position: relative;

@@ -1,4 +1,4 @@
-import i18next from 'i18next';
+import i18next, { TOptions } from 'i18next';
 import en from './locales/en.json';
 import pl from './locales/pl.json';
 import { App } from 'obsidian';
@@ -47,8 +47,8 @@ export const initI18n = async (app: App) => {
   return i18next;
 };
 
-export const t = (key: string) => {
-  return i18next.t(key);
+export const t = (key: string, options?: TOptions) => {
+  return i18next.t(key, options);
 };
 
 export const changeLanguage = async (lang: string) => {

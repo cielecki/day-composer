@@ -14,6 +14,7 @@ import { modeToNoteContent } from "./utils/mode-utils";
 import path from "path";
 import { getDefaultLNMode, mergeWithDefaultMode } from "./defaults/ln-mode-defaults";
 import { STARTER_KIT_DATA } from "./generated/starter-kit-data";
+import { ConfirmReloadModal } from "./components/ConfirmReloadModal";
 
 
 
@@ -294,12 +295,12 @@ export default class MyPlugin extends Plugin {
 
 		// Add command to update the plugin from the latest GitHub release with version checks
 		this.addCommand({
-			id: "update-plugin-from-github",
-			name: "Update Plugin from Latest GitHub Release",
+			id: "check-for-updates",
+			name: t("tools.checkForUpdates"),
 			callback: async () => {
 				const repo = "cielecki/life-navigator";
 				const apiUrl = `https://api.github.com/repos/${repo}/releases/latest`;
-				new Notice("Checking for updates...");
+				new Notice(t("messages.checkingForUpdates"));
 
 				try {
 					// Read current version from manifest.json
@@ -323,9 +324,12 @@ export default class MyPlugin extends Plugin {
 
 					const cmp = compareVersions(latestVersion, currentVersion);
 					if (cmp <= 0) {
-						new Notice(`Plugin is already up to date (version ${currentVersion}).`);
+						new Notice(t("messages.pluginUpToDate", { version: currentVersion }));
 						return;
 					}
+
+					// Notify user that a new version is found and download is starting
+					new Notice(t("messages.newVersionFoundDownloading", { latestVersion, currentVersion }));
 
 					// Helper to download and save an asset
 					const saveAsset = async (assetName: string) => {
@@ -372,9 +376,14 @@ export default class MyPlugin extends Plugin {
 					await saveAsset("styles.css"); // If it exists
 					console.log("All assets downloaded successfully");
 
-					new Notice(`Plugin updated from version ${currentVersion} to ${latestVersion}! Please reload Obsidian to apply the update.`);
+					// Show a modal to ask the user if they want to reload Obsidian.
+					new ConfirmReloadModal(this.app, () => {
+						// @ts-ignore
+						this.app.commands.executeCommandById('app:reload');
+					}, currentVersion, latestVersion).open();
+
 				} catch (e) {
-					new Notice("Failed to update plugin: " + e);
+					new Notice(t("errors.failedToUpdatePlugin", { error: e instanceof Error ? e.message : String(e) }));
 				}
 			}
 		});
