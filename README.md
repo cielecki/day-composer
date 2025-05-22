@@ -2,7 +2,7 @@
 
 This plugin provides a set of tools for enhancing your experience with Obsidian, with a focus on AI assistance and journal management.
 
-**New to Obsidian?** Check out [why we chose Obsidian](WHY_OBSIDIAN.md) as the foundation for Life Navigator.
+**New to Obsidian?** Check out [why we chose Obsidian](docs/why-obsidian.md) as the foundation for Life Navigator.
 
 ## Features
 
@@ -10,14 +10,13 @@ This plugin provides a set of tools for enhancing your experience with Obsidian,
 
 An AI assistant that can help you with various tasks in Obsidian, with customizable modes.
 
-
 ## Installation
 
-For the most up-to-date installation instructions, please refer to the [docs/INSTALL.md](docs/INSTALL.md) guide.
+For the most up-to-date installation instructions, please refer to the [docs/installation.md](docs/installation.md) guide.
 
-## Usage
+## User Guide
 
-For detailed usage instructions, please refer to the [docs/USAGE.md](docs/USAGE.md) guide.
+For detailed usage instructions, please refer to the [docs/user-guide.md](docs/user-guide.md) guide.
 
 ## Development
 
