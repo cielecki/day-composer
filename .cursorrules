@@ -3,7 +3,7 @@ When making changes to the code:
 - Plan and investigate the implementation first before writing code, always seek aproval of the plan from the user
 - Remove any entries to the translation files that are no longer needed
 - If you made any changes to the starter kit bump the starter kit version in main.ts
-
+- Avoid code duplication, create reusable functions and components
 
 If asked to release a new version:
 - node scripts/version.js X.X.X

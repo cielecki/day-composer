@@ -6,6 +6,8 @@ import { getDailyNotePath } from "./utils/getDailyNotePath";
 import { appendCommentLine } from "./utils/task-utils";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { validateTasks } from "./utils/task-validation";
+import { findCurrentSpot } from "./utils/note-utils";
+import { removeTaskFromDocument, insertTaskAtPosition } from "./utils/task-utils";
 import { t } from "../i18n";
 
 const schema = {
@@ -106,12 +108,15 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
     // Track tasks that will be abandoned
     const abandonedTasks: string[] = [];
     
+    // If we get here, all tasks were validated successfully
+    let updatedNote = JSON.parse(JSON.stringify(note));
+    
     // Process each to-do item
     for (const todo of todos) {
       const { todo_text, comment } = todo;
       
       // We already validated all tasks exist
-      const task = findTaskByDescription(note, todo_text);
+      const task = findTaskByDescription(updatedNote, todo_text);
       
       // Update status
       task.status = 'abandoned';
@@ -121,11 +126,20 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
         appendCommentLine(task, comment);
       }
       
+      // Remove the task from its current position
+      updatedNote = removeTaskFromDocument(updatedNote, task);
+      
+      // Find the current position (first pending task or end of document)
+      const currentSpot = findCurrentSpot(updatedNote);
+      
+      // Insert the abandoned task at the current position
+      updatedNote = insertTaskAtPosition(updatedNote, task, currentSpot);
+      
       abandonedTasks.push(todo_text);
     }
     
     // Update the note with all abandoned tasks
-    await updateNote({plugin, filePath, updatedNote: note});
+    await updateNote({plugin, filePath, updatedNote});
     
     // Prepare success message
     const tasksDescription = abandonedTasks.length === 1 
