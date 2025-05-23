@@ -1,7 +1,7 @@
-import MyPlugin from "src/main";
+import MyPlugin from "../../main";
 import { fileExists } from "./fileExists";
 import { getFile } from "./getFile";
-import { readFile } from "./readFile";
+import { modifyFile } from "./modifyFile";
 import {
 	appendCommentLine,
 	isCommentLine,
@@ -11,7 +11,6 @@ import {
 } from "./task-utils";
 import { ToolExecutionError } from "./ToolExecutionError";
 import { formatMarkdown } from "./formatMarkdown";
-import { modifyFile } from "./modifyFile";
 import { t } from "../../i18n";
 
 export type NoteNode = Task | TextBlock;
@@ -76,8 +75,8 @@ export function findCurrentSpot(document: Note): number {
 	// We need to skip over any text blocks that immediately follow the preceding task
 	let insertionIndex = precedingTaskIndex + 1;
 	while (insertionIndex < firstPendingIndex && 
-		   insertionIndex < document.content.length &&
-		   document.content[insertionIndex].type === "text") {
+		insertionIndex < document.content.length &&
+		document.content[insertionIndex].type === "text") {
 		insertionIndex++;
 	}
 
@@ -95,7 +94,7 @@ export async function readNote({
 
 	if (!exists) {
 		throw new ToolExecutionError(
-			t("errors.files.notFound").replace("{{path}}", filePath),
+			t("errors.files.notFound", { path: filePath }),
 		);
 	}
 
@@ -103,15 +102,20 @@ export async function readNote({
 
 	if (!file) {
 		throw new ToolExecutionError(
-			t("errors.files.getFailed").replace("{{path}}", filePath),
+			t("errors.files.getFailed", { path: filePath }),
 		);
 	}
 
-	const readFileContent = await readFile(file, plugin.app);
-
-	const document = parseMarkdown(readFileContent, filePath);
-
-	return document;
+	try {
+		const readFileContent = await plugin.app.vault.read(file);
+		const document = parseMarkdown(readFileContent, filePath);
+		return document;
+	} catch (error) {
+		console.error("Error reading file:", error);
+		throw new ToolExecutionError(
+			t("errors.files.getFailed", { path: filePath }),
+		);
+	}
 }
 
 export async function updateNote({
@@ -127,7 +131,7 @@ export async function updateNote({
 
 	if (!exists) {
 		throw new ToolExecutionError(
-			t("errors.files.notFound").replace("{{path}}", filePath),
+			t("errors.files.notFound", { path: filePath }),
 		);
 	}
 
@@ -135,7 +139,7 @@ export async function updateNote({
 
 	if (!file) {
 		throw new ToolExecutionError(
-			t("errors.files.getFailed").replace("{{path}}", filePath),
+			t("errors.files.getFailed", { path: filePath }),
 		);
 	}
 
@@ -147,34 +151,6 @@ export async function updateNote({
 	}
 
 	await modifyFile(file, newContent, plugin.app);
-}
-
-export function findTaskByDescription(
-	note: Note,
-	taskDescription: string,
-): Task {
-	// Find the task
-	const tasks = findTasksByDescription(note, taskDescription);
-
-	if (tasks.length === 0) {
-		throw new ToolExecutionError(
-			t("errors.tasks.notFound")
-				.replace("{{task}}", taskDescription)
-				.replace("{{path}}", note.filePath),
-		);
-	}
-
-	if (tasks.length > 1) {
-		throw new ToolExecutionError(
-			t("errors.tasks.multipleFound")
-				.replace("{{task}}", taskDescription)
-				.replace("{{path}}", note.filePath),
-		);
-	}
-
-	const task = tasks[0];
-
-	return task;
 }
 
 /**
@@ -234,6 +210,36 @@ export function findTasksByDescription(
 	}
 
 	return results;
+}
+
+/**
+ * Find a task in a document by description (throws if not found or multiple found)
+ * @param note The parsed document
+ * @param taskDescription The task description to search for
+ * @returns The matching task
+ */
+export function findTaskByDescription(
+	note: Note,
+	taskDescription: string,
+): Task {
+	// Find the task
+	const tasks = findTasksByDescription(note, taskDescription);
+
+	if (tasks.length === 0) {
+		throw new ToolExecutionError(
+			t("errors.tasks.notFound", { task: taskDescription, path: note.filePath }),
+		);
+	}
+
+	if (tasks.length > 1) {
+		throw new ToolExecutionError(
+			t("errors.tasks.multipleFound", { task: taskDescription, path: note.filePath }),
+		);
+	}
+
+	const task = tasks[0];
+
+	return task;
 }
 
 /**

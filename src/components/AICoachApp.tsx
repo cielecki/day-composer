@@ -82,8 +82,8 @@ export const AICoachApp: React.FC = () => {
 	} = useAIAgent();
 
 	// Use LNModes context
-	const { lnModes, activeModeId,setActiveMode } = useLNMode();
-	const activeMode = lnModes[activeModeId];
+	const { lnModesRef, activeModeIdRef, setActiveModeId } = useLNMode();
+	const activeMode = lnModesRef.current[activeModeIdRef.current];
 
 	const conversationContainerRef = useRef<HTMLDivElement>(null);
 
@@ -174,17 +174,6 @@ export const AICoachApp: React.FC = () => {
 		stopAudio();
 	}, [abortController, setAbortController, stopAudio]);
 
-	// Function to handle LN mode selection
-	const handleModeSelect = useCallback(
-		(modeId: string): void => {
-			// Set the active mode using the ID
-			const mode = lnModes[modeId];
-			if (mode) {
-				setActiveMode(mode);
-			}
-		},
-		[lnModes, setActiveMode],
-	);
 
 	const toggleDropdown = useCallback(() => {
 		setDropdownOpen(!dropdownOpen);
@@ -272,7 +261,7 @@ export const AICoachApp: React.FC = () => {
 						</ReactMarkdown>
 					</div>
 
-						{Object.keys(lnModes).length === 0 && (
+						{Object.keys(lnModesRef.current).length === 0 && (
 							<button
 								className="mod-cta"
 								onClick={() => {
@@ -513,9 +502,9 @@ export const AICoachApp: React.FC = () => {
 							</div>
 
 							{/* Mode list */}
-							{Object.keys(lnModes).length > 0 && (
+							{Object.keys(lnModesRef.current).length > 0 && (
 								<>
-									{Object.values(lnModes).map((mode, index) => (
+									{Object.values(lnModesRef.current).map((mode, index) => (
 										<div
 											key={index}
 											style={{
@@ -534,7 +523,7 @@ export const AICoachApp: React.FC = () => {
 												wordBreak: "break-word",
 											}}
 											onClick={() => {
-												handleModeSelect(mode.ln_path);
+												setActiveModeId(mode.ln_path);
 												setDropdownOpen(false);
 											}}
 											onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}

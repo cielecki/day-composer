@@ -112,7 +112,7 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
     // Make sure source file exists
     const sourceExists = await fileExists(source_path, plugin.app);
     if (!sourceExists) {
-      throw new ToolExecutionError(t('errors.files.sourceNotFound').replace('{{path}}', source_path));
+      throw new ToolExecutionError(t('errors.files.sourceNotFound', { path: source_path }));
     }
     
     // Check if target file exists, create it if not
@@ -121,9 +121,10 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       try {
         await createFile(target_path, '', plugin.app);
       } catch (error) {
-        throw new ToolExecutionError(t('errors.files.createFailed')
-          .replace('{{path}}', target_path)
-          .replace('{{error}}', error.message));
+        throw new ToolExecutionError(t('errors.files.createFailed', {
+          path: target_path,
+          error: error.message
+        }));
       }
     }
     
@@ -149,9 +150,10 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       const referenceTask = findTaskByDescription(targetNote, after_todo_text);
       
       if (!referenceTask) {
-        throw new ToolExecutionError(t('errors.tasks.notFound')
-          .replace('{{task}}', `"${after_todo_text}"`)
-          .replace('{{file}}', target_path));
+        throw new ToolExecutionError(t('errors.tasks.notFound', {
+          task: `"${after_todo_text}"`,
+          path: target_path
+        }));
       }
     }
     

@@ -80,6 +80,19 @@
       "check": "✓ Checked off {{task}} in {{path}} ({{time}})",
       "uncheck": "✓ Unchecked \"{{task}}\" in {{path}}",
       "abandon": "✓ Marked {{task}} as abandoned in {{path}}"
+    },
+    "handover": {
+      "switched": "Switched to {{modeName}} mode",
+      "successMessage": "Successfully switched from {{fromMode}} to {{toMode}} mode.",
+      "newMode": "New mode:",
+      "description": "Description:",
+      "noModes": "No modes available for switching.",
+      "modeNotFound": "Mode with ID \"{{modeId}}\" not found.",
+      "switchFailed": "Failed to switch mode: {{error}}",
+      "alreadyInMode": "Already in {{modeName}} mode. No change needed.",
+      "switching": "Switching to {{modeName}} mode...",
+      "failedToSwitch": "Failed to switch to {{modeName}}",
+      "noDescription": "No description available"
     }
   },
   "errors": {

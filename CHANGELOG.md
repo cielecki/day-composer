@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Handover Mode Tool**: New AI tool that allows changing the active mode during conversations
+  - Enables AI to switch between different personalities, contexts, or specialized modes
 
 ### Changed
-- Enhanced speaker button with three distinct states: default, generating speech (spinner), and playing (stop button)
+- **Enhanced speaker button** Enhanced speaker button with three distinct states: default, generating speech (spinner), and playing (pause button)
+- **Improved task insertion logic**: Tasks are now inserted after the task preceding the first uncompleted one, preserving any text/comments between them. This ensures that related content stays with their associated tasks while maintaining logical flow.
+change: enforce thinking in claude, as it's needed for handover to work
 
 ## [0.6.10] - 2025-05-22
 

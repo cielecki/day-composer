@@ -70,8 +70,7 @@ export const AIAgentProvider: React.FC<{
 	/* trunk-ignore(eslint/@typescript-eslint/no-unused-vars) */
 	const [_, setForceUpdate] = useState(0);
 	const textToSpeech = useTextToSpeech();
-	const { activeModeId, lnModes } = useLNMode();
-	const activeMode = lnModes[activeModeId];
+	const { activeModeIdRef, lnModesRef } = useLNMode();
 	const app = plugin.app;
 	const clearConversation = useCallback(() => {
 		conversationRef.current = [];
@@ -105,8 +104,9 @@ export const AIAgentProvider: React.FC<{
 		[],
 	);
 	const getContext = useCallback(async (): Promise<string> => {
-		return (await new ContextCollector(app).expandLinks(activeMode.ln_system_prompt)).trim();
-	}, [activeMode, app]);
+		const currentActiveMode = lnModesRef.current[activeModeIdRef.current];
+		return (await new ContextCollector(app).expandLinks(currentActiveMode.ln_system_prompt)).trim();
+	}, [lnModesRef, activeModeIdRef, app]);
 
 	const extractTextForTTS = useCallback(
 		(contentBlocks: ContentBlock[]): string => {
@@ -442,7 +442,6 @@ export const AIAgentProvider: React.FC<{
 		};
 	};
 
-	// *** NEW: Core conversation loop function ***
 	const runConversationTurn = useCallback(
 		async (
 			systemPrompt: string,
@@ -473,13 +472,14 @@ export const AIAgentProvider: React.FC<{
 
 						const defaultMode = getDefaultLNMode();
 
-						// Get API parameters from active mode or defaults
+						// Get API parameters from active mode or defaults (using refs for current values)
+						const currentActiveMode = lnModesRef.current[activeModeIdRef.current];
 						const model = "claude-4-sonnet-20250514"; // upgraded from claude-3-7-sonnet-20250219
 						const maxTokens =
-							activeMode.ln_max_tokens ??
+							currentActiveMode.ln_max_tokens ??
 							defaultMode.ln_max_tokens;
 						const thinkingBudgetTokens =
-							activeMode.ln_thinking_budget_tokens ??
+							currentActiveMode.ln_thinking_budget_tokens ??
 							defaultMode.ln_thinking_budget_tokens;
 
 						
@@ -494,12 +494,10 @@ export const AIAgentProvider: React.FC<{
 								(tool) =>
 									tool.specification as Anthropic.Messages.Tool,
 							),
-							...(thinkingBudgetTokens > 0 && {
-								thinking: {
-									type: "enabled",
-									budget_tokens: thinkingBudgetTokens,
-								},
-							}),
+							thinking: {
+								type: "enabled",
+								budget_tokens: thinkingBudgetTokens,
+							},
 						};
 
 						console.log(
@@ -643,7 +641,8 @@ export const AIAgentProvider: React.FC<{
 			processAnthropicStream,
 			plugin,
 			addUserOrToolResultMessage,
-			activeMode, // Updated dependency
+			lnModesRef,
+			activeModeIdRef,
 		],
 	);
 
@@ -657,9 +656,10 @@ export const AIAgentProvider: React.FC<{
 				finalAssistantMessageForTTS.content as ContentBlock[],
 			);
 			
-			// Use activeMode directly instead of getActiveMode
+			// Use refs to get current mode instead of captured activeMode
 			const defaultMode = getDefaultLNMode();
-			const autoplayEnabled = activeMode?.ln_voice_autoplay || defaultMode.ln_voice_autoplay;
+			const currentActiveMode = lnModesRef.current[activeModeIdRef.current];
+			const autoplayEnabled = currentActiveMode?.ln_voice_autoplay || defaultMode.ln_voice_autoplay;
 			
 			// Only auto-play if both the global setting and the mode-specific autoplay are enabled
 			if (autoplayEnabled && textForTTS.trim().length > 0) {
@@ -678,7 +678,7 @@ export const AIAgentProvider: React.FC<{
 				}
 			}
 		},
-		[extractTextForTTS, textToSpeech, activeMode],
+		[extractTextForTTS, textToSpeech, lnModesRef, activeModeIdRef],
 	);
 
 	const addUserMessage = useCallback(

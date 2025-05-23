@@ -5,27 +5,27 @@ import React, {
 	useEffect,
 	ReactNode,
 	useCallback,
+	useRef,
 } from "react";
 import { LNMode } from "../types/types";
 import { App, TFile, EventRef } from "obsidian";
 import {
 	mergeWithDefaultMode,
-	validateModeSettings,
 	getDefaultLNMode,
 } from "../defaults/ln-mode-defaults";
 import * as yaml from "js-yaml";
-import { useTextToSpeech } from "./TextToSpeechContext";
 import { t } from '../i18n';
 import { getPluginSettings } from "../settings/PluginSettings";
+import { modeManagerService } from "../services/ModeManagerService";
 
 
 
 export interface LNModeContextType {
-	lnModes: Record<string, LNMode>;
-	activeModeId: string;
-	setActiveMode: (mode: LNMode | null) => void;
+	setActiveModeId: (modeId: string) => Promise<void>;
 	loadLNModes: () => Promise<void>;
 	defaultLNMode: Partial<LNMode>;
+	lnModesRef: React.RefObject<Record<string, LNMode>>;
+	activeModeIdRef: React.RefObject<string>;
 }
 
 const LNModeContext = createContext<LNModeContextType | undefined>(undefined);
@@ -36,13 +36,17 @@ export const LNModeProvider: React.FC<{
 }> = ({ children, app }) => {
 	const defaultMode = getDefaultLNMode();
 	const settings = getPluginSettings();
-	const [lnModes, setLNModes] = useState<Record<string, LNMode>>({
+	
+	// Use refs for always getting current values (no stale closures)
+	const lnModesRef = useRef<Record<string, LNMode>>({
 		default: defaultMode,
 	});
-	const [activeModeId, setActiveModeId] = useState<string>(settings.activeModeId);
+	const activeModeIdRef = useRef<string>(settings.activeModeId);
+	
+	// State for triggering re-renders and other state that needs reactivity
+	const [, setForceUpdate] = useState(0);
 	const [fileEventRefs, setFileEventRefs] = useState<EventRef[]>([]);
 	const [modeFilePaths, setModeFilePaths] = useState<Set<string>>(new Set());
-	const { setTTSSettings } = useTextToSpeech();
 
 	// Function to extract an LN mode from a file with the #ln-mode tag
 	const extractLNModeFromFile = async (
@@ -178,28 +182,30 @@ export const LNModeProvider: React.FC<{
 				}
 			}
 
-			setLNModes(modesMap);
+			lnModesRef.current = modesMap;
+			setForceUpdate(prev => prev + 1);
 			console.log(
 				`Loaded ${Object.keys(modesMap).length - 1} modes with #ln-mode tag`
 			);
 			// If active mode no longer exists, set it to the first available mode
-			if (!modesMap[activeModeId] && Object.keys(modesMap).length > 0) {
+			if (!modesMap[activeModeIdRef.current] && Object.keys(modesMap).length > 0) {
 				const firstModeId = Object.keys(modesMap)[0] || "";
-				setActiveModeId(firstModeId);
+				activeModeIdRef.current = firstModeId;
+				setForceUpdate(prev => prev + 1);
 				settings.activeModeId = firstModeId;
 				await settings.saveSettings();
 			}
 		} catch (error) {
 			console.error("Error loading LN modes:", error);
 		}
-	}, [app, activeModeId, settings]);
+	}, [app, activeModeIdRef, settings]);
 
 	// Update mode file paths when modes change
 	useEffect(() => {
 		setModeFilePaths(
-			new Set(Object.keys(lnModes).filter((path) => path !== "")),
+			new Set(Object.keys(lnModesRef.current).filter((path) => path !== "")),
 		);
-	}, [lnModes]);
+	}, [lnModesRef]);
 
 	// Setup vault event listeners
 	useEffect(() => {
@@ -318,63 +324,38 @@ export const LNModeProvider: React.FC<{
 	}, [loadLNModes]);
 
 	// Helper to set the active mode
-	const setActiveMode = useCallback(
-		async (mode: LNMode | null) => {
-			console.log("Setting active mode:", mode);
-			if (!mode) {
-				setActiveModeId("");
-				settings.activeModeId = "";
-				await settings.saveSettings();
-
-				// Update text-to-speech settings for the default mode
-				const defaultMode = getDefaultLNMode();
-				setTTSSettings({
-					enabled: defaultMode.ln_voice_autoplay,
-					voice: defaultMode.ln_voice,
-					instructions: defaultMode.ln_voice_instructions,
-					speed: defaultMode.ln_voice_speed,
-				});
-
-				return;
-			}
-
-			// Merge with defaults and validate settings
-			const completeMode = validateModeSettings(
-				mergeWithDefaultMode(mode),
-			);
-
-			// Save in modes if not already there (shouldn't usually happen)
-			if (completeMode.ln_path && !lnModes[completeMode.ln_path]) {
-				setLNModes((prev) => ({
-					...prev,
-					[completeMode.ln_path]: completeMode,
-				}));
-			}
-
-			// Set active mode ID
-			const newActiveId = completeMode.ln_path;
-			setActiveModeId(newActiveId);
+	const setActiveModeId = useCallback(
+		async (modeId: string) => {
+			console.log("Setting active mode:", modeId);
+			activeModeIdRef.current = modeId;
+			setForceUpdate(prev => prev + 1);
 			
 			// Save to plugin settings
-			settings.activeModeId = newActiveId;
+			settings.activeModeId = modeId;
 			await settings.saveSettings();
-
-			// Update text-to-speech settings for the new mode
-			setTTSSettings({
-				enabled: completeMode.ln_voice_autoplay,
-				voice: completeMode.ln_voice,
-				instructions: completeMode.ln_voice_instructions,
-				speed: completeMode.ln_voice_speed,
-			});
 		},
-		[lnModes, setTTSSettings, settings],
+		[settings],
 	);
+
+	// Register bridge with ModeManagerService for external access
+	useEffect(() => {
+		modeManagerService.registerContextBridge({
+			setActiveModeId: setActiveModeId,
+			getCurrentModes: () => lnModesRef.current,
+			getActiveModeId: () => activeModeIdRef.current,
+		});
+
+		// Cleanup: unregister when component unmounts
+		return () => {
+			modeManagerService.unregisterContextBridge();
+		};
+	}, [setActiveModeId, lnModesRef, activeModeIdRef]);
 
 	// Context value that provides the modes and functionality
 	const contextValue: LNModeContextType = {
-		lnModes: lnModes,
-		activeModeId,
-		setActiveMode,
+		lnModesRef: lnModesRef,
+		activeModeIdRef: activeModeIdRef,
+		setActiveModeId,
 		loadLNModes: loadLNModes,
 		defaultLNMode: getDefaultLNMode(),
 	};

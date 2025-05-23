@@ -59,9 +59,10 @@ export const validateTasks = (
         ? `"${notFoundTasks[0]}"`
         : `${notFoundTasks.length} tasks: ${notFoundTasks.map(t => `"${t}"`).join(', ')}`;
         
-      errorMessage += t('errors.tasks.notFound')
-        .replace('{{task}}', notFoundDescription)
-        .replace('{{file}}', note.filePath || 'document');
+      errorMessage += t('errors.tasks.notFound', {
+        task: notFoundDescription,
+        path: note.filePath || 'document'
+      });
     }
     
     if (invalidStatusTasks.length > 0) {
@@ -71,9 +72,10 @@ export const validateTasks = (
         ? `"${invalidStatusTasks[0]}"`
         : `${invalidStatusTasks.length} tasks: ${invalidStatusTasks.map(t => `"${t}"`).join(', ')}`;
         
-      errorMessage += t('errors.tasks.invalidState')
-        .replace('{{task}}', invalidDescription)
-        .replace('{{state}}', requiredStatus || 'correct state');
+      errorMessage += t('errors.tasks.invalidState', {
+        task: invalidDescription,
+        state: requiredStatus || 'correct state'
+      });
     }
     
     throw new ToolExecutionError(errorMessage);

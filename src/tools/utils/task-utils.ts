@@ -176,19 +176,19 @@ export function formatTask(task: Task): string {
   // Format completion time if present and task is completed
   let completionStr = '';
   if (task.status === 'completed' && task.timeInfo.completed) {
-    completionStr = t('tasks.format.completionTime').replace('{{time}}', task.timeInfo.completed);
+    completionStr = t('tasks.format.completionTime', { time: task.timeInfo.completed });
   }
 
   // Format target if moved
   let targetStr = '';
   if (task.status === 'moved' && task.target) {
-    targetStr = t('tasks.format.movedTo').replace('{{target}}', task.target);
+    targetStr = t('tasks.format.movedTo', { target: task.target });
   }
 
   // Format source if this task was moved from elsewhere
   let sourceStr = '';
   if (task.source) {
-    sourceStr = t('tasks.format.movedFrom').replace('{{source}}', task.source);
+    sourceStr = t('tasks.format.movedFrom', { source: task.source });
   }
 
   // Build task line

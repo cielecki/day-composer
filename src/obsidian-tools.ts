@@ -10,6 +10,7 @@ import { moveTodoTool } from "./tools/move-todo";
 import { abandonTodoTool } from "./tools/abandon-todo";
 import { createCompletedTodoTool } from "./tools/create-completed-todo";
 import { showTodosTool } from "./tools/show-todos";
+import { handoverModeTool } from "./tools/handover-mode";
 import { ToolExecutionError } from "./tools/utils/ToolExecutionError";
 import { t } from "./i18n";
 
@@ -60,6 +61,7 @@ export class ObsidianTools {
 		abandonTodoTool,
 		createCompletedTodoTool,
 		showTodosTool,
+		handoverModeTool,
 	];
 
 	constructor(plugin: MyPlugin) {

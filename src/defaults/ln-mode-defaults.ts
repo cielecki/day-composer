@@ -32,7 +32,7 @@ export function getDefaultLNMode(): LNMode {
     ln_example_usages: [],
     
     // API parameters
-    ln_thinking_budget_tokens: 2000,
+    ln_thinking_budget_tokens: 1024,
     ln_max_tokens: 4096,
     
     // TTS defaults
@@ -49,10 +49,10 @@ export function getDefaultLNMode(): LNMode {
  * @returns Complete LN mode with all required fields
  */
 export function mergeWithDefaultMode(userMode: Partial<LNMode>): LNMode {
-  return {
+  return validateModeSettings({
     ...getDefaultLNMode(),
     ...userMode,
-  } as LNMode;
+  } as LNMode);
 }
 
 export function validateModeSettings(mode: LNMode): LNMode {
@@ -68,7 +68,7 @@ export function validateModeSettings(mode: LNMode): LNMode {
   // Validate thinking budget (must be positive number)
   if (mode.ln_thinking_budget_tokens !== undefined && 
       (typeof mode.ln_thinking_budget_tokens !== 'number' || 
-       mode.ln_thinking_budget_tokens < 0)) {
+       mode.ln_thinking_budget_tokens < 1024)) {
     validatedMode.ln_thinking_budget_tokens = defaultMode.ln_thinking_budget_tokens;
   }
   
@@ -78,6 +78,8 @@ export function validateModeSettings(mode: LNMode): LNMode {
        mode.ln_max_tokens <= 0)) {
     validatedMode.ln_max_tokens = defaultMode.ln_max_tokens;
   }
+
+  console.log("validatedMode", validatedMode);
   
   return validatedMode;
 }

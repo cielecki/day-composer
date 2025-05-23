@@ -80,6 +80,19 @@
       "check": "✓ Oznaczono {{task}} jako zakończone w {{path}} ({{time}})",
       "uncheck": "✓ Cofnięto oznaczenie \"{{task}}\" jako zakończone w {{path}}",
       "abandon": "✓ Oznaczono {{task}} jako porzucone w {{path}}"
+    },
+    "handover": {
+      "switched": "Przełączono na tryb {{modeName}}",
+      "successMessage": "Pomyślnie przełączono z trybu {{fromMode}} na {{toMode}}.",
+      "newMode": "Nowy tryb:",
+      "description": "Opis:",
+      "noModes": "Brak dostępnych trybów do przełączenia.",
+      "modeNotFound": "Nie znaleziono trybu o ID \"{{modeId}}\".",
+      "switchFailed": "Nie udało się przełączyć trybu: {{error}}",
+      "alreadyInMode": "Już w trybie {{modeName}}. Zmiana nie jest potrzebna.",
+      "switching": "Przełączanie na tryb {{modeName}}...",
+      "failedToSwitch": "Nie udało się przełączyć na {{modeName}}",
+      "noDescription": "Brak dostępnego opisu"
     }
   },
   "errors": {

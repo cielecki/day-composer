@@ -70,15 +70,15 @@ export class AICoachView extends ItemView {
 		console.log(t('logs.view.rendering').replace('{{count}}', this._conversation.length.toString()));
 
 		this.reactRoot.render(
-			<TextToSpeechProvider>
-				<LNModeProvider app={this.app}>
+			<LNModeProvider app={this.app}>
+				<TextToSpeechProvider>
 					<AIAgentProvider plugin={this.props.plugin}>
 						<SpeechToTextProvider>
 							<AICoachApp />
 						</SpeechToTextProvider>
 					</AIAgentProvider>
-				</LNModeProvider>
-			</TextToSpeechProvider>,
+				</TextToSpeechProvider>
+			</LNModeProvider>
 		);
 	}
 

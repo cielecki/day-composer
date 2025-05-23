@@ -64,9 +64,10 @@ export const uncheckTodoTool: ObsidianTool<UncheckTodoToolInput> = {
     
     // Check if task was found
     if (!task) {
-      throw new ToolExecutionError(t('errors.tasks.notFound')
-        .replace('{{task}}', todoDescription)
-        .replace('{{file}}', filePath));
+      throw new ToolExecutionError(t('errors.tasks.notFound', {
+        task: todoDescription,
+        path: filePath
+      }));
     }
 
     // Create a copy to avoid modifying the original
@@ -83,8 +84,9 @@ export const uncheckTodoTool: ObsidianTool<UncheckTodoToolInput> = {
 
     await updateNote({plugin, filePath, updatedNote: note})
 
-    return t('tools.success.uncheck')
-      .replace('{{task}}', todoDescription)
-      .replace('{{path}}', filePath);
+    return t('tools.success.uncheck', {
+      task: todoDescription,
+      path: filePath
+    });
   }
 };

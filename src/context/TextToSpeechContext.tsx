@@ -5,19 +5,12 @@ import { getPluginSettings, TTSVoice } from "../settings/PluginSettings";
 import { TTS_VOICES } from "../settings/PluginSettings";
 import { t } from '../i18n';
 import { DEFAULT_VOICE_INSTRUCTIONS } from 'src/defaults/ln-mode-defaults';
-
-interface TTSSettings {
-	enabled: boolean;
-	voice?: string;
-	instructions?: string;
-	speed?: number;
-}
+import { useLNMode } from './LNModeContext';
+import { getDefaultLNMode } from 'src/defaults/ln-mode-defaults';
 
 interface TextToSpeechContextType {
 	isPlayingAudio: boolean;
 	isGeneratingSpeech: boolean;
-	ttsSettings: TTSSettings;
-	setTTSSettings: (settings: TTSSettings) => void;
 	speakText: (text: string, signal: AbortSignal, bypassEnabledCheck?: boolean) => Promise<void>;
 	stopAudio: () => void;
 }
@@ -29,12 +22,20 @@ export const TextToSpeechProvider: React.FC<{
 }> = ({ children }) => {
 	const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 	const [isGeneratingSpeech, setIsGeneratingSpeech] = useState(false);
-	const [ttsSettings, setTTSSettings] = useState<TTSSettings>({
-		enabled: true,
-		voice: 'alloy',
-		instructions: DEFAULT_VOICE_INSTRUCTIONS,
-		speed: 1.0
-	});
+	const { lnModesRef, activeModeIdRef } = useLNMode();
+	
+	// Helper function to get current TTS settings from active mode
+	const getCurrentTTSSettings = useCallback(() => {
+		const currentMode = lnModesRef.current[activeModeIdRef.current];
+		const defaultMode = getDefaultLNMode();
+		
+		return {
+			enabled: currentMode?.ln_voice_autoplay ?? defaultMode.ln_voice_autoplay,
+			voice: currentMode?.ln_voice ?? defaultMode.ln_voice,
+			instructions: currentMode?.ln_voice_instructions ?? defaultMode.ln_voice_instructions,
+			speed: currentMode?.ln_voice_speed ?? defaultMode.ln_voice_speed,
+		};
+	}, [lnModesRef, activeModeIdRef]);
 	
 	// Ref to track the current playing state to avoid stale closure issues
 	const isPlayingRef = React.useRef(false);
@@ -59,7 +60,7 @@ export const TextToSpeechProvider: React.FC<{
 	
 	const speakText = useCallback((text: string, signal: AbortSignal, bypassEnabledCheck = false): Promise<void> => {
 		return new Promise((resolve, reject) => {
-			if (!bypassEnabledCheck && !ttsSettings.enabled) {
+			if (!bypassEnabledCheck && !getCurrentTTSSettings().enabled) {
 				resolve();
 				return;
 			}
@@ -133,22 +134,22 @@ export const TextToSpeechProvider: React.FC<{
 
 					let voice: TTSVoice = 'alloy';
 
-					if (ttsSettings.voice) {
-						if (!TTS_VOICES.includes(ttsSettings.voice as TTSVoice)) {
-							new Notice(t('errors.tts.invalidVoice').replace('{{voice}}', ttsSettings.voice));
+					if (getCurrentTTSSettings().voice) {
+						if (!TTS_VOICES.includes(getCurrentTTSSettings().voice as TTSVoice)) {
+							new Notice(t('errors.tts.invalidVoice').replace('{{voice}}', getCurrentTTSSettings().voice));
 						} else {
-							voice = ttsSettings.voice as TTSVoice;
+							voice = getCurrentTTSSettings().voice as TTSVoice;
 						}
 					}
 
-					console.log('Using settings:', ttsSettings);
+					console.log('Using settings:', getCurrentTTSSettings());
 					
 					const response = await openai.audio.speech.create({
 						model: "gpt-4o-mini-tts",
 						voice: voice,
-						instructions: ttsSettings.instructions || DEFAULT_VOICE_INSTRUCTIONS,
+						instructions: getCurrentTTSSettings().instructions || DEFAULT_VOICE_INSTRUCTIONS,
 						input: textToConvert,
-						speed: ttsSettings.speed || 1.0,
+						speed: getCurrentTTSSettings().speed || 1.0,
 						response_format: "mp3",
 					}, {
 						signal: combinedSignal
@@ -321,17 +322,12 @@ export const TextToSpeechProvider: React.FC<{
 				}
 			})();
 		});
-	}, [ttsSettings, stopAudio]);
+	}, [getCurrentTTSSettings, stopAudio]);
 
 	// Build context value
 	const value = {
 		isPlayingAudio,
 		isGeneratingSpeech,
-		ttsSettings,
-		setTTSSettings: (settings: TTSSettings) => {
-			console.log('Setting TTS settings:', settings);
-			setTTSSettings(settings);
-		},
 		speakText,
 		stopAudio,
 	};

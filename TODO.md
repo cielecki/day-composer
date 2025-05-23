@@ -25,15 +25,18 @@
 - [x] Why are mobile styles completely different and there's a contrast issue?
 - [x] Distinct animation for when speech is being generated vs when it's playing
 - [x] point of insertion should be after the task preceeding the first uncompleted one (so any text in between should follow the inserted task)
+- [x] Waveform when I enable it for the second time, it seems to very briefly show either old data or some noise - non empty waveform - this needs to be fixed
+- [x] handover tool do innych trybów
+- [x] Naprawić w life navigatorze:
+```markdown
+❌ Nie znaleziono zadania ""🍳 10:30 Śniadanie z Michałem"" w {{path}}. Jeśli zadanie znajduje się w innym pliku, określ go w parametrze file_path.
+```
 
-- [ ] Waveform when I enable it for the second time, it seems to very briefly show either old data or some noise - non empty waveform - this needs to be fixed
 - [ ] Fix styling of main chat - borders and backgrounds
 - [ ] More relaxed todo format in the plugin
 - [ ] 🔧 Dodać funkcję edycji todo itemów
 - [ ] 🔧 Poprawić funkcjonalność przenoszenia zadań (problem z dodawaniem do konkretnych dni)
 - [ ] Life navigator: comments jak sa multiline to zle sie formatuja po dodaniu do notatki przez AI
-- [ ] handover tool do innych trybów 
-
 - [ ] abandoning powinien przenosić zadania na początek notatki dla lepszej widoczności
 - [ ] Bug gdy zastopuje generowanego tool calla
 
@@ -47,10 +50,14 @@ conversation turn processing: BadRequestError: 400 {"type":"error","error":{"typ
 ```
 
 - [ ] Dodać możliwość konfiguracjii tooli w trybach
-- [ ] Naprawić w life navigatorze:
-```markdown
-❌ Nie znaleziono zadania ""🍳 10:30 Śniadanie z Michałem"" w {{path}}. Jeśli zadanie znajduje się w innym pliku, określ go w parametrze file_path.
-```
+
+
+
+
+--------------------------------
+
+
+
 
 - [ ] Working daily planning and habits in the starter kit
 
@@ -61,7 +68,6 @@ conversation turn processing: BadRequestError: 400 {"type":"error","error":{"typ
 - [ ] Modes are not translated to english
 
 ## AI breakfast release
-
 
 - [ ] Write down the obsidian bullet journal md format that the plugin uses
 - [ ] Create tool documentation in README or MODE_GUIDE or smth

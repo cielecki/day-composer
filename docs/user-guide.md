@@ -190,6 +190,10 @@ Life Navigator comes with several pre-configured modes, each designed for specif
 
 You can switch between modes at any time based on your current needs. Each mode has access to the same information (via your _Index_.md), but will respond with different tones and approaches.
 
+### Dynamic Mode Switching During Conversations
+
+Life Navigator includes a powerful **Handover Mode Tool** that allows the AI to autonomously switch between different modes during a conversation based on your needs. This feature enables seamless transitions between different AI personalities without losing conversation context.
+
 ## Practical Usage Tips
 
 ### Working with Example Content
