@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.11] - 2025-05-23
+
 ### Added
 - **Tool Filtering for Modes**: New configuration options for controlling which tools are available in each mode
   - Added `ln_tools_allowed` and `ln_tools_disallowed` fields to mode configuration
