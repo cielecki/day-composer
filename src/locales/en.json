@@ -70,7 +70,7 @@
       },
       "add": {
         "failed": "Failed to add todo {{task}}",
-        "success": "Added todo {{task}}",
+        "success": "Added {{task}}",
         "inProgress": "Adding todo..."
       }
     },

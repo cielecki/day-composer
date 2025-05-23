@@ -70,7 +70,7 @@
       },
       "add": {
         "failed": "Nie udało się dodać zadania {{task}}",
-        "success": "Dodano zadanie {{task}}",
+        "success": "Dodano {{task}}",
         "inProgress": "Dodawanie zadania..."
       }
     },
@@ -80,7 +80,7 @@
       "check": "✓ Oznaczono {{task}} jako zakończone w {{path}} ({{time}})",
       "uncheck": "✓ Cofnięto oznaczenie \"{{task}}\" jako zakończone w {{path}}",
       "abandon": "✓ Oznaczono {{task}} jako porzucone w {{path}}"
-    },
+     },
     "handover": {
       "switched": "Przełączono na tryb {{modeName}}",
       "successMessage": "Pomyślnie przełączono z trybu {{fromMode}} na {{toMode}}.",
