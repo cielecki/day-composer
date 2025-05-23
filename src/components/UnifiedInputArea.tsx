@@ -697,12 +697,13 @@ export const UnifiedInputArea: React.FC<{
               </button>
             )}
 
-            {/* Send button - visible when there's a message or image, AND not recording, AND nothing is being generated */}
-            {(message.trim() !== "" || attachedImages.length > 0) && !isRecording && !(isGeneratingResponse || isPlayingAudio) && (
+            {/* Send button - visible when not recording, AND nothing is being generated */}
+            {!isRecording && !(isGeneratingResponse || isPlayingAudio) && (
               <button
                 className="input-control-button send-button"
                 onClick={handleSendMessage}
                 aria-label={t("ui.input.send")}
+                disabled={message.trim() === "" && attachedImages.length === 0}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

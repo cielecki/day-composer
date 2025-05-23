@@ -1324,14 +1324,19 @@ If your plugin does not need CSS, delete this file.
   background-color: var(--background-modifier-hover);
 }
 
-.mic-button.recording {
+.ai-coach-view .mic-button.recording {
   background-color: var(--background-modifier-error);
   color: var(--text-on-accent);
 }
 
 
-.mic-button .spinner {
+.ai-coach-view .mic-button .spinner {
   animation: spin 1.5s linear infinite;
+}
+
+.ai-coach-view .input-control-button.mic-button {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
 }
 
 

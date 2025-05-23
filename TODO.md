@@ -36,6 +36,7 @@
 - [x] Life navigator: comments jak sa multiline to zle sie formatuja po dodaniu do notatki przez AI
 - [x] Fix styling of main chat - borders and backgrounds
 
+- [ ] Do I want the input buttons to be flat?
 - [ ] When stopping audio during eneration, something breaks and it's not being stopped, furthermoe when it starts playing the stop button is not working
 - [ ] 🔧 Dodać funkcję edycji todo itemów
 - [ ] 🔧 Poprawić funkcjonalność przenoszenia zadań (problem z dodawaniem do konkretnych dni)
