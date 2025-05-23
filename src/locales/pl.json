@@ -244,7 +244,7 @@
     },
     "thinking": {
       "inProgress": "Myślę...",
-      "completed": "Przemyślałem przez chwilę",
+      "completed": "Pomyślałem przez chwilę",
       "redacted": "[Rozumowanie asystenta automatycznie ukryte ze względów bezpieczeństwa]"
     },
     "mode": {
@@ -282,12 +282,6 @@
       "createdSuccess": "Pomyślnie utworzono pakiet startowy",
       "createdError": "Błąd podczas tworzenia pakietu startowego: {{error}}",
       "directoryName": "Pakiet startowy"
-    },
-    "status": {
-      "recording": "Nagrywanie...",
-      "transcribing": "Transkrypcja...",
-      "thinking": "Myślę...",
-      "speaking": "Mówię..."
     }
   },
   "tasks": {

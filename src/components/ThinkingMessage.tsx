@@ -1,5 +1,4 @@
 import React from 'react';
-import { t } from '../i18n';
 
 interface ThinkingMessageProps {
   status: 'recording' | 'transcribing' | 'thinking' | 'speaking';
@@ -12,7 +11,6 @@ export const ThinkingMessage: React.FC<ThinkingMessageProps> = ({ status }) => {
         <div className="thinking-dot"></div>
         <div className="thinking-dot"></div>
         <div className="thinking-dot"></div>
-        <span className="thinking-text">{t(`ui.status.${status}`)}</span>
       </div>
     </div>
   );

@@ -282,12 +282,6 @@
       "createdSuccess": "Successfully created starter kit",
       "createdError": "Error creating starter kit: {{error}}",
       "directoryName": "Starter Kit"
-    },
-    "status": {
-      "recording": "Recording...",
-      "transcribing": "Transcribing...",
-      "thinking": "Thinking...",
-      "speaking": "Speaking..."
     }
   },
   "tasks": {

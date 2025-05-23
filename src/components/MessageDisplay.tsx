@@ -240,8 +240,8 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   // If in editing mode, show edit interface instead of message content
   if (isEditing && role === 'user') {
     return (
-      <div className={messageClasses.join(' ')}>
-        <div className="message-content editing">
+      <div className={messageClasses.join(' ') + " editing"}>
+        <div className="message-content">
           <div className="unified-input-area">
             <div className="input-wrapper">
               <textarea 
@@ -275,70 +275,68 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
     );
   }
 
-  // Determine whether to show action buttons
-  const shouldShowActions = !isGeneratingResponse;
+  const hasTextContent = contentBlocksToRender.some(block => block.type === 'text');
 
-  // Normal message display
   return (
     <div className={messageClasses.join(' ')}>
       <div className="message-content">
-        {/* Always map over contentBlocksToRender which is guaranteed to be an array */}
         <div className="content-blocks">
           {contentBlocksToRender.map(renderContentBlock)}
         </div>
-        
-        {/* Message action buttons container - only shown if not generating response */}
-        {shouldShowActions && (
+
+        {hasTextContent && (
           <div className="message-actions">
-            {role === 'user' && (
-              <>
-                <button 
-                  className="message-action-button edit-button" 
-                  onClick={handleEditClick}
-                  aria-label={t('ui.message.edit')}
-                >
-                  <LucideIcon name="pencil" size={18} />
-                </button>
-                <button 
-                  className="message-action-button copy-button" 
-                  onClick={handleCopyMessage}
-                  aria-label={t('ui.message.copy')}
-                >
-                  <LucideIcon name={copyIcon} size={18} />
-                </button>
-              </>
-            )}
-            
-            {role === 'assistant' && (
-              <>
-                <button 
-                  className={`message-action-button speak-button ${isPlayingAudio ? 'playing' : isGeneratingSpeech ? 'generating' : ''}`}
-                  onClick={handleSpeakMessage}
-                  aria-label={
-                    isPlayingAudio 
-                        ? t('ui.message.stopSpeech') 
-                        : isGeneratingSpeech 
-                          ? t('ui.message.generatingSpeech') 
-                          : t('ui.message.speak')
-                  }
-                >
-                  {isPlayingAudio ? (
-                    <LucideIcon name="circle-stop" size={18} />
-                  ) : isGeneratingSpeech ? (
-                    <LucideIcon name="loader" size={18} />
-                  ) : (
-                    <LucideIcon name="volume-2" size={18} />
-                  )}
-                </button>
-                <button 
-                  className="message-action-button copy-button" 
-                  onClick={handleCopyMessage}
-                  aria-label={t('ui.message.copy')}
-                >
-                  <LucideIcon name={copyIcon} size={18} />
-                </button>
-              </>
-            )}
+            {!isGeneratingResponse && <>
+              {role === 'user' && (
+                <>
+                  <button 
+                    className="clickable-icon" 
+                    onClick={handleEditClick}
+                    aria-label={t('ui.message.edit')}
+                  >
+                    <LucideIcon name="pencil" size={18} />
+                  </button>
+                  <button 
+                    className="clickable-icon" 
+                    onClick={handleCopyMessage}
+                    aria-label={t('ui.message.copy')}
+                  >
+                    <LucideIcon name={copyIcon} size={18} />
+                  </button>
+                </>
+              )}
+              
+              {role === 'assistant' && (
+                <>
+                  <button 
+                    className={`message-action-button ${isPlayingAudio ? 'playing' : isGeneratingSpeech ? 'generating' : ''}`}
+                    onClick={handleSpeakMessage}
+                    aria-label={
+                      isPlayingAudio 
+                          ? t('ui.message.stopSpeech') 
+                          : isGeneratingSpeech 
+                            ? t('ui.message.generatingSpeech') 
+                            : t('ui.message.speak')
+                    }
+                  >
+                    {isPlayingAudio ? (
+                      <LucideIcon name="circle-stop" size={18} />
+                    ) : isGeneratingSpeech ? (
+                      <LucideIcon name="loader" size={18} />
+                    ) : (
+                      <LucideIcon name="volume-2" size={18} />
+                    )}
+                  </button>
+                  <button 
+                    className="message-action-button" 
+                    onClick={handleCopyMessage}
+                    aria-label={t('ui.message.copy')}
+                  >
+                    <LucideIcon name={copyIcon} size={18} />
+                  </button>
+                </>
+              )}
+            </>}
           </div>
         )}
       </div>

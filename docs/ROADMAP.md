@@ -19,6 +19,9 @@ Introduce the ability for the user to add extra tools to the system. Investigate
 **Deep Research Tool:**
 Implement a tool for deep research using firecrawl api.
 
+**Mode Settings Editor:**
+Create a comprehensive mode settings editor that allows users to configure all mode parameters through a user-friendly interface.
+
 ## Floating Ideas
 
 **AI-Assisted Knowledge Base Editing:**

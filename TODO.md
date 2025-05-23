@@ -34,9 +34,8 @@
 - [x] abandoning powinien przenosić zadania na początek notatki dla lepszej widoczności
 - [x] Dodać możliwość konfiguracjii tooli w trybach
 - [x] Life navigator: comments jak sa multiline to zle sie formatuja po dodaniu do notatki przez AI
+- [x] Fix styling of main chat - borders and backgrounds
 
-
-- [ ] Fix styling of main chat - borders and backgrounds
 - [ ] 🔧 Dodać funkcję edycji todo itemów
 - [ ] 🔧 Poprawić funkcjonalność przenoszenia zadań (problem z dodawaniem do konkretnych dni)
 - [ ] Bug gdy zastopuje generowanego tool calla
@@ -50,16 +49,18 @@ conversation turn processing: BadRequestError: 400 {"type":"error","error":{"typ
 ```
 - [ ] Better info dumped to AI when file is not found in expand links
 - [ ] still there is something wrong with the current spot logic
+- [ ] Starter kit should be created even if a directory like this already exists (it should just be created under a new name (like starter kit 2 or smth))
 
 --------------------------------
 
 - [ ] Working daily planning and habits in the starter kit
-
-- [ ] Test with B
+- [ ] Test with G
 - [ ] Test with Piotr
 - [ ] Acquire as many test users as possible
-
+- [ ] Gandi and other updates to personas and prompts
 - [ ] Modes are not translated to english
+- [ ] 📝 Asystentka - Zachowywać dokładnie oryginalne sformułowania użytkownika bez robienia rephrasingów
+- [ ] 🐛 Naprawić problem automatycznego dodawania niepotrzebnych komentarzy
 
 ## AI breakfast release
 
@@ -76,12 +77,13 @@ conversation turn processing: BadRequestError: 400 {"type":"error","error":{"typ
 
 ## Initial release
 - [ ] Lepszy entry level experience
-- [ ] 📝 Asystentka - Zachowywać dokładnie oryginalne sformułowania użytkownika bez robienia rephrasingów
+
 - [ ] Upewnienie się że AI rozumiem ze [-] to anulowany task
 - [ ] Disable show todo for now
 - [ ] I made a marketing plan of the Vibe Living project
 
 ## Nice to haves
+- [ ] Test with B
 - [ ] AI Coach -> Life Navigator
-- [ ] 🐛 Naprawić problem automatycznego dodawania niepotrzebnych komentarzy
+
 

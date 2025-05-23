@@ -17,7 +17,8 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 		try {
 			if (modeManagerService.isContextAvailable()) {
 				const modes = modeManagerService.getAvailableModes();
-				availableModes = modes.map(mode => mode.id);
+                const currentModeId = modeManagerService.getActiveModeId();
+				availableModes = modes.filter(mode => mode.id !== currentModeId).map(mode => mode.id);
 				
 				// Build a description that includes all available modes and their purposes
 				if (modes.length > 0) {

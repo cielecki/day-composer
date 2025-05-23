@@ -14,7 +14,6 @@ If your plugin does not need CSS, delete this file.
 }
 
 .ai-coach-view .message-content,
-.ai-coach-view .tool-use-result,
 .ai-coach-view .thinking-content,
 .ai-coach-view .debug-content,
 .ai-coach-view .tool-result-content,
@@ -108,21 +107,13 @@ If your plugin does not need CSS, delete this file.
 
 .ai-coach-view .message.user {
   align-self: flex-end;
-  margin-bottom: 30px;
   max-width: 80%;
   background-color: var(--background-secondary);
   color: var(--text-normal);
-  padding: 10px;
-  border: 1px solid var(--background-modifier-border);
 }
 
 .ai-coach-view .message.assistant {
   align-self: flex-start;
-  padding: 10px;
-  margin-right: 10px;
-  margin-left: 10px;
-  margin-bottom: 30px;
-  border-radius: 12px 12px 12px 0;
   color: var(--text-normal);
   border: none;
   background-color: transparent;
@@ -273,16 +264,16 @@ If your plugin does not need CSS, delete this file.
   animation: dot-pulse 1.5s infinite linear -0.6s;
 }
 
-/* Animations */
-@keyframes pulse {
+
+@keyframes block-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(var(--text-error-rgb), 0.4);
+    opacity: 0.4;
   }
-  70% {
-    box-shadow: 0 0 0 10px rgba(var(--text-error-rgb), 0);
+  50% {
+    opacity: 1;
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(var(--text-error-rgb), 0);
+    opacity: 0.4;
   }
 }
 
@@ -306,26 +297,16 @@ If your plugin does not need CSS, delete this file.
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Thinking indicator */
-.thinking-message {
-  display: flex;
-  justify-content: center;
-  margin: 10px 0;
-}
-
 .thinking-indicator {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 16px;
-  background-color: var(--background-modifier-hover);
+  gap: 4px;
+  padding: 4px;
 }
 
 .thinking-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+  width: 2px;
+  height: 2px;
   background-color: var(--text-muted);
   animation: bounce 1.4s infinite ease-in-out both;
 }
@@ -476,14 +457,9 @@ If your plugin does not need CSS, delete this file.
   padding: 0.5rem;
   max-height: 300px;
   overflow-y: auto;
-  background-color: var(--code-background);
-  font-family: var(--font-monospace);
   font-size: 0.85rem;
-  white-space: pre-wrap;
   color: var(--code-text);
 }
-
-
 
 .message.user.has-tool-results {
   background-color: var(--background-secondary-alt);
@@ -584,54 +560,10 @@ If your plugin does not need CSS, delete this file.
   flex-direction: column;
 }
 
-/* Thinking block styles */
-.thinking-block, .tool-use-block {
-  margin-bottom: 8px;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
 /* Add styles for pulsing thinking block */
-.thinking-block.pulsing, .tool-use-block.pulsing {
-  animation: thinking-pulse 1.5s infinite ease-in-out;
+.collapsible-block.pulsing {
+  animation: block-pulse 1.5s infinite ease-in-out;
   transition: opacity 0.3s ease-in-out;
-}
-
-
-@keyframes thinking-pulse {
-  0% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.4;
-  }
-}
-
-.thinking-summary {
-  padding: 8px 12px;
-  display: flex;
-  align-items: center;
-  user-select: none;
-  cursor: pointer;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-normal);
-}
-
-.thinking-content {
-  padding: 0.5rem;
-  margin: 0;
-  background-color: var(--background-secondary);
-  font-family: var(--font-monospace);
-  font-size: 0.85rem;
-  line-height: 1.4;
-  max-height: 500px;
-  overflow-y: auto;
-  white-space: pre-wrap;
 }
 
 /* Redacted thinking styles */
@@ -650,14 +582,6 @@ If your plugin does not need CSS, delete this file.
 .redacted-icon {
   margin-right: 0.5rem;
   font-size: 1.1rem;
-}
-
-/* Tool use blocks */
-.tool-use-block {
-  margin: 0.5em 0;
-  border-radius: 6px;
-  border: 1px solid var(--background-modifier-border);
-  background-color: var(--background-secondary-alt);
 }
 
 .tool-use-summary {
@@ -718,61 +642,17 @@ If your plugin does not need CSS, delete this file.
   background-color: var(--tool-block-bg);
 }
 
-.tool-use-result {
-  margin: 0;
-  padding: 10px;
-  background-color: transparent;
-  border-radius: 4px;
-  font-family: var(--font-monospace);
-  font-size: 0.85rem;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  max-height: 300px;
-  overflow-y: auto;
-  border-left: none;
-}
-
-/* State indicators */
-.tool-use-block[open] .tool-use-summary {
-  border-bottom: 1px solid var(--background-modifier-border);
-}
-
-.tool-use-block:not([open]) .tool-use-summary {
-  opacity: 0.85;
-}
-
-.tool-use-block:not([open]):hover .tool-use-summary {
-  opacity: 1;
-  background-color: var(--background-secondary-alt);
-}
-
-/* Style for tools that might have large outputs (like search) */
-.tool-use-block[data-tool="search_notes"] .tool-use-result,
-.tool-use-block[data-tool="read_note"] .tool-use-result {
-  max-height: 400px;
-}
-
-/* For a cleaner look in assistant messages */
-.message.assistant .tool-use-block {
-  margin-left: 0;
-  margin-right: 0;
-  width: 100%;
-}
-
 
 /* User message background styling */
 .message.user .content-blocks {
-  background-color: var(--background-secondary);
+  background-color: var(--background-secondary-alt);
   border-radius: 12px 12px 0 12px;
-  padding: 10px;
+  padding: 10px 20px;
 }
 
 /* Assistant message background styling */
 .message.assistant .content-blocks {
   width: 100%;
-  background-color: transparent;
-  border-radius: 12px 12px 12px 0;
-  padding: 10px;
 }
 
 /* Fix excessive spacing in ReactMarkdown content */
@@ -800,7 +680,7 @@ If your plugin does not need CSS, delete this file.
 }
 
 .collapsible-summary {
-  padding: 8px 12px;
+  padding: 8px 0px;
   display: flex;
   align-items: center;
   font-size: 0.9rem;
@@ -834,11 +714,12 @@ If your plugin does not need CSS, delete this file.
 }
 
 .collapsible-details {
-  background-color: transparent;
-  padding: 12px;
   gap: 12px;
   display: flex;
   flex-direction: column;
+  border-left: 2px solid var(--background-modifier-border);
+  margin-left: 8px;
+  margin-top: 4px;
 }
 
 /* State indicators */
@@ -854,12 +735,6 @@ If your plugin does not need CSS, delete this file.
 .collapsible-block:not([open]):hover .collapsible-summary {
   opacity: 0.85;
 }
-
-/* Tool block specific styles */
-.tool-use-block {
-  border-left: none;
-}
-
 
 .tool-input-content {
   margin: 0;
@@ -891,36 +766,23 @@ If your plugin does not need CSS, delete this file.
   background-color: var(--tool-block-bg);
 }
 
-.tool-use-result {
-  margin: 0;
-  padding: 10px;
-  background-color: transparent;
-  border-radius: 4px;
-  font-family: var(--font-monospace);
-  font-size: 0.85rem;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  max-height: 300px;
-  overflow-y: auto;
-  border-left: none;
-}
-
-/* Thinking block specific styles */
-.thinking-block {
-  border-left: none;
-}
-
-.thinking-content {
+.ai-coach-view .thinking-content {
   padding: 10px;
   margin: 0;
-  background-color: transparent;
-  font-family: var(--font-monospace);
   font-size: 0.85rem;
   line-height: 1.4;
   max-height: 500px;
   overflow-y: auto;
   white-space: pre-wrap;
   border-radius: 4px;
+  padding: 0.5rem;
+  margin: 0;
+  background-color: var(--background-secondary);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  max-height: 500px;
+  overflow-y: auto;
+  white-space: pre-wrap;
 }
 
 /* Redacted thinking styles */
@@ -1006,14 +868,13 @@ If your plugin does not need CSS, delete this file.
   max-width: 100%;
   padding: 6px 10px;
   border-radius: 20px;
-  background-color: var(--background-secondary);
-  border: 1px solid var(--background-modifier-border);
+  background-color: var(--interactive-normal);
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .ln-mode-pill:hover {
-  background-color: var(--background-modifier-hover);
+  background-color: var(--interactive-hover);
 }
 
 .ln-mode-icon-container {
@@ -1357,8 +1218,7 @@ If your plugin does not need CSS, delete this file.
   padding: 12px;
   width: 100%;
   gap: 12px;
-  background-color: var(--background-primary-alt);
-  border: 1px solid var(--background-modifier-border);
+  background-color: var(--background-secondary-alt);
   border-radius: 16px;
 }
 
@@ -1442,7 +1302,6 @@ If your plugin does not need CSS, delete this file.
   width: 100%;
   padding: 0;
   margin-top: 8px;
-  background-color: var(--background-primary-alt);
   border-radius: 8px;
 }
 
@@ -1530,28 +1389,20 @@ If your plugin does not need CSS, delete this file.
 
 /* Message action buttons */
 .message-actions {
-  position: absolute;
-  bottom: -24px;
-  right: 8px;
   display: flex;
-  gap: 6px;
+  margin-top: 8px;
+  gap: 2px;
   opacity: 0;
+  height: 24px;
+  min-width: 54px;
   transition: opacity 0.2s ease;
-  z-index: 5;
-  background-color: transparent;
-  padding: 0;
-  border-radius: 0;
-  box-shadow: none;
-  border: none;
 }
-
 .message.user .message-actions {
-  right: 8px;
+  justify-content: right;
 }
 
 .message.assistant .message-actions {
-  left: 8px;
-  right: auto;
+  justify-content: left;
 }
 
 /* Show message actions on hover, but not when generating */
@@ -1562,11 +1413,6 @@ If your plugin does not need CSS, delete this file.
 /* Always show message actions for the last message, unless generating */
 .message.is-last-message:not(.is-generating) .message-actions {
   opacity: 1;
-}
-
-/* Hide message actions when generating (redundant but explicit) */
-.message.is-generating .message-actions {
-  display: none;
 }
 
 .message-action-button {
@@ -1590,33 +1436,20 @@ If your plugin does not need CSS, delete this file.
   color: var(--text-normal);
 }
 
-.message-action-button.edit-button:hover {
-  color: var(--text-accent);
-}
-
-.message-action-button.speak-button:hover {
-  color: var(--text-accent);
-}
-
-.message-action-button.copy-button:hover {
-  color: var(--text-accent);
-}
-
 /* Message editing styles */
-.message-content.editing {
+.message.user.editing {
   padding: 0;
   max-width: 800px;
   width: 100%;
 }
 
-.message-content.editing .unified-input-area {
-  background-color: var(--background-secondary);
-  border: 1px solid var(--background-modifier-border);
+.message.user.editing .unified-input-area {
+  background-color: var(--background-secondary-alt);
   border-radius: 16px;
   width: 100%;
 }
 
-.message-content.editing .unified-input-textarea {
+.message.user.editing .unified-input-textarea {
   width: 100%;
   min-height: 40px;
   color: var(--text-normal);
@@ -1624,14 +1457,14 @@ If your plugin does not need CSS, delete this file.
   background-color: transparent;
 }
 
-.message-content.editing .input-control-button {
+.message.user.editing .input-control-button {
   border-radius: 8px !important;
   height: 36px;
   width: auto;
   padding: 0 16px;
 }
 
-.message-content.editing .send-button {
+.message.user.editing .send-button {
   background-color: var(--interactive-accent) !important;
   color: var(--text-on-accent);
 }
@@ -1639,7 +1472,7 @@ If your plugin does not need CSS, delete this file.
 /* Add position relative to messages to anchor the actions */
 .ai-coach-view .message {
   border-radius: 8px;
-  padding: 10px;
+  padding: 0px;
   position: relative;
 }
 
@@ -2074,4 +1907,60 @@ If your plugin does not need CSS, delete this file.
 .ln-tool-input__value--null,
 .ln-tool-input__value--empty {
   font-style: italic;
+}
+
+/* Icon container for overlaying chevron and primary icon */
+.collapsible-icon-container {
+  position: relative;
+  margin-right: 0.5rem;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Animated chevron for collapsible blocks */
+.collapsible-chevron {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  transform: rotate(0deg);
+  opacity: 0;
+}
+
+/* Show chevron and hide primary icon on hover */
+.collapsible-summary:hover .collapsible-chevron {
+  opacity: 1;
+}
+
+.collapsible-summary:hover .collapsible-lucide-icon {
+  opacity: 0;
+}
+
+/* Show chevron and hide primary icon when expanded */
+.collapsible-block[open] .collapsible-chevron {
+  transform: rotate(90deg);
+  opacity: 1;
+}
+
+.collapsible-block[open] .collapsible-lucide-icon {
+  opacity: 0;
+}
+
+/* Update collapsible icons positioning for overlay effect */
+.collapsible-lucide-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  transition: opacity 0.2s ease;
 } 

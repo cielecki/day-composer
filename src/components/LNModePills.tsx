@@ -12,7 +12,7 @@ interface LNModePillProps {
 
 export const LNModePill: React.FC<LNModePillProps> = ({ id, icon, iconColor, name, onClick }) => {
   return (
-    <button
+    <div
       className="ln-mode-pill"
       onClick={() => onClick(id)}
       title={name}
@@ -32,7 +32,7 @@ export const LNModePill: React.FC<LNModePillProps> = ({ id, icon, iconColor, nam
         </div>
       )}
       <span className="ln-mode-name">{name}</span>
-    </button>
+    </div>
   );
 };
 

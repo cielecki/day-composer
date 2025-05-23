@@ -35,7 +35,10 @@ export const CollapsibleBlock: React.FC<CollapsibleBlockProps> = ({
   return (
     <details className={`collapsible-block ${className}`} open={defaultOpen} {...dataProps}>
       <summary className="collapsible-summary">
-        {lucideIcon && <LucideIcon name={lucideIcon} className="collapsible-lucide-icon" color={iconColor} />}
+        <div className="collapsible-icon-container">
+          <LucideIcon name="chevron-right" className="collapsible-chevron" size={16} />
+          {lucideIcon && <LucideIcon name={lucideIcon} className="collapsible-lucide-icon" color={iconColor} size={16} />}
+        </div>
         <span className="collapsible-content">
           {summary}
         </span>
@@ -90,7 +93,7 @@ export const ToolBlock: React.FC<ToolBlockProps> = ({
       summary={summary}
       lucideIcon={effectiveIsError ? "alert-circle" : iconName}
       iconColor={effectiveIsError ? "var(--color-red)" : "var(--color-blue)"}
-      className={`tool-use-block ${!hasResult ? "pulsing" : ""} ${effectiveIsError ? "tool-error" : ""}`}
+      className={`${!hasResult ? "pulsing" : ""} ${effectiveIsError ? "tool-error" : ""}`}
       defaultOpen={defaultOpen}
       dataAttributes={{ 
         tool: toolName,
@@ -112,7 +115,7 @@ export const ToolBlock: React.FC<ToolBlockProps> = ({
         </div>
       ) : (
         <div className={`tool-result-content ${effectiveIsError ? "tool-result-error" : ""}`}>
-          <pre className="tool-use-result"><code>{result}</code></pre>
+          {result}
         </div>
       )}
     </CollapsibleBlock>
@@ -140,10 +143,10 @@ export const ThinkingCollapsibleBlock: React.FC<ThinkingBlockProps> = ({
       }
       lucideIcon="brain"
       iconColor="var(--color-yellow)"
-      className={`thinking-block ${reasoningInProgress ? "pulsing" : ""}`}
+      className={`${reasoningInProgress ? "pulsing" : ""}`}
       defaultOpen={defaultOpen}
     >
-      <pre className="thinking-content"><code>{thinking}</code></pre>
+      <div className="thinking-content">{thinking}</div>
     </CollapsibleBlock>
   );
 };

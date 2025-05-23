@@ -539,6 +539,9 @@ export const AIAgentProvider: React.FC<{
 							console.warn(
 								"API call completed but no final content received.",
 							);
+							// Remove the empty message from the conversation
+							conversationRef.current = conversationRef.current.slice(0, -1);
+							setForceUpdate((prev) => prev + 1);
 							currentTurnAborted = true; // Treat as an issue, stop the loop
 							break;
 						}
