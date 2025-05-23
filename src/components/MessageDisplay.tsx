@@ -309,7 +309,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
               {role === 'assistant' && (
                 <>
                   <button 
-                    className={`message-action-button ${isPlayingAudio ? 'playing' : isGeneratingSpeech ? 'generating' : ''}`}
+                    className={`clickable-icon ${isPlayingAudio ? 'playing' : isGeneratingSpeech ? 'generating' : ''}`}
                     onClick={handleSpeakMessage}
                     aria-label={
                       isPlayingAudio 
@@ -328,7 +328,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
                     )}
                   </button>
                   <button 
-                    className="message-action-button" 
+                    className="clickable-icon" 
                     onClick={handleCopyMessage}
                     aria-label={t('ui.message.copy')}
                   >

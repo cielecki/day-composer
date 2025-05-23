@@ -1415,26 +1415,6 @@ If your plugin does not need CSS, delete this file.
   opacity: 1;
 }
 
-.message-action-button {
-  width: 24px;
-  height: 24px;
-  border: none !important;
-  background-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--text-muted);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s ease;
-  padding: 0;
-  outline: none;
-}
-
-.message-action-button:hover {
-  background-color: transparent !important;
-  color: var(--text-normal);
-}
 
 /* Message editing styles */
 .message.user.editing {
@@ -1506,8 +1486,9 @@ If your plugin does not need CSS, delete this file.
   border-radius: 8px;
   position: relative;
 }
+
 /* Add spinner animation for the loader icon */
-.message-action-button.generating .lucide-icon svg {
+.message-actions .generating .lucide-icon svg {
   animation: spin 1.5s linear infinite;
 }
 

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Styling of main chat
+- Better view of pills
+- Better editing of messages
+- Less invasive thinking indicator
+- Removing empty messages so chat can continue
+- Skipping current mode in handover options
 
 ## [0.6.11] - 2025-05-23
 
