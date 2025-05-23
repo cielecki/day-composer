@@ -1,6 +1,6 @@
 {
   "name": "life-navigator",
-  "version": "0.6.10",
+  "version": "0.6.11",
   "description": "Life Navigator for Obsidian",
   "main": "src/main.js",
   "scripts": {
