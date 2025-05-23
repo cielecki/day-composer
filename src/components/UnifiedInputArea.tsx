@@ -133,6 +133,9 @@ export const UnifiedInputArea: React.FC<{
   // Setup audio analyzer when recording starts
   useEffect(() => {
     if (isRecording) {
+      // Immediately reset waveform data to prevent showing old/noise data
+      setWaveformData(Array(WAVEFORM_HISTORY_LENGTH).fill(0));
+      
       setupAudioAnalyzer();
       // Start collecting waveform data at higher frequency (30 samples per second)
       waveformIntervalRef.current = window.setInterval(() => {
@@ -141,6 +144,8 @@ export const UnifiedInputArea: React.FC<{
     } else {
       // Clean up when recording stops
       cleanup();
+      // Also clear the waveform data to ensure clean state
+      setWaveformData(Array(WAVEFORM_HISTORY_LENGTH).fill(0));
     }
 
     return () => cleanup();
@@ -226,9 +231,6 @@ export const UnifiedInputArea: React.FC<{
       // Connect microphone to analyzer
       const source = audioContext.createMediaStreamSource(stream);
       source.connect(analyser);
-
-      // Reset waveform data
-      setWaveformData(Array(WAVEFORM_HISTORY_LENGTH).fill(0));
     } catch (error) {
       console.error("Error setting up audio analyzer:", error);
     }
