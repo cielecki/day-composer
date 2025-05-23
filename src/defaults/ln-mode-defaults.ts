@@ -40,6 +40,10 @@ export function getDefaultLNMode(): LNMode {
     ln_voice: "alloy",
     ln_voice_instructions: DEFAULT_VOICE_INSTRUCTIONS,
     ln_voice_speed: 1.0,
+
+    // Tool filtering defaults
+    ln_tools_allowed: ["*"], // Allow all tools by default
+    ln_tools_disallowed: [], // Disallow nothing by default
   }
 }
 

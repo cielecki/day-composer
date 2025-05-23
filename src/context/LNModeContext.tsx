@@ -157,6 +157,18 @@ export const LNModeProvider: React.FC<{
 					frontmatter.ln_voice_speed !== undefined
 						? parseFloat(String(frontmatter.ln_voice_speed))
 						: undefined,
+
+				// Tool filtering
+				ln_tools_allowed: Array.isArray(frontmatter.ln_tools_allowed)
+					? frontmatter.ln_tools_allowed
+					: frontmatter.ln_tools_allowed
+						? [frontmatter.ln_tools_allowed]
+						: undefined,
+				ln_tools_disallowed: Array.isArray(frontmatter.ln_tools_disallowed)
+					? frontmatter.ln_tools_disallowed
+					: frontmatter.ln_tools_disallowed
+						? [frontmatter.ln_tools_disallowed]
+						: undefined,
 			};
 
 			partialMode.ln_system_prompt = contentStr;

@@ -98,4 +98,8 @@ export interface LNMode {
 	ln_voice: string;
 	ln_voice_instructions: string;
 	ln_voice_speed: number;
+
+	// Tool filtering
+	ln_tools_allowed?: string[]; // Array of patterns for allowed tools (default: ["*"])
+	ln_tools_disallowed?: string[]; // Array of patterns for disallowed tools (default: [])
 }

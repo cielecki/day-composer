@@ -26,7 +26,7 @@ const createStarterKit = async (app: App) => {
 		const starterKitDirNameKey = 'ui.starterKit.directoryName';
 		let starterKitDirName = t(starterKitDirNameKey);
 
-		starterKitDirName = starterKitDirName + " v0.3";
+		starterKitDirName = starterKitDirName + " v0.4";
 
 		// Check if we have files for the current language
 		if (!STARTER_KIT_DATA[currentLanguage]) {

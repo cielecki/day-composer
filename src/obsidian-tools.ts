@@ -13,6 +13,8 @@ import { showTodosTool } from "./tools/show-todos";
 import { handoverModeTool } from "./tools/handover-mode";
 import { ToolExecutionError } from "./tools/utils/ToolExecutionError";
 import { t } from "./i18n";
+import { filterToolsByMode } from "./utils/tool-filter";
+import { LNMode } from "./types/types";
 
 // Import React
 import React from "react";
@@ -73,6 +75,15 @@ export class ObsidianTools {
 	 */
 	getTools(): ObsidianTool<any>[] {
 		return this.tools;
+	}
+
+	/**
+	 * Get tools filtered by mode configuration
+	 * @param mode The mode configuration to use for filtering
+	 * @returns Filtered array of tools based on mode settings
+	 */
+	getToolsForMode(mode: LNMode): ObsidianTool<any>[] {
+		return filterToolsByMode(this.tools, mode);
 	}
 
 	/**

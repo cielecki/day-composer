@@ -1,7 +1,7 @@
 import MyPlugin from "../main";
 import { getCurrentTime } from "./utils/getCurrentTime";
 import { getDailyNotePath } from "./utils/getDailyNotePath";
-import { appendCommentLine } from "./utils/task-utils";
+import { appendComment } from "./utils/task-utils";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { ObsidianTool } from "../obsidian-tools";
 import { findTaskByDescription, readNote } from './utils/note-utils';
@@ -134,7 +134,7 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
       
       // Add comment if provided
       if (comment) {
-        appendCommentLine(task, comment);
+        appendComment(task, comment);
       }
       
       // Remove the task from its current position

@@ -9,6 +9,10 @@ ln_max_tokens: 4096
 ln_voice_autoplay: false
 ln_voice: nova
 ln_voice_instructions: Speak with enthusiasm and creative energy, as if discussing musical ideas. Vary your tone to convey excitement about the creative process.
+ln_tools_allowed:
+  - "*_document"
+  - "search_vault"
+ln_tools_disallowed: []
 ln_example_usages:
   - Stwórz piosenkę inspirującą do zrobienia rzeczy w dzisiejszym dniu w stylu epickiego sound tracku do filmu
   - Stwórz piosenkę w stylu deep house

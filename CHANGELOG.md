@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Tool Filtering for Modes**: New configuration options for controlling which tools are available in each mode
+  - Added `ln_tools_allowed` and `ln_tools_disallowed` fields to mode configuration
+  - Supports simple wildcard patterns (e.g., `*todo*`, `create_*`, `*document`)
+  - Disallowed patterns take precedence over allowed patterns
+  - Default behavior allows all tools (`["*"]`) for backward compatibility
+  - Updated starter kit modes with example tool filtering configurations
 - **Handover Mode Tool**: New AI tool that allows changing the active mode during conversations
   - Enables AI to switch between different personalities, contexts, or specialized modes
 
@@ -16,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Improved task insertion logic**: Tasks are now inserted after the task preceding the first uncompleted one, preserving any text/comments between them. This ensures that related content stays with their associated tasks while maintaining logical flow.
 - **Improved abandon todo visibility**: Abandoned tasks are now moved to the beginning of the note for better visibility, same as completed tasks
 change: enforce thinking in claude, as it's needed for handover to work
+
+### Fixed
+- **Fixed multi-line comment indentation**: When todos are checked off or completed with multi-line comments, all lines are now properly indented with 4 spaces instead of only the first line
 
 ## [0.6.10] - 2025-05-22
 

@@ -3,7 +3,7 @@ import { ObsidianTool } from "../obsidian-tools";
 import { findTaskByDescription, updateNote } from './utils/note-utils';
 import { readNote } from './utils/note-utils';
 import { getDailyNotePath } from "./utils/getDailyNotePath";
-import { appendCommentLine } from "./utils/task-utils";
+import { appendComment } from "./utils/task-utils";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { validateTasks } from "./utils/task-validation";
 import { findCurrentSpot } from "./utils/note-utils";
@@ -123,7 +123,7 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
       
       // Add comment if provided
       if (comment) {
-        appendCommentLine(task, comment);
+        appendComment(task, comment);
       }
       
       // Remove the task from its current position

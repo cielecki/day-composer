@@ -100,7 +100,7 @@ After:
 **Process:**
 1. Change `[ ]` to `[-]`
 2. Optionally add timestamp and reason
-3. Position remains unchanged
+3. Move task to the "current" spot for better visibility (same as completed tasks)
 
 **Example:**
 
@@ -109,7 +109,7 @@ Before:
 - [ ] 📞 Call John about project
 ```
 
-After:
+After (moved to current spot):
 ```markdown
 - [-] 📞 Call John about project
     No longer needed as we decided to go with a different approach
@@ -135,7 +135,7 @@ After:
 
 ## 4. The "Current" Spot Concept
 
-The "current" spot is where newly completed tasks and notes are placed.
+The "current" spot is where newly completed, abandoned tasks and notes are placed.
 
 **Determining location:**
 - After the task preceding the first uncompleted (pending) task, preserving any text between them

@@ -708,11 +708,18 @@ export const AIAgentProvider: React.FC<{
 						// Prepare context, prompt, and tools
 						const systemPrompt = await getContext();
 						const obsidianTools = getObsidianTools(plugin);
-						const tools = obsidianTools.getTools() as any; // Keep cast for now
+						
+						// Get current mode for tool filtering
+						const currentActiveMode = lnModesRef.current[activeModeIdRef.current];
+						const tools = currentActiveMode 
+							? obsidianTools.getToolsForMode(currentActiveMode) 
+							: obsidianTools.getTools();
 
 						console.log(
 							`🚀 Triggering conversation turn for user message with ${images?.length || 0} images`,
 						);
+						console.log(currentActiveMode.ln_tools_allowed, currentActiveMode.ln_tools_disallowed)
+						console.log(`🔧 Using ${tools.length} tools for mode: ${currentActiveMode?.ln_name || 'default'}`);
 
 						// Call the core loop function - it now handles its own loading state
 						const finalAssistantMessageForTTS =
@@ -770,6 +777,8 @@ export const AIAgentProvider: React.FC<{
 			plugin,
 			runConversationTurn,
 			handleTTS, // Dependencies
+			lnModesRef,
+			activeModeIdRef,
 		],
 	);
 
@@ -813,9 +822,15 @@ export const AIAgentProvider: React.FC<{
 				// Prepare context, prompt, and tools
 				const systemPrompt = await getContext();
 				const obsidianTools = getObsidianTools(plugin);
-				const tools = obsidianTools.getTools() as any;
+				
+				// Get current mode for tool filtering
+				const currentActiveMode = lnModesRef.current[activeModeIdRef.current];
+				const tools = currentActiveMode 
+					? obsidianTools.getToolsForMode(currentActiveMode) 
+					: obsidianTools.getTools();
 
 				console.log("Generating new response after message edit");
+				console.log(`🔧 Using ${tools.length} tools for mode: ${currentActiveMode?.ln_name || 'default'}`);
 
 				// Call the conversation turn function to generate a new response
 				const finalAssistantMessageForTTS = await runConversationTurn(
@@ -847,7 +862,9 @@ export const AIAgentProvider: React.FC<{
 			plugin,
 			runConversationTurn,
 			handleTTS,
-			isGeneratingResponse
+			isGeneratingResponse,
+			lnModesRef,
+			activeModeIdRef,
 		]
 	);
 

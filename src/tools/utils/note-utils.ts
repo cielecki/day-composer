@@ -3,7 +3,7 @@ import { fileExists } from "./fileExists";
 import { getFile } from "./getFile";
 import { modifyFile } from "./modifyFile";
 import {
-	appendCommentLine,
+	appendComment,
 	isCommentLine,
 	parseTaskContent,
 	STATUS_MAP,
@@ -322,7 +322,7 @@ export function parseMarkdown(markdown: string, filePath: string): Note {
 
 		if (current?.type == "task" && isCommentLine(line)) {
 			//check for continuation of task
-			appendCommentLine(current, line);
+			appendComment(current, line);
 		} else if (taskMatch) {
 			//check for start of task
 			const statusChar = taskMatch[1];

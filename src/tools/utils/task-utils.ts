@@ -153,7 +153,7 @@ export function addCommentToTask(
     : comment;
     
   // Add the comment
-  appendCommentLine(updatedTask, formattedComment);
+  appendComment(updatedTask, formattedComment);
   
   return updatedTask;
 }
@@ -304,10 +304,18 @@ export function isCommentLine(line: string) {
   return line.startsWith("> ") || line.startsWith("    ") || line.startsWith("\t");
 }
 
-export function appendCommentLine(task: Task, line: string) {
-  const indentedLine = isCommentLine(line) ? line : '    ' + line;
-
-  task.comment = task.comment ? task.comment + "\n" + indentedLine : indentedLine;
+export function appendComment(task: Task, comment: string) {
+  // Split the line into individual lines to handle multi-line comments properly
+  const lines = comment.split('\n');
+  
+  // Process each line individually for proper indentation
+  const indentedLines = lines.map(singleLine => {
+    // Only add indentation if the line is not already indented
+    return isCommentLine(singleLine) ? singleLine : '    ' + singleLine;
+  });
+  
+  const indentedComment = indentedLines.join('\n');
+  task.comment = task.comment ? task.comment + "\n" + indentedComment : indentedComment;
 }
 
 /**

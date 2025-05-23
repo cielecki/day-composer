@@ -31,15 +31,15 @@
 ```markdown
 ❌ Nie znaleziono zadania ""🍳 10:30 Śniadanie z Michałem"" w {{path}}. Jeśli zadanie znajduje się w innym pliku, określ go w parametrze file_path.
 ```
+- [x] abandoning powinien przenosić zadania na początek notatki dla lepszej widoczności
+- [x] Dodać możliwość konfiguracjii tooli w trybach
+- [x] Life navigator: comments jak sa multiline to zle sie formatuja po dodaniu do notatki przez AI
+
 
 - [ ] Fix styling of main chat - borders and backgrounds
-- [ ] More relaxed todo format in the plugin
 - [ ] 🔧 Dodać funkcję edycji todo itemów
 - [ ] 🔧 Poprawić funkcjonalność przenoszenia zadań (problem z dodawaniem do konkretnych dni)
-- [ ] Life navigator: comments jak sa multiline to zle sie formatuja po dodaniu do notatki przez AI
-- [ ] abandoning powinien przenosić zadania na początek notatki dla lepszej widoczności
 - [ ] Bug gdy zastopuje generowanego tool calla
-
 ```markdown
 conversation turn processing: BadRequestError: 400 {"type":"error","error":{"type":"invalid_request_error","message":"messages.4: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_016aY9VAzzsaK6mWENg3JN8L. Each `tool_use` block must have a corresponding `tool_result` block in the next message."}}
     at _APIError.generate (plugin:day-composer:48107:14)
@@ -48,16 +48,10 @@ conversation turn processing: BadRequestError: 400 {"type":"error","error":{"typ
     at async eval (plugin:day-composer:51631:28)
     at async eval (plugin:day-composer:51802:49)
 ```
-
-- [ ] Dodać możliwość konfiguracjii tooli w trybach
-
-
-
+- [ ] Better info dumped to AI when file is not found in expand links
+- [ ] still there is something wrong with the current spot logic
 
 --------------------------------
-
-
-
 
 - [ ] Working daily planning and habits in the starter kit
 
@@ -71,7 +65,6 @@ conversation turn processing: BadRequestError: 400 {"type":"error","error":{"typ
 
 - [ ] Write down the obsidian bullet journal md format that the plugin uses
 - [ ] Create tool documentation in README or MODE_GUIDE or smth
-
 
 - [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
 - [ ] User guide requires a cleanup

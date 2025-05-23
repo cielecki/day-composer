@@ -2,7 +2,7 @@ import MyPlugin from "../main";
 import { createFile } from "./utils/createFile";
 import { fileExists } from "./utils/fileExists";
 import { getCurrentTime } from "./utils/getCurrentTime";
-import { createTask, appendCommentLine, insertTaskAtPosition } from "./utils/task-utils";
+import { createTask, appendComment, insertTaskAtPosition } from "./utils/task-utils";
 import { suggestEmojiForTask } from "./utils/suggest-emoji-for-task";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { ObsidianTool } from "../obsidian-tools";
@@ -101,7 +101,7 @@ export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput>
       task.timeInfo.completed = completionTime;
 
       // Add the content as a comment
-      appendCommentLine(task, content);
+      appendComment(task, content);
 
       // Find the current spot for insertion
       const currentSpot = findCurrentSpot(note);

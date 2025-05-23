@@ -9,6 +9,9 @@ ln_max_tokens: 8096
 ln_voice_autoplay: true
 ln_voice: nova
 ln_voice_instructions: Adopt a calm, reflective tone. Speak slowly and thoughtfully to encourage introspection.
+ln_tools_allowed:
+  - "*"
+ln_tools_disallowed: []
 ln_example_usages:
   - Pomóż mi z chwilą refleksji nad ostatnimi dniami, dniem dzisiejszym, co udało mi się zrobić, jaki chcę mieć plan na najbliższy czas, czego mogę nie widzieć?
   - Przenalizuj dzisiejszy dzień, jak mógłbym na przyszłość mieć 10 razy lepsze rezultaty z mniejszym wkładem moich zasobów?
