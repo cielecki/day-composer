@@ -27,7 +27,7 @@ export const UnifiedInputArea: React.FC<{
     startRecording,
     finalizeRecording,
   } = useSpeechToText();
-  const { isPlayingAudio } = useTextToSpeech();
+  const { isPlayingAudio, isGeneratingSpeech } = useTextToSpeech();
 
   // Input state
   const [message, setMessage] = useState("");
@@ -304,7 +304,7 @@ export const UnifiedInputArea: React.FC<{
       e.preventDefault();
 
       // If a response is being generated, abort it first before sending new message
-      if (isGeneratingResponse || isPlayingAudio) {
+      if (isGeneratingResponse || isPlayingAudio || isGeneratingSpeech) {
         abort();
         // Use setTimeout to ensure abort is processed before sending the new message
         setTimeout(() => {
@@ -603,7 +603,7 @@ export const UnifiedInputArea: React.FC<{
               <button
                 className={`input-control-button mic-button ${isTranscribing ? "transcribing" : ""}`}
                 onClick={handleMicrophoneClick}
-                disabled={isTranscribing || isPlayingAudio}
+                disabled={isTranscribing}
                 aria-label={
                   isTranscribing
                     ? t("ui.recording.transcribing")
@@ -646,7 +646,7 @@ export const UnifiedInputArea: React.FC<{
               <button // This is the "Finish Recording" button
                 className={`input-control-button mic-button confirm ${isTranscribing ? "transcribing" : ""}`}
                 onClick={handleMicrophoneClick} // Calls finalizeRecording when isRecording is true
-                disabled={isTranscribing || isPlayingAudio}
+                disabled={isTranscribing}
                 aria-label={
                   isTranscribing
                     ? t("ui.recording.transcribing")
@@ -678,7 +678,7 @@ export const UnifiedInputArea: React.FC<{
             )}
 
             {/* Stop button - visible whenever a response is being generated or audio is playing */}
-            {(isGeneratingResponse || isPlayingAudio) && !isRecording && (
+            {(isGeneratingResponse || isPlayingAudio || isGeneratingSpeech) && !isRecording && (
               <button
                 className="input-control-button stop-button"
                 onClick={abort}
@@ -698,7 +698,7 @@ export const UnifiedInputArea: React.FC<{
             )}
 
             {/* Send button - visible when not recording, AND nothing is being generated */}
-            {!isRecording && !(isGeneratingResponse || isPlayingAudio) && (
+            {!isTranscribing && !isRecording && !(isGeneratingResponse || isPlayingAudio || isGeneratingSpeech) && (
               <button
                 className="input-control-button send-button"
                 onClick={handleSendMessage}
