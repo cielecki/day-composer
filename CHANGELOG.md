@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.12] - 2025-05-23
+
+### Changed
+- Showing mic and send button at the same time
+
 ### Fixed
 - Styling of main chat
 - Better view of pills
