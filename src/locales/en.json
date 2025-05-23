@@ -216,7 +216,9 @@
     "message": {
       "edit": "Edit message",
       "copy": "Copy message",
-      "speak": "Speak message",
+      "speak": "Read aloud",
+      "stopSpeech": "Stop speech",
+      "generatingSpeech": "Generating speech",
       "attachedImage": "Attached image"
     },
     "todo": {

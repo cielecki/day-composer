@@ -42,7 +42,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   abort,
 }) => {
   const { editUserMessage } = useAIAgent();
-  const { speakText, isPlayingAudio, stopAudio } = useTextToSpeech();
+  const { speakText, isPlayingAudio, isGeneratingSpeech, stopAudio } = useTextToSpeech();
   const [isEditing, setIsEditing] = useState(false);
   const [editedMessage, setEditedMessage] = useState('');
   const [copyIcon, setCopyIcon] = useState('copy');
@@ -312,11 +312,23 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
             {role === 'assistant' && (
               <>
                 <button 
-                  className={`message-action-button speak-button ${isPlayingAudio ? 'speaking' : ''}`}
+                  className={`message-action-button speak-button ${isPlayingAudio ? 'playing' : isGeneratingSpeech ? 'generating' : ''}`}
                   onClick={handleSpeakMessage}
-                  aria-label={t('ui.message.speak')}
+                  aria-label={
+                    isPlayingAudio 
+                        ? t('ui.message.stopSpeech') 
+                        : isGeneratingSpeech 
+                          ? t('ui.message.generatingSpeech') 
+                          : t('ui.message.speak')
+                  }
                 >
-                  <LucideIcon name={isPlayingAudio ? "loader" : "volume-2"} size={18} />
+                  {isPlayingAudio ? (
+                    <LucideIcon name="circle-stop" size={18} />
+                  ) : isGeneratingSpeech ? (
+                    <LucideIcon name="loader" size={18} />
+                  ) : (
+                    <LucideIcon name="volume-2" size={18} />
+                  )}
                 </button>
                 <button 
                   className="message-action-button copy-button" 

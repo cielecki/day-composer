@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.9] - 2025-05-22
+
+### Changed
+- Enhanced speaker button with three distinct states: default, generating speech (spinner), and playing (stop button)
+
+## [0.6.10] - 2025-05-22
 
 ### Added
 - Added persistence of active mode between plugin sessions
@@ -41,15 +45,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Standardized naming from "Starter Pack" to "Starter Kit" throughout the codebase for consistency
 
 ## [0.6.6] - 2025-05-22
-
-### Added
-- Check for updates now asks for reloading obsidian using a dedicated dialog
-- Customizable prompt for transcriptions
-
-### Fixed
-- Check for updates is now translated and is properly named
-- Styling issue that broke all mod-cta buttons in obsidian
-- Transcription issues
-
-## [0.6.5] - 2025-05-22
-...

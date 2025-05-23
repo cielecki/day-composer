@@ -215,8 +215,10 @@
     },
     "message": {
       "edit": "Edytuj wiadomość",
-      "copy": "Kopiuj wiadomość",
-      "speak": "Odtwórz wiadomość głosowo",
+      "copy": "Kopiuj wiadomość", 
+      "speak": "Przeczytaj na głos",
+      "stopSpeech": "Zatrzymaj odtwarzanie",
+      "generatingSpeech": "Generowanie mowy",
       "attachedImage": "Załączony obraz"
     },
     "todo": {

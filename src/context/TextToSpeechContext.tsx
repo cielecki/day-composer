@@ -15,6 +15,7 @@ interface TTSSettings {
 
 interface TextToSpeechContextType {
 	isPlayingAudio: boolean;
+	isGeneratingSpeech: boolean;
 	ttsSettings: TTSSettings;
 	setTTSSettings: (settings: TTSSettings) => void;
 	speakText: (text: string, signal: AbortSignal, bypassEnabledCheck?: boolean) => Promise<void>;
@@ -27,6 +28,7 @@ export const TextToSpeechProvider: React.FC<{
 	children: ReactNode;
 }> = ({ children }) => {
 	const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+	const [isGeneratingSpeech, setIsGeneratingSpeech] = useState(false);
 	const [ttsSettings, setTTSSettings] = useState<TTSSettings>({
 		enabled: true,
 		voice: 'alloy',
@@ -51,6 +53,7 @@ export const TextToSpeechProvider: React.FC<{
 			currentAudioController.current.abort();
 			currentAudioController.current = null;
 			setIsPlayingAudio(false);
+			setIsGeneratingSpeech(false);
 		}
 	}, []);
 	
@@ -95,7 +98,7 @@ export const TextToSpeechProvider: React.FC<{
 
 			(async () => {
 				try {
-					setIsPlayingAudio(true); // Mark as playing while we're gathering chunks
+					setIsGeneratingSpeech(true); // Mark as playing while we're gathering chunks
 							
 					// Handle abort signal
 					if (combinedSignal.aborted) {
@@ -173,7 +176,13 @@ export const TextToSpeechProvider: React.FC<{
 						let accumulatedSize = 0;
 						
 						// Function to play a chunk of audio
+						let startedPlaying = false;
 						const playNextChunk = (blob: Blob): Promise<void> => {
+							if (!startedPlaying) {
+								setIsPlayingAudio(true);
+								startedPlaying = true;
+							}
+
 							return new Promise<void>((resolve, reject) => {
 								// Create a new audio element for each chunk
 								const currentAudioElement: HTMLAudioElement = new Audio();
@@ -307,6 +316,7 @@ export const TextToSpeechProvider: React.FC<{
 					reject(error);
 				} finally {
 					setIsPlayingAudio(false);
+					setIsGeneratingSpeech(false);
 					currentAudioController.current = null;
 				}
 			})();
@@ -316,6 +326,7 @@ export const TextToSpeechProvider: React.FC<{
 	// Build context value
 	const value = {
 		isPlayingAudio,
+		isGeneratingSpeech,
 		ttsSettings,
 		setTTSSettings: (settings: TTSSettings) => {
 			console.log('Setting TTS settings:', settings);

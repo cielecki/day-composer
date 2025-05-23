@@ -1674,7 +1674,7 @@ If your plugin does not need CSS, delete this file.
   position: relative;
 }
 /* Add spinner animation for the loader icon */
-.message-action-button.speaking .lucide-icon svg {
+.message-action-button.generating .lucide-icon svg {
   animation: spin 1.5s linear infinite;
 }
 
