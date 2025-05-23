@@ -30,19 +30,58 @@ export interface TextBlock {
 
 /**
  * Find the "current spot" in a document - where newly processed tasks should be placed
+ * The insertion point is after the task preceding the first uncompleted one
+ * (so any text in between should follow the inserted task)
  * @param document The parsed document
  * @returns The index where new processed tasks should be placed
  */
 export function findCurrentSpot(document: Note): number {
+	// First, find the index of the first pending task
+	let firstPendingIndex = -1;
 	for (let i = 0; i < document.content.length; i++) {
 		const node = document.content[i];
-
 		if (node.type === "task" && node.status === "pending") {
-			return i;
+			firstPendingIndex = i;
+			break;
 		}
 	}
 
-	return document.content.length;
+	// If no pending tasks found, insert at the end
+	if (firstPendingIndex === -1) {
+		return document.content.length;
+	}
+
+	// If the first pending task is at the beginning, insert at the beginning
+	if (firstPendingIndex === 0) {
+		return 0;
+	}
+
+	// Find the task that precedes the first pending task
+	// We need to find the last task before the first pending task
+	let precedingTaskIndex = -1;
+	for (let i = firstPendingIndex - 1; i >= 0; i--) {
+		const node = document.content[i];
+		if (node.type === "task") {
+			precedingTaskIndex = i;
+			break;
+		}
+	}
+
+	// If no preceding task found, insert at the beginning
+	if (precedingTaskIndex === -1) {
+		return 0;
+	}
+
+	// Find the end of the preceding task (including any associated text blocks)
+	// We need to skip over any text blocks that immediately follow the preceding task
+	let insertionIndex = precedingTaskIndex + 1;
+	while (insertionIndex < firstPendingIndex && 
+		   insertionIndex < document.content.length &&
+		   document.content[insertionIndex].type === "text") {
+		insertionIndex++;
+	}
+
+	return insertionIndex;
 }
 
 export async function readNote({

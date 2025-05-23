@@ -24,8 +24,9 @@
 - [x] Spinner when transcribing has some opacity or color issue
 - [x] Why are mobile styles completely different and there's a contrast issue?
 - [x] Distinct animation for when speech is being generated vs when it's playing
+- [x] point of insertion should be after the task preceeding the first uncompleted one (so any text in between should follow the inserted task)
 
-
+- [ ] Waveform when I enable it for the second time, it seems to very briefly show either old data or some noise - non empty waveform - this needs to be fixed
 - [ ] Fix styling of main chat - borders and backgrounds
 - [ ] More relaxed todo format in the plugin
 - [ ] 🔧 Dodać funkcję edycji todo itemów
@@ -33,7 +34,6 @@
 - [ ] Life navigator: comments jak sa multiline to zle sie formatuja po dodaniu do notatki przez AI
 - [ ] handover tool do innych trybów 
 
-- [ ] point of insertion should be after the task preceeding the first uncompleted one (so any text in between should follow the inserted task)
 - [ ] abandoning powinien przenosić zadania na początek notatki dla lepszej widoczności
 - [ ] Bug gdy zastopuje generowanego tool calla
 

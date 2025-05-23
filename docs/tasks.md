@@ -138,10 +138,22 @@ After:
 The "current" spot is where newly completed tasks and notes are placed.
 
 **Determining location:**
-- After the last completed task if there's a clear section of completed tasks
-- After the most recently completed task if tasks are mixed
-- At the beginning if no completed tasks exist
-- After any recently added notes
+- After the task preceding the first uncompleted (pending) task, preserving any text between them
+- If no preceding task exists, at the beginning of the document
+- If no uncompleted tasks exist, at the end of the document
+- This ensures that related content (task comments, notes) stays with their associated tasks
+
+**Example:**
+```markdown
+- [x] 🌅 Morning routine (08:00)
+- [x] 📧 Check emails (08:30)
+    Found important message from client
+    ← NEW TASKS INSERTED HERE
+- [ ] 📞 Call client about project
+- [ ] 📝 Write report
+```
+
+In this example, new tasks would be inserted after the "Check emails" task and its associated comment, but before the first uncompleted task "Call client about project". This preserves the relationship between tasks and their comments while maintaining logical flow.
 
 ## 5. Organizational Operations
 
