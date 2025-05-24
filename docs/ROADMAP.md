@@ -14,7 +14,7 @@ via ln-monthly-note and ln-weekly-note.
 Add support for Gemini model from Google, and add a model selection option from the mode settings.
 
 **User-Defined Tools:**
-Introduce the ability for the user to add extra tools to the system. Investigate methods for loading extra tools (e.g., eval, JSON, MCP).
+Introduce the ability for the user to add extra tools to the system. Investigate methods for loading extra tools (e.g., eval, JSON, MCP). This could allow accessing calendar for example.
 
 **Deep Research Tool:**
 Implement a tool for deep research using firecrawl api.

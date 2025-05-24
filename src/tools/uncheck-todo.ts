@@ -60,7 +60,7 @@ export const uncheckTodoTool: ObsidianTool<UncheckTodoToolInput> = {
     const note = await readNote({plugin, filePath})
 
     // Find the task
-    const task = findTaskByDescription(note, todoDescription);
+    const task = findTaskByDescription(note, todoDescription, (task) => task.status !== 'pending');
     
     // Check if task was found
     if (!task) {

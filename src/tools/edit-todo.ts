@@ -100,14 +100,14 @@ export const editTodoTool: ObsidianTool<EditTodoToolInput> = {
     // Validate that the original task exists
     validateTasks(
       note, 
-      [{ todo_text: original_todo.todo_text }]
+      [{ todoText: original_todo.todo_text }]
     );
     
     // Create a copy for modification
     let updatedNote = JSON.parse(JSON.stringify(note));
     
     // Find the task in the updated note
-    const taskToUpdate = findTaskByDescription(updatedNote, original_todo.todo_text);
+    const taskToUpdate = findTaskByDescription(updatedNote, original_todo.todo_text, (task) => true);
     
     // Remember the original position for reinsertion
     const originalPosition = updatedNote.content.findIndex((node: NoteNode) => 

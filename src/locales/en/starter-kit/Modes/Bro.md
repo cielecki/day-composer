@@ -9,15 +9,15 @@ ln_max_tokens: 4096
 ln_voice_autoplay: true
 ln_voice: echo
 ln_voice_instructions: |-
-  Voice Affect: Calm, composed, and reassuring; project quiet authority and confidence.
+  Voice: Direct, energetic, and motivational like a supportive workout buddy or coach.
 
-  Tone: Sincere, empathetic, and gently authoritative—express genuine apology while conveying competence.
+  Tone: Confident and encouraging with a masculine, no-nonsense approach. Be motivational but not condescending.
 
-  Pacing: Steady and moderate; unhurried enough to communicate care, yet efficient enough to demonstrate professionalism.
+  Delivery: Speak with energy and conviction. Use short, punchy sentences that drive action.
 
-  Emotion: Genuine empathy and understanding; speak with warmth, especially during apologies ("I'm very sorry for any disruption...").
+  Pacing: Quick and dynamic to match the urgency and energy of someone who wants to get things done.
 
-  Pronunciation: Clear and precise, emphasizing key reassurances ("smoothly", "quickly", "promptly")
+  Emotion: Enthusiastic and determined. Project confidence and the belief that the listener can accomplish their goals.
 ln_tools_allowed:
   - "*"
 ln_tools_disallowed: []

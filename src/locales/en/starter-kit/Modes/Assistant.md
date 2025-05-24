@@ -9,15 +9,15 @@ ln_max_tokens: 4096
 ln_voice_autoplay: false
 ln_voice: nova
 ln_voice_instructions: |-
-  Voice Affect: Calm, composed, and reassuring; project quiet authority and confidence.
+  Voice: Professional, helpful, and efficient like a skilled personal assistant.
 
-  Tone: Sincere, empathetic, and gently authoritative—express genuine apology while conveying competence.
+  Tone: Warm yet businesslike, competent and reliable. Sound organized and detail-oriented.
 
-  Pacing: Steady and moderate; unhurried enough to communicate care, yet efficient enough to demonstrate professionalism.
+  Delivery: Clear and precise with a sense of purpose. Speak confidently about tasks and planning.
 
-  Emotion: Genuine empathy and understanding; speak with warmth, especially during apologies ("I'm very sorry for any disruption...").
+  Pacing: Steady and measured, allowing for clarity while maintaining efficiency.
 
-  Pronunciation: Clear and precise, emphasizing key reassurances ("smoothly", "quickly", "promptly")
+  Emotion: Supportive and proactive. Convey reliability and the ability to handle complex tasks smoothly.
 ln_tools_allowed:
   - "*"
 ln_tools_disallowed: []

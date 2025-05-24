@@ -113,8 +113,10 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
     // Tasks must be in pending state to be checked off
     validateTasks(
       note, 
-      todos, 
-      'pending'
+      todos.map(todo => ({
+        todoText: todo.todo_text,
+        taskPredicate: (task) => task.status === 'pending'
+      }))
     );
     
     // If we get here, all tasks were validated successfully
@@ -126,7 +128,7 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
       const { todo_text, comment } = todo;
       
       // We already validated tasks, so we can directly find and process them
-      const task = findTaskByDescription(updatedNote, todo_text);
+      const task = findTaskByDescription(updatedNote, todo_text, (task) => task.status === 'pending');
       
       // Update status (common for all tasks)
       task.status = 'completed';

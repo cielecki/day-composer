@@ -153,52 +153,78 @@ export async function updateNote({
 }
 
 /**
- * Find tasks in a document by description
+ * Normalize text by converting special characters to ASCII equivalents
+ * Useful for fuzzy matching that ignores diacritics and special characters
+ * @param text The text to normalize
+ * @returns Normalized text
+ */
+export function normalizeText(text: string): string {
+	return text
+		.normalize('NFKD') // Decompose characters into base + diacritics
+		.replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+		.replace(/[^\w\s]/g, '') // Remove remaining special characters
+		.toLowerCase()
+		.trim();
+}
+
+/**
+ * Find tasks in a document by description using tiered matching strategy
  * @param document The parsed document
- * @param taskDescription The task description to search for
- * @returns Array of matching tasks
+ * @param todoText The task description to search for
+ * @param taskPredicate A predicate to filter the tasks to search in (applied only to tasks)
+ * @returns Array of matching tasks ordered by match quality (exact matches first)
  */
 export function findTasksByDescription(
 	document: Note,
-	taskDescription: string,
+	todoText: string,
+	taskPredicate: (task: Task) => boolean,
 ): Task[] {
-	const results: Task[] = [];
-	// Helper function to normalize text by converting special characters to ASCII
-	const normalizeText = (text: string): string => {
-		return text
-			.normalize('NFKD') // Decompose characters into base + diacritics
-			.replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-			.replace(/[^\w\s]/g, '') // Remove remaining special characters
-			.toLowerCase()
-			.trim();
-	};
 
-	// First check if the todoText contains the search text exactly
-	for (const node of document.content) {
-		if (node.type === "task") {
-			if (node.todoText.includes(taskDescription)) {
-				results.push(node);
-			}
+	// Precompute search terms
+	const trimmedTodoText = todoText.trim();
+	const normalizedSearchText = normalizeText(todoText);
+
+	// Extract and filter tasks in a single pass
+	const tasks = document.content
+		.filter((node): node is Task => node.type === "task")
+		.filter(taskPredicate);
+
+	// Results arrays for different match tiers
+	const exactMatches: Task[] = [];
+	const partialMatches: Task[] = [];
+	const normalizedMatches: Task[] = [];
+
+	// Single pass through filtered tasks
+	for (const task of tasks) {
+		const trimmedTaskText = task.todoText.trim();
+
+		// Tier 1: Exact match
+		if (trimmedTaskText === trimmedTodoText) {
+			exactMatches.push(task);
+			continue; // Skip other checks for exact matches
+		}
+
+		// Tier 2: Partial match
+		if (trimmedTaskText.includes(trimmedTodoText)) {
+			partialMatches.push(task);
+			continue; // Skip normalization for partial matches
+		}
+
+		// Tier 3: Normalized partial match (only if no exact/partial matches)
+		const normalizedTaskText = normalizeText(task.todoText);
+		if (normalizedTaskText.includes(normalizedSearchText)) {
+			normalizedMatches.push(task);
 		}
 	}
 
-
-	// If not found verbatim, check with special characters ignored
-	if (results.length === 0) {
-		const normalizedSearch = normalizeText(taskDescription);
-    console.log('normalizedSearch', normalizedSearch);
-    
-		for (const node of document.content) {
-			if (node.type === "task") {
-				const normalizedLine = normalizeText(node.todoText);
-				if (normalizedLine.includes(normalizedSearch)) {
-					results.push(node);
-				}
-			}
-		}
+	// Return best matches first, falling back to lower tiers only if higher tiers are empty
+	if (exactMatches.length > 0) {
+		return exactMatches;
 	}
-
-	return results;
+	if (partialMatches.length > 0) {
+		return partialMatches;
+	}
+	return normalizedMatches;
 }
 
 /**
@@ -210,9 +236,10 @@ export function findTasksByDescription(
 export function findTaskByDescription(
 	note: Note,
 	taskDescription: string,
+	taskPredicate: (task: Task) => boolean,
 ): Task {
 	// Find the task
-	const tasks = findTasksByDescription(note, taskDescription);
+	const tasks = findTasksByDescription(note, taskDescription, taskPredicate);
 
 	if (tasks.length === 0) {
 		throw new ToolExecutionError(
@@ -259,7 +286,7 @@ export function determineInsertionPosition(
 
 		try {
 			// Find the task by description
-			const referenceTask = findTaskByDescription(note, afterTodoText);
+			const referenceTask = findTaskByDescription(note, afterTodoText, () => true);
 
 			// Find its index in the document
 			let foundIndex = -1;
@@ -288,6 +315,10 @@ export function determineInsertionPosition(
 				`Error finding reference task: ${error.message}`,
 			);
 		}
+	} else {
+		throw new ToolExecutionError(
+			`Invalid position: ${position}`,
+		);
 	}
 
 	// Default case

@@ -269,7 +269,6 @@
       "createdSuccess": "Successfully created new mode",
       "createdError": "Error creating new mode: {{error}}",
       "defaultDescription": "New AI assistant mode",
-      "defaultVoiceInstructions": "Speak clearly and professionally",
       "files": {
         "noFrontmatter": "File {{filename}} has no frontmatter, using defaults with file content as system prompt"
       }

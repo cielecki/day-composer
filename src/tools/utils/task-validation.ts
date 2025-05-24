@@ -1,12 +1,12 @@
 import { findTaskByDescription } from "./note-utils";
 import { ToolExecutionError } from "./ToolExecutionError";
-import { t } from "../../i18n";
 import { Note } from "./note-utils";
 import { Task } from "./task-utils";
 
 // Define a standard todo item structure
 export type TaskToValidate = {
-  todo_text: string;
+  todoText: string;
+  taskPredicate?: (task: Task) => boolean;
 };
 
 type ValidTaskResult = Array<{todo: TaskToValidate, task: Task}>;
@@ -26,58 +26,26 @@ export const validateTasks = (
   requiredStatus?: string,
 ): ValidTaskResult => {
   const validTasks: ValidTaskResult = [];
-  const notFoundTasks: string[] = [];
-  const invalidStatusTasks: string[] = [];
+  const taskErrors: string[] = [];
 
   // Validate all tasks first
   for (const todo of todos) {
-    const todoText = todo.todo_text;
+    const todoText = todo.todoText;
     
     try {
-      // Find the task - this may throw an error if not found
-      const task = findTaskByDescription(note, todoText);
-      
-      // If we need to validate status
-      if (requiredStatus && task.status !== requiredStatus) {
-        invalidStatusTasks.push(todoText);
-      } else {
-        // Task is valid, store it for processing
-        validTasks.push({todo, task});
-      }
+      // Find the task - this may throw an error if not found or if multiple found
+      const task = findTaskByDescription(note, todoText, todo.taskPredicate || (() => true));
+
+      validTasks.push({todo, task});
     } catch (error) {
-      // Task not found
-      notFoundTasks.push(todoText);
+      // Accumulate the actual error message instead of assuming it's "not found"
+      taskErrors.push(error instanceof Error ? error.message : String(error));
     }
   }
 
   // If any validation failed, throw a consolidated error
-  if (notFoundTasks.length > 0 || invalidStatusTasks.length > 0) {
-    let errorMessage = '';
-    
-    if (notFoundTasks.length > 0) {
-      const notFoundDescription = notFoundTasks.length === 1
-        ? `"${notFoundTasks[0]}"`
-        : `${notFoundTasks.length} tasks: ${notFoundTasks.map(t => `"${t}"`).join(', ')}`;
-        
-      errorMessage += t('errors.tasks.notFound', {
-        task: notFoundDescription,
-        path: note.filePath || 'document'
-      });
-    }
-    
-    if (invalidStatusTasks.length > 0) {
-      if (errorMessage) errorMessage += '\n\n';
-      
-      const invalidDescription = invalidStatusTasks.length === 1
-        ? `"${invalidStatusTasks[0]}"`
-        : `${invalidStatusTasks.length} tasks: ${invalidStatusTasks.map(t => `"${t}"`).join(', ')}`;
-        
-      errorMessage += t('errors.tasks.invalidState', {
-        task: invalidDescription,
-        state: requiredStatus || 'correct state'
-      });
-    }
-    
+  if (taskErrors.length > 0) {
+    const errorMessage = taskErrors.join('\n\n');
     throw new ToolExecutionError(errorMessage);
   }
 

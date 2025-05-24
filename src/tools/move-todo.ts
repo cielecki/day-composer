@@ -142,12 +142,14 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
     // Validate all tasks upfront - will throw if any validation fails
     validateTasks(
       sourceNote,
-      todos
+      todos.map(todo => ({
+        todoText: todo.todo_text
+      }))
     );
     
     // Check if the after_todo_text is specified and exists when position is 'after'
     if (position === "after" && after_todo_text) {
-      const referenceTask = findTaskByDescription(targetNote, after_todo_text);
+      const referenceTask = findTaskByDescription(targetNote, after_todo_text, (task) => true);
       
       if (!referenceTask) {
         throw new ToolExecutionError(t('errors.tasks.notFound', {
@@ -174,7 +176,7 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       const todoText = todo.todo_text;
       
       // We already validated that all tasks exist
-      const task = findTaskByDescription(updatedSourceNote, todoText);
+      const task = findTaskByDescription(updatedSourceNote, todoText, (task) => true);
       
       // Handle moving based on whether it's within the same document or to another document
       if (isMovingWithinSameDocument) {

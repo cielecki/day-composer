@@ -102,7 +102,10 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
     // Validate all tasks upfront - will throw if any validation fails
     validateTasks(
       note,
-      todos
+      todos.map(todo => ({
+        todoText: todo.todo_text,
+        taskPredicate: (task) => task.status !== 'abandoned'
+      }))
     );
     
     // Track tasks that will be abandoned
@@ -116,7 +119,7 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
       const { todo_text, comment } = todo;
       
       // We already validated all tasks exist
-      const task = findTaskByDescription(updatedNote, todo_text);
+      const task = findTaskByDescription(updatedNote, todo_text, (task) => task.status !== 'abandoned');
       
       // Update status
       task.status = 'abandoned';

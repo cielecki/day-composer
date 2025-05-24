@@ -11,9 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Edit Todo Tool**: New `edit_todo` tool allows editing existing todo items
 - **Remove Todo Tool**: New `remove_todo` tool for removing todo items without deletion
 
-
 ### Changed
 - **Relaxed todo format**: All tools now don't enforce emojis etc
+
+### Fixed
+- **Voice Instructions**: Fixed voice instructions in Bro/Ziomal and Assistant/Asystentka modes with proper personality-matching instructions
+- **New Mode Creation**: Fixed new modes using generic translated voice instructions instead of proper detailed DEFAULT_VOICE_INSTRUCTIONS
+- **Task Search in Tools**: Improved task search precision by using exact text matching instead of fuzzy matching
+
 
 ## [0.6.12] - 2025-05-23
 

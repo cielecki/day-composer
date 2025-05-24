@@ -269,7 +269,6 @@
       "createdSuccess": "Pomyślnie utworzono nowy tryb",
       "createdError": "Błąd podczas tworzenia nowego trybu: {{error}}",
       "defaultDescription": "Nowy tryb asystenta AI",
-      "defaultVoiceInstructions": "Mów wyraźnie i profesjonalnie",
       "files": {
         "noFrontmatter": "Plik {{filename}} nie ma frontmattera, używam wartości domyślnych z treścią pliku jako prompt systemowy"
       }

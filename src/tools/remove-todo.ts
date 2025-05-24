@@ -97,7 +97,9 @@ export const removeTodoTool: ObsidianTool<RemoveTodoToolInput> = {
     // Validate all tasks upfront - will throw if any validation fails
     validateTasks(
       note,
-      todos
+      todos.map(todo => ({
+        todoText: todo.todo_text
+      }))
     );
     
     // Track tasks that will be removed
@@ -111,7 +113,7 @@ export const removeTodoTool: ObsidianTool<RemoveTodoToolInput> = {
       const { todo_text, removal_reason } = todo;
       
       // Find the task to remove
-      const taskToRemove = findTaskByDescription(updatedNote, todo_text);
+      const taskToRemove = findTaskByDescription(updatedNote, todo_text, (task) => true);
       
       // Get the original position to insert the comment block
       const originalPosition = updatedNote.content.findIndex((node: NoteNode) => 

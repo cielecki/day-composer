@@ -36,13 +36,25 @@
 - [x] Life navigator: comments jak sa multiline to zle sie formatuja po dodaniu do notatki przez AI
 - [x] Fix styling of main chat - borders and backgrounds
 - [x] More relaxed todo format
-
-- [ ] Format of the todo items should be refered to somewhere in prompts - write down the obsidian bullet journal md format that the plugin uses
 - [x] 🔧 Edit todo items
 - [x] Add function to delete tasks (putting them in a comment)
-- [ ] Defaulting not to todays log but to currently open file, or maybe just don't do defaults at all.
+- [x] In the new mode voice instructions are not correct
 
---------------------------------
+- [ ] Format of the todo items should be refered to somewhere in prompts - write down the obsidian bullet journal md format that the plugin uses
+- [ ] Defaulting not to todays log but to currently open file, or maybe just don't do defaults at all.
+- [ ] ⚡ Szybki tryb w obsidianie
+- [ ] 💻 Dodać możliwość anulowania transkrypcji w Obsidianie
+- [ ] 🔧 Naprawić problem z edycją zadań w Obsidianie (orginal todo is required)
+- [ ] 💻 Naprawić w Obsidianie: przy przenoszeniu wielu zadań zachowywać kolejność z parametru, nie oryginalną
+- [ ] 📋 Dodać w Obsidianie sekcję z informacjami dla asystentki (czasy dojazdów, standardowe przygotowania do wyjść)
+- [ ] 🎤 Naprawić w Obsidianie: gdy załączam obrazek, powinienem nadal móc nagrać głosówkę
+- [ ] 🤖 Dodać w Obsidianie możliwość zmiany Opus na Sonnet
+- [ ] 📱 Zmienić w Obsidianie żeby na mobilce nie był hover action item dla wiadomości
+- [ ] 🔧 Naprawić w Obsidianie: current open file tryb ma nie poszerzać linków wewnętrznych rekurencyjnie, tylko jeden poziom
+- [ ] 🔧 Naprawić w Obsidianie: batony do przykładów użycia - problem z widocznością na mobile
+- [ ] 🔧 Naprawić w Obsidianie: podczas usuwania zadania dodaje się "Removed task", który nie jest przetłumaczony
+
+
 
 - [ ] Working daily planning and habits in the starter kit
 - [ ] Test with G

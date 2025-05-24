@@ -12,7 +12,7 @@ import { initI18n, t } from "./i18n";
 import { LNMode } from "./types/types";
 import { modeToNoteContent } from "./utils/mode-utils";
 import path from "path";
-import { getDefaultLNMode, mergeWithDefaultMode } from "./defaults/ln-mode-defaults";
+import { getDefaultLNMode, mergeWithDefaultMode, DEFAULT_VOICE_INSTRUCTIONS } from "./defaults/ln-mode-defaults";
 import { STARTER_KIT_DATA } from "./generated/starter-kit-data";
 import { ConfirmReloadModal } from "./components/ConfirmReloadModal";
 
@@ -143,7 +143,7 @@ const createNewMode = async (app: App) => {
 			ln_example_usages: [],
 			ln_voice_autoplay: true,
 			ln_voice: "alloy",
-			ln_voice_instructions: t('ui.mode.defaultVoiceInstructions'),
+			ln_voice_instructions: DEFAULT_VOICE_INSTRUCTIONS,
 			ln_voice_speed: 1.0,
 		};
 
