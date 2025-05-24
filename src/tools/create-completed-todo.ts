@@ -2,8 +2,8 @@ import MyPlugin from "../main";
 import { createFile } from "./utils/createFile";
 import { fileExists } from "./utils/fileExists";
 import { getCurrentTime } from "./utils/getCurrentTime";
-import { createTask, appendComment, insertTaskAtPosition } from "./utils/task-utils";
-import { suggestEmojiForTask } from "./utils/suggest-emoji-for-task";
+import { appendComment, insertTaskAtPosition, Task } from "./utils/task-utils";
+
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { ObsidianTool } from "../obsidian-tools";
 import { findCurrentSpot, readNote, updateNote } from "./utils/note-utils";
@@ -12,40 +12,35 @@ import { t } from "../i18n";
 
 const schema = {
   name: "create_completed_todo",
-  description: "Creates a completed todo entry for storing notes in your daily log. Perfect for recording thoughts, observations, or events that don't require further action.",
+  description: "Creates a completed todo entry. This can be used both for recording a completion of a task that has not been planned or for storing thoughts, observations, or events in your daily log.",
   input_schema: {
     type: "object",
     properties: {
-      description: {
+      todo_text: {
         type: "string",
-        description: "The description of the completed todo item (defaults to 'Note' if not provided)",
+        description: "The complete text of the to-do item. This should contain all formatting, emojis, time markers, and any other specific formatting you want to include. (defaults to 'Note' if not provided)",
       },
-      content: {
+      comment: {
         type: "string",
-        description: "The content to add as an indented comment below the completed todo",
+        description: "The content to add as an indented comment below the completed todo or the contents of the note to add to your daily log",
       },
-      path: {
+      file_path: {
         type: "string",
         description: "The path of the document to add the completed todo to (including .md extension). If not provided, adds to today's daily note.",
-      },
-      emoji: {
-        type: "string",
-        description: "Optional emoji to add to the completed todo. If not provided, an appropriate emoji will be suggested based on the content.",
       },
       completion_time: {
         type: "string",
         description: "Optional completion time in HH:MM format. If not provided, current time will be used.",
       }
     },
-    required: ["content"]
+    required: ["comment"]
   }
 };
 
 type CreateCompletedTodoToolInput = {
-  description?: string,
-  content: string,
-  path?: string,
-  emoji?: string,
+  todo_text?: string,
+  comment: string,
+  file_path?: string,
   completion_time?: string
 }
 
@@ -53,8 +48,8 @@ export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput>
   specification: schema,
   icon: "check-square-2",
   getActionText: (input: CreateCompletedTodoToolInput, output: string, hasResult: boolean, hasError: boolean) => {
-    const contentPreview = input?.content ? 
-      (input.content.length > 20 ? input.content.substring(0, 20) + '...' : input.content) :
+    const contentPreview = input?.comment ? 
+      (input.comment.length > 20 ? input.comment.substring(0, 20) + '...' : input.comment) :
       'entry';
     
     if (hasResult) {
@@ -67,16 +62,13 @@ export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput>
   },
   execute: async (plugin: MyPlugin, params: CreateCompletedTodoToolInput): Promise<string> => {
     try {
-      const { content } = params;
+      const { comment } = params;
       
       // Use "Note" as default description if not provided
-      const description = params.description || "Note";
+      const description = params.todo_text || "Note";
       
       // If no path is provided, use today's daily note
-      const filePath = params.path ? params.path : await getDailyNotePath(plugin.app);
-      
-      // Use provided emoji or suggest based on content and description
-      const emoji = params.emoji || suggestEmojiForTask(description + " " + content);
+      const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
       
       // Get current time or use provided completion time
       const completionTime = params.completion_time || getCurrentTime();
@@ -94,14 +86,19 @@ export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput>
       // Read the note
       const note = await readNote({plugin, filePath});
 
-      // Create a task with the provided description
-      const task = createTask(description, emoji, null);
-      // Update status and completion time
-      task.status = 'completed';
-      task.timeInfo.completed = completionTime;
+      // Create a task with the provided description and completion time
+      const todoText = `${description} (${completionTime})`;
+      const task: Task = {
+        type: 'task',
+        status: 'completed',
+        todoText: todoText,
+        comment: "",
+        lineIndex: -1 // Will be set when inserted
+      };
+
 
       // Add the content as a comment
-      appendComment(task, content);
+      appendComment(task, comment);
 
       // Find the current spot for insertion
       const currentSpot = findCurrentSpot(note);

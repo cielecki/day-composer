@@ -11,6 +11,8 @@ import { abandonTodoTool } from "./tools/abandon-todo";
 import { createCompletedTodoTool } from "./tools/create-completed-todo";
 import { showTodosTool } from "./tools/show-todos";
 import { handoverModeTool } from "./tools/handover-mode";
+import { editTodoTool } from "./tools/edit-todo";
+import { removeTodoTool } from "./tools/remove-todo";
 import { ToolExecutionError } from "./tools/utils/ToolExecutionError";
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tool-filter";
@@ -64,6 +66,8 @@ export class ObsidianTools {
 		createCompletedTodoTool,
 		showTodosTool,
 		handoverModeTool,
+		editTodoTool,
+		removeTodoTool,
 	];
 
 	constructor(plugin: MyPlugin) {

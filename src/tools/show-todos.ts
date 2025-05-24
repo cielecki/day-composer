@@ -17,13 +17,9 @@ import { t } from "../i18n";
 // Mapping function to convert from parsed Task to TodoItem
 const mapTaskToTodoItem = (task: Task): TodoItem => {
 	return {
-		description: task.description,
+		todo_text: task.todoText,
 		status: task.status,
-		emoji: task.emoji,
 		notes: task.comment.split("\n"),
-		timeInfo: task.timeInfo,
-		target: task.target,
-		source: task.source,
 	};
 };
 
@@ -181,7 +177,7 @@ export const showTodosTool: ObsidianTool<ShowTodosToolInput> = {
 				// Look for tasks matching the specific descriptions
 				matchedTasks = statusFiltered.filter((task) =>
 					todos.some((todoText) =>
-						task.description
+						task.todoText
 							.toLowerCase()
 							.includes(todoText.toLowerCase()),
 					),

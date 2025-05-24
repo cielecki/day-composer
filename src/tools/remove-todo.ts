@@ -1,35 +1,32 @@
 import MyPlugin from "../main";
 import { ObsidianTool } from "../obsidian-tools";
-import { findTaskByDescription, updateNote } from './utils/note-utils';
-import { readNote } from './utils/note-utils';
+import { findTaskByDescription, updateNote, readNote, NoteNode, TextBlock } from './utils/note-utils';
 import { getDailyNotePath } from "./utils/getDailyNotePath";
-import { appendComment } from "./utils/task-utils";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { validateTasks } from "./utils/task-validation";
-import { findCurrentSpot } from "./utils/note-utils";
-import { removeTaskFromDocument, insertTaskAtPosition } from "./utils/task-utils";
+import { removeTaskFromDocument, formatTask } from "./utils/task-utils";
 import { t } from "../i18n";
 
 const schema = {
-  name: "abandon_todo",
-  description: "Marks one or more to-do items as abandoned / skipped in a specified document or today's daily note",
+  name: "remove_todo",
+  description: "Removes one or more to-do items by converting them to comment blocks indicating they have been removed",
   input_schema: {
     type: "object",
     properties: {
       todos: {
         type: "array",
-        description: "Array of to-do items to abandon",
+        description: "Array of to-do items to remove",
         items: {
           type: "object",
           properties: {
             todo_text: {
               type: "string",
-              description: "The complete text of the to-do item to abandon. This should include all formatting, emojis, time markers, and any other specific formatting.",
+              description: "The complete text of the to-do item to remove. This should include all formatting, emojis, time markers, and any other specific formatting.",
             },
-            comment: {
+            removal_reason: {
               type: "string",
-              description: "The comment explaining why the task is being abandoned, will be added below the task",
-            },
+              description: "Optional reason for removing the task. Will be included in the removal comment.",
+            }
           },
           required: ["todo_text"]
         }
@@ -44,21 +41,20 @@ const schema = {
 };
 
 type TodoItem = {
-  todo_text: string,
-  comment?: string
-}
+  todo_text: string;
+  removal_reason?: string;
+};
 
-type AbandonTodoToolInput = {
-  todos: TodoItem[],
-  file_path?: string
-}
+type RemoveTodoToolInput = {
+  todos: TodoItem[];
+  file_path?: string;
+};
 
-export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
+export const removeTodoTool: ObsidianTool<RemoveTodoToolInput> = {
   specification: schema,
-  icon: "x-square",
-  getActionText: (input: AbandonTodoToolInput, output: string, hasResult: boolean, hasError: boolean) => {
+  icon: "trash-2",
+  getActionText: (input: RemoveTodoToolInput, output: string, hasResult: boolean, hasError: boolean) => {
     if (hasResult) {
-      // Only process task text for completed operations
       let actionText = '';
       if (!input || typeof input !== 'object') actionText = '';
       const todoCount = input.todos?.length || 0;
@@ -82,14 +78,13 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
       }
       
       return hasError
-        ? t('tools.actions.abandon.failed').replace('{{task}}', actionText)
-        : t('tools.actions.abandon.success').replace('{{task}}', actionText);
+        ? t('tools.actions.remove.failed').replace('{{task}}', actionText)
+        : t('tools.actions.remove.success').replace('{{task}}', actionText);
     } else {
-      // For in-progress operations, don't show task details
-      return t('tools.actions.abandon.inProgress').replace('{{task}}', '');
+      return t('tools.actions.remove.inProgress').replace('{{task}}', '');
     }
   },
-  execute: async (plugin: MyPlugin, params: AbandonTodoToolInput): Promise<string> => {
+  execute: async (plugin: MyPlugin, params: RemoveTodoToolInput): Promise<string> => {
     const { todos } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
@@ -105,49 +100,59 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
       todos
     );
     
-    // Track tasks that will be abandoned
-    const abandonedTasks: string[] = [];
+    // Track tasks that will be removed
+    const removedTasks: string[] = [];
     
     // If we get here, all tasks were validated successfully
     let updatedNote = JSON.parse(JSON.stringify(note));
     
     // Process each to-do item
     for (const todo of todos) {
-      const { todo_text, comment } = todo;
+      const { todo_text, removal_reason } = todo;
       
-      // We already validated all tasks exist
-      const task = findTaskByDescription(updatedNote, todo_text);
+      // Find the task to remove
+      const taskToRemove = findTaskByDescription(updatedNote, todo_text);
       
-      // Update status
-      task.status = 'abandoned';
+      // Get the original position to insert the comment block
+      const originalPosition = updatedNote.content.findIndex((node: NoteNode) => 
+        node.type === 'task' && 
+        node.todoText === taskToRemove.todoText && 
+        node.status === taskToRemove.status
+      );
       
-      // Add comment if provided
-      if (comment) {
-        appendComment(task, comment);
-      }
+      // Remove the task from the document
+      updatedNote = removeTaskFromDocument(updatedNote, taskToRemove);
       
-      // Remove the task from its current position
-      updatedNote = removeTaskFromDocument(updatedNote, task);
+      // Create the comment block with the removed task information
+      const originalTaskText = formatTask(taskToRemove);
+      const reasonText = removal_reason ? ` (Reason: ${removal_reason})` : '';
+      const removalComment = `<!-- REMOVED TASK: This task has been removed${reasonText}
+${originalTaskText}
+-->`;
       
-      // Find the current position (first pending task or end of document)
-      const currentSpot = findCurrentSpot(updatedNote);
+      // Create a text block for the removal comment
+      const commentBlock: TextBlock = {
+        type: 'text',
+        content: removalComment,
+        lineIndex: -1
+      };
       
-      // Insert the abandoned task at the current position
-      updatedNote = insertTaskAtPosition(updatedNote, task, currentSpot);
+      // Insert the comment block at the original position
+      updatedNote.content.splice(originalPosition, 0, commentBlock);
       
-      abandonedTasks.push(todo_text);
+      removedTasks.push(todo_text);
     }
     
-    // Update the note with all abandoned tasks
+    // Update the note with all removals
     await updateNote({plugin, filePath, updatedNote});
     
     // Prepare success message
-    const tasksDescription = abandonedTasks.length === 1 
-      ? `"${abandonedTasks[0]}"`
-      : `${abandonedTasks.length} ${t('tools.tasks.plural')}`;
+    const tasksDescription = removedTasks.length === 1 
+      ? `"${removedTasks[0]}"`
+      : `${removedTasks.length} ${t('tools.tasks.plural')}`;
       
-    return t('tools.success.abandon')
+    return t('tools.success.remove')
       .replace('{{task}}', tasksDescription)
       .replace('{{path}}', filePath);
   }
-};
+}; 

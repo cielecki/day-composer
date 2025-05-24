@@ -72,6 +72,16 @@
         "failed": "Nie udało się dodać zadania {{task}}",
         "success": "Dodano {{task}}",
         "inProgress": "Dodawanie zadania..."
+      },
+      "edit": {
+        "failed": "Nie udało się edytować zadania {{task}}",
+        "success": "Edytowano zadanie {{task}}",
+        "inProgress": "Edytowanie zadania..."
+      },
+      "remove": {
+        "failed": "Nie udało się usunąć zadania {{task}}",
+        "success": "Usunięto zadanie {{task}}",
+        "inProgress": "Usuwanie zadania..."
       }
     },
     "success": {
@@ -79,7 +89,9 @@
       "complete": "✓ Dodano zakończone zadanie \"{{task}}\"{{time}} do {{path}}",
       "check": "✓ Oznaczono {{task}} jako zakończone w {{path}} ({{time}})",
       "uncheck": "✓ Cofnięto oznaczenie \"{{task}}\" jako zakończone w {{path}}",
-      "abandon": "✓ Oznaczono {{task}} jako porzucone w {{path}}"
+      "abandon": "✓ Oznaczono {{task}} jako porzucone w {{path}}",
+      "edit": "✓ Edytowano {{originalTask}} na {{newTask}} w {{path}}{{details}}",
+      "remove": "✓ Usunięto {{task}} z {{path}} (przekonwertowano na komentarz)"
      },
     "handover": {
       "switched": "Przełączono na tryb {{modeName}}",

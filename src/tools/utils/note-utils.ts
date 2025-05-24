@@ -5,7 +5,6 @@ import { modifyFile } from "./modifyFile";
 import {
 	appendComment,
 	isCommentLine,
-	parseTaskContent,
 	STATUS_MAP,
 	Task,
 } from "./task-utils";
@@ -174,25 +173,15 @@ export function findTasksByDescription(
 			.trim();
 	};
 
-	// First check if the description contains the search text exactly
+	// First check if the todoText contains the search text exactly
 	for (const node of document.content) {
 		if (node.type === "task") {
-			if (node.description.includes(taskDescription)) {
+			if (node.todoText.includes(taskDescription)) {
 				results.push(node);
 			}
 		}
 	}
 
-  // Check the original line
-	if (results.length === 0) {
-		for (const node of document.content) {
-			if (node.type === "task") {
-				if (node.originalLine.includes(taskDescription)) {
-					results.push(node);
-				}
-			}
-		}
-	}
 
 	// If not found verbatim, check with special characters ignored
 	if (results.length === 0) {
@@ -201,7 +190,7 @@ export function findTasksByDescription(
     
 		for (const node of document.content) {
 			if (node.type === "task") {
-				const normalizedLine = normalizeText(node.originalLine);
+				const normalizedLine = normalizeText(node.todoText);
 				if (normalizedLine.includes(normalizedSearch)) {
 					results.push(node);
 				}
@@ -278,7 +267,7 @@ export function determineInsertionPosition(
 				const node = note.content[i];
 				if (
 					node.type === "task" &&
-					node.description === referenceTask.description &&
+					node.todoText === referenceTask.todoText &&
 					node.status === referenceTask.status
 				) {
 					foundIndex = i;
@@ -328,8 +317,8 @@ export function parseMarkdown(markdown: string, filePath: string): Note {
 			const statusChar = taskMatch[1];
 			const taskContent = taskMatch[2];
 
-			// Parse task details
-			const parsedTask = parseTaskContent(taskContent);
+			// Parse task details - simplified to just return the content as-is
+			const todoText = taskContent.trim();
 
 			// Create task object
 			const newTask: Task = {
@@ -337,16 +326,8 @@ export function parseMarkdown(markdown: string, filePath: string): Note {
 				status:
 					STATUS_MAP[statusChar as keyof typeof STATUS_MAP] ||
 					"pending",
-				emoji: parsedTask.emoji,
-				timeInfo: {
-					scheduled: parsedTask.scheduled,
-					completed: parsedTask.completed,
-				},
-				description: parsedTask.description,
-				originalLine: line,
+				todoText: todoText,
 				comment: "",
-				target: parsedTask.target,
-				source: parsedTask.source,
 				lineIndex,
 			};
 

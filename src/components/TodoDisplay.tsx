@@ -2,29 +2,20 @@ import React, { useState } from 'react';
 import { LucideIcon } from './LucideIcon';
 import { t } from '../i18n';
 
-// Types for todo items
-interface TodoTimeInfo {
-  scheduled: string | null;
-  completed: string | null;
-}
-
+// Simplified types for todo items
 export interface TodoItem {
-  description: string;
+  todo_text: string; // Everything after the checkbox brackets - includes emojis, time markers, formatting, etc.
   status: 'pending' | 'completed' | 'abandoned' | 'moved';
-  emoji: string | null;
   notes: string[];
-  timeInfo: TodoTimeInfo;
-  target: string | null;
-  source: string | null;
 }
 
 // Props needed to enable interactivity
 interface TodoDisplayProps {
   todos: TodoItem[];
   fileName: string;
-  onCheckTodo?: (description: string) => void;
-  onUncheckTodo?: (description: string) => void;
-  onAbandonTodo?: (description: string) => void;
+  onCheckTodo?: (todo_text: string) => void;
+  onUncheckTodo?: (todo_text: string) => void;
+  onAbandonTodo?: (todo_text: string) => void;
 }
 
 export const TodoDisplay: React.FC<TodoDisplayProps> = ({ 
@@ -49,12 +40,12 @@ export const TodoDisplay: React.FC<TodoDisplayProps> = ({
     }
     
     if (todo.status === 'pending') {
-      onCheckTodo(todo.description);
+      onCheckTodo(todo.todo_text);
     } else if (todo.status === 'completed') {
-      onUncheckTodo(todo.description);
+      onUncheckTodo(todo.todo_text);
     } else if (todo.status === 'abandoned') {
       // First uncheck, then can be checked
-      onUncheckTodo(todo.description);
+      onUncheckTodo(todo.todo_text);
     }
     // Moved todos can't be interacted with
   };
@@ -98,25 +89,7 @@ export const TodoDisplay: React.FC<TodoDisplayProps> = ({
             
             <div className="todo-content">
               <div className="todo-main-line">
-                {todo.emoji && <span className="todo-emoji">{todo.emoji}</span>}
-                
-                {todo.timeInfo.scheduled && (
-                  <span className="todo-scheduled">{todo.timeInfo.scheduled}</span>
-                )}
-                
-                <span className="todo-description">{todo.description}</span>
-                
-                {todo.timeInfo.completed && (
-                  <span className="todo-completed">({todo.timeInfo.completed})</span>
-                )}
-                
-                {todo.target && (
-                  <span className="todo-target">→ {todo.target}</span>
-                )}
-                
-                {todo.source && (
-                  <span className="todo-source">(from {todo.source})</span>
-                )}
+                <span className="todo-text">{todo.todo_text}</span>
               </div>
               
               {todo.notes.length > 0 && (
@@ -134,7 +107,7 @@ export const TodoDisplay: React.FC<TodoDisplayProps> = ({
                 <button 
                   className="todo-action-button abandon"
                   title={t('ui.todo.abandon')}
-                  onClick={() => onAbandonTodo(todo.description)}
+                  onClick={() => onAbandonTodo(todo.todo_text)}
                 >
                   <LucideIcon name="x" size={14} />
                 </button>

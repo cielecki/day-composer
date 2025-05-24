@@ -35,24 +35,12 @@
 - [x] Dodać możliwość konfiguracjii tooli w trybach
 - [x] Life navigator: comments jak sa multiline to zle sie formatuja po dodaniu do notatki przez AI
 - [x] Fix styling of main chat - borders and backgrounds
+- [x] More relaxed todo format
 
-- [ ] If I record during generation the stop button is becoming unresponsive
-- [ ] Do I want the input buttons to be flat?
-- [ ] When stopping audio during eneration, something breaks and it's not being stopped, furthermoe when it starts playing the stop button is not working
-- [ ] 🔧 Dodać funkcję edycji todo itemów
-- [ ] 🔧 Poprawić funkcjonalność przenoszenia zadań (problem z dodawaniem do konkretnych dni)
-- [ ] Bug gdy zastopuje generowanego tool calla
-```markdown
-conversation turn processing: BadRequestError: 400 {"type":"error","error":{"type":"invalid_request_error","message":"messages.4: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_016aY9VAzzsaK6mWENg3JN8L. Each `tool_use` block must have a corresponding `tool_result` block in the next message."}}
-    at _APIError.generate (plugin:day-composer:48107:14)
-    at Anthropic.makeStatusError (plugin:day-composer:48883:21)
-    at Anthropic.makeRequest (plugin:day-composer:48928:24)
-    at async eval (plugin:day-composer:51631:28)
-    at async eval (plugin:day-composer:51802:49)
-```
-- [ ] Better info dumped to AI when file is not found in expand links
-- [ ] still there is something wrong with the current spot logic
-- [ ] Starter kit should be created even if a directory like this already exists (it should just be created under a new name (like starter kit 2 or smth))
+- [ ] Format of the todo items should be refered to somewhere in prompts - write down the obsidian bullet journal md format that the plugin uses
+- [x] 🔧 Edit todo items
+- [x] Add function to delete tasks (putting them in a comment)
+- [ ] Defaulting not to todays log but to currently open file, or maybe just don't do defaults at all.
 
 --------------------------------
 
@@ -67,7 +55,6 @@ conversation turn processing: BadRequestError: 400 {"type":"error","error":{"typ
 
 ## AI breakfast release
 
-- [ ] Write down the obsidian bullet journal md format that the plugin uses
 - [ ] Create tool documentation in README or MODE_GUIDE or smth
 
 - [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
@@ -79,6 +66,23 @@ conversation turn processing: BadRequestError: 400 {"type":"error","error":{"typ
 - [ ] Write a draft blog post for people to read through and give feedback on
 
 ## Initial release
+- [ ] still there is something wrong with the current spot logic
+- [ ] Starter kit should be created even if a directory like this already exists (it should just be created under a new name (like starter kit 2 or smth))
+- [ ] Better info dumped to AI when file is not found in expand links
+
+- [ ] Bug gdy zastopuje generowanego tool calla
+```markdown
+conversation turn processing: BadRequestError: 400 {"type":"error","error":{"type":"invalid_request_error","message":"messages.4: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_016aY9VAzzsaK6mWENg3JN8L. Each `tool_use` block must have a corresponding `tool_result` block in the next message."}}
+    at _APIError.generate (plugin:day-composer:48107:14)
+    at Anthropic.makeStatusError (plugin:day-composer:48883:21)
+    at Anthropic.makeRequest (plugin:day-composer:48928:24)
+    at async eval (plugin:day-composer:51631:28)
+    at async eval (plugin:day-composer:51802:49)
+```
+
+- [ ] If I record during generation the stop button is becoming unresponsive
+- [ ] Do I want the input buttons to be flat?
+- [ ] When stopping audio during eneration, something breaks and it's not being stopped, furthermoe when it starts playing the stop button is not working
 - [ ] Lepszy entry level experience
 
 - [ ] Upewnienie się że AI rozumiem ze [-] to anulowany task

@@ -72,6 +72,16 @@
         "failed": "Failed to add todo {{task}}",
         "success": "Added {{task}}",
         "inProgress": "Adding todo..."
+      },
+      "edit": {
+        "failed": "Failed to edit todo {{task}}",
+        "success": "Edited todo {{task}}",
+        "inProgress": "Editing todo..."
+      },
+      "remove": {
+        "failed": "Failed to remove todo {{task}}",
+        "success": "Removed todo {{task}}",
+        "inProgress": "Removing todo..."
       }
     },
     "success": {
@@ -79,7 +89,9 @@
       "complete": "✓ Added completed todo \"{{task}}\"{{time}} to {{path}}",
       "check": "✓ Checked off {{task}} in {{path}} ({{time}})",
       "uncheck": "✓ Unchecked \"{{task}}\" in {{path}}",
-      "abandon": "✓ Marked {{task}} as abandoned in {{path}}"
+      "abandon": "✓ Marked {{task}} as abandoned in {{path}}",
+      "edit": "✓ Edited {{originalTask}} to {{newTask}} in {{path}}{{details}}",
+      "remove": "✓ Removed {{task}} from {{path}} (converted to comment)"
     },
     "handover": {
       "switched": "Switched to {{modeName}} mode",

@@ -1,7 +1,7 @@
 import MyPlugin from "../main";
 import { createFile } from "./utils/createFile";
 import { fileExists } from "./utils/fileExists";
-import { createTask } from "./utils/task-utils";
+import { Task } from "./utils/task-utils";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { ObsidianTool } from "../obsidian-tools";
 import {
@@ -16,7 +16,7 @@ import { t } from "../i18n";
 const schema = {
 	name: "add_todo",
 	description:
-		"Adds one or more to-do items to a specified document or today's daily note with enhanced formatting",
+		"Adds one or more to-do items to a specified document or today's daily note",
 	input_schema: {
 		type: "object",
 		properties: {
@@ -26,22 +26,13 @@ const schema = {
 				items: {
 					type: "object",
 					properties: {
-						emoji: {
-							type: "string",
-							description:
-								"Emoji to add to the task. Each task can have a different emoji.",
-						},
 						todo_text: {
 							type: "string",
-							description: "The text of the to-do item",
-						},
-						scheduled_time: {
-							type: "string",
 							description:
-								"Optional scheduled time for the task. Can be a time range (09:00-10:00) or approximate time (~13:30).",
+								"The complete text of the to-do item. This should contain all formatting, emojis, time markers, and any other specific formatting you want to include.",
 						},
 					},
-					required: ["emoji", "todo_text"],
+					required: ["todo_text"],
 				},
 			},
 			path: {
@@ -58,7 +49,7 @@ const schema = {
 			after_todo_text: {
 				type: "string",
 				description:
-					"When position is 'after', this is the description of the to-do item after which the new items should be placed.",
+					"When position is 'after', this is the complete text of the to-do item after which the new items should be placed.",
 			},
 		},
 		required: ["todos", "position"],
@@ -67,8 +58,6 @@ const schema = {
 
 type TodoItem = {
 	todo_text: string;
-	emoji: string;
-	scheduled_time?: string;
 };
 
 type AddTodoToolInput = {
@@ -161,10 +150,16 @@ export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
 
 		// Process each to-do item
 		for (let i = 0; i < todos.length; i++) {
-			const { todo_text, emoji, scheduled_time } = todos[i];
+			const { todo_text } = todos[i];
 
 			// Create the task object
-			const task = createTask(todo_text, emoji, scheduled_time);
+			const task: Task = {
+				type: 'task',
+				status: 'pending',
+				todoText: todo_text,
+				comment: "",
+				lineIndex: -1 // Will be set when inserted
+			};
 
 			// Insert the task at the determined position
 			updatedNote = insertTaskAtPosition(

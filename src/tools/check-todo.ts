@@ -26,7 +26,7 @@ const schema = {
           properties: {
             todo_text: {
               type: "string",
-              description: "The exact text of the to-do item to check off",
+              description: "The complete text of the to-do item to check off. This should include all formatting, emojis, time markers, and any other specific formatting.",
             },
             comment: {
               type: "string",
@@ -128,9 +128,13 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
       // We already validated tasks, so we can directly find and process them
       const task = findTaskByDescription(updatedNote, todo_text);
       
-      // Update status and completion time (common for all tasks)
+      // Update status (common for all tasks)
       task.status = 'completed';
-      task.timeInfo.completed = currentTime;
+      
+      // Add completion time to the todo text if provided
+      if (currentTime) {
+        task.todoText = `${task.todoText} (${currentTime})`;
+      }
       
       // Add comment if provided
       if (comment) {

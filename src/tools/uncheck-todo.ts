@@ -16,7 +16,7 @@ const schema = {
     properties: {
       todo_text: {
         type: "string",
-        description: "The exact text of the to-do item to uncheck",
+        description: "The complete text of the to-do item to uncheck. This should include all formatting, emojis, time markers, and any other specific formatting.",
       },
       file_path: {
         type: "string",
@@ -75,7 +75,6 @@ export const uncheckTodoTool: ObsidianTool<UncheckTodoToolInput> = {
 
     // Update status
     updatedTask.status = 'pending';
-    updatedTask.timeInfo.completed = null;
 
     // Add comment if provided
     if (comment) {
