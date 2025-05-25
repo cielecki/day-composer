@@ -1,7 +1,7 @@
 {
   "id": "life-navigator",
   "name": "Life Navigator",
-  "version": "0.6.13",
+  "version": "0.6.14",
   "minAppVersion": "0.15.0",
   "description": "Meet Life Navigator, your AI-powered daily co-pilot for Obsidian. Streamline journal management, leverage a customizable AI Coach, and connect ideas with innovative dynamic day note links. Boost productivity and unlock deeper insights daily.",
   "author": "Maciej Cielecki",
