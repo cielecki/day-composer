@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Edit Todo Tool**: New `edit_todo` tool allows editing existing todo items
 - **Remove Todo Tool**: New `remove_todo` tool for removing todo items without deletion
 - **Time Parameter for Abandon Todo**: Added `time` parameter to abandon-todo tool for consistent time tracking across all task operations
+- **Circular Image Thumbnails**: Improved attached image visualization with compact circular thumbnails and positioned remove buttons for a cleaner, more modern interface
 
 ### Changed
 - **Relaxed todo format**: All tools now don't enforce emojis etc
@@ -27,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Translation of removed task comments**: Fixed "Removed task" text in HTML comments to be properly translated in Polish and other languages
 - **Mobile Waveform Visualization**: Fixed flat waveform issue on mobile devices by improving AudioContext state management, adding automatic recovery mechanisms, handling mobile browser audio interruptions, and implementing better error detection and recovery
 - **Voice Recording with Images**: Fixed issue where the microphone button would disappear when attaching images - users can now record voice notes even when images are attached
+- **Recording Input Behavior**: Input field and placeholder are now completely hidden during voice recording and transcription, image preview area is hidden during transcription, and image editing (paste, attach, remove) is disabled during recording and transcription
+- **Mobile Usage Example Pills**: Improved styling and visibility of usage example buttons (pills) on mobile devices with better contrast, touch-friendly sizing, proper Obsidian theme integration, and enhanced accessibility features
+- **Transcription Cancellation UX**: Improved transcription cancellation by allowing users to click the spinner button itself to cancel transcription, removing the need for a separate X button during transcription
 
 
 ## [0.6.12] - 2025-05-23

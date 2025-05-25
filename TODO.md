@@ -43,16 +43,18 @@
 - [x] 💻 Poprawić w Obsidian - podczas przenoszenia todo, przeniesione itemy powinny być przenoszone do current position (jak w abandoned i check off todo), uwspólnić kod dla wszystkich tych narzędzi
 - [x] 🔧 Naprawić problem z edycją zadań w Obsidianie (orginal todo is required)
 - [x] (completed at 15:00)
-
-- [ ] 💻 Dodać możliwość anulowania transkrypcji w Obsidianie
-- [ ] 🔧 Naprawić w Obsidianie: current open file tryb ma nie poszerzać linków wewnętrznych rekurencyjnie, tylko jeden poziom
-- [ ] 🔧 Naprawić w Obsidianie: batony do przykładów użycia - problem z widocznością na mobile
+- [x] In a mobile app sometimes the waveform visualisation is completly flat, dispite audio being recorded normally, if that happen it remains a problem until I restart the app
+- [x] 🔧 Naprawić w Obsidianie: podczas usuwania zadania dodaje się "Removed task", który nie jest przetłumaczony
 - [x] 🎤 Naprawić w Obsidianie: gdy załączam obrazek, powinienem nadal móc nagrać głosówkę
+
+
+
+- [x] 💻 Dodać możliwość anulowania transkrypcji w Obsidianie
+- [x] 🔧 Naprawić w Obsidianie: current open file tryb ma nie poszerzać linków wewnętrznych rekurencyjnie, tylko jeden poziom
+- [x] 🔧 Naprawić w Obsidianie: batony do przykładów użycia - problem z widocznością na mobile
 - [ ] 📋 Dodać w Obsidianie sekcję z informacjami dla asystentki (czasy dojazdów, standardowe przygotowania do wyjść)
 - [ ] 📱 Zmienić w Obsidianie żeby na mobilce nie był hover action item dla wiadomości (zbadać jak to jest w chacie gpt)
-- [x] In a mobile app sometimes the waveform visualisation is completly flat, dispite audio being recorded normally, if that happen it remains a problem until I restart the app
-
-- [x] 🔧 Naprawić w Obsidianie: podczas usuwania zadania dodaje się "Removed task", który nie jest przetłumaczony
+- [ ] 🔧 No action buttons on text messages ending with a tool call?
 
 - [ ] Format of the todo items should be refered to somewhere in prompts - write down the obsidian bullet journal md format that the plugin uses
 - [ ] Working daily planning and habits in the starter kit

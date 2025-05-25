@@ -13,6 +13,7 @@ interface SpeechToTextContextType {
   lastTranscription: string | null;
   startRecording: (signal: AbortSignal) => Promise<void>;
   finalizeRecording: () => Promise<void>;
+  cancelTranscription: () => void;
 }
 
 const SpeechToTextContext = createContext<SpeechToTextContextType | undefined>(undefined);
@@ -25,6 +26,7 @@ export const SpeechToTextProvider: React.FC<{
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [lastTranscription, setLastTranscription] = useState<string | null>(null);
+  const transcriptionAbortControllerRef = useRef<AbortController | null>(null);
 
   const startRecording = async (signal: AbortSignal): Promise<void> => {
     try {
@@ -87,6 +89,10 @@ export const SpeechToTextProvider: React.FC<{
     
     setIsTranscribing(true);
     
+    // Create a new abort controller for transcription
+    const transcriptionController = new AbortController();
+    transcriptionAbortControllerRef.current = transcriptionController;
+    
     try {
       const pluginSettings = getPluginSettings();
       if (!pluginSettings.openAIApiKey) {
@@ -144,7 +150,7 @@ export const SpeechToTextProvider: React.FC<{
         model: 'gpt-4o-transcribe',
         prompt: trimmedPrompt,
         language: targetLanguageForApi, // Pass the determined language to API
-      }, { signal });
+      }, { signal: transcriptionController.signal });
 
       console.log('Transcribed text:', transcription.text);
       setLastTranscription(transcription.text);
@@ -152,7 +158,7 @@ export const SpeechToTextProvider: React.FC<{
       console.error('Error during transcription:', error);
 
       // If not aborted, show error notice
-      if (!signal.aborted) {
+      if (!transcriptionController.signal.aborted) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error during transcription';
         new Notice(t('errors.tts.transcriptionFailed').replace('{{error}}', errorMessage));
       }
@@ -160,8 +166,17 @@ export const SpeechToTextProvider: React.FC<{
       throw error;
     } finally {
       setIsTranscribing(false);
+      transcriptionAbortControllerRef.current = null;
     }
   };
+
+  const cancelTranscription = useCallback(() => {
+    console.log("Cancelling transcription");
+    if (transcriptionAbortControllerRef.current) {
+      transcriptionAbortControllerRef.current.abort();
+      transcriptionAbortControllerRef.current = null;
+    }
+  }, []);
 
   const finalizeRecording = useCallback(async () => {
     console.log("Stopping speech-to-text operations");
@@ -178,7 +193,8 @@ export const SpeechToTextProvider: React.FC<{
     isTranscribing,
     lastTranscription,
     startRecording,
-    finalizeRecording
+    finalizeRecording,
+    cancelTranscription
   };
 
   return (

@@ -26,6 +26,7 @@ export const UnifiedInputArea: React.FC<{
     lastTranscription,
     startRecording,
     finalizeRecording,
+    cancelTranscription,
   } = useSpeechToText();
   const { isPlayingAudio, isGeneratingSpeech } = useTextToSpeech();
 
@@ -67,20 +68,24 @@ export const UnifiedInputArea: React.FC<{
           ? `${message} ${lastTranscription}`
           : lastTranscription;
         
+        // Immediately clear images to prevent flash before auto-send
+        const imagesToSend = [...attachedImages];
+        setAttachedImages([]);
+        
         // Set the message and then send it in the next tick
         setMessage(newMessage);
         setTimeout(() => {
           // Send the message with proper handling of both text and images
           const messageToSend = newMessage;
           
-          if (messageToSend.trim() === "" && attachedImages.length === 0) {
+          if (messageToSend.trim() === "" && imagesToSend.length === 0) {
             return;
           }
 
           // Process any attached images
-          if (attachedImages.length > 0) {
+          if (imagesToSend.length > 0) {
             // Create a new message with text and attached images
-            const imageData = attachedImages.map((img) => ({
+            const imageData = imagesToSend.map((img) => ({
               type: "image",
               source: {
                 type: "base64",
@@ -102,7 +107,6 @@ export const UnifiedInputArea: React.FC<{
 
           // Reset state
           setMessage("");
-          setAttachedImages([]);
         }, 10);
       } else {
         // Otherwise, insert the transcription into the text input
@@ -423,7 +427,10 @@ export const UnifiedInputArea: React.FC<{
 
   // Handle microphone button click
   const handleMicrophoneClick = () => {
-    if (isRecording) {
+    if (isTranscribing) {
+      // If transcribing, cancel the transcription
+      handleCancelRecording();
+    } else if (isRecording) {
       finalizeRecording();
     } else {
       const controller = newAbortController();
@@ -432,9 +439,11 @@ export const UnifiedInputArea: React.FC<{
     }
   };
 
-  // Handle cancel recording
+  // Handle cancel recording or transcription
   const handleCancelRecording = () => {
-    if (abortControllerRef.current) {
+    if (isTranscribing) {
+      cancelTranscription();
+    } else if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
     abort();
@@ -462,63 +471,56 @@ export const UnifiedInputArea: React.FC<{
         accept="image/*"
         onChange={handleFileChange}
         multiple
+        disabled={isRecording || isTranscribing}
       />
 
-      {/* Image preview area */}
-      {attachedImages.length > 0 && (
-        <div className="attached-images-preview">
-          {attachedImages.map((image) => (
-            <div className="attached-image" key={image.id}>
-              <div className="attached-image-thumbnail">
-                <img
-                  src={image.src}
-                  alt={image.name}
-                  className="thumbnail"
-                  style={{
-                    maxWidth: "100px",
-                    maxHeight: "100px",
-                    objectFit: "contain",
-                  }}
-                />
-              </div>
-              <div className="attached-image-name">
-                {image.name}
-              </div>
-              <button
-                className="attached-image-remove"
-                onClick={() => handleRemoveImage(image.id)}
-                aria-label={t("ui.input.removeFile").replace(
-                  "{{filename}}",
-                  image.name,
-                )}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
       <div className="unified-input-area">
+        {/* Image preview area - hidden during transcription */}
+        {attachedImages.length > 0 && !isTranscribing && (
+          <div className="attached-images-preview">
+            {attachedImages.map((image) => (
+              <div className="attached-image-circular" key={image.id}>
+                <div className="attached-image-thumbnail-circular">
+                  <img
+                    src={image.src}
+                    alt={image.name}
+                    className="thumbnail-circular"
+                  />
+                </div>
+                <button
+                  className="attached-image-remove-circular"
+                  onClick={() => handleRemoveImage(image.id)}
+                  aria-label={t("ui.input.removeFile").replace(
+                    "{{filename}}",
+                    image.name,
+                  )}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Full-width input area with text input or waveform */}
         <div className="input-wrapper">
           {/* Text area - always present but can be visually hidden during recording */}
           <textarea
             ref={textareaRef}
-            className={`unified-input-textarea ${isRecording ? "recording" : ""}`}
+            className={`unified-input-textarea ${isRecording || isTranscribing ? "recording" : ""}`}
             value={message}
             onChange={handleTextareaChange}
             onKeyDown={handleKeyDown}
@@ -591,8 +593,8 @@ export const UnifiedInputArea: React.FC<{
               </button>
             )}
             
-            {/* Cancel recording button - visible during recording */}
-            {isRecording && (
+            {/* Cancel recording button - visible only during recording (not transcription) */}
+            {isRecording && !isTranscribing && (
               <button
                 className="input-control-button cancel-button"
                 onClick={handleCancelRecording}
@@ -623,10 +625,10 @@ export const UnifiedInputArea: React.FC<{
               <button
                 className={`input-control-button mic-button ${isTranscribing ? "transcribing" : ""}`}
                 onClick={handleMicrophoneClick}
-                disabled={isTranscribing}
+                disabled={false}
                 aria-label={
                   isTranscribing
-                    ? t("ui.recording.transcribing")
+                    ? t("ui.recording.cancel")
                     : t("ui.recording.start")
                 }
               >
@@ -665,11 +667,11 @@ export const UnifiedInputArea: React.FC<{
             {isRecording && (
               <button // This is the "Finish Recording" button
                 className={`input-control-button mic-button confirm ${isTranscribing ? "transcribing" : ""}`}
-                onClick={handleMicrophoneClick} // Calls finalizeRecording when isRecording is true
-                disabled={isTranscribing}
+                onClick={handleMicrophoneClick} // Calls finalizeRecording when isRecording is true, or cancels if transcribing
+                disabled={false}
                 aria-label={
                   isTranscribing
-                    ? t("ui.recording.transcribing")
+                    ? t("ui.recording.cancel")
                     : t("ui.recording.confirm") // Label for "Confirm Recording"
                 }
               >
