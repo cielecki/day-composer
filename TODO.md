@@ -68,6 +68,8 @@
 - [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
 - [ ] User guide requires a cleanup
 
+- [ ] There are still some issues with handing over modes, should I disable this feature or fix it?
+
 - [ ] Test with G
 
 - [ ] Create discord server

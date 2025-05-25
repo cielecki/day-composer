@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.13] - 2025-05-25
+
 ### Added
 - **Edit Todo Tool**: New `edit_todo` tool allows editing existing todo items
 - **Remove Todo Tool**: New `remove_todo` tool for removing todo items without deletion
