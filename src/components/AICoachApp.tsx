@@ -301,7 +301,7 @@ export const AICoachApp: React.FC = () => {
 									if (window.app) {
 										// @ts-ignore - Using the Obsidian command API
 										window.app.commands.executeCommandById(
-											"life-navigator:create-starter-pack",
+											"life-navigator:create-starter-kit",
 										);
 									}
 								}}
