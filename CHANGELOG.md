@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Recording Input Behavior**: Input field and placeholder are now completely hidden during voice recording and transcription, image preview area is hidden during transcription, and image editing (paste, attach, remove) is disabled during recording and transcription
 - **Mobile Usage Example Pills**: Improved styling and visibility of usage example buttons (pills) on mobile devices with better contrast, touch-friendly sizing, proper Obsidian theme integration, and enhanced accessibility features
 - **Transcription Cancellation UX**: Improved transcription cancellation by allowing users to click the spinner button itself to cancel transcription, removing the need for a separate X button during transcription
+- **Mobile Message Action Buttons**: Message action buttons (edit, copy, speak) are now always visible on mobile devices instead of requiring hover interaction
 
 
 ## [0.6.12] - 2025-05-23

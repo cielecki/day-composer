@@ -50,8 +50,7 @@
 - [x] 🔧 Naprawić w Obsidianie: current open file tryb ma nie poszerzać linków wewnętrznych rekurencyjnie, tylko jeden poziom
 - [x] 🔧 Naprawić w Obsidianie: batony do przykładów użycia - problem z widocznością na mobile
 - [x] 🔧 Disable show todo for now
-
-- [ ] 📱 Zmienić w Obsidianie żeby na mobilce nie był hover action item dla wiadomości (zbadać jak to jest w chacie gpt)
+- [x] 📱 Zmienić w Obsidianie żeby na mobilce nie był hover action item dla wiadomości (zbadać jak to jest w chacie gpt)
 
 - [ ] 📋 Dodać w Obsidianie sekcję z informacjami dla asystentki (czasy dojazdów, standardowe przygotowania do wyjść)
 - [ ] 📝 Asystentka - Zachowywać dokładnie oryginalne sformułowania użytkownika bez robienia rephrasingów
@@ -63,13 +62,13 @@
 - [ ] Modes are not translated to english
 - [ ] Working daily planning and habits in the starter kit
 
-- [ ] Test with G
-
 - [ ] Choose licence
 - [ ] Great README.md and overal documentation experience
 - [ ] Create tool documentation in README or MODE_GUIDE or smth
 - [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
 - [ ] User guide requires a cleanup
+
+- [ ] Test with G
 
 - [ ] Create discord server
 

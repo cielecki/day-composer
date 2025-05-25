@@ -400,6 +400,11 @@ If your plugin does not need CSS, delete this file.
     outline-offset: 2px;
   }
 
+  /* Always show message action buttons on mobile */
+  .message-actions {
+    opacity: 1 !important;
+  }
+
   /* Improve contrast in dark mode on mobile */
   @media (prefers-color-scheme: dark) {
     .ln-mode-pill {
