@@ -53,19 +53,21 @@
 - [x] 📱 Zmienić w Obsidianie żeby na mobilce nie był hover action item dla wiadomości (zbadać jak to jest w chacie gpt)
 - [x] 🔧 Naprawić problem z autoscrollem w chacie - podczas pisania wiadomości nie scrolluje się automatycznie
 - [x] Starter kit should be created even if a directory like this already exists (it should just be created under a new name (like starter kit 2 or smth))
+- [x] 📋 Dodać w Obsidianie sekcję z informacjami dla asystentki (czasy dojazdów, standardowe przygotowania do wyjść)
+- [x] 📝 Asystentka - Zachowywać dokładnie oryginalne sformułowania użytkownika bez robienia rephrasingów
+- [x] Gandi and other updates to personas and prompts
 
-- [ ] 📋 Dodać w Obsidianie sekcję z informacjami dla asystentki (czasy dojazdów, standardowe przygotowania do wyjść)
-- [ ] 📝 Asystentka - Zachowywać dokładnie oryginalne sformułowania użytkownika bez robienia rephrasingów
-- [ ] Gandi and other updates to personas and prompts
-
+- [ ] czy na mobilce jest zafixowany scroll?
 - [ ] Upewnienie się że AI rozumiem ze [-] to anulowany task
 - [ ] Format of the todo items should be refered to somewhere in prompts - write down the obsidian bullet journal md format that the plugin uses
 
-- [ ] Updating starter kits with all new data
-- [ ] Working daily planning and habits in the starter kit
+- [ ] Cleanup wszystkich trybów
 
+- [ ] Updating starter kits with all new data (remove controversial figures)
+- [ ] Working daily planning and habits in the starter kit
 - [ ] Modes are not translated to english
 
+- [ ] Jak zrobić guidance dla uzytkownika przy tworzeniu swoich materialow? Jakis fajny tryb? czy docs?
 - [ ] Choose licence
 - [ ] Great README.md and overal documentation experience
 - [ ] Create tool documentation in README or MODE_GUIDE or smth
