@@ -46,6 +46,9 @@ Investigate the possibility of an agent that activates based on cron jobs or ran
 **Passive Listening Agent:**
 Explore the ability to enter a voice-activated mode where the system waits for a wake phrase like "Hi Navigator" to start interacting.
 
+**Endless Chat Interface:**
+Implement an endless chat window in Obsidian with a recent messages view that includes truncated context and a "load previous messages" option similar to Cursor's interface. This would provide a more seamless chat experience with better context management.
+
 ## General Notes
 
 *   This roadmap is a living document and priorities may shift based on user feedback and development capacity.
