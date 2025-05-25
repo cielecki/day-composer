@@ -152,10 +152,43 @@ export const AICoachApp: React.FC = () => {
 		}
 	}, []);
 
-	// Effect to scroll to bottom when conversation history updates
+	// Effect to scroll to bottom when conversation history updates (but not during streaming)
 	useEffect(() => {
-		scrollToBottom();
-	}, [filteredConversation, scrollToBottom]);
+		// Only scroll on conversation changes when not generating to avoid double-scrolling
+		if (!isGeneratingResponse) {
+			scrollToBottom();
+		}
+	}, [filteredConversation, scrollToBottom, isGeneratingResponse]);
+
+	// Effect to handle autoscroll during streaming
+	useEffect(() => {
+		if (isGeneratingResponse && conversationContainerRef.current) {
+			const container = conversationContainerRef.current;
+			
+			// Create a MutationObserver to watch for content changes during streaming
+			const observer = new MutationObserver(() => {
+				// Debounce the scroll to avoid excessive scrolling
+				requestAnimationFrame(() => {
+					container.scrollTop = container.scrollHeight;
+				});
+			});
+
+			// Observe changes to the conversation container and its children
+			observer.observe(container, {
+				childList: true,
+				subtree: true,
+				characterData: true,
+			});
+
+			// Scroll immediately when generation starts
+			scrollToBottom();
+
+			// Cleanup observer when generation stops or component unmounts
+			return () => {
+				observer.disconnect();
+			};
+		}
+	}, [isGeneratingResponse, scrollToBottom]);
 
 	const newAbortController = useCallback(() => {
 		const abortController = new AbortController();
