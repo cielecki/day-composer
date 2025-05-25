@@ -46,43 +46,55 @@
 - [x] In a mobile app sometimes the waveform visualisation is completly flat, dispite audio being recorded normally, if that happen it remains a problem until I restart the app
 - [x] 🔧 Naprawić w Obsidianie: podczas usuwania zadania dodaje się "Removed task", który nie jest przetłumaczony
 - [x] 🎤 Naprawić w Obsidianie: gdy załączam obrazek, powinienem nadal móc nagrać głosówkę
-
-
-
 - [x] 💻 Dodać możliwość anulowania transkrypcji w Obsidianie
 - [x] 🔧 Naprawić w Obsidianie: current open file tryb ma nie poszerzać linków wewnętrznych rekurencyjnie, tylko jeden poziom
 - [x] 🔧 Naprawić w Obsidianie: batony do przykładów użycia - problem z widocznością na mobile
-- [ ] 📋 Dodać w Obsidianie sekcję z informacjami dla asystentki (czasy dojazdów, standardowe przygotowania do wyjść)
-- [ ] 📱 Zmienić w Obsidianie żeby na mobilce nie był hover action item dla wiadomości (zbadać jak to jest w chacie gpt)
-- [ ] 🔧 No action buttons on text messages ending with a tool call?
+- [x] 🔧 Disable show todo for now
 
+- [ ] 📱 Zmienić w Obsidianie żeby na mobilce nie był hover action item dla wiadomości (zbadać jak to jest w chacie gpt)
+
+- [ ] 📋 Dodać w Obsidianie sekcję z informacjami dla asystentki (czasy dojazdów, standardowe przygotowania do wyjść)
+- [ ] 📝 Asystentka - Zachowywać dokładnie oryginalne sformułowania użytkownika bez robienia rephrasingów
+- [ ] Upewnienie się że AI rozumiem ze [-] to anulowany task
 - [ ] Format of the todo items should be refered to somewhere in prompts - write down the obsidian bullet journal md format that the plugin uses
-- [ ] Working daily planning and habits in the starter kit
-- [ ] Test with G
+- [ ] Updating starter kits with all new data
+- [ ] Starter kit should be created even if a directory like this already exists (it should just be created under a new name (like starter kit 2 or smth))
 - [ ] Gandi and other updates to personas and prompts
 - [ ] Modes are not translated to english
-- [ ] 📝 Asystentka - Zachowywać dokładnie oryginalne sformułowania użytkownika bez robienia rephrasingów
-- [ ] 🐛 Naprawić problem automatycznego dodawania niepotrzebnych komentarzy
+- [ ] Working daily planning and habits in the starter kit
 
-## AI breakfast release
+- [ ] Test with G
 
-- [ ] ⚡ Szybki tryb w obsidianie - rozpisać co to
+- [ ] Choose licence
+- [ ] Great README.md and overal documentation experience
 - [ ] Create tool documentation in README or MODE_GUIDE or smth
-
 - [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
 - [ ] User guide requires a cleanup
-- [ ] Choose licence
-- [ ] Add plugin to obsidian repository
+
 - [ ] Create discord server
+
 - [ ] Create a presentation for AI breakfast
 - [ ] Write a draft blog post for people to read through and give feedback on
 
-- [ ] Acquire as many test users as possible
-## Initial release
-- [ ] still there is something wrong with the current spot logic
-- [ ] Starter kit should be created even if a directory like this already exists (it should just be created under a new name (like starter kit 2 or smth))
-- [ ] Better info dumped to AI when file is not found in expand links
+- [ ] Add plugin to obsidian repository
 
+- [ ] Do a presentation
+- [ ] Acquire as many test users as possible
+- [ ] Plan for whats next
+
+## Nice to haves
+- [ ] Better info dumped to AI when file is not found in expand links
+- [ ] still there is something wrong with the current spot logic - is it still a problem?
+- [ ] If I record during generation the stop button is becoming unresponsive
+- [ ] Do I want the input buttons to be flat?
+- [ ] When stopping audio during eneration, something breaks and it's not being stopped, furthermoe when it starts playing the stop button is not working
+- [ ] ⚡ Szybki tryb w obsidianie - rozpisać co to (ability to cancel speech for example, pending message etc)
+- [ ] Test with B
+- [ ] Test with Piotr
+- [ ] AI Coach -> Life Navigator
+- [ ] 🤖 Dodać w Obsidianie możliwość zmiany Opus na Sonnet
+- [ ] Klikalne tool calle tak zeby otwieraly edytor
+- [ ] 🔧 No action buttons on text messages ending with a tool call?
 - [ ] Bug gdy zastopuje generowanego tool calla
 ```markdown
 conversation turn processing: BadRequestError: 400 {"type":"error","error":{"type":"invalid_request_error","message":"messages.4: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_016aY9VAzzsaK6mWENg3JN8L. Each `tool_use` block must have a corresponding `tool_result` block in the next message."}}
@@ -92,19 +104,4 @@ conversation turn processing: BadRequestError: 400 {"type":"error","error":{"typ
     at async eval (plugin:day-composer:51631:28)
     at async eval (plugin:day-composer:51802:49)
 ```
-
-- [ ] If I record during generation the stop button is becoming unresponsive
-- [ ] Do I want the input buttons to be flat?
-- [ ] When stopping audio during eneration, something breaks and it's not being stopped, furthermoe when it starts playing the stop button is not working
-- [ ] Lepszy entry level experience
-
-- [ ] Upewnienie się że AI rozumiem ze [-] to anulowany task
-- [ ] Disable show todo for now
-- [ ] I made a marketing plan of the Vibe Living project
-
-## Nice to haves
-- [ ] Test with B
-- [ ] Test with Piotr
-- [ ] AI Coach -> Life Navigator
-- [ ] 🤖 Dodać w Obsidianie możliwość zmiany Opus na Sonnet
-- [ ] Klikalne tool calle tak zeby otwieraly edytor
+- [ ] 🐛 Naprawić problem automatycznego dodawania niepotrzebnych komentarzy - is this still a problem?

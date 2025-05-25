@@ -9,7 +9,6 @@ import { uncheckTodoTool } from "./tools/uncheck-todo";
 import { moveTodoTool } from "./tools/move-todo";
 import { abandonTodoTool } from "./tools/abandon-todo";
 import { createCompletedTodoTool } from "./tools/create-completed-todo";
-import { showTodosTool } from "./tools/show-todos";
 import { handoverModeTool } from "./tools/handover-mode";
 import { editTodoTool } from "./tools/edit-todo";
 import { removeTodoTool } from "./tools/remove-todo";
@@ -64,7 +63,7 @@ export class ObsidianTools {
 		moveTodoTool,
 		abandonTodoTool,
 		createCompletedTodoTool,
-		showTodosTool,
+		//Disabled for now: showTodosTool,
 		handoverModeTool,
 		editTodoTool,
 		removeTodoTool,
