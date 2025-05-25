@@ -51,16 +51,20 @@
 - [x] 🔧 Naprawić w Obsidianie: batony do przykładów użycia - problem z widocznością na mobile
 - [x] 🔧 Disable show todo for now
 - [x] 📱 Zmienić w Obsidianie żeby na mobilce nie był hover action item dla wiadomości (zbadać jak to jest w chacie gpt)
+- [x] 🔧 Naprawić problem z autoscrollem w chacie - podczas pisania wiadomości nie scrolluje się automatycznie
+- [x] Starter kit should be created even if a directory like this already exists (it should just be created under a new name (like starter kit 2 or smth))
 
 - [ ] 📋 Dodać w Obsidianie sekcję z informacjami dla asystentki (czasy dojazdów, standardowe przygotowania do wyjść)
 - [ ] 📝 Asystentka - Zachowywać dokładnie oryginalne sformułowania użytkownika bez robienia rephrasingów
+- [ ] Gandi and other updates to personas and prompts
+
 - [ ] Upewnienie się że AI rozumiem ze [-] to anulowany task
 - [ ] Format of the todo items should be refered to somewhere in prompts - write down the obsidian bullet journal md format that the plugin uses
+
 - [ ] Updating starter kits with all new data
-- [ ] Starter kit should be created even if a directory like this already exists (it should just be created under a new name (like starter kit 2 or smth))
-- [ ] Gandi and other updates to personas and prompts
-- [ ] Modes are not translated to english
 - [ ] Working daily planning and habits in the starter kit
+
+- [ ] Modes are not translated to english
 
 - [ ] Choose licence
 - [ ] Great README.md and overal documentation experience
@@ -93,6 +97,7 @@
 - [ ] Test with B
 - [ ] Test with Piotr
 - [ ] AI Coach -> Life Navigator
+- [ ] Tool do tworzenia obrazów za pomoca openai image generation ktory wkleja ten obraz do aktualnej notatki
 - [ ] 🤖 Dodać w Obsidianie możliwość zmiany Opus na Sonnet
 - [ ] Klikalne tool calle tak zeby otwieraly edytor
 - [ ] 🔧 No action buttons on text messages ending with a tool call?
