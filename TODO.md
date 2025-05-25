@@ -42,21 +42,17 @@
 - [x] 💻 Naprawić w Obsidianie: przy przenoszeniu wielu zadań zachowywać kolejność z parametru, nie oryginalną
 - [x] 💻 Poprawić w Obsidian - podczas przenoszenia todo, przeniesione itemy powinny być przenoszone do current position (jak w abandoned i check off todo), uwspólnić kod dla wszystkich tych narzędzi
 - [x] 🔧 Naprawić problem z edycją zadań w Obsidianie (orginal todo is required)
+- [x] (completed at 15:00)
 
-- [ ] (completed at 15:00)
 - [ ] 💻 Dodać możliwość anulowania transkrypcji w Obsidianie
-
 - [ ] 🔧 Naprawić w Obsidianie: current open file tryb ma nie poszerzać linków wewnętrznych rekurencyjnie, tylko jeden poziom
 - [ ] 🔧 Naprawić w Obsidianie: batony do przykładów użycia - problem z widocznością na mobile
-- [ ] 🎤 Naprawić w Obsidianie: gdy załączam obrazek, powinienem nadal móc nagrać głosówkę
-
------
-
-- [ ] Defaulting not to todays log but to currently open file, or maybe just don't do defaults at all.
+- [x] 🎤 Naprawić w Obsidianie: gdy załączam obrazek, powinienem nadal móc nagrać głosówkę
 - [ ] 📋 Dodać w Obsidianie sekcję z informacjami dla asystentki (czasy dojazdów, standardowe przygotowania do wyjść)
 - [ ] 📱 Zmienić w Obsidianie żeby na mobilce nie był hover action item dla wiadomości (zbadać jak to jest w chacie gpt)
+- [x] In a mobile app sometimes the waveform visualisation is completly flat, dispite audio being recorded normally, if that happen it remains a problem until I restart the app
 
-- [ ] 🔧 Naprawić w Obsidianie: podczas usuwania zadania dodaje się "Removed task", który nie jest przetłumaczony
+- [x] 🔧 Naprawić w Obsidianie: podczas usuwania zadania dodaje się "Removed task", który nie jest przetłumaczony
 
 - [ ] Format of the todo items should be refered to somewhere in prompts - write down the obsidian bullet journal md format that the plugin uses
 - [ ] Working daily planning and habits in the starter kit

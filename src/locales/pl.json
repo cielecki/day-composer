@@ -94,6 +94,9 @@
       "edit": "✓ Edytowano {{originalTask}} na {{newTask}} w {{path}}{{details}}",
       "remove": "✓ Usunięto {{task}} z {{path}} (przekonwertowano na komentarz)"
      },
+    "comments": {
+      "removedTaskHeader": "USUNIĘTE ZADANIE"
+    },
     "handover": {
       "switched": "Przełączono na tryb {{modeName}}",
       "successMessage": "Pomyślnie przełączono z trybu {{fromMode}} na {{toMode}}.",

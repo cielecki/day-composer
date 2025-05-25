@@ -94,6 +94,9 @@
       "edit": "✓ Edited {{originalTask}} to {{newTask}} in {{path}}{{details}}",
       "remove": "✓ Removed {{task}} from {{path}} (converted to comment)"
     },
+    "comments": {
+      "removedTaskHeader": "REMOVED TASK"
+    },
     "handover": {
       "switched": "Switched to {{modeName}} mode",
       "successMessage": "Successfully switched from {{fromMode}} to {{toMode}} mode.",

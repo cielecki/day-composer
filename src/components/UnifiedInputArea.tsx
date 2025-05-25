@@ -70,16 +70,39 @@ export const UnifiedInputArea: React.FC<{
         // Set the message and then send it in the next tick
         setMessage(newMessage);
         setTimeout(() => {
-          // Create a local copy to ensure we use the updated message
+          // Send the message with proper handling of both text and images
           const messageToSend = newMessage;
           
-          // Reset the message first to clear the input box
-          setMessage("");
-          
-          // Send the message
-          if (messageToSend.trim()) {
+          if (messageToSend.trim() === "" && attachedImages.length === 0) {
+            return;
+          }
+
+          // Process any attached images
+          if (attachedImages.length > 0) {
+            // Create a new message with text and attached images
+            const imageData = attachedImages.map((img) => ({
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: img.src.split(";")[0].split(":")[1], // Extract MIME type
+                data: img.src.split(",")[1], // Extract base64 data without the prefix
+              },
+            }));
+
+            // Add the images to the message
+            addUserMessage(
+              messageToSend,
+              newAbortController().signal,
+              imageData,
+            );
+          } else {
+            // Just send text message
             addUserMessage(messageToSend, newAbortController().signal);
           }
+
+          // Reset state
+          setMessage("");
+          setAttachedImages([]);
         }, 10);
       } else {
         // Otherwise, insert the transcription into the text input
@@ -112,7 +135,7 @@ export const UnifiedInputArea: React.FC<{
     }
     // Update ref with current value for next comparison
     prevIsTranscribingRef.current = isTranscribing;
-  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, message, addUserMessage, newAbortController]);
+  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, message, addUserMessage, newAbortController, attachedImages]);
 
   // Add ResizeObserver to ensure textarea is properly sized
   useEffect(() => {
@@ -184,27 +207,24 @@ export const UnifiedInputArea: React.FC<{
 
   const setupAudioAnalyzer = async () => {
     try {
-      // If we already have an active analyzer, don't create a new one
-      if (
-        audioContextRef.current &&
-        analyserRef.current &&
-        streamRef.current
-      ) {
-        console.log("Audio analyzer already set up");
-        return;
-      }
-
-      // Clean up any existing contexts or streams
+      // Clean up any existing contexts or streams first
       if (
         audioContextRef.current &&
         audioContextRef.current.state !== "closed"
       ) {
+        console.log("Closing existing AudioContext");
         audioContextRef.current.close();
       }
 
       if (streamRef.current) {
+        console.log("Stopping existing stream tracks");
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
+
+      // Reset refs
+      audioContextRef.current = null;
+      analyserRef.current = null;
+      streamRef.current = null;
 
       // Create audio context
       const audioContext = new (window.AudioContext ||
@@ -598,8 +618,8 @@ export const UnifiedInputArea: React.FC<{
 
           {/* Right-aligned controls */}
           <div className="input-controls-right">
-            {/* Microphone button to START recording - visible only when message is empty and not currently recording */}
-            {message.trim() === "" && attachedImages.length === 0 && !isRecording && (
+            {/* Microphone button to START recording - visible when message is empty and not currently recording */}
+            {message.trim() === "" && !isRecording && (
               <button
                 className={`input-control-button mic-button ${isTranscribing ? "transcribing" : ""}`}
                 onClick={handleMicrophoneClick}

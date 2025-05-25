@@ -22,10 +22,6 @@ const schema = {
             todo_text: {
               type: "string",
               description: "The complete text of the to-do item to remove. This should include all formatting, emojis, time markers, and any other specific formatting.",
-            },
-            removal_reason: {
-              type: "string",
-              description: "Optional reason for removing the task. Will be included in the removal comment.",
             }
           },
           required: ["todo_text"]
@@ -42,7 +38,6 @@ const schema = {
 
 type TodoItem = {
   todo_text: string;
-  removal_reason?: string;
 };
 
 type RemoveTodoToolInput = {
@@ -110,7 +105,7 @@ export const removeTodoTool: ObsidianTool<RemoveTodoToolInput> = {
     
     // Process each to-do item
     for (const todo of todos) {
-      const { todo_text, removal_reason } = todo;
+      const { todo_text } = todo;
       
       // Find the task to remove
       const taskToRemove = findTaskByDescription(updatedNote, todo_text, (task) => true);
@@ -127,8 +122,7 @@ export const removeTodoTool: ObsidianTool<RemoveTodoToolInput> = {
       
       // Create the comment block with the removed task information
       const originalTaskText = formatTask(taskToRemove);
-      const reasonText = removal_reason ? ` (Reason: ${removal_reason})` : '';
-      const removalComment = `<!-- REMOVED TASK: This task has been removed${reasonText}
+      const removalComment = `<!-- ${t('tools.comments.removedTaskHeader')}:
 ${originalTaskText}
 -->`;
       
