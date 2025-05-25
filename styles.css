@@ -83,7 +83,6 @@ If your plugin does not need CSS, delete this file.
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-width: 800px;
   margin: 0 auto;
   width: 100%;
 }
@@ -1064,7 +1063,6 @@ If your plugin does not need CSS, delete this file.
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 800px;
 }
 
 .input-mode-container.voice-mode {
@@ -1108,7 +1106,6 @@ If your plugin does not need CSS, delete this file.
 
 .text-input-container {
   width: 100%;
-  max-width: 800px;
   margin: 0 auto;
   padding: 0 40px;
   position: relative;
@@ -1310,7 +1307,6 @@ If your plugin does not need CSS, delete this file.
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 800px;
   margin: 0 auto;
   background-color: transparent;
   border-radius: 8px;
@@ -1492,7 +1488,6 @@ If your plugin does not need CSS, delete this file.
 /* Message editing styles */
 .message.user.editing {
   padding: 0;
-  max-width: 800px;
   width: 100%;
 }
 
