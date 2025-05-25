@@ -39,6 +39,7 @@
       }
     },
     "position": {
+      "before": "before \"{{task}}\"",
       "after": "after \"{{task}}\"",
       "at": "at {{position}} position"
     },
@@ -297,8 +298,9 @@
   },
   "tasks": {
     "format": {
-      "completionTime": " ({{time}})",
-      "movedTo": " → {{target}}",
+      "completedAt": " (completed at {{time}})",
+      "abandonedAt": " (abandoned at {{time}})",
+      "movedTo": " (→ {{target}})",
       "movedFrom": " (from {{source}})"
     }
   },

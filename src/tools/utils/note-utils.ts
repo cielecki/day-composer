@@ -261,14 +261,14 @@ export function findTaskByDescription(
 /**
  * Determines the insertion position for tasks based on specified positioning strategy
  * @param note The parsed document
- * @param position The positioning strategy: beginning, end, or after
- * @param afterTodoText The description of a task to insert after (required when position is 'after')
+ * @param position The positioning strategy: beginning, end, before, or after
+ * @param referenceTodoText The description of a reference task for positioning (required when position is 'before' or 'after')
  * @returns The index where new tasks should be placed
  */
 export function determineInsertionPosition(
 	note: Note,
-	position: "beginning" | "end" | "after",
-	afterTodoText?: string,
+	position: "beginning" | "end" | "before" | "after",
+	referenceTodoText?: string,
 ): number {
 	if (position === "beginning") {
 		// Insert at the first pending task or beginning
@@ -276,17 +276,17 @@ export function determineInsertionPosition(
 	} else if (position === "end") {
 		// Insert at the end of the document
 		return note.content.length;
-	} else if (position === "after") {
-		// Validate that after_todo_text is provided
-		if (!afterTodoText) {
+	} else if (position === "before" || position === "after") {
+		// Validate that reference_todo_text is provided
+		if (!referenceTodoText) {
 			throw new ToolExecutionError(
-				"When position is 'after', you must provide 'after_todo_text' to specify which to-do to insert after",
+				`When position is '${position}', you must provide 'reference_todo_text' to specify the reference to-do`,
 			);
 		}
 
 		try {
 			// Find the task by description
-			const referenceTask = findTaskByDescription(note, afterTodoText, () => true);
+			const referenceTask = findTaskByDescription(note, referenceTodoText, () => true);
 
 			// Find its index in the document
 			let foundIndex = -1;
@@ -304,12 +304,16 @@ export function determineInsertionPosition(
 
 			if (foundIndex === -1) {
 				throw new ToolExecutionError(
-					`Could not determine the position of reference task "${afterTodoText}"`,
+					`Could not determine the position of reference task "${referenceTodoText}"`,
 				);
 			}
 
-			// Set insertion point to be after this task
-			return foundIndex + 1;
+			// Set insertion point based on position
+			if (position === "before") {
+				return foundIndex; // Insert before the reference task
+			} else {
+				return foundIndex + 1; // Insert after the reference task
+			}
 		} catch (error) {
 			throw new ToolExecutionError(
 				`Error finding reference task: ${error.message}`,

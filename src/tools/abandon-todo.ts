@@ -3,11 +3,11 @@ import { ObsidianTool } from "../obsidian-tools";
 import { findTaskByDescription, updateNote } from './utils/note-utils';
 import { readNote } from './utils/note-utils';
 import { getDailyNotePath } from "./utils/getDailyNotePath";
+import { getCurrentTime } from "./utils/getCurrentTime";
 import { appendComment } from "./utils/task-utils";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { validateTasks } from "./utils/task-validation";
-import { findCurrentSpot } from "./utils/note-utils";
-import { removeTaskFromDocument, insertTaskAtPosition } from "./utils/task-utils";
+import { moveTaskToPosition } from "./utils/moveTaskToPosition";
 import { t } from "../i18n";
 
 const schema = {
@@ -34,6 +34,10 @@ const schema = {
           required: ["todo_text"]
         }
       },
+      time: {
+        type: "string",
+        description: "Time when the tasks were abandoned in HH:MM format. If not provided, current time will be used. This time is applied to all tasks in the batch.",
+      },
       file_path: {
         type: "string",
         description: "The path of the document containing the to-dos (including .md extension). If not provided, searches only in today's daily note.",
@@ -50,6 +54,7 @@ type TodoItem = {
 
 type AbandonTodoToolInput = {
   todos: TodoItem[],
+  time?: string,
   file_path?: string
 }
 
@@ -90,11 +95,14 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
     }
   },
   execute: async (plugin: MyPlugin, params: AbandonTodoToolInput): Promise<string> => {
-    const { todos } = params;
+    const { todos, time } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
       throw new ToolExecutionError("No to-do items provided");
     }
+    
+    // Format the current time if provided (common for all tasks)
+    const currentTime = getCurrentTime(time);
     
     const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
     const note = await readNote({plugin, filePath});
@@ -124,19 +132,18 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
       // Update status
       task.status = 'abandoned';
       
+      // Add abandonment time to the todo text if provided
+      if (currentTime) {
+        task.todoText = `${task.todoText}${t('tasks.format.abandonedAt', { time: currentTime })}`;
+      }
+      
       // Add comment if provided
       if (comment) {
         appendComment(task, comment);
       }
       
-      // Remove the task from its current position
-      updatedNote = removeTaskFromDocument(updatedNote, task);
-      
-      // Find the current position (first pending task or end of document)
-      const currentSpot = findCurrentSpot(updatedNote);
-      
-      // Insert the abandoned task at the current position
-      updatedNote = insertTaskAtPosition(updatedNote, task, currentSpot);
+      // Move the abandoned task to the current position (unified logic with check-todo and move-todo)
+      updatedNote = moveTaskToPosition(updatedNote, task);
       
       abandonedTasks.push(todo_text);
     }

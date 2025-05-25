@@ -3,8 +3,9 @@ import { createFile } from "./utils/createFile";
 import { fileExists } from "./utils/fileExists";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { ObsidianTool } from "../obsidian-tools";
-import { readNote, updateNote, Note, determineInsertionPosition, findTaskByDescription } from "./utils/note-utils";
-import { insertTaskAtPosition, removeTaskFromDocument, Task } from "./utils/task-utils";
+import { readNote, updateNote, Note, findTaskByDescription, determineInsertionPosition } from "./utils/note-utils";
+import { insertTaskAtPosition, Task } from "./utils/task-utils";
+import { moveTaskToPosition } from "./utils/moveTaskToPosition";
 import { validateTasks } from "./utils/task-validation";
 import { t } from "../i18n";
 
@@ -40,13 +41,13 @@ const schema = {
 			position: {
 				type: "string",
 				description:
-					"Where to place the moved to-do items: 'beginning' (at the start of the document, after all done items), 'end' (at the end of the document), or 'after' (after a specific to-do)",
-				enum: ["beginning", "end", "after"],
+					"Where to place the moved to-do items: 'beginning' (at the start of the document, after all done items), 'end' (at the end of the document), 'before' (before a specific to-do), or 'after' (after a specific to-do)",
+				enum: ["beginning", "end", "before", "after"],
 			},
-			after_todo_text: {
+			reference_todo_text: {
 				type: "string",
 				description:
-					"When position is 'after', this is the complete text of the to-do item after which the new items should be placed.",
+					"When position is 'before' or 'after', this is the complete text of the reference to-do item for positioning.",
 			},
     },
     required: ["todos", "source_path", "target_path", "position"]
@@ -61,8 +62,8 @@ type MoveTodoToolInput = {
   todos: TodoItem[],
   source_path: string,
   target_path: string,
-  position: "beginning" | "end" | "after",
-  after_todo_text?: string
+  position: "beginning" | "end" | "before" | "after",
+  reference_todo_text?: string
 }
 
 export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
@@ -103,7 +104,7 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
   },
   execute: async (plugin: MyPlugin, params: MoveTodoToolInput): Promise<string> => {
     // Extract parameters
-    const { todos, source_path, position, after_todo_text, target_path } = params;
+    const { todos, source_path, position, reference_todo_text, target_path } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
       throw new ToolExecutionError("No to-do items provided");
@@ -147,13 +148,13 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       }))
     );
     
-    // Check if the after_todo_text is specified and exists when position is 'after'
-    if (position === "after" && after_todo_text) {
-      const referenceTask = findTaskByDescription(targetNote, after_todo_text, (task) => true);
+    // Check if the reference_todo_text is specified and exists when position is 'before' or 'after'
+    if ((position === "before" || position === "after") && reference_todo_text) {
+      const referenceTask = findTaskByDescription(targetNote, reference_todo_text, (task) => true);
       
       if (!referenceTask) {
         throw new ToolExecutionError(t('errors.tasks.notFound', {
-          task: `"${after_todo_text}"`,
+          task: `"${reference_todo_text}"`,
           path: target_path
         }));
       }
@@ -171,8 +172,7 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       ? updatedSourceNote
       : JSON.parse(JSON.stringify(targetNote)) as Note;
     
-    // Process each to-do item
-    for (const todo of todos) {
+    function processTodo(todo: TodoItem) {
       const todoText = todo.todo_text;
       
       // We already validated that all tasks exist
@@ -180,19 +180,8 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       
       // Handle moving based on whether it's within the same document or to another document
       if (isMovingWithinSameDocument) {
-        // Remove the task from its current position
-        updatedSourceNote = removeTaskFromDocument(updatedSourceNote, task);
-        
-        // Determine insertion position in the document
-        const insertionIndex = determineInsertionPosition(
-          updatedSourceNote,
-          position,
-          after_todo_text
-        );
-        
-        // Insert the task at the new position
-        updatedSourceNote = insertTaskAtPosition(updatedSourceNote, task, insertionIndex);
-        updatedTargetNote = updatedSourceNote; // Keep them in sync
+        updatedSourceNote = moveTaskToPosition(updatedSourceNote, task, position, reference_todo_text);
+        updatedTargetNote = updatedSourceNote;
       } else {
         // Create the task for the target document
         const newMovedTask: Task = JSON.parse(JSON.stringify(task));
@@ -202,21 +191,21 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
         newMovedTask.status = task.status === 'moved' ? 'pending' : task.status;
         
         if (sourceName) {
-          newMovedTask.todoText += " " + t('tasks.format.movedFrom', { source: sourceName });
+          newMovedTask.todoText += t('tasks.format.movedFrom', { source: sourceName });
         }
         
         // Mark the task as moved in the source note
         task.status = 'moved';
 
         if (targetName) {
-          task.todoText += " " + t('tasks.format.movedTo', { target: targetName });
+          task.todoText += t('tasks.format.movedTo', { target: targetName });
         }
         
         // Determine insertion position in target note based on positioning strategy
         const insertionIndex = determineInsertionPosition(
           updatedTargetNote,
           position,
-          after_todo_text
+          reference_todo_text
         );
         
         // Add the moved task to the target note at the determined position
@@ -224,6 +213,19 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       }
       
       movedTasks.push(todoText);
+    }
+
+    if (position === "before" || position === "end") {
+      // Process in normal order for "before" or "end" positions
+      for (const todo of todos) {
+        processTodo(todo);
+      }
+    } else {
+      // Process in reverse order for all other positions
+      for (let i = todos.length - 1; i >= 0; i--) {
+        const todo = todos[i];
+        processTodo(todo);
+      }
     }
     
     // Update the files with all the changes
@@ -235,8 +237,8 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
     }
     
     // Include positioning details in the success message
-    const positionDetail = position === "after"
-      ? t('tools.position.after').replace('{{task}}', after_todo_text || '')
+    const positionDetail = (position === "after" || position === "before")
+      ? t(`tools.position.${position}`).replace('{{task}}', reference_todo_text || '')
       : t('tools.position.at').replace('{{position}}', position);
     
     const tasksDescription = movedTasks.length === 1 

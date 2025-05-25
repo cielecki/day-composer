@@ -39,27 +39,28 @@
 - [x] 🔧 Edit todo items
 - [x] Add function to delete tasks (putting them in a comment)
 - [x] In the new mode voice instructions are not correct
+- [x] 💻 Naprawić w Obsidianie: przy przenoszeniu wielu zadań zachowywać kolejność z parametru, nie oryginalną
+- [x] 💻 Poprawić w Obsidian - podczas przenoszenia todo, przeniesione itemy powinny być przenoszone do current position (jak w abandoned i check off todo), uwspólnić kod dla wszystkich tych narzędzi
+- [x] 🔧 Naprawić problem z edycją zadań w Obsidianie (orginal todo is required)
 
-- [ ] Format of the todo items should be refered to somewhere in prompts - write down the obsidian bullet journal md format that the plugin uses
-- [ ] Defaulting not to todays log but to currently open file, or maybe just don't do defaults at all.
-- [ ] ⚡ Szybki tryb w obsidianie
+- [ ] (completed at 15:00)
 - [ ] 💻 Dodać możliwość anulowania transkrypcji w Obsidianie
-- [ ] 🔧 Naprawić problem z edycją zadań w Obsidianie (orginal todo is required)
-- [ ] 💻 Naprawić w Obsidianie: przy przenoszeniu wielu zadań zachowywać kolejność z parametru, nie oryginalną
-- [ ] 📋 Dodać w Obsidianie sekcję z informacjami dla asystentki (czasy dojazdów, standardowe przygotowania do wyjść)
-- [ ] 🎤 Naprawić w Obsidianie: gdy załączam obrazek, powinienem nadal móc nagrać głosówkę
-- [ ] 🤖 Dodać w Obsidianie możliwość zmiany Opus na Sonnet
-- [ ] 📱 Zmienić w Obsidianie żeby na mobilce nie był hover action item dla wiadomości
+
 - [ ] 🔧 Naprawić w Obsidianie: current open file tryb ma nie poszerzać linków wewnętrznych rekurencyjnie, tylko jeden poziom
 - [ ] 🔧 Naprawić w Obsidianie: batony do przykładów użycia - problem z widocznością na mobile
+- [ ] 🎤 Naprawić w Obsidianie: gdy załączam obrazek, powinienem nadal móc nagrać głosówkę
+
+-----
+
+- [ ] Defaulting not to todays log but to currently open file, or maybe just don't do defaults at all.
+- [ ] 📋 Dodać w Obsidianie sekcję z informacjami dla asystentki (czasy dojazdów, standardowe przygotowania do wyjść)
+- [ ] 📱 Zmienić w Obsidianie żeby na mobilce nie był hover action item dla wiadomości (zbadać jak to jest w chacie gpt)
+
 - [ ] 🔧 Naprawić w Obsidianie: podczas usuwania zadania dodaje się "Removed task", który nie jest przetłumaczony
 
-
-
+- [ ] Format of the todo items should be refered to somewhere in prompts - write down the obsidian bullet journal md format that the plugin uses
 - [ ] Working daily planning and habits in the starter kit
 - [ ] Test with G
-- [ ] Test with Piotr
-- [ ] Acquire as many test users as possible
 - [ ] Gandi and other updates to personas and prompts
 - [ ] Modes are not translated to english
 - [ ] 📝 Asystentka - Zachowywać dokładnie oryginalne sformułowania użytkownika bez robienia rephrasingów
@@ -67,6 +68,7 @@
 
 ## AI breakfast release
 
+- [ ] ⚡ Szybki tryb w obsidianie - rozpisać co to
 - [ ] Create tool documentation in README or MODE_GUIDE or smth
 
 - [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
@@ -77,6 +79,7 @@
 - [ ] Create a presentation for AI breakfast
 - [ ] Write a draft blog post for people to read through and give feedback on
 
+- [ ] Acquire as many test users as possible
 ## Initial release
 - [ ] still there is something wrong with the current spot logic
 - [ ] Starter kit should be created even if a directory like this already exists (it should just be created under a new name (like starter kit 2 or smth))
@@ -103,6 +106,7 @@ conversation turn processing: BadRequestError: 400 {"type":"error","error":{"typ
 
 ## Nice to haves
 - [ ] Test with B
+- [ ] Test with Piotr
 - [ ] AI Coach -> Life Navigator
-
-
+- [ ] 🤖 Dodać w Obsidianie możliwość zmiany Opus na Sonnet
+- [ ] Klikalne tool calle tak zeby otwieraly edytor

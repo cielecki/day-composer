@@ -135,13 +135,18 @@ After (moved to current spot):
 
 ## 4. The "Current" Spot Concept
 
-The "current" spot is where newly completed, abandoned tasks and notes are placed.
+The "current" spot is where newly completed, abandoned tasks and notes are placed by default.
 
 **Determining location:**
 - After the task preceding the first uncompleted (pending) task, preserving any text between them
 - If no preceding task exists, at the beginning of the document
 - If no uncompleted tasks exist, at the end of the document
 - This ensures that related content (task comments, notes) stays with their associated tasks
+
+**Note:** The task movement system also supports other positioning options:
+- **"beginning"** - Uses the current spot logic described above (default behavior)
+- **"end"** - Places tasks at the end of the document
+- **"after"** - Places tasks after a specific reference task
 
 **Example:**
 ```markdown

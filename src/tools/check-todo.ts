@@ -5,9 +5,8 @@ import { appendComment } from "./utils/task-utils";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { ObsidianTool } from "../obsidian-tools";
 import { findTaskByDescription, readNote } from './utils/note-utils';
-import { findCurrentSpot } from "./utils/note-utils";
 import { updateNote } from './utils/note-utils';
-import { removeTaskFromDocument, insertTaskAtPosition } from "./utils/task-utils";
+import { moveTaskToPosition } from "./utils/moveTaskToPosition";
 import { validateTasks } from "./utils/task-validation";
 import { t } from "../i18n";
 
@@ -135,7 +134,7 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
       
       // Add completion time to the todo text if provided
       if (currentTime) {
-        task.todoText = `${task.todoText} (${currentTime})`;
+        task.todoText = `${task.todoText}${t('tasks.format.completedAt', { time: currentTime })}`;
       }
       
       // Add comment if provided
@@ -143,14 +142,8 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
         appendComment(task, comment);
       }
       
-      // Remove the task from its current position
-      updatedNote = removeTaskFromDocument(updatedNote, task);
-      
-      // Find the current position (first pending task or end of document)
-      const currentSpot = findCurrentSpot(updatedNote);
-      
-      // Insert the completed task at the current position
-      updatedNote = insertTaskAtPosition(updatedNote, task, currentSpot);
+      // Move the completed task to the current position (unified logic with abandon-todo and move-todo)
+      updatedNote = moveTaskToPosition(updatedNote, task);
       
       checkedTasks.push(todo_text);
     }

@@ -43,13 +43,13 @@ const schema = {
 			position: {
 				type: "string",
 				description:
-					"Where to place the to-do items: 'beginning' (at the current spot), 'end' (at the end of the list), or 'after' (after a specific to-do)",
-				enum: ["beginning", "end", "after"],
+					"Where to place the to-do items: 'beginning' (at the current spot), 'end' (at the end of the list), 'before' (before a specific to-do), or 'after' (after a specific to-do)",
+				enum: ["beginning", "end", "before", "after"],
 			},
-			after_todo_text: {
+			reference_todo_text: {
 				type: "string",
 				description:
-					"When position is 'after', this is the complete text of the to-do item after which the new items should be placed.",
+					"When position is 'before' or 'after', this is the complete text of the reference to-do item for positioning.",
 			},
 		},
 		required: ["todos", "position"],
@@ -63,8 +63,8 @@ type TodoItem = {
 type AddTodoToolInput = {
 	todos: TodoItem[];
 	path?: string;
-	position: "beginning" | "end" | "after";
-	after_todo_text?: string;
+	position: "beginning" | "end" | "before" | "after";
+	reference_todo_text?: string;
 };
 
 export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
@@ -142,7 +142,7 @@ export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
 		let insertionIndex = determineInsertionPosition(
 			note,
 			position,
-			params.after_todo_text,
+			params.reference_todo_text,
 		);
 
 		let updatedNote = note;
@@ -184,8 +184,8 @@ export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
 
 		// Include reference task in the success message if applicable
 		const positionDetail =
-			position === "after"
-				? `after "${params.after_todo_text}"`
+			(position === "before" || position === "after")
+				? `${position} "${params.reference_todo_text}"`
 				: `at ${position} position`;
 
 		return `✓ Added ${todoDescription} to ${filePath} ${positionDetail}`;
