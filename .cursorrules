@@ -5,6 +5,14 @@ When making changes to the code:
 - If you made any changes to the starter kit bump the starter kit version in main.ts
 - Avoid code duplication, create reusable functions and components
 
+Commit message format (conventional commits):
+- Use format: type(scope): description
+- Types: feat, fix, docs, style, refactor, test, chore
+- Scope: component/area affected (chat, ui, tools, etc.)
+- Description: concise summary under 50 chars
+- Body: detailed explanation of problem, solution, and technical details
+- Example: "fix(chat): improve autoscroll during streaming"
+
 If asked to release a new version:
 - node scripts/version.js X.X.X
 - update the CHANGELOG.md (unreleased -> X.X.X + new empty unreleased section)
