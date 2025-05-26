@@ -1,8 +1,12 @@
-# Life Navigator Project
+a# Life Navigator Project
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/430e7b0d-4d7c-4e41-8738-00ff9eb361a2" width="300" alt="Life Navigator Project Logo">
 </div>
+
+> AI has the potential to make us more human from the inside out as no tool has ever done before.
+ — Deepak Chopra
+
 
 Life Navigator is an open-source experiment in creating a deeply personal AI companion that lives in your private notes and helps you navigate life with greater awareness and intentionality. Unlike generic AI assistants, it builds deep context about your life through daily voice journaling, then reflects patterns you can't see yourself, holds you accountable to your goals, and provides personalized guidance in multiple "modes" - from empathetic reflection to tough-love motivation. It's not just a tool but a new practice of living: where every day you dialogue with an AI that truly knows you, turning the chaos of daily life into structured growth while keeping all your data completely private on your own devices.
 
