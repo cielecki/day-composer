@@ -1,4 +1,4 @@
-a# Life Navigator Project
+# Life Navigator Project
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/430e7b0d-4d7c-4e41-8738-00ff9eb361a2" width="300" alt="Life Navigator Project Logo">
