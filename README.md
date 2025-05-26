@@ -6,18 +6,13 @@
 
 Life Navigator is an open-source experiment in creating a deeply personal AI companion that lives in your private notes and helps you navigate life with greater awareness and intentionality. Unlike generic AI assistants, it builds deep context about your life through daily voice journaling, then reflects patterns you can't see yourself, holds you accountable to your goals, and provides personalized guidance in multiple "modes" - from empathetic reflection to tough-love motivation. It's not just a tool but a new practice of living: where every day you dialogue with an AI that truly knows you, turning the chaos of daily life into structured growth while keeping all your data completely private on your own devices.
 
+Join our community:
+
 <div align="center">
   <a href="https://discord.gg/VrxZdr3JWH">
     <img src="https://img.shields.io/badge/Discord-Server-5865F2.svg?logo=discord&label=Life%20Navigator%20Community&style=flat" alt="Discord">
   </a>
 </div>
-
-Life Navigator represents a different relationship with AI:
-
-- **AI as Growth Partner**: Not just a tool, but a companion in personal development
-- **Intentional Technology**: Replace mindless scrolling with meaningful AI interactions
-- **Augmented Self-Awareness**: Use AI to see patterns and blind spots in your behavior
-- **Privacy-First Design**: Your most intimate thoughts deserve the highest security
 
 ## The Obsidian Plugin
 
