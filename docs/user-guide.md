@@ -1,277 +1,296 @@
-# Usage: Exploring Your Starter Kit
+# Life Navigator User Guide
 
-In the starter kit, you have five modes: Reflection, Bro, Assistant, Planner, Songwriter as well as some files in the info directory about me, backlog relationships and index. 
+**Note:** This guide assumes you have already installed Life Navigator and completed the initial setup. If you haven't installed the plugin yet, please follow the [Installation Guide](installation.md) first.
 
-Let's walk through those files.
+Life Navigator is an AI-powered personal assistant plugin for Obsidian that helps you with daily planning, reflection, habit building, and life guidance. Unlike generic AI chatbots, Life Navigator knows your personal context and can provide tailored advice based on your goals, preferences, and daily patterns.
 
-The info directory contains your master database of things about you. If you go to the about me file, it contains all the information about your context.
+## What Makes Life Navigator Different
 
-Feel free to adjust it in any way. At the beginning, it might be good to just delete all of the things from here and just put some basics in just to get started. 
+**Privacy-First Design:** All your data stays on your devices (computer and phone) and syncs through your chosen service (like iCloud). The AI only receives the specific information you choose to share, and no personal data is stored on external servers.
 
-Then have a look at the relationship file. It's basically something very similar, but it's just additional information about yourself, but in a separate file. 
+**Contextual Intelligence:** The AI has access to your personal information, daily notes, and patterns, allowing it to provide insights you might not see yourself - like noticing correlations between sleep and mood, or identifying patterns in your behavior.
 
-It's here to show that you can organize it in both one file or multiple files, and what governs this is the index file which specifies the files that get injected into AI. Any new files you add, add them here so they get referred from AI. 
+**Voice-First Interaction:** Designed for natural voice conversations throughout your day. You can quickly log activities, ask for guidance, or reflect on your experiences without typing.
 
-You can also create such links in those separate directories, so it's like all of those will get inlined into an AI context. 
+## Core Concepts
 
-There is also a very useful backlog file for storing your pending to-do lists which are not added to your daily notes. Feel free to edit that file and just add some stuff that is related to yourself. Remove anything from here. 
+### How the AI "Knows" About You
 
-After you've clicked "Create Starter Kit" (step 20 in the installation), a new folder will appear in your vault, typically named "Starter Kit vX.X" or similar. This kit is your starting point for using the plugin. Here's what to explore:
+Life Navigator's intelligence comes from three sources:
 
-1.  **Core Information Files (usually in an `Info` sub-directory):**
-    *   `About Me.md`: This is where you can describe yourself, your preferences, goals, and any context you want the AI to have about you.
-    *   `Relationships.md` (example): Shows how you can keep information about important people or entities in separate files.
-    *   `Backlog.md`: A place to keep your to-do lists or pending tasks that aren't tied to a specific day.
-    *   **Crucially, `_Index_.md`**: This file is the control center for what information is fed to the AI. It contains links to the other files (like `About Me.md`, `Backlog.md`, etc.). If you create new information files that you want the AI to use, you *must* add a link to them in `_Index_.md`.
+1. **Your Information Files:** Personal details, goals, preferences, and context you explicitly provide
+2. **Daily Notes:** Your ongoing journal entries and activity logs
+3. **Current Conversation:** The immediate context of what you're discussing
 
-2.  **Personalizing Your Information:**
-    *   The starter files contain placeholder examples. It's **highly recommended** to personalize these files. You can either:
-        *   **Delete** the placeholder examples entirely and write your own information from scratch.
-        *   **Adapt** the examples, using them as inspiration but replacing the content with your own details.
-    *   The more relevant and personal the information you provide, the more effectively the AI can assist you.
-    *   **Note:** If you keep the placeholder text, it will be used in AI and skew it's responses, it's best to delete everything that you don't plan to immediatelly replace. You can always find the [original starter kit files](https://github.com/cielecki/life-navigator/tree/main/src/locales).
+**Important:** The AI doesn't have persistent memory between sessions. To "teach" it something new, it needs to be saved to your information files or daily notes.
 
-3.  **AI Modes (usually in a `Modes` sub-directory):**
-    *   You'll find templates for different AI "personalities" or assistants (e.g., `Songwriter.md`, `Reflection.md`, `Brawl Assistant.md`).
-    *   Explore these files. Each mode defines how the AI should behave, what icon/color it uses, and critically, which `Index.md` file (and thus which set of your personal data) it should use.
-    *   You can customize these modes or create new ones to suit your needs.
+### The Link System
 
-This initial setup and personalization are key to getting the most out of Life Navigator.
+Life Navigator uses a special linking system to control what information the AI sees:
 
-## Understanding Your Starter Kit in Detail
+- **Regular links** `[[File Name]]` - References the file but doesn't include its content
+- **Inline links** `[[File Name]] 🔎` - Includes the full content of the file in the AI's context
+- **Dynamic links** `[[ln-day-note-(0)]] 🔎` - References daily notes relative to today (0=today, -1=yesterday, etc.). This allows modes to automatically include recent context.
 
-### The Information Files: Your AI's Knowledge Base
 
-**About Me.md:**
-- This is your primary profile containing personal details that help the AI understand your context.
-- Include information like your age, occupation, interests, goals, values, personality traits, and daily routines.
-- Add health information, preferences, and anything else you'd like the AI to know about you.
-- You can be as detailed or minimal as you prefer, but more relevant details lead to more personalized assistance.
+Learn more about the link system in the [link-expansion](link-expansion.md) document.
 
-**Relationships.md:**
-- Use this file to document important people in your life.
-- Include names, relationships to you, notable characteristics, and any important details about your interactions.
-- This helps the AI understand your social context when you mention people by name.
-- Example: "John - my brother, 34, lives in Berlin, has two kids, we talk weekly about our shared interest in hiking."
+## Getting Started: Exploring Your Starter Kit
 
-**Backlog.md:**
-- A centralized place for tasks and ideas that aren't tied to a specific day.
-- Unlike daily notes which capture day-specific activities, this is for ongoing projects and longer-term goals.
-- Format suggestions: Use bullet points, checkboxes (- [ ]), or headers to organize different categories of tasks.
-- Example sections might include "Work Projects," "Personal Goals," "Shopping List," or "Ideas to Explore."
+After installation, click "Create Starter Kit" to generate example files. Here's what you'll find:
 
-**_Index_.md:**
-- This is the crucial file that determines what information gets fed to the AI.
-- It uses links to other files (like `[[About Me]]`) to include their content in the AI's context.
-- **Important:** Any new information file you create must be linked in _Index_.md for the AI to "see" it.
-- You can organize these links however you want; the AI will receive all linked content regardless of organization.
-- Example of adding a new file: If you create "Health.md" with health information, add `[[Health]]` to _Index_.md.
+**Note:** You can always recreate your starter kit or create additional copies by opening the Command Palette (Ctrl/Cmd + P) and searching for "Life Navigator: Create Starter Kit". This is useful if you want to start fresh or create multiple starter kit versions for different purposes.
 
-## Customizing AI Modes
+### Information Files (Info Directory)
 
-Life Navigator uses "modes" to create different AI personalities for different purposes. Each mode lives in its own markdown file and can be extensively customized.
+**About Me.md** - Your personal profile and control center
+- Start by replacing the example content with your own information
+- Include details like age, occupation, interests, goals, values, daily routines
+- This file also includes links to all information files in `About Me` directory, so any time you link to this file the AI will also have access to all the information in the `About Me` directory.
+- To add new information files, you MUST link them from `About Me.md` using `[[File Name]] 🔎`
+- The more relevant details you provide, the more personalized the AI's assistance becomes
 
-### Understanding the Mode Structure
+**About Me/Day Structure.md** - Your ideal daily routine
+- This defines how the AI plans your days when you ask for daily planning
+- Describe your preferred schedule, habits, and recurring activities
+- Example: "Morning routine: Wake at 7:00, meditation, coffee, review daily plan"
+- **Note:** This should describe your ideal day, not necessarily your current reality
 
-Each mode file (e.g., `Assistant.md`, `Reflection.md`, `Brawl Assistant.md`) contains several key elements:
+**About Me/Role Models.md** - Influential figures or role models
+- List people whose wisdom you value (historical figures, mentors, authors, etc.)
+- The Reflection mode references these when providing guidance
 
-- **System Prompt:** The instructions that shape the AI's personality and behavior.
-- **Configuration:** Settings for appearance (icon, color) and functionality (which index file to use, voice settings).
-- **Context Handling:** Instructions for how the mode should handle information from your vault.
+**About Me/Relationships.md** - Important people in your life
+- Document family, friends, colleagues, and their key characteristics
+- Helps the AI understand your social context when you mention people by name
 
-### Customizing AI Personality
+**Backlog.md** - Ongoing tasks and projects
+- Tasks that aren't tied to specific days
+- Long-term goals, project ideas, things to remember
+- Different from daily notes which capture day-specific activities
 
-You can modify any mode to better suit your preferences:
+### AI Modes (Modes Directory)
 
-1. **Changing Personality Traits:** 
-   - Example: The "Brawl Assistant" (Ziomal) mode is designed to be motivational but somewhat aggressive. You can edit its system prompt to be less aggressive or change its gender presentation.
-   - Look for language in the system prompt that defines personality and modify it.
-   - Example change: "You are Ziomal, a tough, no-nonsense male coach" → "You are Ziomal, a firm but supportive female coach"
+Life Navigator includes several pre-configured AI personalities:
 
-2. **Voice Selection:**
-   - Each mode can have a specific AI voice for text-to-speech responses.
-   - Visit [OpenAI's Voice Demo](https://platform.openai.com/docs/guides/text-to-speech) to listen to different voice options (like Nova, Echo, Shimmer, Alloy, etc.).
-   - In the mode file, look for a setting like `voice: "alloy"` and change it to your preferred voice name.
-   - Note that voice availability may depend on your OpenAI subscription.
+**Assistant** - General-purpose helper
+- Task management, scheduling, answering questions
+- Best for: Logging notes, managing and checking off your daily tasks
 
-3. **Icon and Color Customization:**
-   - Each mode can have a unique icon and color in the interface.
-   - Look for settings like `icon: "brain"` and `color: "#ff5500"` in the mode file.
-   - Change the icon name to any [Lucide icon name](https://lucide.dev/icons/).
-   - Change the color to any valid CSS color (hex code, rgb value, or color name).
+**Planner** - Focused on daily planning
+- Creates detailed daily schedules based on your Day Structure
+- Best for: Morning planning sessions, schedule optimization
 
-### The System Prompt Explained
+**Bro** - Motivational coach
+- Direct, encouraging, designed to push you through procrastination and resistance
+- Best for: Motivation, accountability, breaking through mental blocks
 
-The system prompt is the most important part of each mode file:
+**Reflection** - Thoughtful advisor
+- Contemplative, wise personality for deeper thinking, using your role models and values
+- Best for: Processing emotions, gaining insights, philosophical discussions
 
-- It's the set of instructions that defines how the AI behaves in that mode.
-- It automatically includes:
-  - Content from your _Index_.md file (and all linked files)
-  - Recent daily notes (if configured)
-  - The current time and date
-  - Any special instructions for that particular mode
+## Daily Workflow
 
-To view the complete system prompt for any mode:
-1. Open the Life Navigator panel
-2. Select your desired mode
-3. Look for the "Show system prompt" option (usually in a menu or info icon)
-4. You can view and even copy the full prompt to understand what the AI "sees".
-5. You can also use the copied prompt in tools like chatgpt or other ai tools, and use it as a pellet of information about yourself.
+### Morning Planning
 
-## How the AI "Learns" and "Remembers"
+1. Open Life Navigator and select the **Planner** mode
+2. Say or type: "Plan my day" or "What should I do today?"
+3. The AI will ask about your calendar and energy levels
+4. It creates a detailed plan based on your Day Structure and current priorities
+5. Review and adjust the plan as needed
 
-It's important to understand how Life Navigator's AI memory works:
+### Throughout the Day
 
-- **No Persistent Memory:** The AI does not have a traditional "memory" that evolves over time on its own.
-- **Context-Based Knowledge:** The AI only "knows" what's explicitly provided in:
-  1. Files linked in your _Index_.md
-  2. Content from recent daily notes (if configured in the mode)
-  3. The current conversation (limited to the current session)
-  
-- **Updating the AI's Knowledge:**
-  - To "teach" the AI something new, add it to one of your information files (e.g., About Me.md).
-  - To help the AI "remember" a conversation, you need to save important points to your daily note or another file linked in _Index_.md.
-  - Example workflow: Have a reflection with the AI, then ask it (or another mode) to "save these thoughts to today's note."
+**Quick Activity Logging:**
+- Use voice input to quickly log completed tasks: "I finished my workout"
+- Report challenges: "I'm struggling to focus on this project"
+- Ask for guidance: "What should I do next?"
 
-## Interacting with the AI
 
-### Voice Commands and Transcription
+### Evening Reflection
 
-Life Navigator supports voice interaction:
+1. Switch to **Reflection** mode
+2. Ask: "Help me reflect on my day" or "What patterns do you notice?"
+3. The AI analyzes your daily activities and provides insights
+4. Save important insights to your daily note for future reference
 
-- Click the microphone icon to start voice recording.
-- Speak your question or command clearly.
-- Be aware that transcription errors can occur:
-  - Example: Words that sound similar might be misinterpreted (e.g., "peace" → "penis").
-  - You can always edit the transcribed text before sending it to the AI.
-  - The AI may sometimes begin responding during transcription (this is a known issue that may be improved in future versions).
+## Understanding Daily Notes
 
-### Workflow Tips for Effective Use
+Daily notes are automatically created files that capture your daily activities, thoughts, and plans. They follow a specific format:
 
-**Saving Insights:**
-1. Use the Reflection mode to explore thoughts or ideas.
-2. When you reach valuable insights, switch to Assistant mode.
-3. Ask: "Please save the key points from our reflection to today's note."
-4. The Assistant will create a summary in your daily note for future reference.
+### Daily Note Structure
 
-**Daily Context with Dynamic Links:**
-- Use special link syntax to reference daily notes relative to the current date:
-  - `[[ln-day-note-(0)]] 🔎` refers to today's note
-  - `[[ln-day-note-(-1)]] 🔎` refers to yesterday's note
-  - `[[ln-day-note-(-7)]] 🔎` refers to the note from a week ago
-  - `[[ln-day-note-(3)]] 🔎` refers to the note 3 days in the future
+```markdown
+- [x] 🌅 Wake up at 7:00 AM (completed at 07:15)
+- [x] ☕ Morning coffee and review daily plan (completed at 07:30)
+- [ ] 💼 Work on project presentation
+- [x] 🍽️ Healthy lunch (completed at 12:30)
+    Had salad with grilled chicken, feeling satisfied.
+- [x] 🏃 30-minute workout (completed at 18:00)
+    Felt energized after the workout, good endurance today.
+- [ ] 📚 Read for 30 minutes before bed
 
-- These links, when used with the 🔎 symbol, will include the content of these notes in your AI context.
-- This is especially useful for providing recent context or planning future activities.
+```
 
-## Using Different Modes for Different Tasks
+### Working with Daily Notes
 
-Life Navigator comes with several pre-configured modes, each designed for specific purposes:
+**Task Management:**
+- The AI can add, complete, and move tasks between days
+- Use checkboxes `- [ ]` for pending tasks, `- [x]` for completed ones
+- Ask the AI to "move this task to tomorrow" or "mark this as done"
 
-**Assistant Mode:**
-- General-purpose helper for tasks, scheduling, and information management.
-- Best for: Daily planning, answering questions, organizing ideas, managing tasks.
-- Example prompt: "Help me organize my schedule for tomorrow."
+**Activity Logging:**
+- Voice logging automatically adds timestamped entries
+- Creates a searchable history of your activities and thoughts
+- Helps the AI understand your patterns and provide better insights
 
-**Reflection Mode:**
-- Thoughtful, contemplative personality focused on deeper thinking.
-- Best for: Journaling, processing emotions, exploring ideas, philosophical discussions.
-- Example prompt: "I'm feeling anxious about my presentation tomorrow. Let's explore why."
+## Customizing Your Experience
 
-**Brawl Assistant (Ziomal) Mode:**
-- Motivational, direct personality for encouragement and accountability.
-- Best for: Motivation, breaking through procrastination, fitness goals, habit formation.
-- Example prompt: "I've been putting off my workout for three days. I need some motivation."
+### Personalizing AI Modes
 
-**Songwriter Mode:**
-- Creative personality focused on artistic expression.
-- Best for: Creative writing, songwriting, poetry, generating ideas.
-- Example prompt: "Help me write lyrics about overcoming a challenge."
+Each mode can be extensively customized:
 
-You can switch between modes at any time based on your current needs. Each mode has access to the same information (via your _Index_.md), but will respond with different tones and approaches.
+**Changing Personality:**
+- Edit the system prompt in any mode file
+- Example: Make Bro less aggressive or change gender presentation
+- Modify language style, tone, and approach
 
-### Dynamic Mode Switching During Conversations
+**Voice Settings:**
+- Each mode can have a different AI voice
+- Visit [OpenAI's Voice Demo](https://platform.openai.com/docs/guides/text-to-speech) to hear options
+- Change the `ln_voice` setting to: alloy, echo, fable, onyx, nova, or shimmer
+- Modify `ln_voice_instructions` to control speaking style (e.g., "speak quickly and energetically")
 
-Life Navigator includes a powerful **Handover Mode Tool** that allows the AI to autonomously switch between different modes during a conversation based on your needs. This feature enables seamless transitions between different AI personalities without losing conversation context.
+**Visual Customization:**
+- Change the `icon` to any [Lucide icon name](https://lucide.dev/icons/)
+- Modify the `color` using hex codes or color names
+- Example: `icon: "brain"`, `color: "#ff5500"`
 
-## Practical Usage Tips
+### Creating New Modes
 
-### Working with Example Content
+1. Create a new markdown file in the Modes directory
+2. Copy the structure from an existing mode
+3. Customize the system prompt, voice, and appearance settings
+4. The new mode will automatically appear in the Life Navigator panel
 
-When you first create the starter kit, you might be hesitant to delete the example content right away:
+### Adding Information Files
 
-- It's completely fine to keep the examples initially as you learn how the system works.
-- You can gradually replace sections with your own information as you become more comfortable.
-- Consider creating a backup of the original examples in a separate folder if you want to reference them later.
-- Remember that any example content you keep will influence the AI's understanding of your context.
-- Approach: Start by adding your own information alongside examples, then gradually remove examples that aren't relevant to you.
+1. Create a new markdown file with your information
+2. **Critical step:** Add a link to the file in `About Me.md` using the format `[[File Name]] 🔎`
+3. Without this link, the AI cannot access the file's content
 
-### Mobile App Usage
+## Advanced Features
 
-Life Navigator works on both desktop and mobile Obsidian apps, but there are some important considerations for mobile use:
+### System Prompt Inspection
 
-1. **Setting Up Mobile Access:**
-   - Ensure your vault is syncing properly to your mobile device (via iCloud, Dropbox, etc.).
-   - When first opening the vault on mobile, you'll need to explicitly trust community plugins.
-   - Navigate to Settings → Community plugins → Turn on "Restricted mode" toggle → Confirm.
+To see exactly what information the AI receives:
+1. Select any mode in Life Navigator
+2. Look for "Show system prompt" option
+3. View the complete prompt including all your linked information
+4. You can copy this prompt to use in other AI tools if needed
 
-2. **Language Settings:**
-   - If you want to change the interface language on mobile, go to Settings → About → Language.
-   - Make sure this matches the language setting on your desktop for consistency.
+### Habit Building and Pattern Recognition
 
-3. **Optimizing Mobile Workflow:**
-   - Consider setting your daily note to open automatically on startup for quick access.
-   - In Settings → Core plugins → Daily notes → Options → "Open daily note on startup".
-   - Use voice input for faster note-taking on mobile.
+Life Navigator excels at helping you build habits and recognize patterns:
 
-4. **Avoiding Sync Conflicts:**
-   - **Important:** Try not to edit the same file simultaneously on both desktop and mobile.
-   - iCloud and other sync services may have delays, which can cause conflicts or lost changes.
-   - Wait for sync to complete (check sync status) before editing the same file on a different device.
-   - If you've been editing on desktop, give it a few minutes to sync before continuing on mobile, and vice versa.
+**Habit Tracking:**
+- Include recurring activities in your Day Structure
+- The AI can create conditional tasks (e.g., "Add red light therapy only if not done yesterday")
+- Track completion rates and identify obstacles
 
-### Adding New Information Files
+**Pattern Recognition:**
+- The AI analyzes your daily notes to identify correlations
+- Example: "I notice you're more productive on days when you exercise in the morning"
+- Ask directly: "What patterns do you see in my behavior?"
 
-As you use Life Navigator, you'll likely want to add new files to organize different aspects of your life:
+## Mobile Usage
 
-1. **Creating Topic-Specific Files:**
-   - Create a new note in your vault (e.g., "Health.md", "Finances.md", "Hobbies.md").
-   - Add relevant information in any format you prefer.
-   - Place it in the same directory as your other information files (typically in the Info folder).
+### Setup Considerations
 
-2. **The Crucial Step - Adding to _Index_.md:**
-   - **Important:** For the AI to "see" your new file, you must add a link to it in _Index_.md.
-   - Open your _Index_.md file.
-   - Add a new link using the format: `[[Your New File]]` (without the .md extension).
-   - Example: If you created "Health.md" with health information, add `[[Health]]` to _Index_.md.
-   - Save the _Index_.md file.
+- Ensure your vault syncs properly via iCloud or your chosen service
+- Enable community plugins on mobile: Settings → Community plugins → Turn on
+- Language settings should match between desktop and mobile
 
-3. **Example from a Real User:**
-   - During an onboarding session, a user created a file called "Seks.md" (Polish for "Sex") to track thoughts about their relationship.
-   - After creating and filling out the file, they added `[[Seks]]` to their _Index_.md file.
-   - This made all that context available to the AI when discussing relationship topics.
+### Mobile Workflow Tips
 
-### Rapid Journaling Techniques
+- Use voice input for faster note-taking
+- Avoid editing the same file simultaneously on desktop and mobile
+- Allow time for sync between devices (especially with iCloud)
+- Consider setting daily notes to open automatically on startup
 
-Life Navigator excels at quick capture of thoughts and tasks:
+### Sync Best Practices
 
-1. **Voice-to-Text Journaling:**
-   - Open the Life Navigator panel and select an appropriate mode (often Assistant).
-   - Use the microphone button to record your thoughts without typing.
-   - Ask the AI to "save this to today's note" to preserve the conversation.
+- Edit on one device at a time when possible
+- Wait for sync completion before switching devices
+- If conflicts occur, manually resolve them by choosing the correct version
 
-2. **Quick Task Logging:**
-   - Use Assistant mode to say or type something like: "I just finished my workout" or "I completed the project report."
-   - The AI can acknowledge this and offer to log it to your daily note.
-   - This creates a record of completed tasks that can be referenced later.
+## Troubleshooting Common Issues
 
-3. **End-of-Day Reflection:**
-   - Use Reflection mode to ask: "Help me reflect on what I accomplished today."
-   - The AI will use context from your daily note (if available) to help summarize your day.
-   - Ask it to save insights to prepare for tomorrow.
+### AI Not Responding Appropriately
 
-### Bullet journal rapid formatting
+**Check your information files:**
+- Ensure `About Me.md` links to all relevant files with `🔎` symbols
+- Verify your personal information is up-to-date and relevant
+- Remove placeholder content that doesn't apply to you
 
-### Link Expansion
+**Review recent daily notes:**
+- The AI uses recent daily notes for context
+- Ensure important information is captured in your daily logs
 
-Life Navigator supports special link formats that enhance your note-taking experience. For more details, see [Link Expansion](link-expansion.md).
+### Voice Recognition Problems
+
+- Speak clearly and at a moderate pace
+- Stop AI processing and edit sent message if errors occur
+- Consider using text input for complex or technical terms
+
+### Sync Issues
+
+- Check that community plugins are enabled on all devices
+- Verify your vault is properly set up in your sync service
+- Allow adequate time for sync completion
+- Restart Obsidian if the plugin doesn't appear on a new device
+
+## Controlling what goes into AI's context
+
+- Only information in files linked from files defining the modes like `Planner.md` with `🔎` symbols
+- Recent daily notes (if configured in the mode)
+- Current date and time (if configured in the mode)
+- Current conversation context
+
+### API Usage and Costs
+
+- Life Navigator uses Anthropic (Claude) and OpenAI APIs
+- You pay directly to these providers based on usage
+- Costs are typically minimal for personal use
+- Monitor your API usage through the respective provider dashboards
+
+## Getting the Most Out of Life Navigator
+
+### Start Simple
+
+- Begin with basic information in About Me.md
+- Use one or two modes initially
+- Gradually add more detail and complexity as you become comfortable
+- Delete all the example content from the starter kit
+
+### Be Consistent
+
+- Regular daily planning and reflection sessions work best
+- Voice logging throughout the day creates valuable context
+- Consistent use helps the AI provide better insights over time
+
+### Experiment and Iterate
+
+- Try different modes for different situations
+- Customize personalities to match your preferences
+- Adjust your Day Structure based on what actually works
+- Don't be afraid to modify or create new modes
+
+### Focus on Insights
+
+- Ask the AI what patterns it notices in your behavior
+- Use reflection sessions to process experiences and emotions
+- Save important insights to your information files for future reference
+- Let the AI help you see blind spots in your thinking and behavior
+
+Life Navigator becomes more valuable the more you use it and the more context you provide. Start with the basics and gradually build a comprehensive personal AI assistant that truly understands your life and goals.
