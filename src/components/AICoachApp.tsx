@@ -290,7 +290,7 @@ export const AICoachApp: React.FC = () => {
 								},
 							}}
 						>
-							{activeMode ? activeMode.ln_description : t('ui.starterPack.noModes')}
+							{activeMode ? activeMode.ln_description : t('ui.starterKit.noModes')}
 						</ReactMarkdown>
 					</div>
 
@@ -306,7 +306,7 @@ export const AICoachApp: React.FC = () => {
 									}
 								}}
 							>
-								{t('ui.mode.createStarterPack')}
+								{t('ui.mode.createstarterKit')}
 							</button>
 						)}
 

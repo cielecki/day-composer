@@ -206,7 +206,7 @@
   "messages": {
     "settingsSaved": "Ustawienia zostały zapisane",
     "settingsReset": "Ustawienia zostały zresetowane do domyślnych",
-    "creatingStarterPack": "Tworzenie pakietu startowego...",
+    "creatingstarterKit": "Tworzenie pakietu startowego...",
     "checkingForUpdates": "Sprawdzanie aktualizacji...",
     "pluginUpToDate": "Wtyczka jest już aktualna (wersja {{version}}).",
     "newVersionFoundDownloading": "Znaleziono nową wersję {{latestVersion}} (masz {{currentVersion}}). Pobieranie aktualizacji..."
@@ -268,7 +268,7 @@
       "viewSettings": "Pokaż ustawienia trybu",
       "viewSystemPrompt": "Pokaż prompt systemowy",
       "switchTo": "Przełącz na:",
-      "createStarterPack": "Utwórz pakiet startowy",
+      "createstarterKit": "Utwórz pakiet startowy",
       "newMode": "Nowy tryb",
       "createdSuccess": "Pomyślnie utworzono nowy tryb",
       "createdError": "Błąd podczas tworzenia nowego trybu: {{error}}",
@@ -292,7 +292,7 @@
       "reloadRequiredMessageWithVersions": "Wtyczka zaktualizowana z wersji {{currentVersion}} do {{latestVersion}}.\nCzy chcesz ponownie uruchomić Obsidian, aby zastosować zmiany?",
       "reloadButton": "Uruchom ponownie Obsidian"
     },
-    "starterPack": {
+    "starterKit": {
       "noModes": "## Witaj w Life Navigator\n\nAby rozpocząć, utwórz pakiet startowy zawierający podstawowe tryby z tagiem _#ln-mode_.",
       "createdSuccess": "Pomyślnie utworzono pakiet startowy",
       "createdError": "Błąd podczas tworzenia pakietu startowego: {{error}}",
@@ -309,8 +309,6 @@
   },
   "dateTime": {
     "current": "Aktualna Data i Czas",
-    "date": "data",
-    "time": "czas"
   },
   "file": {
     "currentlyOpen": "Aktualnie Otwarty Plik"
