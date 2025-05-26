@@ -65,7 +65,6 @@ For detailed installation instructions, please refer to the [installation guide]
 
 - **[Installation Guide](docs/installation.md)** - Step-by-step setup instructions
 - **[User Guide](docs/user-guide.md)** - Comprehensive guide to using Life Navigator
-- **[Why Obsidian?](docs/why-obsidian.md)** - Understanding our choice of platform
 - **[Development Guide](docs/DEVELOPMENT.md)** - For contributors and developers
 - **[Roadmap](docs/ROADMAP.md)** - Future features and improvements
 
