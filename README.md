@@ -42,7 +42,7 @@ Designed for on-the-go use, Life Navigator lets you capture thoughts, update to-
 Through the link expansion system, you have complete control over what information the AI can access. No RAGs, no guessing what AI can see - you explicitly choose what context to share using our special link syntax with the 🔎 emoji.
 
 #### 🔒 **Maximum Data Privacy**
-All your personal information is stored locally in your Obsidian vault on your private devices and synced through your own iCloud (or preferred sync service). Unlike other AI tools that store your data in startup databases, Life Navigator keeps everything under your control. The information you choose to share is sent only to trusted API providers (Anthropic and OpenAI) who [don't use API data for training](https://platform.openai.com/docs/guides/your-data) and have strong data retention policies.
+All your personal information is stored locally in your Obsidian vault on your private devices and synced through your own iCloud (or preferred sync service). Unlike other AI tools that store your data in startup databases, Life Navigator keeps everything under your control. The information you choose to share is sent only to trusted API providers (Anthropic and OpenAI) who don't use API data for training ([OpenAI policy](https://community.openai.com/t/data-privacy-with-openai-api/929399), [Anthropic policy](https://privacy.anthropic.com/en/articles/7996868-is-my-data-used-for-model-training)) and have strong data retention policies.
 
 ### Getting Started
 
