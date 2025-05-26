@@ -1,10 +1,15 @@
-# Life Navigator for Obsidian
+# Project Life Navigator
+
+![logo-2](https://github.com/user-attachments/assets/430e7b0d-4d7c-4e41-8738-00ff9eb361a2)
+
+
 
 This plugin provides a set of tools for enhancing your experience with Obsidian, with a focus on AI assistance and journal management.
 
 **New to Obsidian?** Check out [why we chose Obsidian](docs/why-obsidian.md) as the foundation for Life Navigator.
 
 ## Features
+
 
 **Context-aware AI that knows you deeply** - Unlike generic ChatGPT, Life Navigator's AI has access to your personal context, goals, relationships, and history through your linked files. It can provide personalized coaching, insights, and guidance based on your actual life situation, not generic responses.
 
