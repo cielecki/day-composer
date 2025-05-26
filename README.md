@@ -4,6 +4,13 @@
   <img src="https://github.com/user-attachments/assets/430e7b0d-4d7c-4e41-8738-00ff9eb361a2" width="300" alt="Life Navigator Project Logo">
 </div>
 
+<div align="center">
+  <a href="https://discord.gg/VrxZdr3JWH">
+    <img src="https://img.shields.io/badge/Discord-Server-5865F2.svg?logo=discord&label=Life%20Navigator&style=flat" alt="Discord">
+  </a>
+</div>
+
+
 This plugin provides a set of tools for enhancing your experience with Obsidian, with a focus on AI assistance and journal management.
 
 **New to Obsidian?** Check out [why we chose Obsidian](docs/why-obsidian.md) as the foundation for Life Navigator.
