@@ -20,6 +20,7 @@ This plugin provides a set of tools for enhancing your experience with Obsidian,
 
 ### Features
 
+**Mobile-first, voice-enabled journaling** - Designed for on-the-go use, Life Navigator lets you capture thoughts, update to-do lists, and manage your daily notes using voice input throughout your day. Whether you're commuting, walking, or just want hands-free interaction, simply speak your thoughts and let the AI organize them into your journal and task management system.
 
 **Context-aware AI that knows you deeply** - Unlike generic ChatGPT, Life Navigator's AI has access to your personal context, goals, relationships, and history through your linked files. It can provide personalized coaching, insights, and guidance based on your actual life situation, not generic responses.
 
