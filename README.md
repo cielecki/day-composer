@@ -20,13 +20,22 @@ This vision is currently materialized as a plugin for [Obsidian](https://obsidia
 
 **New to Obsidian?** Check out [why we chose Obsidian](docs/why-obsidian.md) as the foundation for Life Navigator.
 
-### 🌟 Key Features
-
-#### 🎙️ **Mobile-First Voice Journaling**
-Designed for on-the-go use, Life Navigator lets you capture thoughts, update to-do lists, and manage your daily notes using voice input throughout your day. Whether you're commuting, walking, or just want hands-free interaction, simply speak your thoughts and let the AI organize them into your journal and task management system.
+### Key Features
 
 #### 🧠 **Context-Aware AI That Knows You Deeply**
 Unlike generic ChatGPT, Life Navigator's AI has access to your personal context, goals, relationships, and history through your linked files. It can provide personalized coaching, insights, and guidance based on your actual life situation, not generic responses.
+
+#### 🎭 **Multiple Customizable AI Personalities (Modes)**
+Switch between different AI personalities based on your needs:
+- **Assistant Mode**: General-purpose helper for tasks, scheduling, and information management
+- **Reflection Mode**: Thoughtful, contemplative personality that can help with identify patterns you might miss or alerting you to correlations (like mood and sleep)
+- **Planner Mode**: Intelligent scheduling and task management personality that helps you automatically organize your day, set priorities, and maintain focus on what matters most
+- **Bro Mode**: Motivational, direct personality for encouragement and accountability
+- **Songwriter Mode**: Creative personality for artistic expression
+- **Custom Modes**: Create your own AI personalities with specific traits, voices, and purposes
+
+#### 🎙️ **Mobile-First Voice Journaling**
+Designed for on-the-go use, Life Navigator lets you capture thoughts, update to-do lists, and manage your daily notes using voice input throughout your day. Whether you're commuting, walking, or just want hands-free interaction, simply speak your thoughts and let the AI organize them into your journal and task management system.
 
 #### 🔍 **Full Control Over AI Context**
 Through the link expansion system, you have complete control over what information the AI can access. No RAGs, no guessing what AI can see - you explicitly choose what context to share using our special link syntax with the 🔎 emoji.
@@ -34,29 +43,7 @@ Through the link expansion system, you have complete control over what informati
 #### 🔒 **Maximum Data Privacy**
 All your personal information is stored locally in your Obsidian vault on your private devices and synced through your own iCloud (or preferred sync service). Unlike other AI tools that store your data in startup databases, Life Navigator keeps everything under your control. The information you choose to share is sent only to trusted API providers (Anthropic and OpenAI) who [don't use API data for training](https://community.openai.com/t/data-privacy-with-openai-api/929399) and have strong data retention policies.
 
-#### 🎭 **Multiple AI Personalities (Modes)**
-Switch between different AI personalities based on your needs:
-- **🤝 Assistant Mode**: General-purpose helper for tasks, scheduling, and information management
-- **🧘 Reflection Mode**: Thoughtful, contemplative personality for deeper thinking and insights
-- **📅 Planner Mode**: Intelligent scheduling and task management personality that helps organize your day, set priorities, and maintain focus on what matters most
-- **💪 Bro Mode**: Motivational, direct personality for encouragement and accountability
-- **🎵 Songwriter Mode**: Creative personality for artistic expression
-- **➕ Custom Modes**: Create your own AI personalities with specific traits, voices, and purposes
-
-#### 🔄 **Intelligent Task & Habit Management**
-- Automatic daily planning based on your ideal day structure
-- Smart task tracking with voice-activated updates
-- Habit building with contextual reminders
-- Flexible scheduling that adapts to your actual life
-
-#### 🔮 **Pattern Recognition & Insights**
-The AI analyzes your journal entries and behaviors to:
-- Identify patterns you might miss
-- Suggest improvements to your routines
-- Alert you to correlations (like mood and sleep)
-- Provide periodic reflections on your progress
-
-### 🚀 Getting Started
+### Getting Started
 
 #### Prerequisites
 - Obsidian installed on your device
@@ -81,7 +68,7 @@ For detailed installation instructions, please refer to the [installation guide]
 - **[Development Guide](docs/DEVELOPMENT.md)** - For contributors and developers
 - **[Roadmap](docs/ROADMAP.md)** - Future features and improvements
 
-### 🤝 Community & Support
+### Community & Support
 
 Join our growing community of Life Navigator users:
 
@@ -89,15 +76,15 @@ Join our growing community of Life Navigator users:
 - **[GitHub Discussions](https://github.com/cielecki/life-navigator/discussions)** - Feature requests and general discussions
 - **[Issues](https://github.com/cielecki/life-navigator/issues)** - Bug reports and technical issues
 
-### 🚧 Current Status
+### Current Status
 
 Life Navigator is in active development and currently in beta. While the core features are stable and being used daily by our community, you may encounter bugs or limitations. We welcome feedback and contributions to make this tool better for everyone.
 
-### 📝 License
+### License
 
 This project is open source and available under the [AGPL-3.0 license](LICENSE).
 
-### 🙏 Acknowledgments
+### Acknowledgments
 
 Special thanks to:
 - The Obsidian team for creating an amazing platform
