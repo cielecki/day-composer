@@ -10,6 +10,9 @@
   </a>
 </div>
 
+Life Navigator is an open-source experiment in creating a deeply personal AI companion that lives in your private notes and helps you navigate life with greater awareness and intentionality. Unlike generic AI assistants, it builds deep context about your life through daily voice journaling, then reflects patterns you can't see yourself, holds you accountable to your goals, and provides personalized guidance in multiple "modes" - from empathetic reflection to tough-love motivation. It's not just a tool but a new practice of living: where every day you dialogue with an AI that truly knows you, turning the chaos of daily life into structured growth while keeping all your data completely private on your own devices.
+
+## The Obsidian Plugin
 
 This plugin provides a set of tools for enhancing your experience with Obsidian, with a focus on AI assistance and journal management.
 
