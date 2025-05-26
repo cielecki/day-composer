@@ -306,7 +306,7 @@ export const AICoachApp: React.FC = () => {
 									}
 								}}
 							>
-								{t('ui.mode.createstarterKit')}
+								{t('ui.mode.createStarterKit')}
 							</button>
 						)}
 
