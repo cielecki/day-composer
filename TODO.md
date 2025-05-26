@@ -75,6 +75,8 @@
 - [x] Integracja informacji od Natallii i od Michała w prezentację
 
 - [ ] Modes are not translated to english
+- [ ] 0.7.X release
+- [ ] Add plugin to obsidian repository
 
 - [ ] Create a presentation for AI breakfast
 - [ ] Koncept na prezentacje - poszukanie ludzi ktorzy chca to poeksplorowac, zobaczyc czy to dla nich jest uzyteczne
@@ -86,7 +88,8 @@
 - [ ] Acquire as many test users as possible
 - [ ] Plan for whats next
 
-- [ ] Add plugin to obsidian repository
+- [ ] Test the release
+
 
 ## Nice to haves
 - [ ] Jak zrobić guidance dla uzytkownika przy tworzeniu swoich materialow? Jakis fajny tryb? czy docs?

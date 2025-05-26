@@ -43,7 +43,7 @@ const createStarterKit = async (app: App) => {
 		const starterKitDirNameKey = 'ui.starterKit.directoryName';
 		let baseStarterKitDirName = t(starterKitDirNameKey);
 
-		baseStarterKitDirName = baseStarterKitDirName + " v0.5";
+		baseStarterKitDirName = baseStarterKitDirName + " v0.8";
 
 		// Generate a unique directory name
 		const starterKitDirName = await generateUniqueDirectoryName(app, baseStarterKitDirName);
