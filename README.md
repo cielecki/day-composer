@@ -33,7 +33,6 @@ Switch between different AI personalities based on your needs:
 - **Reflection Mode**: Thoughtful, contemplative personality that can help with identify patterns you might miss or alerting you to correlations (like mood and sleep)
 - **Planner Mode**: Intelligent scheduling and task management personality that helps you automatically organize your day, set priorities, and maintain focus on what matters most
 - **Bro Mode**: Motivational, direct personality for encouragement and accountability
-- **Songwriter Mode**: Creative personality for artistic expression
 - **Custom Modes**: Create your own AI personalities with specific traits, voices, and purposes
 
 #### 🎙️ **Mobile-First Voice Journaling**
