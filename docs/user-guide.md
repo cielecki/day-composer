@@ -1,6 +1,6 @@
 # Usage: Exploring Your Starter Kit
 
-In the starter kit, you have four modes: Songwriter, Reflection, Brawl Assistant, as well as some files in the info directory about me, backlog relationships and index. 
+In the starter kit, you have five modes: Reflection, Bro, Assistant, Planner, Songwriter as well as some files in the info directory about me, backlog relationships and index. 
 
 Let's walk through those files.
 
