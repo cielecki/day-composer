@@ -65,8 +65,8 @@ For detailed installation instructions, please refer to the [installation guide]
 
 - **[Installation Guide](docs/installation.md)** - Step-by-step setup instructions
 - **[User Guide](docs/user-guide.md)** - Comprehensive guide to using Life Navigator
-- **[Development Guide](docs/DEVELOPMENT.md)** - For contributors and developers
-- **[Roadmap](docs/ROADMAP.md)** - Future features and improvements
+- **[Development Guide](docs/developing.md)** - For contributors and developers
+- **[Roadmap](docs/roadmap.md)** - Future features and improvements
 
 ### Community & Support
 
