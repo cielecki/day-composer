@@ -33,4 +33,4 @@
 19. Close the settings. In the left ribbon of Obsidian, find a new button labeled "Life Navigator." Click it to open the plugin's side panel.
 20. Click the "Create Starter Kit" button. This will create a new directory in your vault with example files to get you started with Life Navigator.
 21. **Mobile App:** If you plan to use Life Navigator on mobile, install the Obsidian mobile app. Ensure your vault (e.g., via iCloud) synchronizes to your mobile phone. On the mobile app, you will also need to enable the plugin.
-22. **Next Steps:** After completing the installation, please refer to the [USAGE.md](docs/USAGE.md) guide for detailed instructions on how to use Life Navigator effectively. The guide will walk you through exploring the starter kit, customizing your information, and using the different AI modes.
+22. **Next Steps:** After completing the installation, please refer to the [USAGE.md](user-guide.md) guide for detailed instructions on how to use Life Navigator effectively. The guide will walk you through exploring the starter kit, customizing your information, and using the different AI modes.
