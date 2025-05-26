@@ -22,8 +22,6 @@ Join our community:
 
 This vision is currently materialized as a plugin for [Obsidian](https://obsidian.md), the privacy-first knowledge management app. We chose Obsidian because it aligns perfectly with our core principles: your notes are just markdown files on your computer, you have complete control over your data, and the vibrant plugin ecosystem allows for deep customization. The Life Navigator plugin transforms Obsidian into a powerful AI-augmented journaling and life management system.
 
-**New to Obsidian?** Check out [why we chose Obsidian](docs/why-obsidian.md) as the foundation for Life Navigator.
-
 ### Key Features
 
 #### 🧠 **Context-Aware AI That Knows You Deeply**
