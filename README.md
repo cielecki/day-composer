@@ -6,7 +6,7 @@
 
 <div align="center">
   <a href="https://discord.gg/VrxZdr3JWH">
-    <img src="https://img.shields.io/badge/Discord-Server-5865F2.svg?logo=discord&label=Life%20Navigator&style=flat" alt="Discord">
+    <img src="https://img.shields.io/badge/Discord-Server-5865F2.svg?logo=discord&label=Life%20Navigator%20Community&style=flat" alt="Discord">
   </a>
 </div>
 
