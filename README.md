@@ -60,7 +60,7 @@ For detailed installation instructions, please refer to the [installation guide]
 4. Start your first daily note and ask the AI to plan your day
 5. Use voice input throughout the day to update progress and capture thoughts
 
-### 📖 Documentation
+### Documentation
 
 - **[Installation Guide](docs/installation.md)** - Step-by-step setup instructions
 - **[User Guide](docs/user-guide.md)** - Comprehensive guide to using Life Navigator
