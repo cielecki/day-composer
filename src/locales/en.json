@@ -268,7 +268,7 @@
       "viewSettings": "View mode settings",
       "viewSystemPrompt": "View system prompt",
       "switchTo": "Switch to:",
-      "createStarterKit": "Create starter kit",
+      "createStarterKit": "Create a Starter Kit",
       "newMode": "New mode",
       "createdSuccess": "Successfully created new mode",
       "createdError": "Error creating new mode: {{error}}",

@@ -268,7 +268,7 @@
       "viewSettings": "Pokaż ustawienia trybu",
       "viewSystemPrompt": "Pokaż prompt systemowy",
       "switchTo": "Przełącz na:",
-      "createstarterKit": "Utwórz pakiet startowy",
+      "createStarterKit": "Utwórz pakiet startowy",
       "newMode": "Nowy tryb",
       "createdSuccess": "Pomyślnie utworzono nowy tryb",
       "createdError": "Błąd podczas tworzenia nowego trybu: {{error}}",
