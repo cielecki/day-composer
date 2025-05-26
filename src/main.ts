@@ -263,7 +263,7 @@ export default class MyPlugin extends Plugin {
 		});
 
 		// Add a ribbon icon for the AI Coach
-		this.addRibbonIcon("bot", t("tools.aiCoach"), async (evt: MouseEvent) => {
+		this.addRibbonIcon("compass", t("tools.aiCoach"), async (evt: MouseEvent) => {
 			console.log("Starting AI Coach session");
 
 			try {

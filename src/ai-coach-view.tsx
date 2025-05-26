@@ -36,7 +36,7 @@ export class AICoachView extends ItemView {
 	}
 
 	getIcon(): string {
-		return "bot";
+		return "compass";
 	}
 
 	async onOpen(): Promise<void> {
