@@ -6,6 +6,8 @@ This plugin provides a set of tools for enhancing your experience with Obsidian,
 
 ## Features
 
+**Context-aware AI that knows you deeply** - Unlike generic ChatGPT, Life Navigator's AI has access to your personal context, goals, relationships, and history through your linked files. It can provide personalized coaching, insights, and guidance based on your actual life situation, not generic responses.
+
 **You decide exactly what goes to AI** - Through the link expansion system, you have granular control over what information the AI can access. No RAGs, no guessing what AI can see.
 
 **Maximum data privacy** - All your personal information is stored locally in your Obsidian vault on your private devices and synced through your own iCloud (or preferred sync service). Unlike other AI tools that store your data in startup databases, Life Navigator keeps everything under your control. The information you choose to share is sent only to trusted API providers (Anthropic and OpenAI) who [don't use API data for training](https://community.openai.com/t/data-privacy-with-openai-api/929399) and have good data retention policies with automatic deletion (Anthropic and OpenAI have 30 days for API usage).
