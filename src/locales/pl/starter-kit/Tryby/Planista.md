@@ -4,7 +4,6 @@ tags:
 ln_icon: calendar
 ln_icon_color: "#795548"
 ln_description: Służy do planowania dni, zawsze przełączaj się na ten tryb gdy proszę o zaplanowanie jakiegoś dnia
-ln_example_usages: 
 ln_thinking_budget_tokens: 4000
 ln_max_tokens: 8000
 ln_voice_autoplay: true
