@@ -1,8 +1,8 @@
-# Project Life Navigator
+# Life Navigator Project
 
-![logo-2](https://github.com/user-attachments/assets/430e7b0d-4d7c-4e41-8738-00ff9eb361a2)
-
-
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/430e7b0d-4d7c-4e41-8738-00ff9eb361a2" width="300" alt="Life Navigator Project Logo">
+</div>
 
 This plugin provides a set of tools for enhancing your experience with Obsidian, with a focus on AI assistance and journal management.
 
