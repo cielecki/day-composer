@@ -56,40 +56,40 @@
 - [x] 📋 Dodać w Obsidianie sekcję z informacjami dla asystentki (czasy dojazdów, standardowe przygotowania do wyjść)
 - [x] 📝 Asystentka - Zachowywać dokładnie oryginalne sformułowania użytkownika bez robienia rephrasingów
 - [x] Gandi and other updates to personas and prompts
+- [x] czy na mobilce jest zafixowany scroll?
+- [x] Upewnienie się że AI rozumiem ze [-] to anulowany task
+- [x] Choose licence - AGLP
+- [x] Format of the todo items should be refered to somewhere in prompts - write down the obsidian bullet journal md format that the plugin uses
+- [x] 🔧 Naprawić problem z edycją wiadomości w Obsidianie na mobilce (z 2025-05-25 - niedziela) (z 2025-05-26 - poniedziałek)
+- [x] 💻 Obsidian - zmienić w ustawieniach/kodzie planisty nazwę z "prysznic" na "higiena poranna" (z 2025-05-25 - niedziela)
+- [x] 💻 Obsidian - przypilnować żeby planista trzymał dobrze emoji (z 2025-05-25 - niedziela)
+- [x] 💻 Dodać do Obsidiana informacje o absolutnej kontroli nad tym co idzie do AI (z 2025-05-25 - niedziela)
+- [x] Cleanup wszystkich trybów
+- [x] Updating starter kits with all new data (remove controversial figures)
+- [x] Working daily planning and habits in the starter kit
+- [x] TODO real time mobile voice assistant about your life
+- [x] Test with G
+- [x] Create discord server
+- [x] Great README.md and overal documentation experience
+- [x] User guide requires a cleanup
+- [x] Integracja informacji od Natallii i od Michała w prezentację
 
-- [ ] czy na mobilce jest zafixowany scroll?
-- [ ] Upewnienie się że AI rozumiem ze [-] to anulowany task
-- [ ] Format of the todo items should be refered to somewhere in prompts - write down the obsidian bullet journal md format that the plugin uses
-
-- [ ] Cleanup wszystkich trybów
-
-- [ ] Updating starter kits with all new data (remove controversial figures)
-- [ ] Working daily planning and habits in the starter kit
 - [ ] Modes are not translated to english
 
-- [ ] Jak zrobić guidance dla uzytkownika przy tworzeniu swoich materialow? Jakis fajny tryb? czy docs?
-- [ ] Choose licence
-- [ ] Great README.md and overal documentation experience
-- [ ] Create tool documentation in README or MODE_GUIDE or smth
-- [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
-- [ ] User guide requires a cleanup
-
-- [ ] There are still some issues with handing over modes, should I disable this feature or fix it?
-
-- [ ] Test with G
-
-- [ ] Create discord server
-
 - [ ] Create a presentation for AI breakfast
+- [ ] Koncept na prezentacje - poszukanie ludzi ktorzy chca to poeksplorowac, zobaczyc czy to dla nich jest uzyteczne
+- [ ] 📈 Opracować koncept marketingowy "All you need is markdown" - podkreślający, że Life Navigator nie potrzebuje bazy danych
+- [ ] Arykul wiki paradigm jako markdown database (tworzenie / uzywanie input output nie chaty i rag, ai pomagajace w tym)
 - [ ] Write a draft blog post for people to read through and give feedback on
-
-- [ ] Add plugin to obsidian repository
 
 - [ ] Do a presentation
 - [ ] Acquire as many test users as possible
 - [ ] Plan for whats next
 
+- [ ] Add plugin to obsidian repository
+
 ## Nice to haves
+- [ ] Jak zrobić guidance dla uzytkownika przy tworzeniu swoich materialow? Jakis fajny tryb? czy docs?
 - [ ] Better info dumped to AI when file is not found in expand links
 - [ ] still there is something wrong with the current spot logic - is it still a problem?
 - [ ] If I record during generation the stop button is becoming unresponsive
@@ -113,3 +113,8 @@ conversation turn processing: BadRequestError: 400 {"type":"error","error":{"typ
     at async eval (plugin:day-composer:51802:49)
 ```
 - [ ] 🐛 Naprawić problem automatycznego dodawania niepotrzebnych komentarzy - is this still a problem?
+- [ ] Lepszy design dla edycji wiadomosci na mobilce bo tam jak wyskoczy klawiatura to sie nie da nic zrobic - jest bardzo malo miejsca wertykalnego
+- [ ] Lepszy blad jak nie ma api antropica
+- [ ] Fajniejszy tutorial dotyczący klucza antropica i openai
+- [ ] Create tool documentation in README or MODE_GUIDE or smth
+- [ ] There are still some issues with handing over modes, should I disable this feature or fix it?

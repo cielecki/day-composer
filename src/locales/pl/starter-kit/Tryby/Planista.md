@@ -13,7 +13,10 @@ ln_voice_instructions: "Voice Affect: Calm, composed, and reassuring; project qu
 ln_voice_speed: 1
 ln_tools_allowed:
   - "*"
-ln_tools_disallowed:
+ln_tools_disallowed: []
+ln_example_usages:
+  - Zaplanuj dzisiejszy dzień
+  - Zaplanuj jutrzejszy dzień
 ---
 # Planista
 
