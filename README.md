@@ -12,6 +12,13 @@ Life Navigator is an open-source experiment in creating a deeply personal AI com
   </a>
 </div>
 
+Life Navigator represents a different relationship with AI:
+
+- **AI as Growth Partner**: Not just a tool, but a companion in personal development
+- **Intentional Technology**: Replace mindless scrolling with meaningful AI interactions
+- **Augmented Self-Awareness**: Use AI to see patterns and blind spots in your behavior
+- **Privacy-First Design**: Your most intimate thoughts deserve the highest security
+
 ## The Obsidian Plugin
 
 This vision is currently materialized as a plugin for [Obsidian](https://obsidian.md), the privacy-first knowledge management app. We chose Obsidian because it aligns perfectly with our core principles: your notes are just markdown files on your computer, you have complete control over your data, and the vibrant plugin ecosystem allows for deep customization. The Life Navigator plugin transforms Obsidian into a powerful AI-augmented journaling and life management system.
@@ -26,7 +33,7 @@ Designed for on-the-go use, Life Navigator lets you capture thoughts, update to-
 #### 🧠 **Context-Aware AI That Knows You Deeply**
 Unlike generic ChatGPT, Life Navigator's AI has access to your personal context, goals, relationships, and history through your linked files. It can provide personalized coaching, insights, and guidance based on your actual life situation, not generic responses.
 
-#### 🔍 **Granular Control Over AI Context**
+#### 🔍 **Full Control Over AI Context**
 Through the link expansion system, you have complete control over what information the AI can access. No RAGs, no guessing what AI can see - you explicitly choose what context to share using our special link syntax with the 🔎 emoji.
 
 #### 🔒 **Maximum Data Privacy**
@@ -36,8 +43,8 @@ All your personal information is stored locally in your Obsidian vault on your p
 Switch between different AI personalities based on your needs:
 - **🤝 Assistant Mode**: General-purpose helper for tasks, scheduling, and information management
 - **🧘 Reflection Mode**: Thoughtful, contemplative personality for deeper thinking and insights
-- **📅 Daily Planner Mode**: Intelligent scheduling and task management personality that helps organize your day, set priorities, and maintain focus on what matters most
-- **💪 Brawl Assistant (Ziomal)**: Motivational, direct personality for encouragement and accountability
+- **📅 Planner Mode**: Intelligent scheduling and task management personality that helps organize your day, set priorities, and maintain focus on what matters most
+- **💪 Bro Mode**: Motivational, direct personality for encouragement and accountability
 - **🎵 Songwriter Mode**: Creative personality for artistic expression
 - **➕ Custom Modes**: Create your own AI personalities with specific traits, voices, and purposes
 
@@ -86,33 +93,6 @@ Join our growing community of Life Navigator users:
 - **[Discord Server](https://discord.gg/VrxZdr3JWH)** - Get help, share experiences, and connect with other users
 - **[GitHub Discussions](https://github.com/cielecki/life-navigator/discussions)** - Feature requests and general discussions
 - **[Issues](https://github.com/cielecki/life-navigator/issues)** - Bug reports and technical issues
-
-### 🛠️ Customization
-
-Life Navigator is designed to be deeply customizable:
-
-- **Create Custom Modes**: Design AI personalities that match your needs
-- **Modify Prompts**: Adjust how the AI responds and behaves
-- **Build Templates**: Create your own daily note structures and planning algorithms
-
-### 🔐 Privacy & Security
-
-Your privacy is paramount:
-
-- **Local Storage**: All notes stored as plain text files on your devices
-- **You Control Sync**: Use iCloud, Dropbox, or any sync service you trust
-- **Minimal API Usage**: Only the context you explicitly choose is sent to AI providers
-- **No Analytics**: We don't track your usage or collect any data
-- **Open Source**: Inspect the code yourself to verify our privacy claims
-
-### 🌱 Philosophy
-
-Life Navigator represents a different relationship with AI:
-
-- **AI as Growth Partner**: Not just a tool, but a companion in personal development
-- **Intentional Technology**: Replace mindless scrolling with meaningful AI interactions
-- **Augmented Self-Awareness**: Use AI to see patterns and blind spots in your behavior
-- **Privacy-First Design**: Your most intimate thoughts deserve the highest security
 
 ### 🚧 Current Status
 
