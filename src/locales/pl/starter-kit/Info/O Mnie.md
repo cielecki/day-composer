@@ -62,3 +62,7 @@
 * Cele finansowe: Budowanie portfela inwestycyjnego
 * Długi: Minimalne, tylko kredyt hipoteczny
 * Budżet: Stosuję zasadę 50/30/20
+
+[[Autorytety]] 🔎
+[[Relacje]] 🔎
+[[Struktura dnia]] 🔎

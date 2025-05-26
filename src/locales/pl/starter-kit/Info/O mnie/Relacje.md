@@ -1,8 +1,3 @@
-<!-- 
-TODO: Zastąp tę przykładową treść informacjami o swoich rzeczywistych relacjach.
-Format: Użyj list markdown z odpowiednimi szczegółami, takimi jak wiek, lokalizacja i kontekst relacji.
-Usuń ten blok komentarza po dodaniu swoich prawdziwych informacji.
--->
 ## Rodzina
 * Rodzice: Jakub i Maria Kowalscy (oboje mieszkają w rodzinnym mieście)
 * Rodzeństwo: Anna Kowalska (32 lata, mieszka w rodzinnym mieście), Piotr Kowalski (29 lat, mieszka w Warszawie)

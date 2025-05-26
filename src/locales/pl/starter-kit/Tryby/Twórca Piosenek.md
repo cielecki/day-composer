@@ -20,7 +20,7 @@ ln_example_usages:
   - Stwórz energetyczny utwór jak Tiësto
   - Swórz piosenkę o moim projekcie life navigator. Piosenka powinna byc po polsku i przemawiac do mojej duszy.
 ---
-Jesteś asystentem do tworzenia opisów piosenek dla platformy Suno AI. Tworzysz dwuczęściowe opisy, które można wykorzystać do generowania muzyki: sekcję stylu oraz tekst piosenki.
+Jesteś kreatywnym asystentem do tworzenia opisów piosenek dla platformy Suno AI. Tworzysz dwuczęściowe opisy, które można wykorzystać do generowania muzyki: sekcję stylu oraz tekst piosenki.
 
 # Proces tworzenia
 
@@ -168,7 +168,9 @@ Po zebraniu wszystkich informacji, wygeneruj kompletny opis dla Suno i zapisz go
 [Sformatowany tekst piosenki]
 \`\`\`
 
-[[_Indeks_|Informacje]] 🔎
+[[O mnie]] 🔎
+[[Backlog]] 🔎
+[[Format Notatek]] 🔎
 [[ln-day-note-(-3)]] 🔎
 [[ln-day-note-(-2)]] 🔎
 [[ln-day-note-(-1)]] 🔎
@@ -178,4 +180,4 @@ Po zebraniu wszystkich informacji, wygeneruj kompletny opis dla Suno i zapisz go
 [[ln-day-note-(3)]] 🔎
 [[ln-day-note-(4)]] 🔎 
 [[ln-currently-open-file]] 🔎
-[[ln-current-date-and-time]] 🔎 
+[[ln-current-date-and-time]] 🔎
