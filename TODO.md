@@ -11,8 +11,9 @@
 - [ ] Acquire as many test users as possible, talk to them, setup calls for calendly
 - [ ] Plan for whats next
 
-## Nice to haves
 
+## Nice to haves
+- [ ] Bug: Can only edit user messages sometimes pop up when I edit a user message
 - [ ] Import z notion: https://www.notion.com/help/export-your-content lub https://anytype.io
 - [ ] Presentation concept - finding people who want to explore this, see if it's useful for them
 - [ ] 📈 Develop marketing concept "All you need is markdown" - emphasizing that Life Navigator doesn't need a database

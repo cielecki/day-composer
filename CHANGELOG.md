@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Model Selection for Modes**: Added `ln_model` attribute to Life Navigator modes allowing users to specify which Anthropic model to use for each mode
 - **YouTube Transcript Download Tool**: New `download_youtube_transcript` tool that downloads transcripts from YouTube videos and saves them to Obsidian files. Supports multiple languages, timestamp inclusion/exclusion, and handles various YouTube URL formats. Includes automatic fallback to default language if specified language is unavailable.
+- **HTML Comment Filtering**: System prompts now automatically filter out top-level HTML comments while preserving them in code blocks. This prevents deleted task comments and other HTML annotations from being included in AI context while maintaining code examples intact.
 
 ### Fixed
 - **Mode List Update on Deletion**: Fixed issue where the mode list in the dropdown would not update when deleting starter pack or single mode files. The mode list now properly refreshes when mode files are deleted, ensuring the UI stays in sync with the actual available modes.

@@ -75,3 +75,14 @@ This is particularly useful in speech to text prompt.
 
 All special links must be followed by a magnifying glass emoji (🔎) to trigger the expansion. This is intentional to prevent accidental expansions.
 
+## HTML Comment Filtering
+
+During the link expansion process, Life Navigator automatically filters out top-level HTML comments from the final system prompt while preserving them in code blocks. This feature:
+
+- **Removes top-level HTML comments**: Comments like `<!-- DELETED TASK: ... -->` used to mark deleted tasks are filtered out
+- **Preserves code examples**: HTML comments inside markdown code blocks (fenced with ``` or indented with 4+ spaces) are kept intact
+- **Handles multi-line comments**: Comments spanning multiple lines are properly detected and removed
+- **Maintains code integrity**: Ensures that documentation and code examples remain unchanged
+
+This filtering ensures that the AI doesn't see deleted task markers and other HTML annotations while maintaining the integrity of code examples and documentation.
+
