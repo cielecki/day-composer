@@ -5,6 +5,7 @@
 - [x] Create a presentation for AI breakfast
 - [x] Calendly link with QR code?
 - [x] Do a presentation
+- [x] 🤖 Add ability to switch from Opus to Sonnet in Obsidian
 
 - [ ] Acquire as many test users as possible, talk to them, setup calls for calendly
 - [ ] Plan for whats next
@@ -27,7 +28,6 @@
 - [ ] Test with Piotr
 - [ ] AI Coach -> Life Navigator
 - [ ] Tool for creating images using OpenAI image generation that pastes the image into the current note
-- [ ] 🤖 Add ability to switch from Opus to Sonnet in Obsidian
 - [ ] Clickable tool calls so they open the editor
 - [ ] 🔧 No action buttons on text messages ending with a tool call?
 - [ ] Bug when stopping generated tool call

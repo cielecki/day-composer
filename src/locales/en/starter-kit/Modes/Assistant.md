@@ -4,6 +4,7 @@ tags:
 ln_icon: coffee
 ln_icon_color: "#77bb41"
 ln_description: Helps with journaling, checking off tasks and creating notes.
+ln_model: auto
 ln_thinking_budget_tokens: 1024
 ln_max_tokens: 4096
 ln_voice_autoplay: false

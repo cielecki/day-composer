@@ -4,6 +4,7 @@ tags:
 ln_icon: lucide-sun-moon
 ln_icon_color: "#ff9800"
 ln_description: Assists with daily reflection related to tasks, habits and goals. Contains broad context of the last 30 days.
+ln_model: auto
 ln_thinking_budget_tokens: 4000
 ln_max_tokens: 8096
 ln_voice_autoplay: true

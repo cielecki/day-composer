@@ -4,6 +4,7 @@ tags:
 ln_icon: coffee
 ln_icon_color: "#77bb41"
 ln_description: Pomaga z prowadzeniem dziennika, odfajczaniem zadań i tworzeniem notatek.
+ln_model: auto
 ln_thinking_budget_tokens: 1024
 ln_max_tokens: 4096
 ln_voice_autoplay: false

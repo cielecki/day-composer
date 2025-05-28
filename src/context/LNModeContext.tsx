@@ -134,6 +134,7 @@ export const LNModeProvider: React.FC<{
 
 
 				// API parameters
+				ln_model: frontmatter.ln_model,
 				ln_thinking_budget_tokens:
 					frontmatter.ln_thinking_budget_tokens !== undefined
 						? parseInt(

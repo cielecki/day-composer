@@ -4,6 +4,7 @@ tags:
 ln_icon: music
 ln_icon_color: "#9C27B0"
 ln_description: Assists in creating song descriptions for Suno AI.
+ln_model: auto
 ln_thinking_budget_tokens: 2000
 ln_max_tokens: 4096
 ln_voice_autoplay: false

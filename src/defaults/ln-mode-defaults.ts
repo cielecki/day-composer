@@ -1,6 +1,20 @@
 import { LNMode } from "../types/types";
 import { TTS_VOICES, TTSVoice } from "../settings/PluginSettings";
 
+// Available Anthropic models
+export const ANTHROPIC_MODELS = [
+  "auto",                          // Auto-select based on mode characteristics
+  "claude-opus-4-20250514",        // Claude Opus 4 - Most capable
+  "claude-sonnet-4-20250514",      // Claude Sonnet 4 - High performance
+  "claude-3-5-haiku-20241022",     // Claude Haiku 3.5 - Fastest
+  "claude-3-7-sonnet-20250219",    // Claude Sonnet 3.7 - Current default
+  "claude-3-5-sonnet-20241022",    // Claude Sonnet 3.5 v2
+  "claude-3-5-sonnet-20240620",    // Claude Sonnet 3.5 v1
+  "claude-3-haiku-20240307",       // Claude Haiku 3 - Legacy fast
+  "claude-3-opus-20240229",        // Claude Opus 3 - Legacy powerful
+] as const;
+
+export type AnthropicModel = typeof ANTHROPIC_MODELS[number];
 
 export const DEFAULT_VOICE_INSTRUCTIONS = `
 Voice: Warm, empathetic, and professional, reassuring the customer that their issue is understood and will be resolved.
@@ -13,6 +27,15 @@ Phrasing: Clear and concise, using customer-friendly language that avoids jargon
 
 Tone: Empathetic and solution-focused, emphasizing both understanding and proactive assistance.
 `;
+
+/**
+ * Automatically selects the best model based on mode characteristics
+ * @param mode The LN mode to analyze
+ * @returns The recommended model for this mode
+ */
+export function resolveAutoModel(mode: LNMode): string {
+  return "claude-sonnet-4-20250514";
+}
 
 /**
  * Default configuration for LN modes.
@@ -32,6 +55,7 @@ export function getDefaultLNMode(): LNMode {
     ln_example_usages: [],
     
     // API parameters
+    ln_model: "auto", // Default to auto-selection
     ln_thinking_budget_tokens: 1024,
     ln_max_tokens: 4096,
     
@@ -62,6 +86,12 @@ export function mergeWithDefaultMode(userMode: Partial<LNMode>): LNMode {
 export function validateModeSettings(mode: LNMode): LNMode {
   const validatedMode = { ...mode };
   const defaultMode = getDefaultLNMode();
+  
+  // Validate model if present (allow "auto" as a valid option)
+  if (mode.ln_model && !ANTHROPIC_MODELS.includes(mode.ln_model as AnthropicModel)) {
+    console.warn(`Invalid model selected: ${mode.ln_model}, falling back to auto`);
+    validatedMode.ln_model = "auto";
+  }
   
   // Validate voice if present
   if (mode.ln_voice && !TTS_VOICES.includes(mode.ln_voice as TTSVoice)) {

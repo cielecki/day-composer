@@ -24,7 +24,7 @@ import {
 import { useLNMode } from "./LNModeContext";
 import { MessageCreateParamsStreaming } from "@anthropic-ai/sdk/resources/messages/messages";
 import { t } from '../i18n';
-import { getDefaultLNMode } from "src/defaults/ln-mode-defaults";
+import { getDefaultLNMode, resolveAutoModel } from "src/defaults/ln-mode-defaults";
 import { ContextCollector } from "src/context-collector";
 
 export interface AIAgentContextType {
@@ -474,7 +474,13 @@ export const AIAgentProvider: React.FC<{
 
 						// Get API parameters from active mode or defaults (using refs for current values)
 						const currentActiveMode = lnModesRef.current[activeModeIdRef.current];
-						const model = "claude-4-sonnet-20250514"; // upgraded from claude-3-7-sonnet-20250219
+						const rawModel = currentActiveMode?.ln_model ?? defaultMode.ln_model;
+						
+						// Resolve "auto" model to actual model based on mode characteristics
+						const model = rawModel === "auto" 
+							? resolveAutoModel(currentActiveMode || defaultMode)
+							: rawModel;
+							
 						const maxTokens =
 							currentActiveMode.ln_max_tokens ??
 							defaultMode.ln_max_tokens;

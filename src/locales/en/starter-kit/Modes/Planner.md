@@ -4,6 +4,7 @@ tags:
 ln_icon: calendar
 ln_icon_color: "#795548"
 ln_description: Used for planning days, always switch to this mode when I ask to plan any day
+ln_model: auto
 ln_thinking_budget_tokens: 4000
 ln_max_tokens: 8000
 ln_voice_autoplay: true

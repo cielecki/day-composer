@@ -90,6 +90,7 @@ export interface LNMode {
 	ln_example_usages: string[]; // Message to automatically send when mode is activated
 
 	// API parameters
+	ln_model: string; // Anthropic model to use (e.g., "claude-sonnet-4-20250514")
 	ln_thinking_budget_tokens: number;
 	ln_max_tokens: number;
 

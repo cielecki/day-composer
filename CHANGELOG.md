@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Model Selection for Modes**: Added `ln_model` attribute to Life Navigator modes allowing users to specify which Anthropic model to use for each mode
+
 ### Fixed
 - **Mode List Update on Deletion**: Fixed issue where the mode list in the dropdown would not update when deleting starter pack or single mode files. The mode list now properly refreshes when mode files are deleted, ensuring the UI stays in sync with the actual available modes.
 

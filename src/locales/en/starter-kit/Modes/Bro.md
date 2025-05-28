@@ -4,6 +4,7 @@ tags:
 ln_icon: dumbbell
 ln_icon_color: "#E53935"
 ln_description: 
+ln_model: auto
 ln_thinking_budget_tokens: 2000
 ln_max_tokens: 4096
 ln_voice_autoplay: true
