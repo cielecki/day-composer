@@ -1,20 +1,21 @@
 # TODO
 
-- [ ] Test the final release
+- [x] When I start up the english version I have some problems with translation packs
+- [x] Test the final release
+- [x] Create a presentation for AI breakfast
+- [x] Calendly link with QR code?
+- [x] Do a presentation
 
-- [ ] Create a presentation for AI breakfast
+- [ ] Acquire as many test users as possible, talk to them, setup calls for calendly
+- [ ] Plan for whats next
+
+## Nice to haves
+
+- [ ] Import z notion: https://www.notion.com/help/export-your-content lub https://anytype.io
 - [ ] Presentation concept - finding people who want to explore this, see if it's useful for them
 - [ ] 📈 Develop marketing concept "All you need is markdown" - emphasizing that Life Navigator doesn't need a database
 - [ ] Article about wiki paradigm as markdown database (creating/using input output not chats and rag, AI helping with this)
 - [ ] Write a draft blog post for people to read through and give feedback on
-
-- [ ] Do a presentation
-
-- [ ] Acquire as many test users as possible
-
-- [ ] Plan for whats next
-
-## Nice to haves
 - [ ] How to create guidance for users when creating their materials? Some nice mode? or docs?
 - [ ] Better info dumped to AI when file is not found in expand links
 - [ ] still there is something wrong with the current spot logic - is it still a problem?

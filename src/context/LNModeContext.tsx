@@ -46,7 +46,8 @@ export const LNModeProvider: React.FC<{
 	// State for triggering re-renders and other state that needs reactivity
 	const [, setForceUpdate] = useState(0);
 	const [fileEventRefs, setFileEventRefs] = useState<EventRef[]>([]);
-	const [modeFilePaths, setModeFilePaths] = useState<Set<string>>(new Set());
+	// Use ref instead of state to avoid stale closures in event handlers
+	const modeFilePathsRef = useRef<Set<string>>(new Set());
 
 	// Function to extract an LN mode from a file with the #ln-mode tag
 	const extractLNModeFromFile = async (
@@ -195,9 +196,13 @@ export const LNModeProvider: React.FC<{
 			}
 
 			lnModesRef.current = modesMap;
+			
+			// Update mode file paths ref
+			modeFilePathsRef.current = new Set(Object.keys(modesMap).filter((path) => path !== ""));
+			
 			setForceUpdate(prev => prev + 1);
 			console.log(
-				`Loaded ${Object.keys(modesMap).length - 1} modes with #ln-mode tag`
+				`Loaded ${Object.keys(modesMap).length} modes with #ln-mode tag`
 			);
 			// If active mode no longer exists, set it to the first available mode
 			if (!modesMap[activeModeIdRef.current] && Object.keys(modesMap).length > 0) {
@@ -211,13 +216,6 @@ export const LNModeProvider: React.FC<{
 			console.error("Error loading LN modes:", error);
 		}
 	}, [app, activeModeIdRef, settings]);
-
-	// Update mode file paths when modes change
-	useEffect(() => {
-		setModeFilePaths(
-			new Set(Object.keys(lnModesRef.current).filter((path) => path !== "")),
-		);
-	}, [lnModesRef]);
 
 	// Setup vault event listeners
 	useEffect(() => {
@@ -244,7 +242,7 @@ export const LNModeProvider: React.FC<{
 		);
 	};
 
-	// Register file event handlers
+	// Register file event handlers - simplified dependencies to avoid recreation
 	useEffect(() => {
 		const refs: EventRef[] = [];
 
@@ -265,8 +263,8 @@ export const LNModeProvider: React.FC<{
 		// When a file is modified
 		const modifyRef = app.vault.on("modify", (file) => {
 			if (file instanceof TFile && file.extension === "md") {
-				// Check if this file had or has the tag
-				const hadTag = modeFilePaths.has(file.path);
+				// Check if this file had or has the tag using current ref value
+				const hadTag = modeFilePathsRef.current.has(file.path);
 
 				// Wait for metadata to be indexed
 				setTimeout(() => {
@@ -282,8 +280,12 @@ export const LNModeProvider: React.FC<{
 		// When a file is deleted
 		const deleteRef = app.vault.on("delete", (file) => {
 			if (file instanceof TFile && file.extension === "md") {
-				// If this was a mode file, reload modes
-				if (modeFilePaths.has(file.path)) {
+				// Check if this was a mode file using current ref value
+				const wasMode = modeFilePathsRef.current.has(file.path);
+				console.log(`File deleted: ${file.path}, was mode: ${wasMode}`);
+				
+				if (wasMode) {
+					console.log("Reloading modes after mode file deletion");
 					loadLNModes();
 				}
 			}
@@ -293,8 +295,10 @@ export const LNModeProvider: React.FC<{
 		// When a file is renamed
 		const renameRef = app.vault.on("rename", (file, oldPath) => {
 			if (file instanceof TFile && file.extension === "md") {
-				// If this was a mode file, reload modes
-				if (modeFilePaths.has(oldPath)) {
+				// Check if this was a mode file using current ref value
+				const wasMode = modeFilePathsRef.current.has(oldPath);
+				
+				if (wasMode) {
 					loadLNModes();
 				} else {
 					// Wait for metadata to be indexed
@@ -311,8 +315,8 @@ export const LNModeProvider: React.FC<{
 		// When metadata is changed
 		const metadataRef = app.metadataCache.on("changed", (file) => {
 			if (file instanceof TFile && file.extension === "md") {
-				// Check if this file had the tag before
-				const hadTag = modeFilePaths.has(file.path);
+				// Check if this file had the tag before using current ref value
+				const hadTag = modeFilePathsRef.current.has(file.path);
 				const hasTag = hasModeTag(file);
 
 				// Only reload if tag status changed
@@ -328,7 +332,7 @@ export const LNModeProvider: React.FC<{
 		return () => {
 			refs.forEach((ref) => app.vault.offref(ref));
 		};
-	}, [app, loadLNModes, modeFilePaths]);
+	}, [app, loadLNModes]); // Removed modeFilePaths from dependencies
 
 	// Load modes when component mounts
 	useEffect(() => {

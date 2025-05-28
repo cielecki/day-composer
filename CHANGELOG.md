@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Mode List Update on Deletion**: Fixed issue where the mode list in the dropdown would not update when deleting starter pack or single mode files. The mode list now properly refreshes when mode files are deleted, ensuring the UI stays in sync with the actual available modes.
+
 ## [0.7.4] - 2025-05-26
 
 ### Changed
