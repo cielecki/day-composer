@@ -49,6 +49,12 @@ Explore the ability to enter a voice-activated mode where the system waits for a
 **Endless Chat Interface:**
 Implement an endless chat window in Obsidian with a recent messages view that includes truncated context and a "load previous messages" option similar to Cursor's interface. This would provide a more seamless chat experience with better context management.
 
+**Audio Feedback System:**
+Add audio signals/sounds to Life Navigator for various actions (task completion, end of speech, start of transcription processing) to provide better user feedback and interaction cues.
+
+**Interactive Creator Mode:**
+Create a creator mode that generates sections/files based on dialogue with the user instead of using standard starter kits. This would provide a more personalized and interactive setup experience.
+
 ## General Notes
 
 *   This roadmap is a living document and priorities may shift based on user feedback and development capacity.
