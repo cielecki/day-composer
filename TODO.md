@@ -6,6 +6,7 @@
 - [x] Calendly link with QR code?
 - [x] Do a presentation
 - [x] 🤖 Add ability to switch from Opus to Sonnet in Obsidian
+- [x] YouTube transcript download tool - create tool that downloads transcripts and saves them to Obsidian files
 
 - [ ] Acquire as many test users as possible, talk to them, setup calls for calendly
 - [ ] Plan for whats next

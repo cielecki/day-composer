@@ -12,6 +12,7 @@ import { createCompletedTodoTool } from "./tools/create-completed-todo";
 import { handoverModeTool } from "./tools/handover-mode";
 import { editTodoTool } from "./tools/edit-todo";
 import { removeTodoTool } from "./tools/remove-todo";
+import { downloadYoutubeTranscriptTool } from "./tools/download-youtube-transcript";
 import { ToolExecutionError } from "./tools/utils/ToolExecutionError";
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tool-filter";
@@ -67,6 +68,7 @@ export class ObsidianTools {
 		handoverModeTool,
 		editTodoTool,
 		removeTodoTool,
+		downloadYoutubeTranscriptTool,
 	];
 
 	constructor(plugin: MyPlugin) {
