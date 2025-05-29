@@ -1,5 +1,5 @@
 When making changes to the code:
-- After performing fixes also modify CHANGELOG.md (add to unreleased section), TODO.md (check off done tasks), COMMIT.md (add or create the commit message to git) and genearal documentation in docs/. Note that changelog and commit is cumulative so dont replace content there - add stuff.
+- After performing fixes also modify CHANGELOG.md (add to unreleased section), TODO.md (check off done tasks), .gitmessage (add or create the commit message to git) and genearal documentation in docs/. Note that changelog and commit is cumulative so dont replace content there - add stuff.
 - Plan and investigate the implementation first before writing code, always seek aproval of the plan from the user
 - Remove any entries to the translation files that are no longer needed
 - If you made any changes to the starter kit bump the starter kit version in main.ts

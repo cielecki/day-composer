@@ -55,7 +55,7 @@ export class LifeNavigatorView extends ItemView {
 
 	async onClose(): Promise<void> {
 		// Clean up resources
-		console.log(t('logs.view.closing'));
+		console.log("View closing, cleaning up resources");
 
 		// Clean up React component
 		if (this.reactRoot) {
@@ -67,7 +67,7 @@ export class LifeNavigatorView extends ItemView {
 	renderComponent(): void {
 		if (!this.reactRoot) return;
 
-		console.log(t('logs.view.rendering').replace('{{count}}', this._conversation.length.toString()));
+		console.log(`Rendering LifeNavigatorView component with conversation: ${this._conversation.length} messages`);
 
 		this.reactRoot.render(
 			<LNModeProvider app={this.app}>

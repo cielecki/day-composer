@@ -246,10 +246,35 @@ export const LifeNavigatorApp: React.FC = () => {
 			// Abort the controller but do NOT clear the conversation
 			abortController.abort();
 			setAbortController(null);
+			
+			// After a short delay, clean up any incomplete tool calls that may have been left
+			// We delay this to allow the abort to propagate through the async operations
+			setTimeout(() => {
+				const currentConversation = conversation;
+				if (currentConversation.length > 0) {
+					const lastMessage = currentConversation[currentConversation.length - 1];
+					
+					if (lastMessage.role === "assistant") {
+						const contentBlocks = Array.isArray(lastMessage.content) 
+							? lastMessage.content 
+							: typeof lastMessage.content === "string" 
+								? [{ type: "text", text: lastMessage.content }] 
+								: [];
+								
+						const toolUseBlocks = contentBlocks.filter(block => 
+							typeof block === "object" && block !== null && "type" in block && block.type === "tool_use"
+						);
+						
+						if (toolUseBlocks.length > 0) {
+							console.log("Detected incomplete tool calls after abort, these will be cleaned up on next API call");
+						}
+					}
+				}
+			}, 500);
 		}
 		// Also stop any playing audio
 		stopAudio();
-	}, [abortController, setAbortController, stopAudio]);
+	}, [abortController, setAbortController, stopAudio, conversation]);
 
 
 	const toggleDropdown = useCallback(() => {

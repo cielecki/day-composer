@@ -340,9 +340,27 @@ export function parseMarkdown(markdown: string, filePath: string): Note {
 
 	let current: Task | TextBlock | null = null;
 	let lineIndex = 0;
+	let insideHtmlComment = false;
 
 	for (const line of lines) {
-		const taskMatch = line.match(/^-\s+\[([ x\->])\]\s*(.*?)$/);
+		// Check for HTML comment start/end markers
+		const commentStartMatch = line.match(/<!--/);
+		const commentEndMatch = line.match(/-->/);
+		
+		// Update HTML comment state
+		if (commentStartMatch && commentEndMatch) {
+			// Single line comment (<!-- content -->)
+			insideHtmlComment = false; // Reset state after single-line comment
+		} else if (commentStartMatch) {
+			// Multi-line comment start
+			insideHtmlComment = true;
+		} else if (commentEndMatch) {
+			// Multi-line comment end
+			insideHtmlComment = false;
+		}
+
+		// Only try to parse tasks if we're not inside an HTML comment
+		const taskMatch = !insideHtmlComment ? line.match(/^-\s+\[([ x\->])\]\s*(.*?)$/) : null;
 
 		if (current?.type == "task" && isCommentLine(line)) {
 			//check for continuation of task

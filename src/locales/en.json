@@ -170,6 +170,7 @@
     "startingLifeNavigator": "Error starting Life Navigator",
     "setup": "Setup Error: {{error}}",
     "conversationTurn": "Error during conversation: {{error}}",
+    "incompleteToolCall": "Tool call was interrupted and removed. Please try your request again.",
     "failedToUpdatePlugin": "Failed to update plugin: {{error}}",
     "tools": {
       "noName": "No tool name provided",
@@ -264,12 +265,6 @@
   },
   "view": {
     "title": "Life Navigator"
-  },
-  "logs": {
-    "view": {
-      "closing": "View closing, cleaning up resources",
-      "rendering": "Rendering LifeNavigatorView component with conversation: {{count}} messages"
-    }
   },
   "ui": {
     "recording": {

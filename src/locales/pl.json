@@ -170,6 +170,7 @@
     "startingLifeNavigator": "Błąd podczas uruchamiania Life Navigator",
     "setup": "Błąd konfiguracji: {{error}}",
     "conversationTurn": "Błąd podczas konwersacji: {{error}}",
+    "incompleteToolCall": "Wywołanie narzędzia zostało przerwane i usunięte. Spróbuj ponownie swojego żądania.",
     "failedToUpdatePlugin": "Nie udało się zaktualizować wtyczki: {{error}}",
     "tools": {
       "noName": "Nie podano nazwy narzędzia",
@@ -264,12 +265,6 @@
   },
   "view": {
     "title": "Life Navigator"
-  },
-  "logs": {
-    "view": {
-      "closing": "Zamykanie widoku, czyszczenie zasobów",
-      "rendering": "Renderowanie komponentu LifeNavigatorView z konwersacją: {{count}} wiadomości"
-    }
   },
   "ui": {
     "recording": {

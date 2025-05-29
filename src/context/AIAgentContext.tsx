@@ -121,7 +121,10 @@ export const AIAgentProvider: React.FC<{
 	// Format messages, ensuring content is always ContentBlock[] compatible with API
 	const formatMessagesForAPI = useCallback(
 		(messages: Message[]): Anthropic.Messages.MessageParam[] => {
-			return messages.map((msg) => {
+			// First, validate and clean the messages to handle incomplete tool calls
+			const validatedMessages = validateAndCleanMessages(messages);
+			
+			return validatedMessages.map((msg) => {
 				let apiContent: Anthropic.Messages.MessageParam["content"];
 				const contentBlocks = ensureContentBlocks(msg.content); // Ensure array of blocks
 
@@ -159,6 +162,80 @@ export const AIAgentProvider: React.FC<{
 		},
 		[],
 	);
+
+	// Function to validate and clean messages to prevent incomplete tool call issues
+	const validateAndCleanMessages = useCallback((messages: Message[]): Message[] => {
+		const cleanedMessages: Message[] = [];
+		
+		for (let i = 0; i < messages.length; i++) {
+			const currentMessage = messages[i];
+			
+			// If this is an assistant message, check for tool_use blocks
+			if (currentMessage.role === "assistant") {
+				const contentBlocks = ensureContentBlocks(currentMessage.content);
+				const toolUseBlocks = contentBlocks.filter(block => block.type === "tool_use");
+				
+				if (toolUseBlocks.length > 0) {
+					// This assistant message contains tool calls
+					// Check if the next message contains corresponding tool_result blocks
+					const nextMessage = messages[i + 1];
+					
+					if (!nextMessage || nextMessage.role !== "user") {
+						// No next message or next message is not a user message
+						// This means we have incomplete tool calls - exclude this message
+						console.warn(`Excluding assistant message with incomplete tool calls at index ${i}`);
+						console.warn("Tool use blocks found:", toolUseBlocks.map(block => ({ id: block.id, name: block.name })));
+						break; // Stop processing here to avoid incomplete conversation
+					}
+					
+					// Check if all tool_use blocks have corresponding tool_result blocks
+					const nextContentBlocks = ensureContentBlocks(nextMessage.content);
+					const toolResultBlocks = nextContentBlocks.filter(block => block.type === "tool_result");
+					
+					const toolUseIds = new Set(toolUseBlocks.map(block => block.id));
+					const toolResultIds = new Set(toolResultBlocks.map(block => block.tool_use_id));
+					
+					// Check if all tool_use IDs have corresponding tool_result IDs
+					const missingResults = [...toolUseIds].filter(id => !toolResultIds.has(id));
+					
+					if (missingResults.length > 0) {
+						console.warn(`Excluding assistant message with missing tool results at index ${i}`);
+						console.warn("Missing tool result IDs:", missingResults);
+						break; // Stop processing here to avoid incomplete conversation
+					}
+				}
+			}
+			
+			cleanedMessages.push(currentMessage);
+		}
+		
+		return cleanedMessages;
+	}, []);
+
+	// Function to clean up incomplete tool calls from the conversation
+	const cleanupIncompleteToolCalls = useCallback(() => {
+		const currentConversation = conversationRef.current;
+		if (currentConversation.length === 0) return;
+		
+		// Check the last message
+		const lastMessage = currentConversation[currentConversation.length - 1];
+		
+		if (lastMessage.role === "assistant") {
+			const contentBlocks = ensureContentBlocks(lastMessage.content);
+			const toolUseBlocks = contentBlocks.filter(block => block.type === "tool_use");
+			
+			if (toolUseBlocks.length > 0) {
+				// The last assistant message has tool calls but likely no results
+				// Remove this incomplete message
+				console.log("Cleaning up incomplete tool calls from last assistant message");
+				conversationRef.current = currentConversation.slice(0, -1);
+				setForceUpdate((prev) => prev + 1);
+				
+				// Show user feedback about the cleanup
+				new Notice(t('errors.incompleteToolCall') || "Incomplete tool call removed due to interruption");
+			}
+		}
+	}, []);
 
 	// Modify this function to work with streaming directly to the conversation
 	const processAnthropicStream = async (
@@ -434,6 +511,21 @@ export const AIAgentProvider: React.FC<{
 		} catch (error) {
 			console.error("Error processing Anthropic stream:", error);
 			aborted = true;
+			
+			// If aborted and we have a partial message with incomplete tool calls, remove it
+			if (aborted && localMessage) {
+				const contentBlocks = ensureContentBlocks(localMessage.content);
+				const hasIncompleteToolCalls = contentBlocks.some(block => 
+					block.type === "tool_use" && (!block.input || Object.keys(block.input).length === 0)
+				);
+				
+				if (hasIncompleteToolCalls) {
+					console.log("Removing assistant message with incomplete tool calls due to abort");
+					// Remove the incomplete message from conversation
+					conversationRef.current = conversationRef.current.slice(0, -1);
+					setForceUpdate((prev) => prev + 1);
+				}
+			}
 		}
 
 		return {
@@ -621,6 +713,8 @@ export const AIAgentProvider: React.FC<{
 						// Catch errors from API/stream/tool handling
 						if (error instanceof APIUserAbortError) {
 							console.log("Conversation turn aborted by user.");
+							// Clean up any incomplete tool calls that may have been partially generated
+							cleanupIncompleteToolCalls();
 						} else {
 							console.error(
 								"Error during conversation turn processing:",
@@ -629,6 +723,8 @@ export const AIAgentProvider: React.FC<{
 							new Notice(
 								t('errors.conversationTurn').replace('{{error}}', error instanceof Error ? error.message : "Unknown error")
 							);
+							// Also clean up incomplete tool calls on error
+							cleanupIncompleteToolCalls();
 						}
 						currentTurnAborted = true; // Stop the loop on error or abort
 						break; // Exit the while loop
@@ -653,6 +749,7 @@ export const AIAgentProvider: React.FC<{
 			addUserOrToolResultMessage,
 			lnModesRef,
 			activeModeIdRef,
+			cleanupIncompleteToolCalls,
 		],
 	);
 
