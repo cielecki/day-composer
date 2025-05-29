@@ -795,13 +795,14 @@ export const AIAgentProvider: React.FC<{
 		async (messageIndex: number, newContent: string, signal: AbortSignal): Promise<void> => {
 			// Check if index is valid and is a user message
 			if (messageIndex < 0 || messageIndex >= conversationRef.current.length) {
-				console.error("Invalid message index for editing");
+				console.error(`Invalid message index for editing: ${messageIndex}. Conversation length: ${conversationRef.current.length}`);
 				return;
 			}
 
 			const targetMessage = conversationRef.current[messageIndex];
 			if (targetMessage.role !== "user") {
-				console.error("Can only edit user messages");
+				console.error(`Can only edit user messages. Message at index ${messageIndex} has role: ${targetMessage.role}`);
+				console.error("Current conversation:", conversationRef.current.map((msg, idx) => ({ index: idx, role: msg.role })));
 				return;
 			}
 
@@ -810,6 +811,8 @@ export const AIAgentProvider: React.FC<{
 				console.log("Aborting current generation before editing message");
 				setIsGeneratingResponse(false);
 			}
+
+			console.log(`Editing user message at index ${messageIndex} with new content: "${newContent}"`);
 
 			// Create a copy of the conversation up to the edited message
 			const conversationUpToEdit = conversationRef.current.slice(0, messageIndex + 1);

@@ -12,8 +12,11 @@
 - [ ] Plan for whats next
 
 
+# Fixes
+- [ ] There are still some issues with handing over modes, should I disable this feature or fix it?
+
 ## Nice to haves
-- [ ] Bug: Can only edit user messages sometimes pop up when I edit a user message
+- [x] Bug: Can only edit user messages sometimes pop up when I edit a user message
 - [ ] Import z notion: https://www.notion.com/help/export-your-content lub https://anytype.io
 - [ ] Presentation concept - finding people who want to explore this, see if it's useful for them
 - [ ] 📈 Develop marketing concept "All you need is markdown" - emphasizing that Life Navigator doesn't need a database
@@ -46,4 +49,4 @@ conversation turn processing: BadRequestError: 400 {"type":"error","error":{"typ
 - [ ] Better error when there's no Anthropic API
 - [ ] Better tutorial regarding Anthropic and OpenAI keys
 - [ ] Create tool documentation in README or MODE_GUIDE or smth
-- [ ] There are still some issues with handing over modes, should I disable this feature or fix it?
+

@@ -142,6 +142,43 @@ export const AICoachApp: React.FC = () => {
 		});
 	}, [conversation]);
 
+	// Create a mapping from filtered conversation indices to original conversation indices
+	const filteredToOriginalIndexMap = useMemo(() => {
+		const indexMap: number[] = [];
+		let originalIndex = 0;
+		
+		for (const message of conversation) {
+			if (message.role === "assistant") {
+				indexMap.push(originalIndex);
+				originalIndex++;
+				continue;
+			}
+
+			if (message.role === "user" && Array.isArray(message.content)) {
+				const contentBlocks = message.content as ContentBlock[];
+				const isOnlyToolResults =
+					contentBlocks.length > 0 &&
+					contentBlocks.every(
+						(item) =>
+							typeof item === "object" &&
+							item !== null &&
+							"type" in item &&
+							item.type === "tool_result",
+					);
+
+				if (!isOnlyToolResults) {
+					indexMap.push(originalIndex);
+				}
+			} else {
+				indexMap.push(originalIndex);
+			}
+			
+			originalIndex++;
+		}
+		
+		return indexMap;
+	}, [conversation]);
+
 	// Helper function to scroll to bottom
 	const scrollToBottom = useCallback(() => {
 		if (conversationContainerRef.current) {
@@ -667,7 +704,7 @@ export const AICoachApp: React.FC = () => {
 						role={message.role}
 						content={message.content}
 						toolResults={toolResultsMap}
-						messageIndex={index}
+						messageIndex={filteredToOriginalIndexMap[index]}
 						isLastMessage={index === filteredConversation.length - 1}
 						isGeneratingResponse={isGeneratingResponse}
 						newAbortController={newAbortController}

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Mode List Update on Deletion**: Fixed issue where the mode list in the dropdown would not update when deleting starter pack or single mode files. The mode list now properly refreshes when mode files are deleted, ensuring the UI stays in sync with the actual available modes.
+- **Message Editing Index Bug**: Fixed bug where "Can only edit user messages" error would sometimes appear when editing user messages. The issue was caused by a mismatch between filtered conversation indices (used for display) and original conversation indices (used for editing). Now correctly maps filtered indices to original conversation indices.
 
 ## [0.7.4] - 2025-05-26
 
