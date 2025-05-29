@@ -9,7 +9,7 @@ Life Navigator is an AI-powered Obsidian plugin that transforms your note-taking
 ### Core Components
 
 - **Main Plugin (`src/main.ts`)**: Entry point and plugin lifecycle management
-- **AI Coach View (`src/ai-coach-view.tsx`)**: Main UI component for the chat interface
+- **Life Navigator View (`src/life-navigator-view.tsx`)**: Main UI component for the chat interface
 - **Context Collector (`src/context-collector.ts`)**: Manages AI context from linked files
 - **Tools System (`src/tools/`)**: AI function calling tools for task management and file operations
 - **Mode System (`src/services/ModeManagerService.ts`)**: Manages different AI personalities/modes
@@ -67,7 +67,7 @@ Life Navigator is an AI-powered Obsidian plugin that transforms your note-taking
 1. **Make changes** to source files in `src/`
 2. **esbuild watches** and automatically recompiles to `main.js`
 3. **Reload Obsidian** to see changes (Ctrl/Cmd + R)
-4. **Test your changes** in the AI Coach view
+4. **Test your changes** in the Life Navigator view
 
 ## Project Structure
 
@@ -75,10 +75,10 @@ Life Navigator is an AI-powered Obsidian plugin that transforms your note-taking
 life-navigator/
 ├── src/                          # Source code
 │   ├── main.ts                   # Plugin entry point
-│   ├── ai-coach-view.tsx         # Main chat interface
+│   ├── life-navigator-view.tsx     # Main chat interface
 │   ├── context-collector.ts      # AI context management
 │   ├── components/               # React UI components
-│   │   ├── AICoachApp.tsx        # Main chat application
+│   │   ├── LifeNavigatorApp.tsx   # Main chat application
 │   │   ├── UnifiedInputArea.tsx  # Voice/text input component
 │   │   └── ...
 │   ├── tools/                    # AI function calling tools

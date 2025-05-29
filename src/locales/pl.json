@@ -57,7 +57,7 @@
     "createNewMode": "Utwórz nowy tryb",
     "checkForUpdates": "Sprawdź aktualizacje",
     "resetTutorial": "Resetuj tutorial",
-    "aiCoach": "Life Navigator",
+    "openLifeNavigator": "Life Navigator",
     "readDocument": "Czytanie dokumentu",
     "createDocument": "Tworzenie dokumentu",
     "appendToDocument": "Dodawanie do dokumentu",
@@ -167,7 +167,7 @@
     "notFound": "Nie znaleziono zasobu",
     "invalidInput": "Nieprawidłowe dane wejściowe",
     "creatingNewMode": "Błąd podczas tworzenia nowego trybu",
-    "startingAICoach": "Błąd podczas uruchamiania AI Coach",
+    "startingLifeNavigator": "Błąd podczas uruchamiania Life Navigator",
     "setup": "Błąd konfiguracji: {{error}}",
     "conversationTurn": "Błąd podczas konwersacji: {{error}}",
     "failedToUpdatePlugin": "Nie udało się zaktualizować wtyczki: {{error}}",
@@ -268,7 +268,7 @@
   "logs": {
     "view": {
       "closing": "Zamykanie widoku, czyszczenie zasobów",
-      "rendering": "Renderowanie komponentu AICoachView z konwersacją: {{count}} wiadomości"
+      "rendering": "Renderowanie komponentu LifeNavigatorView z konwersacją: {{count}} wiadomości"
     }
   },
   "ui": {

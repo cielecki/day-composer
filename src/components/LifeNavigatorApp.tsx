@@ -66,7 +66,7 @@ function openSimpleObsidianModal(app: import('obsidian').App, title: string, tex
 	new SimpleObsidianModal(app).open();
 }
 
-export const AICoachApp: React.FC = () => {
+export const LifeNavigatorApp: React.FC = () => {
 	const [abortController, setAbortController] =
 		useState<AbortController | null>(null);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -440,7 +440,7 @@ export const AICoachApp: React.FC = () => {
 	}
 
 	return (
-		<div className="ai-coach-view-content">
+		<div className="life-navigator-view-content">
 			<div className="chat-bar">
 				<div
 					className="chat-bar-title"

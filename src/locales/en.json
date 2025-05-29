@@ -57,7 +57,7 @@
     "createNewMode": "Create a New Mode",
     "checkForUpdates": "Check for updates",
     "resetTutorial": "Reset Tutorial",
-    "aiCoach": "Life Navigator",
+    "openLifeNavigator": "Life Navigator",
     "readDocument": "Reading document",
     "createDocument": "Creating document",
     "appendToDocument": "Appending to document",
@@ -167,7 +167,7 @@
     "notFound": "Resource not found",
     "invalidInput": "Invalid input provided",
     "creatingNewMode": "Error creating a new mode",
-    "startingAICoach": "Error starting AI Coach",
+    "startingLifeNavigator": "Error starting Life Navigator",
     "setup": "Setup Error: {{error}}",
     "conversationTurn": "Error during conversation: {{error}}",
     "failedToUpdatePlugin": "Failed to update plugin: {{error}}",
@@ -268,7 +268,7 @@
   "logs": {
     "view": {
       "closing": "View closing, cleaning up resources",
-      "rendering": "Rendering AICoachView component with conversation: {{count}} messages"
+      "rendering": "Rendering LifeNavigatorView component with conversation: {{count}} messages"
     }
   },
   "ui": {

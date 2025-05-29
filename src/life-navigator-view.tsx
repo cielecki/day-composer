@@ -1,6 +1,6 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import * as ReactDOM from "react-dom/client";
-import { AICoachApp } from "./components/AICoachApp";
+import { LifeNavigatorApp } from "./components/LifeNavigatorApp";
 import { Message } from "./types/types";
 import { AIAgentProvider } from "./context/AIAgentContext";
 import { SpeechToTextProvider } from "./context/SpeechToTextContext";
@@ -9,26 +9,26 @@ import { TextToSpeechProvider } from "./context/TextToSpeechContext";
 import { LNModeProvider } from "./context/LNModeContext";
 import { t } from './i18n';
 
-export interface AICoachViewProps {
+export interface LifeNavigatorViewProps {
 	plugin: MyPlugin;
 	initialMessages?: Message[];
 }
 
-export const AI_COACH_VIEW_TYPE = "ai-coach-view";
+export const LIFE_NAVIGATOR_VIEW_TYPE = "life-navigator-view";
 
-export class AICoachView extends ItemView {
+export class LifeNavigatorView extends ItemView {
 	private reactRoot: ReactDOM.Root | null = null;
-	private props: AICoachViewProps;
+	private props: LifeNavigatorViewProps;
 	private _conversation: Message[] = [];
 
-	constructor(leaf: WorkspaceLeaf, props: AICoachViewProps) {
+	constructor(leaf: WorkspaceLeaf, props: LifeNavigatorViewProps) {
 		super(leaf);
 		this.props = props;
 		this._conversation = props.initialMessages || [];
 	}
 
 	getViewType(): string {
-		return AI_COACH_VIEW_TYPE;
+		return LIFE_NAVIGATOR_VIEW_TYPE;
 	}
 
 	getDisplayText(): string {
@@ -42,7 +42,7 @@ export class AICoachView extends ItemView {
 	async onOpen(): Promise<void> {
 		const container = this.containerEl.children[1];
 		container.empty();
-		container.addClass("ai-coach-view");
+		container.addClass("life-navigator-view");
 
 		// Create a container for React
 		const reactContainer = container.createDiv({ cls: "react-container" });
@@ -74,7 +74,7 @@ export class AICoachView extends ItemView {
 				<TextToSpeechProvider>
 					<AIAgentProvider plugin={this.props.plugin}>
 						<SpeechToTextProvider>
-							<AICoachApp />
+							<LifeNavigatorApp />
 						</SpeechToTextProvider>
 					</AIAgentProvider>
 				</TextToSpeechProvider>
@@ -100,4 +100,4 @@ export class AICoachView extends ItemView {
 	get conversation(): Message[] {
 		return this._conversation;
 	}
-}
+} 

@@ -1,4 +1,4 @@
-import { App, Notice, Plugin, requestUrl } from "obsidian";
+import { App, Notice, Plugin, requestUrl, WorkspaceLeaf } from "obsidian";
 import { SampleSettingTab } from "./settings/SettingsTab";
 import { ContextCollector } from "./context-collector";
 import {
@@ -6,7 +6,7 @@ import {
 	resetPluginSettings,
 } from "./settings/PluginSettings";
 import { resetObsidianTools } from "./obsidian-tools";
-import { AI_COACH_VIEW_TYPE, AICoachView } from "./ai-coach-view";
+import { LIFE_NAVIGATOR_VIEW_TYPE, LifeNavigatorView } from "./life-navigator-view";
 import { getObsidianTools } from "./obsidian-tools";
 import { initI18n, t } from "./i18n";
 import { LNMode } from "./types/types";
@@ -212,7 +212,7 @@ const createNewMode = async (app: App) => {
 
 export default class MyPlugin extends Plugin {
 	contextCollector: ContextCollector;
-	view: AICoachView | null = null;
+	view: LifeNavigatorView | null = null;
 
 	async onload() {
 		console.log("Loading Life Navigator plugin");
@@ -234,9 +234,9 @@ export default class MyPlugin extends Plugin {
 		this.contextCollector = new ContextCollector(this.app);
 
 		// Register the view type
-		this.registerView(AI_COACH_VIEW_TYPE, (leaf) => {
+		this.registerView(LIFE_NAVIGATOR_VIEW_TYPE, (leaf) => {
 			// Create view with empty context first
-			this.view = new AICoachView(leaf, {
+			this.view = new LifeNavigatorView(leaf, {
 				initialMessages: [],
 				plugin: this,
 			});
@@ -287,14 +287,14 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
-		// Add a ribbon icon for the AI Coach
-		this.addRibbonIcon("compass", t("tools.aiCoach"), async (evt: MouseEvent) => {
-			console.log("Starting AI Coach session");
+		// Add a ribbon icon for the Life Navigator
+		this.addRibbonIcon("compass", t("tools.openLifeNavigator"), async (evt: MouseEvent) => {
+			console.log("Starting Life Navigator session");
 
 			try {
 				// Check if the view is already open in a leaf
 				const leaves =
-					this.app.workspace.getLeavesOfType(AI_COACH_VIEW_TYPE);
+					this.app.workspace.getLeavesOfType(LIFE_NAVIGATOR_VIEW_TYPE);
 
 				if (leaves.length > 0) {
 					// View is already open, just focus on it
@@ -307,7 +307,7 @@ export default class MyPlugin extends Plugin {
 						// Get context before setting view state - using the AIAgent
 
 						await rightLeaf.setViewState({
-							type: AI_COACH_VIEW_TYPE,
+							type: LIFE_NAVIGATOR_VIEW_TYPE,
 							active: true,
 							state: {
 								initialMessages: [],
@@ -321,7 +321,7 @@ export default class MyPlugin extends Plugin {
 			} catch (error) {
 				console.error("Error in runAICoach:", error);
 				new Notice(
-					`${t("errors.startingAICoach")}: ${error instanceof Error ? error.message : String(error)}`,
+					`${t("errors.startingLifeNavigator")}: ${error instanceof Error ? error.message : String(error)}`,
 				);
 			}
 		});
@@ -438,7 +438,7 @@ export default class MyPlugin extends Plugin {
 	}
 
 	onunload() {
-		console.log("Unloading AI Coach plugin");
+		console.log("Unloading Life Navigator plugin");
 		resetObsidianTools();
 		resetPluginSettings();
 	}

@@ -8,16 +8,16 @@ If your plugin does not need CSS, delete this file.
 */
 
 /* Ensure text selection works on iOS */
-.ai-coach-view * {
+.life-navigator-view * {
   -webkit-user-select: text !important;
   user-select: text !important;
 }
 
-.ai-coach-view .message-content,
-.ai-coach-view .thinking-content,
-.ai-coach-view .tool-result-content,
-.ai-coach-view .tool-log-details,
-.ai-coach-view .tool-input-content {
+.life-navigator-view .message-content,
+.life-navigator-view .thinking-content,
+.life-navigator-view .tool-result-content,
+.life-navigator-view .tool-log-details,
+.life-navigator-view .tool-input-content {
   -webkit-user-select: text !important;
   user-select: text !important;
   -webkit-touch-callout: default !important;
@@ -70,15 +70,15 @@ If your plugin does not need CSS, delete this file.
     font-style: italic;
 }
 
-/* AI Coach View Styles */
-.ai-coach-view {
+/* Life Navigator View Styles */
+.life-navigator-view {
   display: flex;
   flex-direction: column;
   height: 100%;
   padding: 10px;
 }
 
-.ai-coach-view-content {
+.life-navigator-view-content {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -90,7 +90,7 @@ If your plugin does not need CSS, delete this file.
   height: 100%;
 }
 
-.ai-coach-view .conversation-container {
+.life-navigator-view .conversation-container {
   flex-grow: 1;
   overflow-y: auto;
   overflow-x: hidden; /* Prevent horizontal scrollbar */
@@ -98,35 +98,35 @@ If your plugin does not need CSS, delete this file.
   flex-direction: column;
 }
 
-.ai-coach-view .message {
+.life-navigator-view .message {
   border-radius: 8px;
   position: relative;
 }
 
-.ai-coach-view .message.user {
+.life-navigator-view .message.user {
   align-self: flex-end;
   max-width: 80%;
   background-color: var(--background-secondary);
   color: var(--text-normal);
 }
 
-.ai-coach-view .message.assistant {
+.life-navigator-view .message.assistant {
   align-self: flex-start;
   color: var(--text-normal);
   border: none;
   background-color: transparent;
 }
 
-.ai-coach-view .message-header {
+.life-navigator-view .message-header {
   font-weight: bold;
   margin-bottom: 4px;
 }
 
-.ai-coach-view .message-content {
+.life-navigator-view .message-content {
   user-select: text;
 }
 
-.ai-coach-view .button-container {
+.life-navigator-view .button-container {
   flex: 0 0 auto;
   display: flex;
   justify-content: center;
@@ -337,11 +337,11 @@ If your plugin does not need CSS, delete this file.
 
 /* Responsive styles */
 @media (max-width: 600px) {
-  .ai-coach-view .message {
+  .life-navigator-view .message {
     max-width: 95%;
   }
   
-  .ai-coach-view .record-button {
+  .life-navigator-view .record-button {
     width: 56px;
     height: 56px;
   }
@@ -787,7 +787,7 @@ If your plugin does not need CSS, delete this file.
   background-color: var(--tool-block-bg);
 }
 
-.ai-coach-view .thinking-content {
+.life-navigator-view .thinking-content {
   padding: 10px;
   margin: 0;
   font-size: 0.85rem;
@@ -1341,17 +1341,17 @@ If your plugin does not need CSS, delete this file.
   background-color: var(--background-modifier-hover);
 }
 
-.ai-coach-view .mic-button.recording {
+.life-navigator-view .mic-button.recording {
   background-color: var(--background-modifier-error);
   color: var(--text-on-accent);
 }
 
 
-.ai-coach-view .mic-button .spinner {
+.life-navigator-view .mic-button .spinner {
   animation: spin 1.5s linear infinite;
 }
 
-.ai-coach-view .input-control-button.mic-button {
+.life-navigator-view .input-control-button.mic-button {
   background-color: var(--interactive-accent);
   color: var(--text-on-accent);
 }
@@ -1434,19 +1434,19 @@ If your plugin does not need CSS, delete this file.
 }
 
 /* Add position relative to messages to anchor the actions */
-.ai-coach-view .message {
+.life-navigator-view .message {
   border-radius: 8px;
   padding: 0px;
   position: relative;
 }
 
 /* Image content styling in messages */
-.ai-coach-view .image-content {
+.life-navigator-view .image-content {
   margin: 0.5rem 0;
   overflow: hidden;
 }
 
-.ai-coach-view .image-content img {
+.life-navigator-view .image-content img {
   border-radius: 6px;
   box-shadow: var(--input-shadow);
 }
@@ -1454,7 +1454,7 @@ If your plugin does not need CSS, delete this file.
 
 
 /* Add position relative to messages to anchor the actions */
-.ai-coach-view .message {
+.life-navigator-view .message {
   border-radius: 8px;
   position: relative;
 }
@@ -1702,7 +1702,7 @@ If your plugin does not need CSS, delete this file.
 }
 
 /* Button styles */
-.ai-coach-view .input-control-button {
+.life-navigator-view .input-control-button {
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -1717,64 +1717,64 @@ If your plugin does not need CSS, delete this file.
   padding: 0;
 }
 
-.ai-coach-view .input-control-button:hover:not(:disabled) {
+.life-navigator-view .input-control-button:hover:not(:disabled) {
   background-color: var(--background-modifier-hover);
 }
 
-.ai-coach-view .input-control-button:disabled {
+.life-navigator-view .input-control-button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
 /* Input Controls */
-.ai-coach-view .input-controls-right {
+.life-navigator-view .input-controls-right {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.ai-coach-view .input-control-button:hover {
+.life-navigator-view .input-control-button:hover {
   background-color: var(--interactive-hover);
   color: var(--text-normal);
 }
 
-.ai-coach-view .input-control-button:disabled {
+.life-navigator-view .input-control-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.ai-coach-view .input-control-button.mic-button.recording {
+.life-navigator-view .input-control-button.mic-button.recording {
   background-color: var(--background-modifier-error);
   color: var(--text-on-accent);
 }
 
-.ai-coach-view .input-control-button.mic-button.confirm {
+.life-navigator-view .input-control-button.mic-button.confirm {
   background-color: var(--interactive-accent);
   color: var(--text-on-accent);
 }
 
-.ai-coach-view .input-control-button.send-button {
+.life-navigator-view .input-control-button.send-button {
   background-color: var(--interactive-accent);
   color: var(--text-on-accent);
 }
 
-.ai-coach-view .input-control-button.stop-button {
+.life-navigator-view .input-control-button.stop-button {
   background-color: var(--background-modifier-error);
   color: var(--text-on-accent);
 }
 
-.ai-coach-view .input-control-button.cancel-button {
+.life-navigator-view .input-control-button.cancel-button {
   background-color: var(--background-secondary-alt);
   color: var(--text-normal);
 }
 
-.ai-coach-view .input-control-button.send-button:hover,
-.ai-coach-view .input-control-button.mic-button.recording:hover,
-.ai-coach-view .input-control-button.mic-button.confirm:hover {
+.life-navigator-view .input-control-button.send-button:hover,
+.life-navigator-view .input-control-button.mic-button.recording:hover,
+.life-navigator-view .input-control-button.mic-button.confirm:hover {
   transform: scale(1.05);
 }
 
-.ai-coach-view .input-control-button.send-button.working {
+.life-navigator-view .input-control-button.send-button.working {
   background-color: var(--background-modifier-error);
   color: var(--text-on-accent);
 }

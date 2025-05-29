@@ -240,7 +240,7 @@ export class ContextCollector {
 			if (linkPath === 'ln-current-chat') {
 				// Access the chat content from the app-level view
 				try {
-					// Get the current chat content from the AICoachView
+					// Get the current chat content from the LifeNavigatorView
 					const chatContent = this.getCurrentChatContent();
 					
 					// Get the translated tag name and convert it to a valid XML tag name
@@ -369,18 +369,18 @@ export class ContextCollector {
 	 */
 	private getCurrentChatContent(): string {
 		try {
-			// Find all AICoachView leaves in the workspace
-			const aiCoachViewLeaves = this.app.workspace.getLeavesOfType("ai-coach-view");
+			// Find all LifeNavigatorView leaves in the workspace
+			const lifeNavigatorViewLeaves = this.app.workspace.getLeavesOfType("life-navigator-view");
 			
 			// If no leaves found, return error message
-			if (!aiCoachViewLeaves || aiCoachViewLeaves.length === 0) {
-				console.log("No AI Coach view leaves found");
+			if (!lifeNavigatorViewLeaves || lifeNavigatorViewLeaves.length === 0) {
+				console.log("No Life Navigator view leaves found");
 				return t('errors.chat.noContent');
 			}
 			
 			// Get the view instance from the first leaf
-			const aiCoachViewLeaf = aiCoachViewLeaves[0];
-			const view = aiCoachViewLeaf.view;
+			const lifeNavigatorViewLeaf = lifeNavigatorViewLeaves[0];
+			const view = lifeNavigatorViewLeaf.view;
 			
 			// The conversation is likely stored in the AIAgentContext
 			// Try to access the Life Navigator plugin (this is the proper way to access plugins)
@@ -400,12 +400,12 @@ export class ContextCollector {
 			// Try to find the conversation via DOM inspection
 			try {
 				// Find the conversation container in the DOM
-				const aiCoachView = this.app.workspace.containerEl.querySelector('.ai-coach-view');
-				if (aiCoachView) {
-					console.log("Found AI Coach view in DOM");
+				const lifeNavigatorView = this.app.workspace.containerEl.querySelector('.life-navigator-view');
+				if (lifeNavigatorView) {
+					console.log("Found Life Navigator view in DOM");
 					
 					// Debug: Log the HTML structure
-					console.log("AI Coach view HTML:", aiCoachView.innerHTML);
+					console.log("Life Navigator view HTML:", lifeNavigatorView.innerHTML);
 					
 					// Try different selectors for messages
 					const selectors = [
@@ -421,7 +421,7 @@ export class ContextCollector {
 					
 					// Try each selector until we find elements
 					for (const selector of selectors) {
-						const elements = aiCoachView.querySelectorAll(selector);
+						const elements = lifeNavigatorView.querySelectorAll(selector);
 						console.log(`Selector "${selector}" found ${elements.length} elements`);
 						
 						if (elements && elements.length > 0) {
@@ -496,7 +496,7 @@ export class ContextCollector {
 					
 					// If we couldn't find messages but the chat is not empty
 					// Return a placeholder conversation
-					if (aiCoachView.textContent && !aiCoachView.textContent.includes('No chat content')) {
+					if (lifeNavigatorView.textContent && !lifeNavigatorView.textContent.includes('No chat content')) {
 						console.log("Found chat content but couldn't parse messages, returning empty chat message");
 						// Return a clear "chat is empty" message instead of the raw text
 						return t('chat.empty');
@@ -522,11 +522,11 @@ export class ContextCollector {
 			}
 			
 			// Cast to any to avoid TypeScript errors
-			const aiCoachView = view as any;
+			const lifeNavigatorView = view as any;
 			
 			// Try direct property access as a fallback
-			if (aiCoachView && typeof aiCoachView.conversation !== 'undefined') {
-				const conversation = aiCoachView.conversation;
+			if (lifeNavigatorView && typeof lifeNavigatorView.conversation !== 'undefined') {
+				const conversation = lifeNavigatorView.conversation;
 				
 				if (Array.isArray(conversation) && conversation.length > 0) {
 					console.log("Successfully retrieved conversation using getter");
@@ -535,12 +535,12 @@ export class ContextCollector {
 			}
 			
 			// Fallback to accessing the private _conversation property directly
-			if (aiCoachView && Array.isArray(aiCoachView._conversation) && aiCoachView._conversation.length > 0) {
-				console.log("Successfully retrieved conversation using _conversation property");
-				return this.formatConversationContent(aiCoachView._conversation);
+			if (lifeNavigatorView && Array.isArray(lifeNavigatorView._conversation) && lifeNavigatorView._conversation.length > 0) {
+				console.log("Found conversation in _conversation property");
+				return this.formatConversationContent(lifeNavigatorView._conversation);
 			}
 			
-			console.log("No conversation found in AICoachView");
+			console.log("No conversation found in LifeNavigatorView");
 			return t('errors.chat.noContent');
 		} catch (error) {
 			console.error("Error getting chat content:", error);
