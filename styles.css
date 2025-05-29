@@ -15,7 +15,6 @@ If your plugin does not need CSS, delete this file.
 
 .ai-coach-view .message-content,
 .ai-coach-view .thinking-content,
-.ai-coach-view .debug-content,
 .ai-coach-view .tool-result-content,
 .ai-coach-view .tool-log-details,
 .ai-coach-view .tool-input-content {
@@ -444,49 +443,6 @@ If your plugin does not need CSS, delete this file.
   height: 32px;
   padding: 8px;
 }
-
-
-/* Debug Modal Styles */
-.ai-coach-debug-modal {
-  max-width: 800px;
-  max-height: 600px;
-  overflow-y: auto;
-}
-
-.ai-coach-debug-modal h2,
-.ai-coach-debug-modal h3 {
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-}
-
-.ai-coach-debug-modal .debug-content {
-  max-height: 400px;
-  overflow-y: auto;
-  margin: 10px 0;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 4px;
-  padding: 10px;
-  user-select: text;
-}
-
-.ai-coach-debug-modal pre {
-  white-space: pre-wrap;
-  word-break: break-word;
-  font-family: var(--font-monospace);
-  font-size: 0.9em;
-  padding: 0;
-  margin: 0;
-}
-
-.ai-coach-debug-modal .modal-button-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1em;
-}
-
-.ai-coach-debug-modal button {
-  margin-left: 0.5em;
-} 
 
 /* Add this to the end of the file */
 
@@ -1007,46 +963,6 @@ If your plugin does not need CSS, delete this file.
   margin-bottom: 12px;
 }
 
-/* Debug modal tabs */
-.debug-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--background-modifier-border);
-  margin-bottom: 16px;
-}
-
-.debug-tab {
-  padding: 8px 16px;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  user-select: none;
-}
-
-.debug-tab:hover {
-  background-color: var(--background-modifier-hover);
-}
-
-.debug-tab.active {
-  border-bottom-color: var(--interactive-accent);
-  color: var(--interactive-accent);
-  font-weight: 500;
-}
-
-.debug-content {
-  max-height: 70vh;
-  overflow-y: auto;
-  font-family: var(--font-monospace);
-  padding: 8px;
-  background-color: var(--background-secondary);
-  border-radius: 4px;
-  font-size: 12px;
-  margin-bottom: 16px;
-}
-
-.debug-content pre {
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
 
 /* Update styles for LucideIcon components */
 
@@ -1987,4 +1903,4 @@ If your plugin does not need CSS, delete this file.
   width: 20px;
   height: 20px;
   transition: opacity 0.2s ease;
-} 
+}

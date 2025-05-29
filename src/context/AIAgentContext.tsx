@@ -583,7 +583,8 @@ export const AIAgentProvider: React.FC<{
 										type: "tool_result",
 										tool_use_id: toolUseBlock.id,
 										content: result.result,
-										is_error: result.isError
+										is_error: result.isError,
+										navigationTargets: result.navigationTargets
 									});
 								} catch (error: any) {
 									toolResults.push({

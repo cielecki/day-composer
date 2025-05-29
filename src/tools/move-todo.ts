@@ -2,11 +2,12 @@ import MyPlugin from "../main";
 import { createFile } from "./utils/createFile";
 import { fileExists } from "./utils/fileExists";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
-import { ObsidianTool } from "../obsidian-tools";
+import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
 import { readNote, updateNote, Note, findTaskByDescription, determineInsertionPosition } from "./utils/note-utils";
 import { insertTaskAtPosition, Task } from "./utils/task-utils";
 import { moveTaskToPosition } from "./utils/moveTaskToPosition";
 import { validateTasks } from "./utils/task-validation";
+import { createNavigationTargetsForTasks, createNavigationTarget, findTaskLineNumbers } from "./utils/line-number-utils";
 import { t } from "../i18n";
 
 const schema = {
@@ -102,7 +103,7 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       return t('tools.actions.move.inProgress').replace('{{task}}', '');
     }
   },
-  execute: async (plugin: MyPlugin, params: MoveTodoToolInput): Promise<string> => {
+  execute: async (plugin: MyPlugin, params: MoveTodoToolInput): Promise<ToolExecutionResult> => {
     // Extract parameters
     const { todos, source_path, position, reference_todo_text, target_path } = params;
     
@@ -162,6 +163,8 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
     
     // Track tasks that will be moved
     const movedTasks: string[] = [];
+    const sourceMovedTasks: Task[] = []; // Tasks marked as moved in source
+    const targetMovedTasks: Task[] = []; // Tasks added to target
     
     // Get source and target names for reference (use basename or just the path)
     const sourceName = source_path.split('/').pop()?.replace('.md', '') || source_path;
@@ -182,6 +185,8 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       if (isMovingWithinSameDocument) {
         updatedSourceNote = moveTaskToPosition(updatedSourceNote, task, position, reference_todo_text);
         updatedTargetNote = updatedSourceNote;
+        // For same document moves, track the moved task
+        targetMovedTasks.push(task);
       } else {
         // Create the task for the target document
         const newMovedTask: Task = JSON.parse(JSON.stringify(task));
@@ -210,6 +215,10 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
         
         // Add the moved task to the target note at the determined position
         updatedTargetNote = insertTaskAtPosition(updatedTargetNote, newMovedTask, insertionIndex);
+        
+        // Track both source and target tasks
+        sourceMovedTasks.push(task);
+        targetMovedTasks.push(newMovedTask);
       }
       
       movedTasks.push(todoText);
@@ -236,6 +245,42 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       await updateNote({plugin, filePath: target_path, updatedNote: updatedTargetNote});
     }
     
+    // Calculate line numbers for navigation targets
+    const navigationTargets: NavigationTarget[] = [];
+    
+    if (isMovingWithinSameDocument) {
+      // For same document moves, find the new positions of the moved tasks
+      const navigationTargetsForMoved = createNavigationTargetsForTasks(
+        updatedTargetNote,
+        targetMovedTasks,
+        target_path,
+        `Navigate to moved todo{{count}}`
+      );
+      navigationTargets.push(...navigationTargetsForMoved);
+    } else {
+      // For cross-document moves, provide navigation to both source and target
+      
+      // Source navigation (marked as moved)
+      const sourceLineNumbers = findTaskLineNumbers(updatedSourceNote, sourceMovedTasks);
+      if (sourceLineNumbers.length > 0) {
+        navigationTargets.push(createNavigationTarget(
+          source_path,
+          sourceLineNumbers,
+          `Source: marked as moved`
+        ));
+      }
+      
+      // Target navigation (new tasks)
+      const targetLineNumbers = findTaskLineNumbers(updatedTargetNote, targetMovedTasks);
+      if (targetLineNumbers.length > 0) {
+        navigationTargets.push(createNavigationTarget(
+          target_path,
+          targetLineNumbers,
+          `Destination: moved todo${movedTasks.length > 1 ? 's' : ''}`
+        ));
+      }
+    }
+    
     // Include positioning details in the success message
     const positionDetail = (position === "after" || position === "before")
       ? t(`tools.position.${position}`).replace('{{task}}', reference_todo_text || '')
@@ -245,10 +290,15 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       ? `"${movedTasks[0]}"`
       : `${movedTasks.length} ${t('tools.tasks.plural')}`;
     
-    return t('tools.success.move')
+    const resultMessage = t('tools.success.move')
       .replace('{{task}}', tasksDescription)
       .replace('{{source}}', source_path)
       .replace('{{target}}', target_path)
       .replace('{{position}}', positionDetail);
+
+    return {
+      result: resultMessage,
+      navigationTargets: navigationTargets
+    };
   }
 };

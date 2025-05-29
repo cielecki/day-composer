@@ -1,13 +1,14 @@
 import MyPlugin from "../main";
-import { ObsidianTool } from "../obsidian-tools";
+import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
 import { findTaskByDescription, updateNote } from './utils/note-utils';
 import { readNote } from './utils/note-utils';
 import { getDailyNotePath } from "./utils/getDailyNotePath";
 import { getCurrentTime } from "./utils/getCurrentTime";
-import { appendComment } from "./utils/task-utils";
+import { appendComment, Task } from "./utils/task-utils";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { validateTasks } from "./utils/task-validation";
 import { moveTaskToPosition } from "./utils/moveTaskToPosition";
+import { createNavigationTargetsForTasks } from "./utils/line-number-utils";
 import { t } from "../i18n";
 
 const schema = {
@@ -94,7 +95,7 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
       return t('tools.actions.abandon.inProgress').replace('{{task}}', '');
     }
   },
-  execute: async (plugin: MyPlugin, params: AbandonTodoToolInput): Promise<string> => {
+  execute: async (plugin: MyPlugin, params: AbandonTodoToolInput): Promise<ToolExecutionResult> => {
     const { todos, time } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
@@ -118,6 +119,7 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
     
     // Track tasks that will be abandoned
     const abandonedTasks: string[] = [];
+    const movedTasks: Task[] = []; // Store references to the moved tasks
     
     // If we get here, all tasks were validated successfully
     let updatedNote = JSON.parse(JSON.stringify(note));
@@ -145,19 +147,34 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
       // Move the abandoned task to the current position (unified logic with check-todo and move-todo)
       updatedNote = moveTaskToPosition(updatedNote, task);
       
+      // Store the task reference for finding its new position later
+      movedTasks.push(task);
       abandonedTasks.push(todo_text);
     }
     
     // Update the note with all abandoned tasks
     await updateNote({plugin, filePath, updatedNote});
     
+    // Create navigation targets for the moved tasks
+    const navigationTargets = createNavigationTargetsForTasks(
+      updatedNote,
+      movedTasks,
+      filePath,
+      `Navigate to abandoned todo{{count}}`
+    );
+    
     // Prepare success message
     const tasksDescription = abandonedTasks.length === 1 
       ? `"${abandonedTasks[0]}"`
       : `${abandonedTasks.length} ${t('tools.tasks.plural')}`;
       
-    return t('tools.success.abandon')
+    const resultMessage = t('tools.success.abandon')
       .replace('{{task}}', tasksDescription)
       .replace('{{path}}', filePath);
+
+    return {
+      result: resultMessage,
+      navigationTargets: navigationTargets
+    };
   }
 };

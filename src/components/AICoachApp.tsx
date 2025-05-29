@@ -13,6 +13,7 @@ import {
 	ToolResultBlock,
 	ContentBlock,
 } from "src/types/types";
+import { NavigationTarget } from "src/obsidian-tools";
 import { useAIAgent } from "src/context/AIAgentContext";
 import { LucideIcon } from "./LucideIcon";
 import ReactMarkdown from "react-markdown";
@@ -89,9 +90,9 @@ export const AICoachApp: React.FC = () => {
 
 	const { isPlayingAudio, stopAudio } = useTextToSpeech();
 
-	// Build a map of tool results (tool_use_id -> result content)
+	// Build a map of tool results (tool_use_id -> result content and navigation targets)
 	const toolResultsMap = useMemo(() => {
-		const resultsMap = new Map<string, string>();
+		const resultsMap = new Map<string, { content: string; navigationTargets?: NavigationTarget[] }>();
 
 		conversation.forEach((message) => {
 			if (message.role === "user" && Array.isArray(message.content)) {
@@ -105,7 +106,10 @@ export const AICoachApp: React.FC = () => {
 						const toolResult = item as ToolResultBlock;
 						resultsMap.set(
 							toolResult.tool_use_id,
-							toolResult.content,
+							{
+								content: toolResult.content,
+								navigationTargets: toolResult.navigationTargets
+							}
 						);
 					}
 				});

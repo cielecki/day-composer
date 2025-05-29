@@ -1,101 +1,83 @@
 import MyPlugin from "../main";
 import { getCurrentTime } from "./utils/getCurrentTime";
 import { getDailyNotePath } from "./utils/getDailyNotePath";
-import { appendComment } from "./utils/task-utils";
+import { appendComment, Task } from "./utils/task-utils";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
-import { ObsidianTool } from "../obsidian-tools";
+import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
 import { findTaskByDescription, readNote } from './utils/note-utils';
 import { updateNote } from './utils/note-utils';
 import { moveTaskToPosition } from "./utils/moveTaskToPosition";
 import { validateTasks } from "./utils/task-validation";
+import { createNavigationTargetsForTasks } from "./utils/line-number-utils";
 import { t } from "../i18n";
 
 
 const schema = {
   name: "check_todo",
-  description: "Checks off one or more to-do items in a specified document or today's daily note",
+  description: "Marks one or more to-do items as completed in the specified file (defaults to today's daily note)",
   input_schema: {
     type: "object",
     properties: {
       todos: {
         type: "array",
-        description: "Array of to-do items to check off",
+        description: "Array of to-do items to mark as completed",
         items: {
           type: "object",
           properties: {
             todo_text: {
               type: "string",
-              description: "The complete text of the to-do item to check off. This should include all formatting, emojis, time markers, and any other specific formatting.",
+              description: "The exact text of the to-do item to mark as completed"
             },
             comment: {
               type: "string",
-              description: "Additional contextual information or thoughts about completing this task. Will be added as an indented comment below the checked item.",
+              description: "Optional comment to add when completing the task"
             }
           },
           required: ["todo_text"]
         }
       },
-      time: {
-        type: "string",
-        description: "Time when the tasks were completed in HH:MM format. If not provided, current time will be used. This time is applied to all tasks in the batch.",
-      },
       file_path: {
         type: "string",
-        description: "The specific file to check for the to-dos (including .md extension). If not provided, searches only in today's daily note.",
+        description: "Optional file path (defaults to today's daily note if not provided)"
+      },
+      time: {
+        type: "string",
+        description: "Optional time to record when the task was completed (e.g., '2:30 PM')"
       }
     },
     required: ["todos"]
   }
 };
 
-type TodoItem = {
-  todo_text: string,
-  comment?: string
-}
-
 type CheckTodoToolInput = {
-  todos: TodoItem[],
-  time?: string,
-  file_path?: string
+  todos: Array<{
+    todo_text: string;
+    comment?: string;
+  }>;
+  file_path?: string;
+  time?: string;
 }
 
 export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
   specification: schema,
-  icon: "check-square",
+  icon: "check-circle",
   getActionText: (input: CheckTodoToolInput, output: string, hasResult: boolean, hasError: boolean) => {
+    if (!input || typeof input !== 'object' || !input.todos) {
+      return hasResult ? 'Checked todos' : 'Checking todos...';
+    }
+
+    const count = input.todos.length;
+    const todoText = count === 1 ? input.todos[0].todo_text : `${count} todos`;
+
     if (hasResult) {
-      // Only process task text for completed operations
-      let actionText = '';
-      if (!input || typeof input !== 'object') actionText = '';
-      const todoCount = input.todos?.length || 0;
-      
-      if (todoCount === 1) {
-        actionText = `"${input.todos[0].todo_text}"`;
-      } else {
-        // Use proper pluralization based on count
-        const countKey = todoCount === 0 ? 'zero' :
-                         todoCount === 1 ? 'one' :
-                         todoCount % 10 >= 2 && todoCount % 10 <= 4 && (todoCount % 100 < 10 || todoCount % 100 >= 20) ? 'few' : 'many';
-        
-        // Check if the translation key exists
-        try {
-          const translation = t(`tools.tasks.count.${countKey}`, { count: todoCount });
-          actionText = translation !== `tools.tasks.count.${countKey}` ? translation : `${todoCount} ${t('tools.tasks.plural')}`;
-        } catch (e) {
-          // Fallback to simple pluralization if the count format is not available
-          actionText = `${todoCount} ${t('tools.tasks.plural')}`;
-        }
-      }
-      
-      return hasError
-        ? t('tools.actions.check.failed').replace('{{task}}', actionText)
-        : t('tools.actions.check.success').replace('{{task}}', actionText);
+      return hasError 
+        ? `Failed to check ${todoText}`
+        : `Checked ${todoText}`;
     } else {
-      // For in-progress operations, don't show task details
-      return t('tools.actions.check.inProgress').replace('{{task}}', '');
+      return `Checking ${todoText}...`;
     }
   },
-  execute: async (plugin: MyPlugin, params: CheckTodoToolInput): Promise<string> => {
+  execute: async (plugin: MyPlugin, params: CheckTodoToolInput): Promise<ToolExecutionResult> => {
     const { todos, time } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
@@ -121,6 +103,7 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
     // If we get here, all tasks were validated successfully
     let updatedNote = JSON.parse(JSON.stringify(note));
     const checkedTasks: string[] = [];
+    const movedTasks: Task[] = []; // Store references to the moved tasks
     
     // Process all tasks (we know they're all valid at this point)
     for (const todo of todos) {
@@ -145,20 +128,31 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
       // Move the completed task to the current position (unified logic with abandon-todo and move-todo)
       updatedNote = moveTaskToPosition(updatedNote, task);
       
+      // Store the task reference for finding its new position later
+      movedTasks.push(task);
       checkedTasks.push(todo_text);
     }
     
     // Update the note with all completed tasks
     await updateNote({plugin, filePath, updatedNote});
     
-    // Prepare success message
-    const tasksDescription = checkedTasks.length === 1 
-      ? `"${checkedTasks[0]}"`
-      : `${checkedTasks.length} ${t('tools.tasks.plural')}`;
-      
-    return t('tools.success.check')
-      .replace('{{task}}', tasksDescription)
-      .replace('{{path}}', filePath)
-      .replace('{{time}}', currentTime);
+    // Create navigation targets for the moved tasks
+    const navigationTargets = createNavigationTargetsForTasks(
+      updatedNote,
+      movedTasks,
+      filePath,
+      `Navigate to checked todo{{count}}`
+    );
+
+    // Create result message
+    const resultMessage = checkedTasks.length === 1 
+      ? `✅ Checked off: "${checkedTasks[0]}"`
+      : `✅ Checked off ${checkedTasks.length} todos:\n${checkedTasks.map(task => `• ${task}`).join('\n')}`;
+
+    return {
+      result: resultMessage,
+      navigationTargets: navigationTargets
+    };
   }
 };
+

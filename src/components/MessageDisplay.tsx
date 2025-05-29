@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ContentBlock } from 'src/types/types';
+import { NavigationTarget } from 'src/obsidian-tools';
 import { ThinkingCollapsibleBlock, RedactedThinkingBlock as RedactedThinking, ToolBlock } from './CollapsibleBlock';
 import { getObsidianTools } from 'src/obsidian-tools';
 import { useAIAgent } from 'src/context/AIAgentContext';
@@ -12,7 +13,7 @@ import { LucideIcon } from './LucideIcon';
 interface MessageDisplayProps {
   role: 'user' | 'assistant';
   content: string | ContentBlock[];
-  toolResults?: Map<string, string>;
+  toolResults?: Map<string, { content: string; navigationTargets?: NavigationTarget[] }>;
   messageIndex?: number;
   isLastMessage?: boolean;
   isGeneratingResponse?: boolean;
@@ -171,12 +172,15 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
           <RedactedThinking key={`block-${index}`} />
         );
       case 'tool_use': {
-        const result = toolResultsMap.get(block.id) || '';
-        const hasResult = !!result;
+        const resultData = toolResultsMap.get(block.id);
+        const hasResult = !!resultData;
         const tool = getObsidianTools(undefined!).getToolByName(block.name);
         
+        // Extract content and navigation targets from the result data
+        const resultContent = resultData?.content || '';
+        const navigationTargets = resultData?.navigationTargets;
+        
         // Detect error based on result content starting with ❌
-        const resultContent = typeof result === 'object' ? result.content : result;
         const isErrorByContent = typeof resultContent === 'string' && resultContent.trim().startsWith('❌');
         
         // Get the tool result block to check for error state
@@ -213,6 +217,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
             hasResult={hasResult}
             result={resultContent}
             isError={!!isError}
+            navigationTargets={navigationTargets}
             defaultOpen={false}
           />
         );

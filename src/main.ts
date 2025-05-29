@@ -217,6 +217,9 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 		console.log("Loading Life Navigator plugin");
 
+		// Make app available globally for navigation service
+		(window as any).app = this.app;
+
 		// Initialize i18n
 		await initI18n(this.app);
 

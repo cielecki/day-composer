@@ -1,3 +1,5 @@
+import { NavigationTarget } from '../obsidian-tools';
+
 export interface Message {
 	role: "user" | "assistant";
 	content: string | ToolResult[] | ContentBlock[];
@@ -54,6 +56,7 @@ export interface ToolResultBlock {
 	tool_use_id: string;
 	content: string;
 	is_error?: boolean;
+	navigationTargets?: NavigationTarget[];
 }
 
 // Union type for all possible content blocks

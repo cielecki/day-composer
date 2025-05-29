@@ -1,7 +1,7 @@
 import MyPlugin from "../main";
 import { createFile } from "./utils/createFile";
 import { fileExists } from "./utils/fileExists";
-import { ObsidianTool } from "../obsidian-tools";
+import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { requestUrl } from "obsidian";
 
@@ -207,7 +207,7 @@ export const downloadYoutubeTranscriptTool: ObsidianTool<DownloadYoutubeTranscri
       return `Downloading ${actionText}...`;
     }
   },
-  execute: async (plugin: MyPlugin, params: DownloadYoutubeTranscriptInput): Promise<string> => {
+  execute: async (plugin: MyPlugin, params: DownloadYoutubeTranscriptInput): Promise<ToolExecutionResult> => {
     const { url, path, language = 'en', includeTimestamps = true, overwrite = false } = params;
 
     try {
@@ -251,7 +251,18 @@ export const downloadYoutubeTranscriptTool: ObsidianTool<DownloadYoutubeTranscri
       const transcriptLength = transcript.length;
       const totalDuration = transcript.length > 0 ? Math.round(transcript[transcript.length - 1].offset / 60) : 0;
       
-      return `Successfully downloaded YouTube transcript to ${path}. Contains ${transcriptLength} segments covering approximately ${totalDuration} minutes of video content.`;
+      const resultMessage = `Successfully downloaded YouTube transcript to ${path}. Contains ${transcriptLength} segments covering approximately ${totalDuration} minutes of video content.`;
+
+      // Create navigation target for the downloaded transcript
+      const navigationTargets: NavigationTarget[] = [{
+        filePath: path,
+        description: "Open downloaded transcript"
+      }];
+
+      return {
+        result: resultMessage,
+        navigationTargets: navigationTargets
+      };
     } catch (error) {
       if (error instanceof ToolExecutionError) {
         throw error;

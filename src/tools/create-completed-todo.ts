@@ -5,9 +5,10 @@ import { getCurrentTime } from "./utils/getCurrentTime";
 import { appendComment, insertTaskAtPosition, Task } from "./utils/task-utils";
 
 import { ToolExecutionError } from "./utils/ToolExecutionError";
-import { ObsidianTool } from "../obsidian-tools";
+import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
 import { findCurrentSpot, readNote, updateNote } from "./utils/note-utils";
 import { getDailyNotePath } from "./utils/getDailyNotePath";
+import { createNavigationTargetsForTasks } from "./utils/line-number-utils";
 import { t } from "../i18n";
 
 const schema = {
@@ -60,7 +61,7 @@ export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput>
       return t('tools.actions.complete.inProgress');
     }
   },
-  execute: async (plugin: MyPlugin, params: CreateCompletedTodoToolInput): Promise<string> => {
+  execute: async (plugin: MyPlugin, params: CreateCompletedTodoToolInput): Promise<ToolExecutionResult> => {
     try {
       const { comment } = params;
       
@@ -109,12 +110,25 @@ export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput>
       // Update the file with the new content
       await updateNote({plugin, filePath, updatedNote});
 
+      // Create navigation targets for the created completed todo
+      const navigationTargets = createNavigationTargetsForTasks(
+        updatedNote,
+        [task],
+        filePath,
+        `Navigate to completed todo`
+      );
+
       // Return success message with details
       const timeInfo = completionTime ? ` at ${completionTime}` : '';
-      return t('tools.success.complete')
+      const resultMessage = t('tools.success.complete')
         .replace('{{task}}', description)
         .replace('{{time}}', timeInfo)
         .replace('{{path}}', filePath);
+
+      return {
+        result: resultMessage,
+        navigationTargets: navigationTargets
+      };
 
     } catch (error) {
       console.error('Error creating completed todo:', error);

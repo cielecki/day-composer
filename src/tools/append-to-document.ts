@@ -2,11 +2,11 @@ import MyPlugin from "../main";
 import { modifyFile } from "./utils/modifyFile";
 import { readFile } from "./utils/readFile";
 import { getFile } from "./utils/getFile";
-import { ObsidianTool } from "../obsidian-tools";
+import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
 
 const schema = {
   name: "append_to_document",
-  description: "Appends content to an existing document",
+  description: "Appends content to an existing document in the vault",
   input_schema: {
     type: "object",
     properties: {
@@ -17,7 +17,7 @@ const schema = {
       content: {
         type: "string",
         description: "The content to append to the document",
-      }
+      },
     },
     required: ["path", "content"]
   }
@@ -41,7 +41,7 @@ export const appendToDocumentTool: ObsidianTool<AppendToDocumentToolInput> = {
       return `Appending to ${actionText}...`;
     }
   },
-  execute: async (plugin: MyPlugin, params: AppendToDocumentToolInput): Promise<string> => {
+  execute: async (plugin: MyPlugin, params: AppendToDocumentToolInput): Promise<ToolExecutionResult> => {
     try {
       const { path, content } = params;
       const appendContent = content || ''; // Default to empty string if content is undefined
@@ -50,7 +50,7 @@ export const appendToDocumentTool: ObsidianTool<AppendToDocumentToolInput> = {
       const file = getFile(path, plugin.app);
       
       if (!file) {
-        return `Error: File not found at ${path}`;
+        throw new Error(`File not found at ${path}`);
       }
       
       // Read the current content
@@ -62,10 +62,16 @@ export const appendToDocumentTool: ObsidianTool<AppendToDocumentToolInput> = {
       // Update the file
       await modifyFile(file, newContent, plugin.app);
       
-      return `Successfully appended content to ${path}`;
+      return {
+        result: `Successfully appended content to ${path}`,
+        navigationTargets: [{
+          filePath: path,
+          description: "Open appended document"
+        }]
+      };
     } catch (error) {
       console.error('Error appending to document:', error);
-      return `Error appending to document: ${error.message || 'Unknown error'}`;
+      throw new Error(`Error appending to document: ${error.message || 'Unknown error'}`);
     }
   }
 };

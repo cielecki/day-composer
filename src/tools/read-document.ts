@@ -1,13 +1,13 @@
 import MyPlugin from "../main";
 import { readFile } from "./utils/readFile";
 import { getFile } from "./utils/getFile";
-import { ObsidianTool } from "../obsidian-tools";
+import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
 import { t } from "../i18n";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 
 const schema = {
   name: "read_document",
-  description: "Reads the content of a document at the specified path",
+  description: "Reads the content of a document from the vault",
   input_schema: {
     type: "object",
     properties: {
@@ -38,18 +38,30 @@ export const readDocumentTool: ObsidianTool<ReadDocumentToolInput> = {
       return t('tools.readDocument', { defaultValue: 'Reading' }) + ' ' + actionText + '...';
     }
   },
-  execute: async (plugin: MyPlugin, params: ReadDocumentToolInput): Promise<string> => {
-    const { path } = params;
-    
-    // Get the file
-    const file = getFile(path, plugin.app);
-    
-    if (!file) {
-      throw new ToolExecutionError(t('errors.documents.notFound').replace('{{path}}', path));
+  execute: async (plugin: MyPlugin, params: ReadDocumentToolInput): Promise<ToolExecutionResult> => {
+    try {
+      const { path } = params;
+      
+      // Get the file
+      const file = getFile(path, plugin.app);
+      
+      if (!file) {
+        throw new ToolExecutionError(t('errors.documents.notFound').replace('{{path}}', path));
+      }
+      
+      // Read the content
+      const content = await readFile(file, plugin.app);
+      
+      return {
+        result: content,
+        navigationTargets: [{
+          filePath: path,
+          description: "Open read document"
+        }]
+      };
+    } catch (error) {
+      console.error('Error reading document:', error);
+      throw new Error(`Error reading document: ${error.message || 'Unknown error'}`);
     }
-    
-    // Read the file content
-    const content = await readFile(file, plugin.app);
-    return content; 
   }
 };

@@ -22,6 +22,23 @@ import { LNMode } from "./types/types";
 import React from "react";
 
 /**
+ * Represents a navigation target for tool call clicks
+ */
+export interface NavigationTarget {
+	filePath: string;
+	lineRange?: { start: number; end: number };
+	description: string;
+}
+
+/**
+ * Result returned by tool execution
+ */
+export interface ToolExecutionResult {
+	result: string;
+	navigationTargets?: NavigationTarget[];
+}
+
+/**
  * Interface for all Obsidian tools to match Anthropic's Tool format
  */
 export interface ObsidianTool<TInput> {
@@ -41,7 +58,7 @@ export interface ObsidianTool<TInput> {
 		hasResult: boolean,
 		hasError: boolean,
 	) => string;
-	execute: (plugin: MyPlugin, params: TInput) => Promise<string>;
+	execute: (plugin: MyPlugin, params: TInput) => Promise<string | ToolExecutionResult>;
 	// Optional method to render the tool result as a React component
 	// If provided, this will be used instead of the default text rendering
 	renderResult?: (result: string, input: TInput) => React.ReactNode;
@@ -104,7 +121,7 @@ export class ObsidianTools {
 	async processToolCall(
 		toolName: string,
 		toolInput: any,
-	): Promise<{ result: string; isError: boolean }> {
+	): Promise<{ result: string; isError: boolean; navigationTargets?: NavigationTarget[] }> {
 		console.group(`🔄 Processing Tool Call: ${toolName}`);
 		console.log("Tool Input:", toolInput);
 
@@ -125,9 +142,21 @@ export class ObsidianTools {
 				);
 			}
 
-			const result = await tool.execute(this.plugin, input);
-			console.log("Tool Execution Result:", result);
-			return { result, isError: false };
+			const executionResult = await tool.execute(this.plugin, input);
+			
+			// Handle both string and ToolExecutionResult return types
+			if (typeof executionResult === 'string') {
+				console.log("Tool Execution Result:", executionResult);
+				return { result: executionResult, isError: false };
+			} else {
+				console.log("Tool Execution Result:", executionResult.result);
+				console.log("Navigation Targets:", executionResult.navigationTargets);
+				return { 
+					result: executionResult.result, 
+					isError: false, 
+					navigationTargets: executionResult.navigationTargets 
+				};
+			}
 		} catch (error) {
 			const errorMessage =
 				error instanceof ToolExecutionError

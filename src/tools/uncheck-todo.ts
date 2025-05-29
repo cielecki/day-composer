@@ -1,11 +1,12 @@
 import MyPlugin from "../main";
 import { getDailyNotePath } from "./utils/getDailyNotePath";
-import { ObsidianTool } from "../obsidian-tools";
+import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
 import { findTaskByDescription } from "./utils/note-utils";
 import { updateNote } from './utils/note-utils';
 import { readNote } from './utils/note-utils';
 import { Task } from "./utils/task-utils";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
+import { createNavigationTargetsForTasks } from "./utils/line-number-utils";
 import { t } from "../i18n";
 
 const schema = {
@@ -52,7 +53,7 @@ export const uncheckTodoTool: ObsidianTool<UncheckTodoToolInput> = {
       return t('tools.actions.uncheck.inProgress').replace('{{task}}', actionText);
     }
   },
-  execute: async (plugin: MyPlugin, params: UncheckTodoToolInput): Promise<string> => {
+  execute: async (plugin: MyPlugin, params: UncheckTodoToolInput): Promise<ToolExecutionResult> => {
     const todoDescription = params.todo_text;
     const comment = params.comment;
     const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
@@ -70,22 +71,33 @@ export const uncheckTodoTool: ObsidianTool<UncheckTodoToolInput> = {
       }));
     }
 
-    // Create a copy to avoid modifying the original
-    const updatedTask: Task = JSON.parse(JSON.stringify(task));
-
-    // Update status
-    updatedTask.status = 'pending';
+    // Update status directly on the task (it's already part of the note structure)
+    task.status = 'pending';
 
     // Add comment if provided
     if (comment) {
-      updatedTask.comment = updatedTask.comment ? updatedTask.comment + "\n" + comment : comment;
+      task.comment = task.comment ? task.comment + "\n    " + comment : "    " + comment;
     }
 
+    // Update the note with the modified task
     await updateNote({plugin, filePath, updatedNote: note})
 
-    return t('tools.success.uncheck', {
+    // Create navigation targets for the unchecked task
+    const navigationTargets = createNavigationTargetsForTasks(
+      note,
+      [task],
+      filePath,
+      `Navigate to unchecked todo`
+    );
+
+    const resultMessage = t('tools.success.uncheck', {
       task: todoDescription,
       path: filePath
     });
+
+    return {
+      result: resultMessage,
+      navigationTargets: navigationTargets
+    };
   }
 };

@@ -3,7 +3,7 @@ import { createFile } from "./utils/createFile";
 import { fileExists } from "./utils/fileExists";
 import { Task } from "./utils/task-utils";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
-import { ObsidianTool } from "../obsidian-tools";
+import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
 import {
 	readNote,
 	updateNote,
@@ -11,6 +11,7 @@ import {
 } from "./utils/note-utils";
 import { getDailyNotePath } from "./utils/getDailyNotePath";
 import { insertTaskAtPosition } from "./utils/task-utils";
+import { calculateLineNumberForNode, createNavigationTarget } from "./utils/line-number-utils";
 import { t } from "../i18n";
 
 const schema = {
@@ -108,86 +109,84 @@ export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
 			return t('tools.actions.add.inProgress', { defaultValue: 'Adding todo...' }).replace('{{task}}', '');
 		}
 	},
-	execute: async (
-		plugin: MyPlugin,
-		params: AddTodoToolInput,
-	): Promise<string> => {
-		const { todos, position } = params;
+	execute: async (plugin: MyPlugin, params: AddTodoToolInput): Promise<ToolExecutionResult> => {
+		const { todos, path, position, reference_todo_text } = params;
 
 		if (!todos || !Array.isArray(todos) || todos.length === 0) {
 			throw new ToolExecutionError("No to-do items provided");
 		}
 
-		// If no path is provided, use today's daily note
-		const filePath = params.path
-			? params.path
-			: await getDailyNotePath(plugin.app);
+		const filePath = path ? path : await getDailyNotePath(plugin.app);
 
-		// Handle file creation if it doesn't exist
+		// Check if file exists, create if it doesn't
 		const exists = await fileExists(filePath, plugin.app);
 		if (!exists) {
-			try {
-				await createFile(filePath, "", plugin.app);
-			} catch (error) {
-				throw new ToolExecutionError(
-					`Could not create file at ${filePath}: ${error.message}`,
-				);
-			}
+			await createFile(filePath, "", plugin.app);
 		}
 
 		// Read the note
 		const note = await readNote({ plugin, filePath });
 
-		// Determine insertion position based on user's preference
-		let insertionIndex = determineInsertionPosition(
+		// Determine insertion position
+		const insertionIndex = determineInsertionPosition(
 			note,
 			position,
-			params.reference_todo_text,
+			reference_todo_text,
 		);
 
-		let updatedNote = note;
-		const addedTodos: string[] = [];
+		// Create task objects and insert them
+		let updatedNote = JSON.parse(JSON.stringify(note));
+		const addedTasks: string[] = [];
+		const addedTaskObjects: Task[] = [];
 
-		// Process each to-do item
 		for (let i = 0; i < todos.length; i++) {
-			const { todo_text } = todos[i];
-
-			// Create the task object
+			const todo = todos[i];
 			const task: Task = {
-				type: 'task',
-				status: 'pending',
-				todoText: todo_text,
+				type: "task",
+				status: "pending",
+				todoText: todo.todo_text,
 				comment: "",
-				lineIndex: -1 // Will be set when inserted
+				lineIndex: -1, // Will be updated when the note is saved
 			};
 
-			// Insert the task at the determined position
+			// Insert at the calculated position + i to maintain order
 			updatedNote = insertTaskAtPosition(
 				updatedNote,
 				task,
-				insertionIndex,
+				insertionIndex + i,
 			);
-
-			insertionIndex++;
-
-			addedTodos.push(`"${todo_text}"`);
+			addedTasks.push(todo.todo_text);
+			addedTaskObjects.push(task);
 		}
 
-		// Update the file with the new content
+		// Update the note
 		await updateNote({ plugin, filePath, updatedNote });
 
-		// Return success message
-		const todoDescription =
-			todos.length === 1
-				? addedTodos[0]
-				: `${todos.length} to-dos (${addedTodos.join(", ")})`;
+		// Calculate line numbers for the added tasks
+		const lineNumbers: number[] = [];
+		for (let i = 0; i < addedTaskObjects.length; i++) {
+			lineNumbers.push(calculateLineNumberForNode(updatedNote, insertionIndex + i));
+		}
 
-		// Include reference task in the success message if applicable
-		const positionDetail =
-			(position === "before" || position === "after")
-				? `${position} "${params.reference_todo_text}"`
-				: `at ${position} position`;
+		// Create navigation target
+		const navigationTargets = [createNavigationTarget(
+			filePath,
+			lineNumbers,
+			`Navigate to added todo${addedTasks.length > 1 ? 's' : ''}`
+		)];
 
-		return `✓ Added ${todoDescription} to ${filePath} ${positionDetail}`;
-	},
+		// Prepare success message
+		const tasksDescription = addedTasks.length === 1 
+			? `"${addedTasks[0]}"` 
+			: `${addedTasks.length} ${t('tools.tasks.plural')}`;
+			
+		const resultMessage = t('tools.success.add')
+			.replace('{{task}}', tasksDescription)
+			.replace('{{path}}', filePath);
+
+		return {
+			result: resultMessage,
+			navigationTargets: navigationTargets
+		};
+	}
 };

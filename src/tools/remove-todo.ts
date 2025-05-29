@@ -1,10 +1,11 @@
 import MyPlugin from "../main";
-import { ObsidianTool } from "../obsidian-tools";
+import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
 import { findTaskByDescription, updateNote, readNote, NoteNode, TextBlock } from './utils/note-utils';
 import { getDailyNotePath } from "./utils/getDailyNotePath";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { validateTasks } from "./utils/task-validation";
 import { removeTaskFromDocument, formatTask } from "./utils/task-utils";
+import { calculateLineNumberForNode, createNavigationTarget } from "./utils/line-number-utils";
 import { t } from "../i18n";
 
 const schema = {
@@ -79,7 +80,7 @@ export const removeTodoTool: ObsidianTool<RemoveTodoToolInput> = {
       return t('tools.actions.remove.inProgress').replace('{{task}}', '');
     }
   },
-  execute: async (plugin: MyPlugin, params: RemoveTodoToolInput): Promise<string> => {
+  execute: async (plugin: MyPlugin, params: RemoveTodoToolInput): Promise<ToolExecutionResult> => {
     const { todos } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
@@ -97,8 +98,9 @@ export const removeTodoTool: ObsidianTool<RemoveTodoToolInput> = {
       }))
     );
     
-    // Track tasks that will be removed
+    // Track tasks that will be removed and comment block positions
     const removedTasks: string[] = [];
+    const commentBlockPositions: number[] = [];
     
     // If we get here, all tasks were validated successfully
     let updatedNote = JSON.parse(JSON.stringify(note));
@@ -136,19 +138,38 @@ ${originalTaskText}
       // Insert the comment block at the original position
       updatedNote.content.splice(originalPosition, 0, commentBlock);
       
+      // Track the position where we inserted the comment
+      commentBlockPositions.push(originalPosition);
       removedTasks.push(todo_text);
     }
     
     // Update the note with all removals
     await updateNote({plugin, filePath, updatedNote});
     
+    // Calculate line numbers for the comment blocks
+    const lineNumbers = commentBlockPositions.map(pos => 
+      calculateLineNumberForNode(updatedNote, pos)
+    );
+    
+    // Create navigation target
+    const navigationTargets = [createNavigationTarget(
+      filePath,
+      lineNumbers,
+      `Navigate to removed todo${removedTasks.length > 1 ? 's' : ''}`
+    )];
+    
     // Prepare success message
     const tasksDescription = removedTasks.length === 1 
       ? `"${removedTasks[0]}"`
       : `${removedTasks.length} ${t('tools.tasks.plural')}`;
       
-    return t('tools.success.remove')
+    const resultMessage = t('tools.success.remove')
       .replace('{{task}}', tasksDescription)
       .replace('{{path}}', filePath);
+
+    return {
+      result: resultMessage,
+      navigationTargets: navigationTargets
+    };
   }
 }; 

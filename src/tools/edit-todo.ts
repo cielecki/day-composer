@@ -1,10 +1,11 @@
 import MyPlugin from "../main";
-import { ObsidianTool } from "../obsidian-tools";
+import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
 import { findTaskByDescription, updateNote, readNote, NoteNode } from './utils/note-utils';
 import { getDailyNotePath } from "./utils/getDailyNotePath";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { validateTasks } from "./utils/task-validation";
-import { removeTaskFromDocument, insertTaskAtPosition, appendComment } from "./utils/task-utils";
+import { removeTaskFromDocument, insertTaskAtPosition, appendComment, Task } from "./utils/task-utils";
+import { createNavigationTargetsForTasks } from "./utils/line-number-utils";
 import { t } from "../i18n";
 
 const schema = {
@@ -61,7 +62,7 @@ export const editTodoTool: ObsidianTool<EditTodoToolInput> = {
       return t('tools.actions.edit.inProgress').replace('{{task}}', '');
     }
   },
-  execute: async (plugin: MyPlugin, params: EditTodoToolInput): Promise<string> => {
+  execute: async (plugin: MyPlugin, params: EditTodoToolInput): Promise<ToolExecutionResult> => {
     const { original_todo_text } = params;
     
     if (!original_todo_text) {
@@ -122,14 +123,27 @@ export const editTodoTool: ObsidianTool<EditTodoToolInput> = {
     // Update the note
     await updateNote({plugin, filePath, updatedNote});
     
+    // Create navigation targets for the edited task
+    const navigationTargets = createNavigationTargetsForTasks(
+      updatedNote,
+      [taskToUpdate],
+      filePath,
+      `Navigate to edited todo`
+    );
+    
     // Prepare success message
     const statusText = params.replacement_status ? ` (status: ${params.replacement_status})` : '';
     const commentText = params.replacement_comment ? ` with comment` : '';
     
-    return t('tools.success.edit')
+    const resultMessage = t('tools.success.edit')
       .replace('{{originalTask}}', `"${original_todo_text}"`)
       .replace('{{newTask}}', `"${params.replacement_todo_text}"`)
       .replace('{{path}}', filePath)
       .replace('{{details}}', `${statusText}${commentText}`);
+
+    return {
+      result: resultMessage,
+      navigationTargets: navigationTargets
+    };
   }
 }; 

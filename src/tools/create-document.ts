@@ -1,7 +1,7 @@
 import MyPlugin from "../main";
 import { createFile } from "./utils/createFile";
 import { fileExists } from "./utils/fileExists";
-import { ObsidianTool } from "../obsidian-tools";
+import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 
 const schema = {
@@ -41,7 +41,7 @@ export const createDocumentTool: ObsidianTool<CreateDocumentToolInput> = {
       return `Creating ${actionText}...`;
     }
   },
-  execute: async (plugin: MyPlugin, params: CreateDocumentToolInput): Promise<string> => {
+  execute: async (plugin: MyPlugin, params: CreateDocumentToolInput): Promise<ToolExecutionResult> => {
     const { path, content } = params;
     const documentContent = content || ''; // Default to empty string if content is undefined
 
@@ -55,6 +55,12 @@ export const createDocumentTool: ObsidianTool<CreateDocumentToolInput> = {
     // Create the file
     await createFile(path, documentContent, plugin.app);
 
-    return `Successfully created document at ${path}`;
+    return {
+      result: `Successfully created document at ${path}`,
+      navigationTargets: [{
+        filePath: path,
+        description: "Open created document"
+      }]
+    };
   }
 };
