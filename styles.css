@@ -1904,3 +1904,356 @@ If your plugin does not need CSS, delete this file.
   height: 20px;
   transition: opacity 0.2s ease;
 }
+
+/* Setup screens */
+.setup-screen {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100%;
+	padding: 2rem;
+	background: var(--background-primary);
+}
+
+.setup-content {
+	max-width: 480px;
+	width: 100%;
+	text-align: center;
+	padding: 2rem;
+	border-radius: 8px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.setup-icon {
+	color: var(--interactive-accent);
+	margin-bottom: 1.5rem;
+	display: flex;
+	justify-content: center;
+}
+
+.setup-title {
+	font-size: 1.5rem;
+	font-weight: 600;
+	margin-bottom: 1rem;
+	color: var(--text-normal);
+}
+
+.setup-description {
+	color: var(--text-muted);
+	margin-bottom: 2rem;
+	line-height: 1.5;
+	font-size: 0.95rem;
+}
+
+.setup-features {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	margin-bottom: 2rem;
+	text-align: left;
+}
+
+.setup-feature {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.5rem;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	font-size: 0.9rem;
+}
+
+.setup-feature-icon {
+	font-size: 1.2rem;
+	width: 1.5rem;
+	text-align: center;
+}
+
+.setup-steps {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	margin-bottom: 2rem;
+	text-align: left;
+}
+
+.setup-step {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	padding: 0.75rem;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	font-size: 0.9rem;
+}
+
+.setup-step-number {
+	background: var(--interactive-accent);
+	color: white;
+	width: 1.5rem;
+	height: 1.5rem;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.8rem;
+	font-weight: 600;
+	flex-shrink: 0;
+}
+
+.setup-step-content {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	flex: 1;
+}
+
+.setup-step-link {
+	color: var(--interactive-accent);
+	text-decoration: none;
+	font-size: 0.85rem;
+	font-weight: 500;
+	transition: color 0.2s ease;
+}
+
+.setup-step-link:hover {
+	color: var(--interactive-accent-hover);
+	text-decoration: underline;
+}
+
+.setup-input-group {
+	margin-bottom: 1.5rem;
+}
+
+.setup-input-label {
+	font-size: 0.85rem;
+	color: var(--text-muted);
+	margin-bottom: 0.5rem;
+	font-weight: 500;
+}
+
+.setup-input {
+	width: 100%;
+	padding: 0.75rem;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	background: var(--background-primary);
+	color: var(--text-normal);
+	font-size: 0.9rem;
+	transition: border-color 0.2s ease;
+}
+
+.setup-input:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 2px var(--interactive-accent-hover);
+}
+
+.setup-button {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border: none;
+	padding: 0.75rem 1.5rem;
+	border-radius: 6px;
+	font-size: 0.9rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	min-width: 120px;
+}
+
+.setup-button:hover:not(:disabled) {
+	background: var(--interactive-accent-hover);
+	transform: translateY(-1px);
+}
+
+.setup-button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	transform: none;
+}
+
+.setup-buttons {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	margin-bottom: 1.5rem;
+}
+
+.setup-button-secondary {
+	background: transparent;
+	color: var(--text-muted);
+	border: 1px solid var(--background-modifier-border);
+	padding: 0.5rem 1rem;
+	border-radius: 6px;
+	font-size: 0.85rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.setup-button-secondary:hover {
+	color: var(--text-normal);
+	border-color: var(--interactive-accent);
+	background: var(--background-modifier-hover);
+}
+
+.setup-help {
+	margin-bottom: 1rem;
+}
+
+.setup-link {
+	color: var(--interactive-accent);
+	text-decoration: none;
+	font-size: 0.85rem;
+	font-weight: 500;
+	transition: color 0.2s ease;
+}
+
+.setup-link:hover {
+	color: var(--interactive-accent-hover);
+	text-decoration: underline;
+}
+
+.setup-note {
+	background: var(--background-secondary);
+	padding: 1rem;
+	border-radius: 6px;
+	border-left: 3px solid var(--interactive-accent);
+}
+
+.setup-note p {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--text-muted);
+	line-height: 1.4;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 600px) {
+	.setup-screen {
+		padding: 1rem;
+	}
+	
+	.setup-content {
+		padding: 1.5rem;
+		margin: 0;
+	}
+	
+	.setup-buttons {
+		gap: 0.5rem;
+	}
+}
+
+/* Language selection screen styles */
+.setup-language-info {
+	margin-bottom: 2rem;
+	padding: 1rem;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	border-left: 3px solid var(--interactive-accent);
+}
+
+.setup-current-language {
+	font-size: 0.9rem;
+	color: var(--text-normal);
+}
+
+.setup-language-options {
+	margin-bottom: 2rem;
+}
+
+.setup-language-options h3 {
+	margin: 0 0 1rem 0;
+	font-size: 1rem;
+	color: var(--text-normal);
+	text-align: left;
+}
+
+.setup-language-buttons {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.setup-language-button {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 1rem;
+	border: 2px solid var(--background-modifier-border);
+	border-radius: 8px;
+	background: var(--background-primary);
+	color: var(--text-normal);
+	cursor: pointer;
+	transition: all 0.2s ease;
+	text-align: left;
+	width: 100%;
+}
+
+.setup-language-button:hover:not(:disabled) {
+	border-color: var(--interactive-accent);
+	background: var(--background-modifier-hover);
+	transform: translateY(-1px);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.setup-language-button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	transform: none;
+}
+
+.language-name {
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.language-native {
+	font-size: 0.85rem;
+	opacity: 0.8;
+}
+
+.language-current {
+	font-size: 0.8rem;
+	font-weight: 500;
+	margin-top: 0.5rem;
+	padding: 0.25rem 0.5rem;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 4px;
+  margin-left: 0.5rem;
+}
+
+.setup-language-note {
+	background: var(--background-secondary);
+	padding: 1rem;
+	border-radius: 6px;
+	margin-bottom: 1.5rem;
+}
+
+.setup-language-note p {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--text-muted);
+	line-height: 1.4;
+}
+
+/* Responsive adjustments for language screen */
+@media (max-width: 600px) {
+	.setup-language-buttons {
+		gap: 0.5rem;
+	}
+	
+	.setup-language-button {
+		padding: 0.75rem;
+	}
+	
+	.language-name {
+		font-size: 0.95rem;
+	}
+	
+	.language-native {
+		font-size: 0.8rem;
+	}
+}

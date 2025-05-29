@@ -265,6 +265,28 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
+		// Add command to reset tutorial
+		this.addCommand({
+			id: "reset-tutorial",
+			name: t("tools.resetTutorial"),
+			callback: async () => {
+				try {
+					const settings = getPluginSettings();
+					await settings.resetTutorial();
+					new Notice(t('settings.actions.resetTutorial.success'));
+					
+					// Optionally reload the plugin view to show setup screens
+					setTimeout(() => {
+						// Trigger a refresh of the Life Navigator view if it's open
+						this.app.workspace.trigger('layout-change');
+					}, 500);
+				} catch (error) {
+					console.error('Error resetting tutorial:', error);
+					new Notice(t('settings.actions.resetTutorial.error').replace('{{error}}', error.message));
+				}
+			},
+		});
+
 		// Add a ribbon icon for the AI Coach
 		this.addRibbonIcon("compass", t("tools.aiCoach"), async (evt: MouseEvent) => {
 			console.log("Starting AI Coach session");

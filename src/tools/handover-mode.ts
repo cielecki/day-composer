@@ -110,13 +110,15 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 			// Perform the mode change
 			await modeManagerService.changeModeById(mode_id);
 
-			// Success message with context about the change
+			// Success message with clear handover instructions for the new mode
 			const currentModeName = availableModes.find(m => m.id === currentModeId)?.name || currentModeId;
 			
 			return `${t("tools.handover.successMessage", { fromMode: currentModeName, toMode: targetMode.name })}
 
-${t("tools.handover.newMode")} ${targetMode.name}
-${t("tools.handover.description")} ${targetMode.description || t("tools.handover.noDescription")}`;
+${t("tools.handover.newModeActive", { modeName: targetMode.name })}
+${t("tools.handover.description")} ${targetMode.description || t("tools.handover.noDescription")}
+
+${t("tools.handover.handoverInstructions")}`;
 
 		} catch (error) {
 			console.error('Error in handover mode tool:', error);

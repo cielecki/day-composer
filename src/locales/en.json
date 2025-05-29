@@ -2,7 +2,34 @@
   "settings": {
     "title": "Life Navigator Settings",
     "description": "Configure your Life Navigator plugin settings here",
+    "actions": {
+      "title": "Life Navigator Actions",
+      "checkUpdates": {
+        "name": "Check for Updates",
+        "desc": "Check if there's a newer version of Life Navigator available and download it automatically.",
+        "button": "Check for Updates"
+      },
+      "createStarterKit": {
+        "name": "Create Starter Kit",
+        "desc": "Create a new starter kit with pre-configured AI modes and templates to get you started quickly.",
+        "button": "Create Starter Kit"
+      },
+      "resetTutorial": {
+        "name": "Reset Tutorial",
+        "desc": "Reset the setup tutorial and onboarding flow. This will show the setup screens again next time you open Life Navigator.",
+        "button": "Reset Tutorial",
+        "confirm": "Are you sure you want to reset the tutorial? This will show the setup screens again next time you open Life Navigator.",
+        "success": "Tutorial has been reset. The setup screens will appear next time you open Life Navigator.",
+        "error": "Failed to reset tutorial: {{error}}"
+      },
+      "viewDocs": {
+        "name": "View Documentation",
+        "desc": "Open the Life Navigator user guide and documentation on GitHub in your browser.",
+        "button": "View Documentation"
+      }
+    },
     "apiKeys": {
+      "title": "API Keys",
       "anthropic": "Anthropic API Key",
       "anthropicDesc": "Your Anthropic API key for the main AI assistant functionality. Get it from <a href='https://console.anthropic.com/settings/keys'>Anthropic Console</a>.",
       "openai": "OpenAI API Key",
@@ -10,6 +37,12 @@
       "enterAnthropicKey": "Enter your Anthropic API key",
       "enterOpenAIKey": "Enter your OpenAI API key",
       "securityNote": "Important: Your API key is stored in your Obsidian config folder. Do not share your vault or config folder with others if you store your API key here."
+    },
+    "advanced": {
+      "title": "Advanced Settings"
+    },
+    "security": {
+      "title": "Security Notice"
     },
     "prompts": {
       "speechToTextPrompt": "Speech-to-text Prompt",
@@ -23,11 +56,28 @@
     "createStarterKit": "Create a Starter Kit",
     "createNewMode": "Create a New Mode",
     "checkForUpdates": "Check for updates",
+    "resetTutorial": "Reset Tutorial",
     "aiCoach": "Life Navigator",
     "readDocument": "Reading document",
     "createDocument": "Creating document",
     "appendToDocument": "Appending to document",
     "addTodo": "Adding task",
+    "generateImage": {
+      "success": "Successfully created image at {{path}}",
+      "generating": "Generating image for {{path}}...",
+      "openImage": "Open generated image",
+      "errors": {
+        "emptyPrompt": "Image prompt cannot be empty",
+        "emptyPath": "Image path cannot be empty",
+        "fileExists": "File already exists at {{path}}. Please choose a different path or delete the existing file.",
+        "noApiKey": "OpenAI API Key not set. Please configure it in settings for image generation.",
+        "noImageData": "No image data received from OpenAI API",
+        "noBase64Data": "Invalid image data format received from OpenAI API",
+        "quotaExceeded": "OpenAI API quota exceeded. Please check your billing and usage limits.",
+        "invalidRequest": "Invalid request to OpenAI API: {{error}}",
+        "general": "Error generating image: {{error}}"
+      }
+    },
     "tasks": {
       "single": "task",
       "plural": "tasks",
@@ -100,8 +150,9 @@
     "handover": {
       "switched": "Switched to {{modeName}} mode",
       "successMessage": "Successfully switched from {{fromMode}} to {{toMode}} mode.",
-      "newMode": "New mode:",
+      "newModeActive": "You are now operating as {{modeName}} mode.",
       "description": "Description:",
+      "handoverInstructions": "You have been handed control of this conversation. Please continue executing the user's task using your specialized capabilities and personality. Take over from here and provide appropriate assistance based on your mode's purpose.",
       "noModes": "No modes available for switching.",
       "modeNotFound": "Mode with ID \"{{modeId}}\" not found.",
       "switchFailed": "Failed to switch mode: {{error}}",
@@ -297,6 +348,60 @@
       "createdSuccess": "Successfully created starter kit",
       "createdError": "Error creating starter kit: {{error}}",
       "directoryName": "Starter Kit"
+    },
+    "setup": {
+      "saving": "Saving...",
+      "openSettings": "Open Settings",
+      "language": {
+        "title": "Configure Language",
+        "description": "Life Navigator works best when your Obsidian interface language matches the language you write your notes in. Select your preferred language below - if it's different from your current setting, Obsidian will restart automatically to apply the change. Voice features (speech-to-text and text-to-speech) will automatically use your selected language.",
+        "currentLanguage": "Current Obsidian language:",
+        "supportedLanguages": "Available Language Options",
+        "continueButton": "Continue with Current Language",
+        "useEnglish": "Use English",
+        "skipButton": "Skip Language Setup",
+        "current": "Current",
+        "note": "If you select a different language than currently configured, Obsidian will automatically restart to apply the changes. All Life Navigator content, AI interactions, and starter kit files will then be in your selected language. Voice features will automatically work in your chosen language.",
+        "manualRestart": "Please restart Obsidian to apply the language changes."
+      },
+      "starterKit": {
+        "title": "Welcome to Life Navigator",
+        "description": "Get started by creating your starter kit with pre-configured AI modes and templates.",
+        "button": "Create Starter Kit",
+        "features": {
+          "modes": "Multiple AI personalities",
+          "templates": "Information templates",
+          "examples": "Usage examples"
+        }
+      },
+      "anthropicKey": {
+        "title": "Configure Anthropic API Key",
+        "description": "Anthropic Claude powers the main AI functionality. You'll need an API key to continue.",
+        "placeholder": "Paste your Anthropic API key here",
+        "inputLabel": "Paste your API key here:",
+        "saveButton": "Save and Continue",
+        "getKey": "Get your Anthropic API key",
+        "steps": {
+          "visit": "Visit console.anthropic.com/settings/keys",
+          "create": "Create a new API key",
+          "paste": "Paste it here"
+        }
+      },
+      "openaiKey": {
+        "title": "Configure OpenAI API Key",
+        "description": "OpenAI powers voice features like text-to-speech. This is optional but recommended.",
+        "placeholder": "Paste your OpenAI API key here",
+        "inputLabel": "Paste your API key here:",
+        "saveButton": "Save and Continue",
+        "skipButton": "Skip for now",
+        "getKey": "Get your OpenAI API key",
+        "note": "You can always add this later in settings to enable voice features.",
+        "steps": {
+          "visit": "Visit platform.openai.com/api-keys",
+          "create": "Create a new API key",
+          "paste": "Paste it here"
+        }
+      }
     }
   },
   "tasks": {

@@ -110,6 +110,8 @@ Include timestamps: true
 - Allows the AI to switch between different modes during conversations
 - Enables transitions between different personalities or specialized contexts
 - Useful for moving from planning to reflection or from general assistance to specific expertise
+- Provides clear handover instructions to the new mode to ensure smooth transitions
+- The new mode receives explicit instructions to take control and continue with the task
 
 ## Tool Filtering
 

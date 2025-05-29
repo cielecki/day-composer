@@ -3,11 +3,21 @@ import type MyPlugin from '../main';
 export type TTSVoice = "alloy" | "ash" | "coral" | "echo" | "fable" | "onyx" | "nova" | "sage" | "shimmer";
 export const TTS_VOICES: TTSVoice[] = ['alloy', 'ash', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer'];
 
+export interface TutorialSettings {
+	obsidianLanguageConfigured: boolean;
+	openaiKeyConfigured: boolean; // Tracks if OpenAI has been configured or explicitly skipped
+	// Future tutorial/setup related settings can be added here
+}
+
 export class PluginSettings {
 	openAIApiKey = '';
 	anthropicApiKey = '';
 	speechToTextPrompt = '';
 	activeModeId = '';
+	tutorial: TutorialSettings = {
+		obsidianLanguageConfigured: false,
+		openaiKeyConfigured: false
+	};
     plugin: MyPlugin;
 
     constructor() {}
@@ -21,6 +31,19 @@ export class PluginSettings {
         this.anthropicApiKey = data?.anthropicApiKey ?? '';
         this.speechToTextPrompt = data?.speechToTextPrompt ?? '';
         this.activeModeId = data?.activeModeId ?? '';
+        
+        // Handle migration from old obsidianLanguageConfigured field
+        if (data?.obsidianLanguageConfigured !== undefined) {
+        	this.tutorial = {
+        		obsidianLanguageConfigured: data.obsidianLanguageConfigured,
+        		openaiKeyConfigured: data.openaiKeyConfigured ?? false
+        	};
+        } else {
+        	this.tutorial = data?.tutorial ?? {
+        		obsidianLanguageConfigured: false,
+        		openaiKeyConfigured: false
+        	};
+        }
     }
 
     async saveSettings() {
@@ -29,8 +52,36 @@ export class PluginSettings {
             anthropicApiKey: this.anthropicApiKey,
             speechToTextPrompt: this.speechToTextPrompt,
             activeModeId: this.activeModeId,
+            tutorial: this.tutorial,
         };
         await this.plugin.saveData(settingsToSave);
+    }
+
+    // Reset tutorial/setup state
+    async resetTutorial() {
+    	this.tutorial = {
+    		obsidianLanguageConfigured: false,
+    		openaiKeyConfigured: false
+    	};
+    	await this.saveSettings();
+    }
+
+    // Getter for backward compatibility
+    get obsidianLanguageConfigured(): boolean {
+    	return this.tutorial.obsidianLanguageConfigured;
+    }
+
+    // Setter for backward compatibility
+    set obsidianLanguageConfigured(value: boolean) {
+    	this.tutorial.obsidianLanguageConfigured = value;
+    }
+
+    get openaiKeyConfigured(): boolean {
+    	return this.tutorial.openaiKeyConfigured;
+    }
+
+    set openaiKeyConfigured(value: boolean) {
+    	this.tutorial.openaiKeyConfigured = value;
     }
 }
 

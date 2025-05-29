@@ -2,7 +2,34 @@
   "settings": {
     "title": "Ustawienia Life Navigator",
     "description": "Skonfiguruj ustawienia wtyczki Life Navigator",
+    "actions": {
+      "title": "Akcje Life Navigator",
+      "checkUpdates": {
+        "name": "Sprawdź aktualizacje",
+        "desc": "Sprawdź, czy dostępna jest nowsza wersja Life Navigator i pobierz ją automatycznie.",
+        "button": "Sprawdź aktualizacje"
+      },
+      "createStarterKit": {
+        "name": "Utwórz pakiet startowy",
+        "desc": "Utwórz nowy pakiet startowy z predefiniowanymi trybami AI i szablonami, aby szybko rozpocząć pracę.",
+        "button": "Utwórz pakiet startowy"
+      },
+      "resetTutorial": {
+        "name": "Resetuj tutorial",
+        "desc": "Resetuj tutorial konfiguracji i proces wdrażania. Spowoduje to ponowne wyświetlenie ekranów konfiguracji przy następnym otwarciu Life Navigator.",
+        "button": "Resetuj tutorial",
+        "confirm": "Czy na pewno chcesz zresetować tutorial? Spowoduje to ponowne wyświetlenie ekranów konfiguracji przy następnym otwarciu Life Navigator.",
+        "success": "Tutorial został zresetowany. Ekrany konfiguracji pojawią się przy następnym otwarciu Life Navigator.",
+        "error": "Nie udało się zresetować tutoriala: {{error}}"
+      },
+      "viewDocs": {
+        "name": "Zobacz dokumentację",
+        "desc": "Otwórz przewodnik użytkownika i dokumentację Life Navigator na GitHub w przeglądarce.",
+        "button": "Zobacz dokumentację"
+      }
+    },
     "apiKeys": {
+      "title": "Klucze API",
       "anthropic": "Klucz API Anthropic",
       "anthropicDesc": "Twój klucz API Anthropic do głównej funkcjonalności asystenta AI. Zdobądź go z <a href='https://console.anthropic.com/settings/keys'>Konsoli Anthropic</a>.",
       "openai": "Klucz API OpenAI",
@@ -10,6 +37,12 @@
       "enterAnthropicKey": "Wprowadź swój klucz API Anthropic",
       "enterOpenAIKey": "Wprowadź swój klucz API OpenAI",
       "securityNote": "Ważne: Twój klucz API jest przechowywany w folderze konfiguracyjnym Obsidian. Nie udostępniaj swojego sejfu ani folderu konfiguracyjnego innym osobom, jeśli przechowujesz w nim swój klucz API."
+    },
+    "advanced": {
+      "title": "Ustawienia zaawansowane"
+    },
+    "security": {
+      "title": "Informacja o bezpieczeństwie"
     },
     "prompts": {
       "speechToTextPrompt": "Prompt dla zamiany mowy na tekst",
@@ -23,11 +56,28 @@
     "createStarterKit": "Utwórz pakiet startowy",
     "createNewMode": "Utwórz nowy tryb",
     "checkForUpdates": "Sprawdź aktualizacje",
+    "resetTutorial": "Resetuj tutorial",
     "aiCoach": "Life Navigator",
     "readDocument": "Czytanie dokumentu",
     "createDocument": "Tworzenie dokumentu",
     "appendToDocument": "Dodawanie do dokumentu",
     "addTodo": "Dodawanie zadania",
+    "generateImage": {
+      "success": "Pomyślnie utworzono obraz w {{path}}",
+      "generating": "Generowanie obrazu dla {{path}}...",
+      "openImage": "Otwórz wygenerowany obraz",
+      "errors": {
+        "emptyPrompt": "Prompt obrazu nie może być pusty",
+        "emptyPath": "Ścieżka obrazu nie może być pusta",
+        "fileExists": "Plik już istnieje w {{path}}. Proszę wybrać inną ścieżkę lub usunąć istniejący plik.",
+        "noApiKey": "Nie ustawiono klucza API OpenAI. Proszę skonfigurować go w ustawieniach do generowania obrazów.",
+        "noImageData": "Nie otrzymano danych obrazu z API OpenAI",
+        "noBase64Data": "Otrzymano nieprawidłowy format danych obrazu z API OpenAI",
+        "quotaExceeded": "Przekroczono limit API OpenAI. Proszę sprawdzić rozliczenia i limity użytkowania.",
+        "invalidRequest": "Nieprawidłowe żądanie do API OpenAI: {{error}}",
+        "general": "Błąd generowania obrazu: {{error}}"
+      }
+    },
     "tasks": {
       "single": "zadanie",
       "plural": "zadania",
@@ -100,8 +150,9 @@
     "handover": {
       "switched": "Przełączono na tryb {{modeName}}",
       "successMessage": "Pomyślnie przełączono z trybu {{fromMode}} na {{toMode}}.",
-      "newMode": "Nowy tryb:",
+      "newModeActive": "Teraz działasz jako tryb {{modeName}}.",
       "description": "Opis:",
+      "handoverInstructions": "Przejąłeś kontrolę nad tą rozmową. Kontynuuj wykonywanie zadania użytkownika, używając swoich specjalistycznych możliwości i osobowości. Przejmij kontrolę i zapewnij odpowiednią pomoc zgodnie z celem swojego trybu.",
       "noModes": "Brak dostępnych trybów do przełączenia.",
       "modeNotFound": "Nie znaleziono trybu o ID \"{{modeId}}\".",
       "switchFailed": "Nie udało się przełączyć trybu: {{error}}",
@@ -297,6 +348,60 @@
       "createdSuccess": "Pomyślnie utworzono pakiet startowy",
       "createdError": "Błąd podczas tworzenia pakietu startowego: {{error}}",
       "directoryName": "Pakiet startowy"
+    },
+    "setup": {
+      "saving": "Zapisywanie...",
+      "openSettings": "Otwórz ustawienia",
+      "language": {
+        "title": "Konfiguracja języka",
+        "description": "Life Navigator działa najlepiej, gdy język interfejsu Obsidiana pasuje do języka, w którym piszesz notatki. Wybierz preferowany język poniżej - jeśli różni się od aktualnego ustawienia, Obsidian automatycznie się zrestartuje, aby zastosować zmianę. Funkcje głosowe (mowa na tekst i tekst na mowę) automatycznie użyją wybranego języka.",
+        "currentLanguage": "Aktualny język Obsidiana:",
+        "supportedLanguages": "Dostępne opcje językowe",
+        "continueButton": "Kontynuuj z obecnym językiem",
+        "useEnglish": "Użyj angielskiego",
+        "skipButton": "Pomiń konfigurację języka",
+        "current": "Aktualny",
+        "note": "Jeśli wybierzesz inny język niż aktualnie skonfigurowany, Obsidian automatycznie się zrestartuje, aby zastosować zmiany. Cała zawartość Life Navigator, interakcje z AI i pliki pakietu startowego będą wtedy w wybranym języku. Funkcje głosowe automatycznie będą działać w wybranym języku.",
+        "manualRestart": "Proszę zrestartować Obsidiana, aby zastosować zmiany języka."
+      },
+      "starterKit": {
+        "title": "Witaj w Life Navigator",
+        "description": "Zacznij od utworzenia pakietu startowego z predefiniowanymi trybami AI i szablonami.",
+        "button": "Utwórz pakiet startowy",
+        "features": {
+          "modes": "Wiele osobowości AI",
+          "templates": "Szablony informacji",
+          "examples": "Przykłady użycia"
+        }
+      },
+      "anthropicKey": {
+        "title": "Skonfiguruj klucz API Anthropic",
+        "description": "Anthropic Claude zasila główną funkcjonalność AI. Potrzebujesz klucza API, aby kontynuować.",
+        "placeholder": "Wklej tutaj swój klucz API Anthropic",
+        "inputLabel": "Wklej tutaj swój klucz API:",
+        "saveButton": "Zapisz i kontynuuj",
+        "getKey": "Pobierz swój klucz API Anthropic",
+        "steps": {
+          "visit": "Odwiedź console.anthropic.com/settings/keys",
+          "create": "Utwórz nowy klucz API",
+          "paste": "Wklej go tutaj"
+        }
+      },
+      "openaiKey": {
+        "title": "Skonfiguruj klucz API OpenAI",
+        "description": "OpenAI zasila funkcje głosowe takie jak synteza mowy. To jest opcjonalne, ale zalecane.",
+        "placeholder": "Wklej tutaj swój klucz API OpenAI",
+        "inputLabel": "Wklej tutaj swój klucz API:",
+        "saveButton": "Zapisz i kontynuuj",
+        "skipButton": "Pomiń na razie",
+        "getKey": "Pobierz swój klucz API OpenAI",
+        "note": "Możesz zawsze dodać to później w ustawieniach, aby włączyć funkcje głosowe.",
+        "steps": {
+          "visit": "Odwiedź platform.openai.com/api-keys",
+          "create": "Utwórz nowy klucz API",
+          "paste": "Wklej go tutaj"
+        }
+      }
     }
   },
   "tasks": {

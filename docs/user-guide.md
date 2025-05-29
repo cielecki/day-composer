@@ -35,11 +35,9 @@ Life Navigator uses a special linking system to control what information the AI 
 
 Learn more about the link system in the [link-expansion](link-expansion.md) document.
 
-## Getting Started: Exploring Your Starter Kit
+## Getting Started: The Setup Process
 
-After installation, click "Create Starter Kit" to generate example files. Here's what you'll find:
-
-**Note:** You can always recreate your starter kit or create additional copies by opening the Command Palette (Ctrl/Cmd + P) and searching for "Life Navigator: Create Starter Kit". This is useful if you want to start fresh or create multiple starter kit versions for different purposes.
+Life Navigator features a comprehensive guided setup process that ensures you're properly configured before you start using the plugin. The setup flow consists of four sequential screens that walk you through all necessary configuration steps: language configuration, creation of a starter kit, Anthropic API key configuration and OpenAI API key configuration.
 
 ### Information Files (Info Directory)
 

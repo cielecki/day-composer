@@ -23,6 +23,8 @@ import { TFile } from "obsidian";
 import { Modal } from "obsidian";
 import { t } from '../i18n';
 import { UnifiedInputArea } from "./UnifiedInputArea";
+import { isSetupComplete } from "../utils/setup-state";
+import { SetupFlow } from "./setup/SetupFlow";
 
 declare global {
 	interface Window {
@@ -73,6 +75,7 @@ export const AICoachApp: React.FC = () => {
 	const [menuOpen, setMenuOpen] = useState(false);
 	const menuButtonRef = useRef<HTMLButtonElement>(null);
 	const menuRef = useRef<HTMLDivElement>(null);
+	const [, setForceUpdate] = useState(0);
 
 	const {
 		conversation,
@@ -386,6 +389,55 @@ export const AICoachApp: React.FC = () => {
 		}
 		return null;
 	};
+
+	// Check if setup is complete
+	const isSetupCompleted = isSetupComplete(lnModesRef.current);
+	
+	const handleSetupComplete = useCallback(() => {
+		// Force re-render to show main interface
+		setForceUpdate((prev: number) => prev + 1);
+	}, []);
+
+	const handleOpenSettings = useCallback(() => {
+		// Open Obsidian settings - simplified approach
+		if (window.app) {
+			try {
+				// @ts-ignore - Access Obsidian's settings API
+				window.app.setting?.open();
+				// @ts-ignore - Navigate to plugin settings if available
+				window.app.setting?.openTabById?.('community-plugins');
+			} catch (error) {
+				console.log('Please open Obsidian Settings > Community Plugins > Life Navigator to configure API keys');
+			}
+		}
+	}, []);
+
+	// Refresh setup state check when component becomes visible or mounts
+	useEffect(() => {
+		const checkSetupState = () => {
+			setForceUpdate((prev: number) => prev + 1);
+		};
+
+		// Check immediately when component mounts
+		checkSetupState();
+
+		// Also check when window gains focus (user returns to Obsidian)
+		window.addEventListener('focus', checkSetupState);
+		
+		return () => {
+			window.removeEventListener('focus', checkSetupState);
+		};
+	}, []);
+
+	// If setup is not complete, show setup flow
+	if (!isSetupCompleted) {
+		return (
+			<SetupFlow 
+				onSetupComplete={handleSetupComplete}
+				onOpenSettings={handleOpenSettings}
+			/>
+		);
+	}
 
 	return (
 		<div className="ai-coach-view-content">
