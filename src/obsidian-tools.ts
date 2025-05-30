@@ -140,7 +140,7 @@ export class ObsidianTools {
 
 			if (!tool) {
 				throw new ToolExecutionError(
-					t("errors.tools.unknown").replace("{{tool}}", toolName),
+					t("errors.tools.unknown", { tool: toolName }) || `Unknown tool "${toolName}"`,
 				);
 			}
 
@@ -163,16 +163,12 @@ export class ObsidianTools {
 			const errorMessage =
 				error instanceof ToolExecutionError
 					? error.message
-					: t("errors.tools.execution")
-							.replace("{{tool}}", toolName)
-							.replace(
-								"{{error}}",
-								error.message ||
-									String(error) ||
-									"Unknown error",
-							);
+					: t("errors.tools.execution", { 
+						tool: toolName, 
+						error: error.message || String(error) || "Unknown error" 
+					});
 
-			console.error(errorMessage);
+			console.error(errorMessage, error);
 			return { result: `❌ ${errorMessage}`, isError: true };
 		} finally {
 			console.groupEnd();

@@ -52,9 +52,9 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
     if (!input || typeof input !== 'object') actionText = '';
     if (input.path) actionText = `"${input.path}"`;
     if (hasResult) {
-      return t('tools.generateImage.success').replace('{{path}}', actionText);
+      return t('tools.generateImage.success', { path: actionText });
     } else {
-      return t('tools.generateImage.generating').replace('{{path}}', actionText);
+      return t('tools.generateImage.generating', { path: actionText });
     }
   },
   execute: async (plugin: MyPlugin, params: GenerateImageToolInput): Promise<ToolExecutionResult> => {
@@ -80,7 +80,7 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
     // Check if the file already exists
     const exists = await fileExists(normalizedPath, plugin.app);
     if (exists) {
-      throw new ToolExecutionError(t('tools.generateImage.errors.fileExists').replace('{{path}}', normalizedPath));
+      throw new ToolExecutionError(t('tools.generateImage.errors.fileExists', { path: normalizedPath }));
     }
 
     // Check for OpenAI API key
@@ -128,14 +128,14 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
       await plugin.app.vault.createBinary(normalizedPath, imageBuffer);
 
       return {
-        result: t('tools.generateImage.success').replace('{{path}}', normalizedPath),
+        result: t('tools.generateImage.success', { path: normalizedPath }),
         navigationTargets: [{
           filePath: normalizedPath,
           description: t('tools.generateImage.openImage')
         }]
       };
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating image:', error);
       
       if (error instanceof ToolExecutionError) {
@@ -145,13 +145,11 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
       // Handle OpenAI API specific errors
       if (error?.error?.code === 'insufficient_quota') {
         throw new ToolExecutionError(t('tools.generateImage.errors.quotaExceeded'));
+      } else if (error?.error?.message) {
+        throw new ToolExecutionError(t('tools.generateImage.errors.invalidRequest', { error: error?.error?.message || 'Unknown error' }));
+      } else {
+        throw new ToolExecutionError(t('tools.generateImage.errors.general', { error: error?.message || String(error) }));
       }
-
-      if (error?.error?.code === 'invalid_request_error') {
-        throw new ToolExecutionError(t('tools.generateImage.errors.invalidRequest').replace('{{error}}', error?.error?.message || 'Unknown error'));
-      }
-
-      throw new ToolExecutionError(t('tools.generateImage.errors.general').replace('{{error}}', error?.message || String(error)));
     }
   }
 }; 

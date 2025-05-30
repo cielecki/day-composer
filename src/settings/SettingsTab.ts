@@ -97,7 +97,7 @@ export class SampleSettingTab extends PluginSettingTab {
 						}
 					} catch (error) {
 						console.error('Error checking for updates:', error);
-						new Notice(t('errors.failedToUpdatePlugin').replace('{{error}}', error.message));
+						new Notice(t('errors.failedToUpdatePlugin', { error: error.message }));
 					} finally {
 						button.setDisabled(false);
 						button.setButtonText(t('settings.actions.checkUpdates.button'));
@@ -122,8 +122,8 @@ export class SampleSettingTab extends PluginSettingTab {
 							new Notice(t('ui.starterKit.createdSuccess'));
 						}
 					} catch (error) {
-						console.error('Error creating starter kit:', error);
-						new Notice(t('ui.starterKit.createdError').replace('{{error}}', error.message));
+						console.error('Error creating Starter Kit:', error);
+						new Notice(t('ui.starterKit.createdError', { error: error.message }));
 					} finally {
 						button.setDisabled(false);
 						button.setButtonText(t('settings.actions.createStarterKit.button'));
@@ -162,7 +162,7 @@ export class SampleSettingTab extends PluginSettingTab {
 						}
 					} catch (error) {
 						console.error('Error resetting tutorial:', error);
-						new Notice(t('settings.actions.resetTutorial.error').replace('{{error}}', error.message));
+						new Notice(t('settings.actions.resetTutorial.error', { error: error.message }));
 					} finally {
 						button.setDisabled(false);
 						button.setButtonText(t('settings.actions.resetTutorial.button'));

@@ -134,7 +134,7 @@ const createStarterKit = async (app: App) => {
 
 		new Notice(t('ui.starterKit.createdSuccess'));
 	} catch (error) {
-		new Notice(t('ui.starterKit.createdError').replace('{{error}}', String(error)));
+		new Notice(t('ui.starterKit.createdError', { error: String(error) }));
 		console.error("Error creating a Starter Kit:", error);
 	}
 };
@@ -242,7 +242,7 @@ const createNewMode = async (app: App) => {
 		}
 	} catch (error) {
 		// Only show error notification if there's a problem
-		new Notice(t('ui.mode.createdError').replace('{{error}}', String(error)));
+		new Notice(t('ui.mode.createdError', { error: String(error) }));
 		console.error("Error creating a new mode:", error);
 	}
 }
@@ -319,7 +319,7 @@ export default class MyPlugin extends Plugin {
 					}, 500);
 				} catch (error) {
 					console.error('Error resetting tutorial:', error);
-					new Notice(t('settings.actions.resetTutorial.error').replace('{{error}}', error.message));
+					new Notice(t('settings.actions.resetTutorial.error', { error: error.message }));
 				}
 			},
 		});

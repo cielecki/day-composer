@@ -46,7 +46,7 @@ export const readDocumentTool: ObsidianTool<ReadDocumentToolInput> = {
       const file = getFile(path, plugin.app);
       
       if (!file) {
-        throw new ToolExecutionError(t('errors.documents.notFound').replace('{{path}}', path));
+        throw new ToolExecutionError(t('errors.documents.notFound', { path }));
       }
       
       // Read the content

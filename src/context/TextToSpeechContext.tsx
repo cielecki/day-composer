@@ -136,7 +136,7 @@ export const TextToSpeechProvider: React.FC<{
 
 					if (getCurrentTTSSettings().voice) {
 						if (!TTS_VOICES.includes(getCurrentTTSSettings().voice as TTSVoice)) {
-							new Notice(t('errors.tts.invalidVoice').replace('{{voice}}', getCurrentTTSSettings().voice));
+							new Notice(t('errors.tts.invalidVoice', { voice: getCurrentTTSSettings().voice }));
 						} else {
 							voice = getCurrentTTSSettings().voice as TTSVoice;
 						}
@@ -243,8 +243,9 @@ export const TextToSpeechProvider: React.FC<{
 								currentAudioElement.src = audioUrl;
 								
 								currentAudioElement.play().catch(err => {
-									console.error('Failed to play audio chunk:', err);
-									new Notice(t('errors.audio.playback'));
+									console.error('Error playing audio:', err);
+									setIsPlayingAudio(false);
+									new Notice(t('errors.audio.playbackError', { error: err instanceof Error ? err.message : String(err) }));
 									reject(err);
 								});
 							});
@@ -302,7 +303,7 @@ export const TextToSpeechProvider: React.FC<{
 							}
 						} catch (err) {
 							console.error('Error streaming audio chunks:', err);
-							new Notice(t('errors.audio.playbackError').replace('{{error}}', err instanceof Error ? err.message : String(err)));
+							new Notice(t('errors.audio.playbackError', { error: err instanceof Error ? err.message : String(err) }));
 						}
 					} else {
 						console.error('No audio stream received from API');
@@ -312,7 +313,7 @@ export const TextToSpeechProvider: React.FC<{
 					console.error('Error during TTS:', error);
 					if (!combinedSignal.aborted) {
 						const errorMessage = error instanceof Error ? error.message : 'Unknown error during TTS';
-						new Notice(t('errors.tts.transcriptionFailed').replace('{{error}}', errorMessage));
+						new Notice(t('errors.tts.transcriptionFailed', { error: errorMessage }));
 					}
 					reject(error);
 				} finally {

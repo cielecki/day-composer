@@ -160,7 +160,7 @@ export const SpeechToTextProvider: React.FC<{
       // If not aborted, show error notice
       if (!transcriptionController.signal.aborted) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error during transcription';
-        new Notice(t('errors.tts.transcriptionFailed').replace('{{error}}', errorMessage));
+        new Notice(t('errors.tts.transcriptionFailed', { error: errorMessage }));
       }
 
       throw error;

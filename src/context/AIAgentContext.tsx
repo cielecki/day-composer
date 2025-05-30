@@ -721,7 +721,7 @@ export const AIAgentProvider: React.FC<{
 								error,
 							);
 							new Notice(
-								t('errors.conversationTurn').replace('{{error}}', error instanceof Error ? error.message : "Unknown error")
+								t('errors.conversationTurn', { error: error instanceof Error ? error.message : "Unknown error" })
 							);
 							// Also clean up incomplete tool calls on error
 							cleanupIncompleteToolCalls();
@@ -849,9 +849,7 @@ export const AIAgentProvider: React.FC<{
 						);
 						// Avoid duplicate notices if runConversationTurn already showed one
 						if (!(error instanceof APIUserAbortError)) {
-							new Notice(
-								t('errors.setup').replace('{{error}}', error instanceof Error ? error.message : "Unknown error")
-							);
+							new Notice(t('errors.setup', { error: error instanceof Error ? error.message : "Unknown error" }));
 						}
 						// *** Ensure loading state is reset if setup fails ***
 						setIsGeneratingResponse(false);
@@ -869,9 +867,7 @@ export const AIAgentProvider: React.FC<{
 				);
 				// Avoid duplicate notices if runConversationTurn already showed one
 				if (!(error instanceof APIUserAbortError)) {
-					new Notice(
-						t('errors.setup').replace('{{error}}', error instanceof Error ? error.message : "Unknown error")
-					);
+					new Notice(t('errors.setup', { error: error instanceof Error ? error.message : "Unknown error" }));
 				}
 				// *** Ensure loading state is reset if setup fails ***
 				setIsGeneratingResponse(false);
@@ -960,9 +956,7 @@ export const AIAgentProvider: React.FC<{
 			} catch (error) {
 				console.error("Error during message edit processing:", error);
 				if (!(error instanceof APIUserAbortError)) {
-					new Notice(
-						t('errors.setup').replace('{{error}}', error instanceof Error ? error.message : "Unknown error")
-					);
+					new Notice(t('errors.setup', { error: error instanceof Error ? error.message : "Unknown error" }));
 				}
 				setIsGeneratingResponse(false);
 			}
