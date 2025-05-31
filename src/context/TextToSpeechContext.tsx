@@ -7,6 +7,7 @@ import { t } from '../i18n';
 import { DEFAULT_VOICE_INSTRUCTIONS } from 'src/defaults/ln-mode-defaults';
 import { useLNMode } from './LNModeContext';
 import { getDefaultLNMode } from 'src/defaults/ln-mode-defaults';
+import { TTSStreamingService } from '../services/TTSStreamingService';
 
 interface TextToSpeechContextType {
 	isPlayingAudio: boolean;
@@ -24,6 +25,9 @@ export const TextToSpeechProvider: React.FC<{
 	const [isGeneratingSpeech, setIsGeneratingSpeech] = useState(false);
 	const { lnModesRef, activeModeIdRef } = useLNMode();
 	
+	// Streaming service ref
+	const streamingServiceRef = React.useRef<TTSStreamingService | null>(null);
+	
 	// Helper function to get current TTS settings from active mode
 	const getCurrentTTSSettings = useCallback(() => {
 		const currentMode = lnModesRef.current[activeModeIdRef.current];
@@ -36,6 +40,21 @@ export const TextToSpeechProvider: React.FC<{
 			speed: currentMode?.ln_voice_speed ?? defaultMode.ln_voice_speed,
 		};
 	}, [lnModesRef, activeModeIdRef]);
+	
+	// Initialize streaming service when needed
+	const initializeStreamingService = useCallback(() => {
+		const apiKey = getPluginSettings().openAIApiKey;
+		const settings = getCurrentTTSSettings();
+		
+		if (apiKey && !streamingServiceRef.current) {
+			streamingServiceRef.current = new TTSStreamingService(
+				apiKey, 
+				(settings.voice as TTSVoice) || 'alloy', 
+				settings.speed || 1.0
+			);
+		}
+		return streamingServiceRef.current;
+	}, [getCurrentTTSSettings]);
 	
 	// Ref to track the current playing state to avoid stale closure issues
 	const isPlayingRef = React.useRef(false);
@@ -50,24 +69,92 @@ export const TextToSpeechProvider: React.FC<{
 	
 	// Function to stop the currently playing audio
 	const stopAudio = useCallback(() => {
+		if (streamingServiceRef.current) {
+			// Stop streaming TTS
+			streamingServiceRef.current.stopStreaming();
+		}
+		
 		if (currentAudioController.current) {
+			// Stop legacy TTS
 			currentAudioController.current.abort();
 			currentAudioController.current = null;
+		}
+		setIsPlayingAudio(false);
+		setIsGeneratingSpeech(false);
+	}, []);
+	
+	const speakTextWithStreaming = useCallback(async (text: string, signal: AbortSignal): Promise<void> => {
+		const service = initializeStreamingService();
+		if (!service) {
+			console.error('Failed to initialize streaming service');
+			new Notice(t('errors.tts.noApiKey'));
+			return;
+		}
+
+		try {
+			setIsGeneratingSpeech(true);
+			
+			// Handle abort signal
+			signal.addEventListener('abort', () => {
+				service.stopStreaming();
+				setIsPlayingAudio(false);
+				setIsGeneratingSpeech(false);
+			});
+
+			await service.startStreaming(text, {
+				onChunkReady: (chunk) => {
+					console.log(`Streaming chunk ${chunk.position + 1} ready`);
+				},
+				
+				onPlaybackStart: (chunk) => {
+					console.log(`Started streaming chunk ${chunk.position + 1}`);
+					setIsPlayingAudio(true);
+					setIsGeneratingSpeech(false);
+				},
+				
+				onPlaybackEnd: (chunk) => {
+					console.log(`Finished streaming chunk ${chunk.position + 1}`);
+					const progress = service.getProgress();
+					
+					// Check if all chunks are complete
+					if (progress.current >= progress.total) {
+						setIsPlayingAudio(false);
+						setIsGeneratingSpeech(false);
+					}
+				},
+				
+				onError: (error, chunk) => {
+					console.error('Streaming TTS Error:', error, chunk);
+					new Notice(t('errors.tts.transcriptionFailed', { error }));
+					setIsPlayingAudio(false);
+					setIsGeneratingSpeech(false);
+				}
+			});
+
+		} catch (error) {
+			console.error('Streaming TTS failed:', error);
+			const errorMessage = error instanceof Error ? error.message : 'Unknown streaming error';
+			new Notice(t('errors.tts.transcriptionFailed', { error: errorMessage }));
 			setIsPlayingAudio(false);
 			setIsGeneratingSpeech(false);
 		}
-	}, []);
-	
-	const speakText = useCallback((text: string, signal: AbortSignal, bypassEnabledCheck = false): Promise<void> => {
-		return new Promise((resolve, reject) => {
-			if (!bypassEnabledCheck && !getCurrentTTSSettings().enabled) {
-				resolve();
-				return;
-			}
+	}, [initializeStreamingService]);
 
-			// First stop any currently playing audio
-			stopAudio();
-			
+	const speakText = useCallback((text: string, signal: AbortSignal, bypassEnabledCheck = false): Promise<void> => {
+		if (!bypassEnabledCheck && !getCurrentTTSSettings().enabled) {
+			return Promise.resolve();
+		}
+
+		const settings = getPluginSettings();
+		stopAudio();
+
+		// Use streaming TTS if enabled and conditions are met
+		if (text) {
+			return speakTextWithStreaming(text, signal);
+		}
+
+		// Legacy TTS implementation (existing code)
+		return new Promise((resolve, reject) => {
 			// Create a new abort controller that we can reference later
 			const controller = new AbortController();
 			currentAudioController.current = controller;

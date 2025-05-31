@@ -19,12 +19,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **YouTube Transcript Download Tool**: New `download_youtube_transcript` tool that downloads transcripts from YouTube videos and saves them to Obsidian files. Supports multiple languages, timestamp inclusion/exclusion, and handles various YouTube URL formats. Includes automatic fallback to default language if specified language is unavailable.
 - **HTML Comment Filtering**: System prompts now automatically filter out top-level HTML comments while preserving them in code blocks. This prevents deleted task comments and other HTML annotations from being included in AI context while maintaining code examples intact.
 - **Unique File/Directory Name Generation**: Created reusable utility functions for generating unique file and directory names by appending numbers when paths already exist. Deep research tool now automatically generates unique filenames (e.g., "research.md", "research 2.md") instead of throwing errors when files exist and overwrite is disabled. Path determination happens at the end of the research process to avoid reserving filenames during potentially long-running operations. Extracted existing directory naming logic from starter kit creation into shared utilities for consistent behavior across all file operations.
+- 🎵 **Revolutionary TTS Streaming System**: Production-ready streaming text-to-speech with seamless, low-latency audio playback
+  - **Intelligent Text Chunking**: Automatically splits text at natural speech boundaries (sentences, clauses, conjunctions)
+  - **Predictive Buffer Management**: Starts generating next chunk before current finishes for gap-free playback
+  - **Adaptive Performance**: Learns from network speed and API response times for optimal timing
+  - **Mobile Optimized**: Uses only HTML Audio elements for maximum iOS and Android compatibility
+  - **Production Quality**: Automatic error recovery, memory management, and retry logic
+  - **Real-time Monitoring**: Buffer health, progress tracking, and performance metrics
+  - **Configurable Settings**: Adjustable chunk sizes, timing parameters, and debug options
+  - **Test Interface**: Built-in test modal with real-time monitoring and custom text input
+  - **Direct Integration**: Seamlessly integrated into existing TTS context for backward compatibility
+- Command palette integration: `🎵 Test TTS Streaming System` for easy testing
+- Comprehensive TTS streaming configuration panel in plugin settings
 
 ### Changed
 - **User Guide Documentation**: Completely updated the user guide to reflect the new sequential setup process. Added detailed sections covering the four-step setup flow (Language Configuration, Starter Kit Creation, Anthropic API Key, OpenAI API Key), new settings page organization, tutorial reset functionality, and comprehensive troubleshooting for setup-related issues. Enhanced mobile usage guidance and advanced features documentation.
 - **Setup Screen Icons**: Replaced custom SVG icons with Lucide icons across all setup screens for consistency and better visual integration. Language Selection uses "languages" icon, Starter Kit Creation uses "rocket" icon, Anthropic API Key uses "key" icon, and OpenAI API Key uses "mic" icon to represent voice functionality.
 - **Settings Page Layout**: Reorganized settings page for better user experience. Security notice now appears directly below API Keys section where it's most relevant. Life Navigator Actions moved to bottom of settings page for better logical flow. Settings now follow order: API Keys → Advanced Settings → Actions.
 - **Reset Tutorial Implementation**: Reset Tutorial functionality is now implemented as a proper command (like Create Starter Kit) instead of directly calling settings methods. Added "Reset Tutorial" command that can be invoked from the command palette and properly integrated with Obsidian's command system. Settings page now invokes this command for consistency with other actions.
+- **English Starter Kit Recreated**: Completely recreated the English starter kit by translating from the Polish version. All content has been thoroughly translated including filenames, with key translations like "Ziomal" → "Bro" and "O mnie" → "About Me". The English starter kit now matches the comprehensive structure and content of the Polish version.
+- **Chat Autoscroll During Agent Response**: Fixed autoscroll functionality to properly scroll to bottom while agent is typing/streaming responses, ensuring users can always see the latest content being generated. Optimized to prevent double-scrolling by using MutationObserver during streaming and conversation-based scrolling otherwise.
+- **Starter Kit Directory Creation**: Fixed starter kit creation to handle existing directories by automatically generating unique names (e.g., "Starter Kit v0.4 2", "Starter Kit v0.4 3") instead of failing when a directory already exists
 
 ### Fixed
 - **Windows Starter Kit Creation**: Fixed critical bug on Windows where starter kit creation would fail with "Folder already exists" error after creating only the first file. Improved nested directory creation logic to handle Windows path normalization properly and avoid race conditions. The fix ensures that nested directories (like "Info/About Me") are created recursively with proper parent directory checks, resolving the Windows-specific filesystem handling issues.
