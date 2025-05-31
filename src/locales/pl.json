@@ -335,6 +335,7 @@
     "input": {
       "placeholder": "Napisz wiadomość...",
       "send": "Wyślij",
+      "save": "Zapisz",
       "cancel": "Anuluj",
       "stop": "Zatrzymaj",
       "addFile": "Dodaj plik",
@@ -349,7 +350,8 @@
       "stopSpeech": "Zatrzymaj odtwarzanie",
       "generatingSpeech": "Generowanie mowy",
       "recordingInProgress": "Nagrywanie w toku",
-      "attachedImage": "Załączony obraz"
+      "attachedImage": "Załączony obraz",
+      "editing": "Edytowanie wiadomości"
     },
     "todo": {
       "clickToChange": "Kliknij, aby zmienić status",

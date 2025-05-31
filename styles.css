@@ -403,6 +403,25 @@ If your plugin does not need CSS, delete this file.
     opacity: 1 !important;
   }
 
+  /* Mobile editing optimizations */
+  .life-navigator-view .unified-input-area {
+    padding: 16px 12px;
+    gap: 16px;
+  }
+
+  .life-navigator-view .unified-input-textarea {
+    font-size: 16px; /* Prevent zoom on iOS */
+    min-height: 44px;
+    padding: 12px 8px;
+    max-height: 200px; /* More space on mobile when editing */
+  }
+
+  .life-navigator-view .input-control-button {
+    min-height: 44px; /* Touch-friendly minimum size */
+    padding: 8px 16px;
+    font-size: 16px;
+  }
+
   /* Improve contrast in dark mode on mobile */
   @media (prefers-color-scheme: dark) {
     .life-navigator-view .ln-mode-pill {
@@ -1232,6 +1251,45 @@ If your plugin does not need CSS, delete this file.
   padding: 10px;
 }
 
+/* Editing header styles */
+.life-navigator-view .editing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: var(--background-modifier-hover);
+  border-bottom: 1px solid var(--background-modifier-border-hover);
+  border-radius: 6px 6px 0 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.life-navigator-view .editing-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  color: var(--text-normal);
+}
+
+.life-navigator-view .editing-close-button {
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.life-navigator-view .editing-close-button:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+/* Adjust unified input area when editing */
+.life-navigator-view .editing-header + .unified-input-area {
+  border-radius: 0 0 16px 16px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
 .life-navigator-view .unified-input-area {
   display: flex;
   flex-direction: column;
@@ -1240,43 +1298,6 @@ If your plugin does not need CSS, delete this file.
   gap: 12px;
   background-color: var(--background-secondary-alt);
   border-radius: 16px;
-}
-
-.life-navigator-view .input-wrapper {
-  position: relative;
-  width: 100%;
-  min-height: 40px;
-}
-
-.life-navigator-view .unified-input-textarea {
-  width: 100%;
-  resize: none;
-  background-color: transparent;
-  color: var(--text-normal);
-  font-size: 15px;
-  font-family: var(--font-text);
-  line-height: 1.5;
-  padding: 10px 4px;
-  min-height: 40px;
-  max-height: 120px;
-  overflow-y: auto;
-  outline: none;
-  border: none;
-  border-radius: 0;
-}
-
-.life-navigator-view .unified-input-textarea::placeholder {
-  color: var(--text-muted);
-}
-
-.life-navigator-view .unified-input-textarea:focus {
-  box-shadow: none;
-}
-
-.life-navigator-view .unified-input-textarea.recording {
-  opacity: 0;
-  position: absolute;
-  pointer-events: none;
 }
 
 /* Waveform container */
@@ -1452,14 +1473,6 @@ If your plugin does not need CSS, delete this file.
 .life-navigator-view .image-content img {
   border-radius: 6px;
   box-shadow: var(--input-shadow);
-}
-
-
-
-/* Add position relative to messages to anchor the actions */
-.life-navigator-view .message {
-  border-radius: 8px;
-  position: relative;
 }
 
 /* Add spinner animation for the loader icon */
@@ -2054,6 +2067,12 @@ If your plugin does not need CSS, delete this file.
 	box-shadow: 0 0 0 2px var(--interactive-accent-hover);
 }
 
+.life-navigator-view .setup-input:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	transform: none;
+}
+
 .life-navigator-view .setup-button {
 	background: var(--interactive-accent);
 	color: var(--text-on-accent);
@@ -2258,4 +2277,41 @@ If your plugin does not need CSS, delete this file.
 	.life-navigator-view .language-native {
 		font-size: 0.8rem;
 	}
+}
+
+.life-navigator-view .input-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 40px;
+}
+
+.life-navigator-view .unified-input-textarea {
+  width: 100%;
+  resize: none;
+  background-color: transparent;
+  color: var(--text-normal);
+  font-size: 15px;
+  font-family: var(--font-text);
+  line-height: 1.5;
+  padding: 10px 4px;
+  min-height: 40px;
+  max-height: 120px;
+  overflow-y: auto;
+  outline: none;
+  border: none;
+  border-radius: 0;
+}
+
+.life-navigator-view .unified-input-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.life-navigator-view .unified-input-textarea:focus {
+  box-shadow: none;
+}
+
+.life-navigator-view .unified-input-textarea.recording {
+  opacity: 0;
+  position: absolute;
+  pointer-events: none;
 }

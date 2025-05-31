@@ -335,6 +335,7 @@
     "input": {
       "placeholder": "Type your message...",
       "send": "Send",
+      "save": "Save",
       "cancel": "Cancel",
       "stop": "Stop",
       "addFile": "Add File",
@@ -349,7 +350,8 @@
       "stopSpeech": "Stop speech",
       "generatingSpeech": "Generating speech",
       "recordingInProgress": "Recording in progress",
-      "attachedImage": "Attached image"
+      "attachedImage": "Attached image",
+      "editing": "Editing message"
     },
     "todo": {
       "clickToChange": "Click to change status",

@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, KeyboardEvent } from "react";
-import { useAIAgent } from "src/context/AIAgentContext";
+import { useAIAgent } from "../context/AIAgentContext";
 import { useSpeechToText } from "../context/SpeechToTextContext";
-import { useTextToSpeech } from "src/context/TextToSpeechContext";
-import { t } from "../i18n";
-import { LucideIcon } from "./LucideIcon";
+import { useTextToSpeech } from "../context/TextToSpeechContext";
+import { t } from '../i18n';
+import { LucideIcon } from './LucideIcon';
 
 // Define an interface for attached images (keeping compatibility with TextInputArea)
 interface AttachedImage {
@@ -18,8 +18,9 @@ const WAVEFORM_HISTORY_LENGTH = 120; // 4 seconds at 30 samples per second
 export const UnifiedInputArea: React.FC<{
   newAbortController: () => AbortController;
   abort: () => void;
-}> = ({ newAbortController, abort }) => {
-  const { addUserMessage, isGeneratingResponse } = useAIAgent();
+  editingMessage?: { index: number; content: string; images?: any[] } | null;
+}> = ({ newAbortController, abort, editingMessage }) => {
+  const { addUserMessage, isGeneratingResponse, editUserMessage, cancelEditingMessage } = useAIAgent();
   const {
     isRecording,
     isTranscribing,
@@ -53,6 +54,25 @@ export const UnifiedInputArea: React.FC<{
   // Volume level state
   const [volumeLevel, setVolumeLevel] = useState(0);
 
+  // Initialize editing state when editingMessage changes
+  useEffect(() => {
+    if (editingMessage) {
+      setMessage(editingMessage.content);
+      setAttachedImages(editingMessage.images || []);
+      // Focus the textarea after a brief delay to ensure proper rendering
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.focus();
+          textareaRef.current.setSelectionRange(textareaRef.current.value.length, textareaRef.current.value.length);
+        }
+      }, 100);
+    } else {
+      // Reset state when exiting editing mode
+      setMessage("");
+      setAttachedImages([]);
+    }
+  }, [editingMessage]);
+
   // Effect to handle transcription completion and insert text into input
   useEffect(() => {
     // Detect when transcription completes (transition from true to false)
@@ -61,136 +81,67 @@ export const UnifiedInputArea: React.FC<{
       !isTranscribing &&
       lastTranscription
     ) {
-      // Special case: If audio is playing, stop it and send the message automatically
+      // Add the transcription to the message (append to existing text)
+      const newMessage = message.trim()
+        ? `${message} ${lastTranscription}`
+        : lastTranscription;
+      
+      // Always auto-send after transcription completes, whether editing or new message
       if (isPlayingAudio || isGeneratingSpeech) {
         console.log("Transcription completed during audio playback - stopping audio and auto-sending");
         stopAudio();
+      }
+      
+      // Immediately clear images to prevent flash before auto-send
+      const imagesToSend = [...attachedImages];
+      setAttachedImages([]);
+      
+      // Set the message and then send it in the next tick
+      setMessage(newMessage);
+      setTimeout(() => {
+        // Send/save the message with proper handling of both text and images
+        const messageToSend = newMessage;
         
-        // Add the transcription to the message (in case there's already text in the input)
-        const newMessage = message.trim()
-          ? `${message} ${lastTranscription}`
-          : lastTranscription;
-        
-        // Immediately clear images to prevent flash before auto-send
-        const imagesToSend = [...attachedImages];
-        setAttachedImages([]);
-        
-        // Set the message and then send it in the next tick
-        setMessage(newMessage);
-        setTimeout(() => {
-          // Send the message with proper handling of both text and images
-          const messageToSend = newMessage;
-          
-          if (messageToSend.trim() === "" && imagesToSend.length === 0) {
-            return;
-          }
+        if (messageToSend.trim() === "" && imagesToSend.length === 0) {
+          return;
+        }
 
-          // Process any attached images
-          if (imagesToSend.length > 0) {
-            // Create a new message with text and attached images
-            const imageData = imagesToSend.map((img) => ({
-              type: "image",
-              source: {
-                type: "base64",
-                media_type: img.src.split(";")[0].split(":")[1], // Extract MIME type
-                data: img.src.split(",")[1], // Extract base64 data without the prefix
-              },
-            }));
+        // Process any attached images for the final message
+        let finalImageData: any[] = [];
+        if (imagesToSend.length > 0) {
+          finalImageData = imagesToSend.map((img) => ({
+            type: "image",
+            source: {
+              type: "base64",
+              media_type: img.src.split(";")[0].split(":")[1], // Extract MIME type
+              data: img.src.split(",")[1], // Extract base64 data without the prefix
+            },
+          }));
+        }
 
-            // Add the images to the message
-            addUserMessage(
-              messageToSend,
-              newAbortController().signal,
-              imageData,
-            );
+        // Handle editing vs new message
+        if (editingMessage) {
+          // For editing mode, save the edit
+          console.log("Auto-saving edit after transcription");
+          const controller = newAbortController();
+          editUserMessage(editingMessage.index, messageToSend, controller.signal, finalImageData);
+        } else {
+          // For new message mode, send as new message
+          console.log("Auto-sending new message after transcription");
+          if (finalImageData.length > 0) {
+            addUserMessage(messageToSend, newAbortController().signal, finalImageData);
           } else {
-            // Just send text message
             addUserMessage(messageToSend, newAbortController().signal);
           }
+        }
 
-          // Reset state
-          setMessage("");
-        }, 10);
-      }
-      // If nothing is being generated, send the transcription immediately
-      else if (!isGeneratingResponse && !isRecording) {
-        // Add the transcription to the message (in case there's already text in the input)
-        const newMessage = message.trim()
-          ? `${message} ${lastTranscription}`
-          : lastTranscription;
-        
-        // Immediately clear images to prevent flash before auto-send
-        const imagesToSend = [...attachedImages];
-        setAttachedImages([]);
-        
-        // Set the message and then send it in the next tick
-        setMessage(newMessage);
-        setTimeout(() => {
-          // Send the message with proper handling of both text and images
-          const messageToSend = newMessage;
-          
-          if (messageToSend.trim() === "" && imagesToSend.length === 0) {
-            return;
-          }
-
-          // Process any attached images
-          if (imagesToSend.length > 0) {
-            // Create a new message with text and attached images
-            const imageData = imagesToSend.map((img) => ({
-              type: "image",
-              source: {
-                type: "base64",
-                media_type: img.src.split(";")[0].split(":")[1], // Extract MIME type
-                data: img.src.split(",")[1], // Extract base64 data without the prefix
-              },
-            }));
-
-            // Add the images to the message
-            addUserMessage(
-              messageToSend,
-              newAbortController().signal,
-              imageData,
-            );
-          } else {
-            // Just send text message
-            addUserMessage(messageToSend, newAbortController().signal);
-          }
-
-          // Reset state
-          setMessage("");
-        }, 10);
-      } else {
-        // Otherwise, insert the transcription into the text input
-        setMessage((prev) => {
-          const newMessage = prev.trim()
-            ? `${prev} ${lastTranscription}`
-            : lastTranscription;
-          // Resize the textarea without focusing it
-          if (textareaRef.current) {
-            // Delay a bit to ensure DOM updates have completed
-            setTimeout(() => {
-              const textarea = textareaRef.current;
-              if (textarea) {
-                textarea.style.height = "auto";
-                textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
-
-                // Second resize attempt with longer delay to ensure rendering is complete
-                setTimeout(() => {
-                  if (textarea) {
-                    textarea.style.height = "auto";
-                    textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
-                  }
-                }, 100);
-              }
-            }, 10);
-          }
-          return newMessage;
-        });
-      }
+        // Reset state
+        setMessage("");
+      }, 10);
     }
     // Update ref with current value for next comparison
     prevIsTranscribingRef.current = isTranscribing;
-  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, isPlayingAudio, isGeneratingSpeech, message, addUserMessage, newAbortController, attachedImages, stopAudio]);
+  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, isPlayingAudio, isGeneratingSpeech, message, addUserMessage, editUserMessage, newAbortController, attachedImages, stopAudio, editingMessage]);
 
   // Add ResizeObserver to ensure textarea is properly sized
   useEffect(() => {
@@ -339,7 +290,37 @@ export const UnifiedInputArea: React.FC<{
   const handleSendMessage = () => {
     if (message.trim() === "" && attachedImages.length === 0) return;
 
-    // Process any attached images
+    // If in editing mode, save the edit instead of sending new message
+    if (editingMessage) {
+      const finalMessage = message;
+
+      if (attachedImages.length > 0) {
+        // Create image data for editing
+        const imageData = attachedImages.map((img) => ({
+          type: "image",
+          source: {
+            type: "base64",
+            media_type: img.src.split(";")[0].split(":")[1], // Extract MIME type
+            data: img.src.split(",")[1], // Extract base64 data without the prefix
+          },
+        }));
+
+        // For editing, pass both text and images
+        const controller = newAbortController();
+        editUserMessage(editingMessage.index, finalMessage, controller.signal, imageData);
+      } else {
+        // Just save text message
+        const controller = newAbortController();
+        editUserMessage(editingMessage.index, finalMessage, controller.signal);
+      }
+
+      // Reset state after editing
+      setMessage("");
+      setAttachedImages([]);
+      return;
+    }
+
+    // Regular message sending logic
     const finalMessage = message;
 
     if (attachedImages.length > 0) {
@@ -371,6 +352,13 @@ export const UnifiedInputArea: React.FC<{
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
     }
+  };
+
+  // Handle cancel editing
+  const handleCancelEdit = () => {
+    setMessage("");
+    setAttachedImages([]);
+    cancelEditingMessage();
   };
 
   // Handle Enter key to send message (Shift+Enter for new line)
@@ -550,6 +538,23 @@ export const UnifiedInputArea: React.FC<{
         disabled={isRecording || isTranscribing}
       />
 
+      {/* Editing header - shown when editing a message */}
+      {editingMessage && (
+        <div className="editing-header">
+          <div className="editing-label">
+            <LucideIcon name="edit" size={16} />
+            <span>{t('ui.message.editing')}</span>
+          </div>
+          <button
+            className="clickable-icon editing-close-button"
+            onClick={handleCancelEdit}
+            aria-label={t('buttons.cancel')}
+          >
+            <LucideIcon name="x" size={18} />
+          </button>
+        </div>
+      )}
+
       <div className="unified-input-area">
         {/* Image preview area - hidden during transcription */}
         {attachedImages.length > 0 && !isTranscribing && (
@@ -696,60 +701,15 @@ export const UnifiedInputArea: React.FC<{
 
           {/* Right-aligned controls */}
           <div className="input-controls-right">
-            {/* Microphone button to START recording - visible when message is empty and not currently recording */}
-            {message.trim() === "" && !isRecording && !isTranscribing && (
-              <button
-                className="input-control-button mic-button"
-                onClick={handleMicrophoneClick}
-                disabled={false}
-                aria-label={t("ui.recording.start")}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                  <line
-                    x1="12"
-                    y1="19"
-                    x2="12"
-                    y2="22"
-                  ></line>
-                </svg>
-              </button>
-            )}
-
-            {isTranscribing && (
-              <button
-                className="input-control-button mic-button confirm transcribing"
-                onClick={handleCancelRecording}
-                disabled={false}
-                aria-label={t("ui.recording.cancel")}
-              >
-                <LucideIcon
-                  name="loader"
-                  className="spinner"
-                  size={20}
-                  />
-              </button>
-            )}
-            
-            {/* Button visible DURING recording - Finish Recording button */}
-            {isRecording && !isTranscribing && (
-              <>
-                <button // This is the "Finish Recording" button
-                  className="input-control-button mic-button confirm"
-                  onClick={finalizeRecording}
+            {/* Regular mode controls - show even when editing to allow voice recording and normal send */}
+            <>
+              {/* Microphone button to START recording - visible when not currently recording */}
+              {!isRecording && !isTranscribing && (
+                <button
+                  className="input-control-button mic-button"
+                  onClick={handleMicrophoneClick}
                   disabled={false}
-                  aria-label={t("ui.recording.confirm")}
+                  aria-label={t("ui.recording.start")}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -762,56 +722,104 @@ export const UnifiedInputArea: React.FC<{
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <polyline points="20 6 9 17 4 12"></polyline>
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line
+                      x1="12"
+                      y1="19"
+                      x2="12"
+                      y2="22"
+                    ></line>
                   </svg>
                 </button>
-              </>
-            )}
+              )}
 
-            {/* Stop button - visible for generation, audio playback, and transcription (but NOT basic recording) */}
-            {(isGeneratingResponse || isPlayingAudio || isGeneratingSpeech) && !isRecording && (
-              <button
-                className="input-control-button stop-button"
-                onClick={handleStopAll}
-                aria-label={t("ui.recording.stop")}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  stroke="none"
+              {isTranscribing && (
+                <button
+                  className="input-control-button mic-button confirm transcribing"
+                  onClick={handleCancelRecording}
+                  disabled={false}
+                  aria-label={t("ui.recording.cancel")}
                 >
-                  <rect x="6" y="6" width="12" height="12" />
-                </svg>
-              </button>
-            )}
+                  <LucideIcon
+                    name="loader"
+                    className="spinner"
+                    size={20}
+                    />
+                </button>
+              )}
+              
+              {/* Button visible DURING recording - Finish Recording button */}
+              {isRecording && !isTranscribing && (
+                <>
+                  <button // This is the "Finish Recording" button
+                    className="input-control-button mic-button confirm"
+                    onClick={finalizeRecording}
+                    disabled={false}
+                    aria-label={t("ui.recording.confirm")}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </button>
+                </>
+              )}
 
-            {/* Send button - visible when not recording, AND nothing is being generated */}
-            {!isTranscribing && !isRecording && !(isGeneratingResponse || isPlayingAudio || isGeneratingSpeech) && (
-              <button
-                className="input-control-button send-button"
-                onClick={handleSendMessage}
-                aria-label={t("ui.input.send")}
-                disabled={message.trim() === "" && attachedImages.length === 0}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+              {/* Stop button - visible for generation, audio playback, and transcription (but NOT basic recording) */}
+              {(isGeneratingResponse || isPlayingAudio || isGeneratingSpeech) && !isRecording && (
+                <button
+                  className="input-control-button stop-button"
+                  onClick={handleStopAll}
+                  aria-label={t("ui.recording.stop")}
                 >
-                  <path d="M22 2L11 13"></path>
-                  <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
-                </svg>
-              </button>
-            )}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    stroke="none"
+                  >
+                    <rect x="6" y="6" width="12" height="12" />
+                  </svg>
+                </button>
+              )}
+
+              {/* Send button - visible when not recording, AND nothing is being generated */}
+              {!isTranscribing && !isRecording && !(isGeneratingResponse || isPlayingAudio || isGeneratingSpeech) && (
+                <button
+                  className="input-control-button send-button"
+                  onClick={handleSendMessage}
+                  aria-label={editingMessage ? t("ui.input.save") : t("ui.input.send")}
+                  disabled={message.trim() === "" && attachedImages.length === 0}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 2L11 13"></path>
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+                  </svg>
+                </button>
+              )}
+            </>
           </div>
         </div>
       </div>

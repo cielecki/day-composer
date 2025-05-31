@@ -43,11 +43,9 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   newAbortController,
   abort,
 }) => {
-  const { editUserMessage } = useAIAgent();
+  const { editUserMessage, startEditingMessage } = useAIAgent();
   const { speakText, isPlayingAudio, isGeneratingSpeech, stopAudio } = useTextToSpeech();
   const { isRecording } = useSpeechToText();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedMessage, setEditedMessage] = useState('');
   const [copyIcon, setCopyIcon] = useState('copy');
 
   const contentBlocksToRender = ensureContentBlocksForDisplay(content);
@@ -73,30 +71,9 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
 
   // Handle edit message button click
   const handleEditClick = () => {
-    if (role === 'user') {
-      setEditedMessage(getPlainTextContent(contentBlocksToRender));
-      setIsEditing(true);
+    if (role === 'user' && messageIndex !== undefined) {
+      startEditingMessage(messageIndex);
     }
-  };
-
-  // Handle save edited message
-  const handleSaveEdit = () => {
-    if (editedMessage.trim() && messageIndex !== undefined) {
-      // Create a new abort controller to allow stopping the operation
-      const controller = newAbortController ? newAbortController() : new AbortController();
-      
-      // Use the new editUserMessage function that handles history preservation
-      editUserMessage(messageIndex, editedMessage.trim(), controller.signal);
-      
-      // Reset editing state
-      setIsEditing(false);
-    }
-  };
-
-  // Handle cancel edit
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setEditedMessage('');
   };
 
   // Handle speak message
@@ -250,45 +227,8 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
     messageClasses.push('is-generating');
   }
 
-  // If in editing mode, show edit interface instead of message content
-  if (isEditing && role === 'user') {
-    return (
-      <div className={messageClasses.join(' ') + " editing"}>
-        <div className="message-content">
-          <div className="unified-input-area">
-            <div className="input-wrapper">
-              <textarea 
-                className="unified-input-textarea"
-                value={editedMessage}
-                onChange={(e) => setEditedMessage(e.target.value)}
-                rows={Math.max(3, editedMessage.split('\n').length)}
-              />
-            </div>
-            <div className="input-controls-bottom">
-              <div className="input-controls-left"></div>
-              <div className="input-controls-right">
-                <button 
-                  className="input-control-button cancel-button"
-                  onClick={handleCancelEdit}
-                >
-                  {t('buttons.cancel')}
-                </button>
-                <button 
-                  className="input-control-button send-button"
-                  onClick={handleSaveEdit}
-                  disabled={!editedMessage.trim()}
-                >
-                  {t('ui.input.send')}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const hasTextContent = contentBlocksToRender.some(block => block.type === 'text');
+  const hasAnyContent = contentBlocksToRender.length > 0;
 
   return (
     <div className={messageClasses.join(' ')}>
@@ -297,7 +237,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
           {contentBlocksToRender.map(renderContentBlock)}
         </div>
 
-        {hasTextContent && (
+        {hasAnyContent && (
           <div className="message-actions">
             {!isGeneratingResponse && <>
               {role === 'user' && (
@@ -309,47 +249,53 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
                   >
                     <LucideIcon name="pencil" size={18} />
                   </button>
-                  <button 
-                    className="clickable-icon" 
-                    onClick={handleCopyMessage}
-                    aria-label={t('ui.message.copy')}
-                  >
-                    <LucideIcon name={copyIcon} size={18} />
-                  </button>
+                  {hasTextContent && (
+                    <button 
+                      className="clickable-icon" 
+                      onClick={handleCopyMessage}
+                      aria-label={t('ui.message.copy')}
+                    >
+                      <LucideIcon name={copyIcon} size={18} />
+                    </button>
+                  )}
                 </>
               )}
               
               {role === 'assistant' && (
                 <>
-                  <button 
-                    className={`clickable-icon ${isPlayingAudio ? 'playing' : isGeneratingSpeech ? 'generating' : ''} ${isRecording ? 'disabled' : ''}`}
-                    onClick={handleSpeakMessage}
-                    disabled={isRecording}
-                    aria-label={
-                      isRecording
-                        ? t('ui.message.recordingInProgress')
-                        : isPlayingAudio 
-                          ? t('ui.message.stopSpeech') 
-                          : isGeneratingSpeech 
-                            ? t('ui.message.generatingSpeech') 
-                            : t('ui.message.speak')
-                    }
-                  >
-                    {isPlayingAudio ? (
-                      <LucideIcon name="circle-stop" size={18} />
-                    ) : isGeneratingSpeech ? (
-                      <LucideIcon name="loader" size={18} />
-                    ) : (
-                      <LucideIcon name="volume-2" size={18} />
-                    )}
-                  </button>
-                  <button 
-                    className="clickable-icon" 
-                    onClick={handleCopyMessage}
-                    aria-label={t('ui.message.copy')}
-                  >
-                    <LucideIcon name={copyIcon} size={18} />
-                  </button>
+                  {hasTextContent && (
+                    <button 
+                      className={`clickable-icon ${isPlayingAudio ? 'playing' : isGeneratingSpeech ? 'generating' : ''} ${isRecording ? 'disabled' : ''}`}
+                      onClick={handleSpeakMessage}
+                      disabled={isRecording}
+                      aria-label={
+                        isRecording
+                          ? t('ui.message.recordingInProgress')
+                          : isPlayingAudio 
+                            ? t('ui.message.stopSpeech') 
+                            : isGeneratingSpeech 
+                              ? t('ui.message.generatingSpeech') 
+                              : t('ui.message.speak')
+                      }
+                    >
+                      {isPlayingAudio ? (
+                        <LucideIcon name="circle-stop" size={18} />
+                      ) : isGeneratingSpeech ? (
+                        <LucideIcon name="loader" size={18} />
+                      ) : (
+                        <LucideIcon name="volume-2" size={18} />
+                      )}
+                    </button>
+                  )}
+                  {hasTextContent && (
+                    <button 
+                      className="clickable-icon" 
+                      onClick={handleCopyMessage}
+                      aria-label={t('ui.message.copy')}
+                    >
+                      <LucideIcon name={copyIcon} size={18} />
+                    </button>
+                  )}
                 </>
               )}
             </>}

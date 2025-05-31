@@ -32,10 +32,13 @@ export interface AIAgentContextType {
 	conversation: Message[];
 	clearConversation: () => void;
 	addUserMessage: (userMessage: string, signal: AbortSignal, images?: any[]) => Promise<void>;
-	editUserMessage: (messageIndex: number, newContent: string, signal: AbortSignal) => Promise<void>;
+	editUserMessage: (messageIndex: number, newContent: string, signal: AbortSignal, images?: any[]) => Promise<void>;
 	getContext: () => Promise<string>;
 	reset: () => void;
 	isGeneratingResponse: boolean;
+	editingMessage: { index: number; content: string; images?: any[] } | null;
+	startEditingMessage: (messageIndex: number) => void;
+	cancelEditingMessage: () => void;
 }
 
 const AIAgentContext = createContext<AIAgentContextType | undefined>(undefined);
@@ -67,9 +70,9 @@ export const AIAgentProvider: React.FC<{
 }> = ({ children, plugin }) => {
 	const conversationRef = useRef<Message[]>([]);
 	const partialJsonRef = useRef<Record<number, string>>({});
+	const [forceUpdate, setForceUpdate] = useState(0);
 	const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);
-	/* trunk-ignore(eslint/@typescript-eslint/no-unused-vars) */
-	const [_, setForceUpdate] = useState(0);
+	const [editingMessage, setEditingMessage] = useState<{ index: number; content: string; images?: any[] } | null>(null);
 	const textToSpeech = useTextToSpeech();
 	const { isRecording } = useSpeechToText();
 	const { activeModeIdRef, lnModesRef } = useLNMode();
@@ -895,7 +898,7 @@ export const AIAgentProvider: React.FC<{
 	);
 
 	const editUserMessage = useCallback(
-		async (messageIndex: number, newContent: string, signal: AbortSignal): Promise<void> => {
+		async (messageIndex: number, newContent: string, signal: AbortSignal, images?: any[]): Promise<void> => {
 			// Check if index is valid and is a user message
 			if (messageIndex < 0 || messageIndex >= conversationRef.current.length) {
 				console.error(`Invalid message index for editing: ${messageIndex}. Conversation length: ${conversationRef.current.length}`);
@@ -920,66 +923,143 @@ export const AIAgentProvider: React.FC<{
 			// Create a copy of the conversation up to the edited message
 			const conversationUpToEdit = conversationRef.current.slice(0, messageIndex + 1);
 			
+			// Create the new content blocks
+			const newContentBlocks: any[] = [];
+			
+			// Add text content if provided
+			if (newContent.trim()) {
+				newContentBlocks.push({ type: "text", text: newContent });
+			}
+			
+			// Add images if provided
+			if (images && images.length > 0) {
+				images.forEach((img) => {
+					// Check if this is already in API format (from editing mode)
+					if (img.type === "image" && img.source) {
+						newContentBlocks.push(img);
+					} else {
+						// Handle AttachedImage format (with src property)
+						newContentBlocks.push({
+							type: "image",
+							source: {
+								type: "base64",
+								media_type: img.src.split(";")[0].split(":")[1], // Extract MIME type
+								data: img.src.split(",")[1], // Extract base64 data without the prefix
+							},
+						});
+					}
+				});
+			}
+			
 			// Update the edited message with new content
 			conversationUpToEdit[messageIndex] = {
 				role: "user",
-				content: [{ type: "text", text: newContent }]
+				content: newContentBlocks
 			};
 			
 			// Replace the entire conversation reference with the truncated version
 			conversationRef.current = conversationUpToEdit;
 			setForceUpdate(prev => prev + 1);
 			
-			// Now generate a new response for the edited message
-			try {
-				setIsGeneratingResponse(true);
+			// Clear editing state
+			setEditingMessage(null);
 
-				// Prepare context, prompt, and tools
-				const systemPrompt = await getContext();
-				const obsidianTools = getObsidianTools(plugin);
+			// Trigger a new AI conversation turn from this point
+			if (newContentBlocks.length > 0) {
+				console.log("Triggering AI response after message edit");
 				
-				// Get current mode for tool filtering
-				const currentActiveMode = lnModesRef.current[activeModeIdRef.current];
-				const tools = currentActiveMode 
-					? obsidianTools.getToolsForMode(currentActiveMode) 
-					: obsidianTools.getTools();
+				try {
+					// Set generating state
+					setIsGeneratingResponse(true);
 
-				console.log("Generating new response after message edit");
-				console.log(`🔧 Using ${tools.length} tools for mode: ${currentActiveMode?.ln_name || 'default'}`);
+					// Prepare context, prompt, and tools
+					const systemPrompt = await getContext();
+					const obsidianTools = getObsidianTools(plugin);
+					
+					// Get current mode for tool filtering
+					const currentActiveMode = lnModesRef.current[activeModeIdRef.current];
+					const tools = currentActiveMode 
+						? obsidianTools.getToolsForMode(currentActiveMode) 
+						: obsidianTools.getTools();
 
-				// Call the conversation turn function to generate a new response
-				const finalAssistantMessageForTTS = await runConversationTurn(
-					systemPrompt,
-					tools,
-					signal
-				);
-				
-				await handleTTS(finalAssistantMessageForTTS, signal);
+					console.log(`🚀 Triggering conversation turn after edit`);
+					console.log(`🔧 Using ${tools.length} tools for mode: ${currentActiveMode?.ln_name || 'default'}`);
 
-				// Log completion/abort status
-				if (signal.aborted) {
-					console.log("Message edit processing was aborted");
-				} else {
-					console.log("Message edit processing completed");
+					// Call the core loop function
+					const finalAssistantMessageForTTS = await runConversationTurn(systemPrompt, tools, signal);
+					await handleTTS(finalAssistantMessageForTTS, signal);
+
+					// Logging completion or abortion status after the turn finishes
+					if (signal.aborted) {
+						console.log("Message edit processing was aborted.");
+					} else {
+						console.log("Message edit processing finished.");
+					}
+				} catch (error) {
+					console.error("Error processing conversation after edit:", error);
+					setIsGeneratingResponse(false);
 				}
-			} catch (error) {
-				console.error("Error during message edit processing:", error);
-				if (!(error instanceof APIUserAbortError)) {
-					new Notice(t('errors.setup', { error: error instanceof Error ? error.message : "Unknown error" }));
-				}
-				setIsGeneratingResponse(false);
 			}
 		},
 		[
+			conversationRef,
+			isGeneratingResponse,
+			setEditingMessage,
+			setForceUpdate,
 			getContext,
 			plugin,
 			runConversationTurn,
 			handleTTS,
-			isGeneratingResponse,
 			lnModesRef,
 			activeModeIdRef,
 		]
 	);
+
+	const startEditingMessage = useCallback((messageIndex: number) => {
+		// Check if index is valid and is a user message
+		if (messageIndex < 0 || messageIndex >= conversationRef.current.length) {
+			console.error(`Invalid message index for editing: ${messageIndex}`);
+			return;
+		}
+
+		const targetMessage = conversationRef.current[messageIndex];
+		if (targetMessage.role !== "user") {
+			console.error(`Can only edit user messages. Message at index ${messageIndex} has role: ${targetMessage.role}`);
+			return;
+		}
+
+		// Extract text content and images from the message
+		const contentBlocks = Array.isArray(targetMessage.content) ? targetMessage.content : [];
+		
+		const textContent = contentBlocks
+			.filter(block => block.type === 'text')
+			.map(block => (block as any).text || '')
+			.join('\n');
+		
+		const imageBlocks = contentBlocks.filter(block => block.type === 'image');
+		
+		const images = imageBlocks.map(block => {
+			const imageBlock = block as any;
+			if (imageBlock.source && imageBlock.source.data) {
+				return {
+					id: Math.random().toString(36).substring(2, 11),
+					name: `image.${imageBlock.source.media_type?.split('/')[1] || 'png'}`,
+					src: `data:${imageBlock.source.media_type || 'image/png'};base64,${imageBlock.source.data}`
+				};
+			}
+			return null;
+		}).filter(Boolean);
+
+		setEditingMessage({
+			index: messageIndex,
+			content: textContent,
+			images: images
+		});
+	}, []);
+
+	const cancelEditingMessage = useCallback(() => {
+		setEditingMessage(null);
+	}, []);
 
 	const value: AIAgentContextType = {
 		conversation: conversationRef.current,
@@ -989,6 +1069,9 @@ export const AIAgentProvider: React.FC<{
 		getContext,
 		reset: clearConversation,
 		isGeneratingResponse,
+		editingMessage,
+		startEditingMessage,
+		cancelEditingMessage,
 	};
 
 	return (

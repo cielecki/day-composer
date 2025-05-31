@@ -82,7 +82,8 @@ export const LifeNavigatorApp: React.FC = () => {
 		clearConversation,
 		isGeneratingResponse,
 		addUserMessage,
-		getContext
+		getContext,
+		editingMessage
 	} = useAIAgent();
 
 	// Use LNModes context
@@ -124,7 +125,14 @@ export const LifeNavigatorApp: React.FC = () => {
 
 	// Filter out user messages that contain only tool results
 	const filteredConversation = useMemo(() => {
-		return conversation.filter((message) => {
+		let conversationToFilter = conversation;
+		
+		// If editing, only show messages up to (but NOT including) the one being edited
+		if (editingMessage) {
+			conversationToFilter = conversation.slice(0, editingMessage.index);
+		}
+
+		return conversationToFilter.filter((message) => {
 			if (message.role === "assistant") {
 				return true;
 			}
@@ -147,7 +155,7 @@ export const LifeNavigatorApp: React.FC = () => {
 
 			return true;
 		});
-	}, [conversation]);
+	}, [conversation, editingMessage]);
 
 	// Create a mapping from filtered conversation indices to original conversation indices
 	const filteredToOriginalIndexMap = useMemo(() => {
@@ -801,6 +809,7 @@ export const LifeNavigatorApp: React.FC = () => {
 					<UnifiedInputArea
 						newAbortController={newAbortController}
 						abort={abort}
+						editingMessage={editingMessage}
 					/>
 				</div>
 			</div> }
