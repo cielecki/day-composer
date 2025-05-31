@@ -294,6 +294,7 @@
       "speak": "Przeczytaj na głos",
       "stopSpeech": "Zatrzymaj odtwarzanie",
       "generatingSpeech": "Generowanie mowy",
+      "recordingInProgress": "Nagrywanie w toku",
       "attachedImage": "Załączony obraz"
     },
     "todo": {

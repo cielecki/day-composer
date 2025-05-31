@@ -157,6 +157,7 @@ export const SpeechToTextProvider: React.FC<{
     } catch (error) {
       console.error('Error during transcription:', error);
 
+      setLastTranscription(null);
       // If not aborted, show error notice
       if (!transcriptionController.signal.aborted) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error during transcription';
@@ -176,6 +177,7 @@ export const SpeechToTextProvider: React.FC<{
       transcriptionAbortControllerRef.current.abort();
       transcriptionAbortControllerRef.current = null;
     }
+    setLastTranscription(null);
   }, []);
 
   const finalizeRecording = useCallback(async () => {

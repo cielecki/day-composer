@@ -7,6 +7,7 @@ import { ThinkingCollapsibleBlock, RedactedThinkingBlock as RedactedThinking, To
 import { getObsidianTools } from 'src/obsidian-tools';
 import { useAIAgent } from 'src/context/AIAgentContext';
 import { useTextToSpeech } from 'src/context/TextToSpeechContext';
+import { useSpeechToText } from 'src/context/SpeechToTextContext';
 import { t } from 'src/i18n';
 import { LucideIcon } from './LucideIcon';
 
@@ -44,6 +45,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
 }) => {
   const { editUserMessage } = useAIAgent();
   const { speakText, isPlayingAudio, isGeneratingSpeech, stopAudio } = useTextToSpeech();
+  const { isRecording } = useSpeechToText();
   const [isEditing, setIsEditing] = useState(false);
   const [editedMessage, setEditedMessage] = useState('');
   const [copyIcon, setCopyIcon] = useState('copy');
@@ -100,6 +102,12 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   // Handle speak message
   const handleSpeakMessage = () => {
     if (role === 'assistant') {
+      // Don't allow TTS if recording is active
+      if (isRecording) {
+        console.log("🚫 Cannot start TTS because recording is active");
+        return;
+      }
+      
       if (isPlayingAudio) {
         // If audio is already playing, stop it
         stopAudio();
@@ -314,10 +322,13 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
               {role === 'assistant' && (
                 <>
                   <button 
-                    className={`clickable-icon ${isPlayingAudio ? 'playing' : isGeneratingSpeech ? 'generating' : ''}`}
+                    className={`clickable-icon ${isPlayingAudio ? 'playing' : isGeneratingSpeech ? 'generating' : ''} ${isRecording ? 'disabled' : ''}`}
                     onClick={handleSpeakMessage}
+                    disabled={isRecording}
                     aria-label={
-                      isPlayingAudio 
+                      isRecording
+                        ? t('ui.message.recordingInProgress')
+                        : isPlayingAudio 
                           ? t('ui.message.stopSpeech') 
                           : isGeneratingSpeech 
                             ? t('ui.message.generatingSpeech') 

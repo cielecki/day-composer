@@ -72,11 +72,11 @@ export class LifeNavigatorView extends ItemView {
 		this.reactRoot.render(
 			<LNModeProvider app={this.app}>
 				<TextToSpeechProvider>
-					<AIAgentProvider plugin={this.props.plugin}>
-						<SpeechToTextProvider>
+					<SpeechToTextProvider>
+						<AIAgentProvider plugin={this.props.plugin}>
 							<LifeNavigatorApp />
-						</SpeechToTextProvider>
-					</AIAgentProvider>
+						</AIAgentProvider>
+					</SpeechToTextProvider>
 				</TextToSpeechProvider>
 			</LNModeProvider>
 		);

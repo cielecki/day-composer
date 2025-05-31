@@ -28,7 +28,7 @@ export const UnifiedInputArea: React.FC<{
     finalizeRecording,
     cancelTranscription,
   } = useSpeechToText();
-  const { isPlayingAudio, isGeneratingSpeech } = useTextToSpeech();
+  const { isPlayingAudio, isGeneratingSpeech, stopAudio } = useTextToSpeech();
 
   // Input state
   const [message, setMessage] = useState("");
@@ -61,8 +61,59 @@ export const UnifiedInputArea: React.FC<{
       !isTranscribing &&
       lastTranscription
     ) {
+      // Special case: If audio is playing, stop it and send the message automatically
+      if (isPlayingAudio || isGeneratingSpeech) {
+        console.log("Transcription completed during audio playback - stopping audio and auto-sending");
+        stopAudio();
+        
+        // Add the transcription to the message (in case there's already text in the input)
+        const newMessage = message.trim()
+          ? `${message} ${lastTranscription}`
+          : lastTranscription;
+        
+        // Immediately clear images to prevent flash before auto-send
+        const imagesToSend = [...attachedImages];
+        setAttachedImages([]);
+        
+        // Set the message and then send it in the next tick
+        setMessage(newMessage);
+        setTimeout(() => {
+          // Send the message with proper handling of both text and images
+          const messageToSend = newMessage;
+          
+          if (messageToSend.trim() === "" && imagesToSend.length === 0) {
+            return;
+          }
+
+          // Process any attached images
+          if (imagesToSend.length > 0) {
+            // Create a new message with text and attached images
+            const imageData = imagesToSend.map((img) => ({
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: img.src.split(";")[0].split(":")[1], // Extract MIME type
+                data: img.src.split(",")[1], // Extract base64 data without the prefix
+              },
+            }));
+
+            // Add the images to the message
+            addUserMessage(
+              messageToSend,
+              newAbortController().signal,
+              imageData,
+            );
+          } else {
+            // Just send text message
+            addUserMessage(messageToSend, newAbortController().signal);
+          }
+
+          // Reset state
+          setMessage("");
+        }, 10);
+      }
       // If nothing is being generated, send the transcription immediately
-      if (!isGeneratingResponse && !isRecording) {
+      else if (!isGeneratingResponse && !isRecording) {
         // Add the transcription to the message (in case there's already text in the input)
         const newMessage = message.trim()
           ? `${message} ${lastTranscription}`
@@ -139,7 +190,7 @@ export const UnifiedInputArea: React.FC<{
     }
     // Update ref with current value for next comparison
     prevIsTranscribingRef.current = isTranscribing;
-  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, message, addUserMessage, newAbortController, attachedImages]);
+  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, isPlayingAudio, isGeneratingSpeech, message, addUserMessage, newAbortController, attachedImages, stopAudio]);
 
   // Add ResizeObserver to ensure textarea is properly sized
   useEffect(() => {
@@ -433,6 +484,12 @@ export const UnifiedInputArea: React.FC<{
     } else if (isRecording) {
       finalizeRecording();
     } else {
+      // Stop any playing audio when starting to record
+      if (isPlayingAudio || isGeneratingSpeech) {
+        console.log("Stopping audio playback before starting recording");
+        stopAudio();
+      }
+      
       const controller = newAbortController();
       abortControllerRef.current = controller;
       startRecording(controller.signal);
@@ -442,10 +499,29 @@ export const UnifiedInputArea: React.FC<{
   // Handle cancel recording or transcription
   const handleCancelRecording = () => {
     if (isTranscribing) {
+      // Cancel transcription first
       cancelTranscription();
-    } else if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
     }
+    
+    // Cancel recording if active
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    
+    // Don't call the main abort() here as it handles different operations
+    // The recording/transcription cancellation should be handled separately
+    // from generation/audio playback cancellation
+  };
+
+  // Unified stop handler for all operations
+  const handleStopAll = () => {
+    // Stop recording/transcription first
+    if (isRecording || isTranscribing) {
+      handleCancelRecording();
+    }
+    
+    // Then stop generation/audio playback
     abort();
   };
 
@@ -621,67 +697,60 @@ export const UnifiedInputArea: React.FC<{
           {/* Right-aligned controls */}
           <div className="input-controls-right">
             {/* Microphone button to START recording - visible when message is empty and not currently recording */}
-            {message.trim() === "" && !isRecording && (
+            {message.trim() === "" && !isRecording && !isTranscribing && (
               <button
-                className={`input-control-button mic-button ${isTranscribing ? "transcribing" : ""}`}
+                className="input-control-button mic-button"
                 onClick={handleMicrophoneClick}
                 disabled={false}
-                aria-label={
-                  isTranscribing
-                    ? t("ui.recording.cancel")
-                    : t("ui.recording.start")
-                }
+                aria-label={t("ui.recording.start")}
               >
-                {isTranscribing ? (
-                  <LucideIcon
-                    name="loader"
-                    className="spinner"
-                    size={20}
-                  />
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                    <line
-                      x1="12"
-                      y1="19"
-                      x2="12"
-                      y2="22"
-                    ></line>
-                  </svg>
-                )}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  <line
+                    x1="12"
+                    y1="19"
+                    x2="12"
+                    y2="22"
+                  ></line>
+                </svg>
               </button>
             )}
 
-            {/* Buttons visible DURING recording - only the Stop/Finish Recording button */}
-            {isRecording && (
-              <button // This is the "Finish Recording" button
-                className={`input-control-button mic-button confirm ${isTranscribing ? "transcribing" : ""}`}
-                onClick={handleMicrophoneClick} // Calls finalizeRecording when isRecording is true, or cancels if transcribing
+            {isTranscribing && (
+              <button
+                className="input-control-button mic-button confirm transcribing"
+                onClick={handleCancelRecording}
                 disabled={false}
-                aria-label={
-                  isTranscribing
-                    ? t("ui.recording.cancel")
-                    : t("ui.recording.confirm") // Label for "Confirm Recording"
-                }
+                aria-label={t("ui.recording.cancel")}
               >
-                {isTranscribing ? (
-                  <LucideIcon
-                    name="loader"
-                    className="spinner"
-                    size={20}
+                <LucideIcon
+                  name="loader"
+                  className="spinner"
+                  size={20}
                   />
-                ) : ( // Check mark icon for "Confirm Recording"
+              </button>
+            )}
+            
+            {/* Button visible DURING recording - Finish Recording button */}
+            {isRecording && !isTranscribing && (
+              <>
+                <button // This is the "Finish Recording" button
+                  className="input-control-button mic-button confirm"
+                  onClick={finalizeRecording}
+                  disabled={false}
+                  aria-label={t("ui.recording.confirm")}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="20"
@@ -695,15 +764,15 @@ export const UnifiedInputArea: React.FC<{
                   >
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
-                )}
-              </button>
+                </button>
+              </>
             )}
 
-            {/* Stop button - visible whenever a response is being generated or audio is playing */}
+            {/* Stop button - visible for generation, audio playback, and transcription (but NOT basic recording) */}
             {(isGeneratingResponse || isPlayingAudio || isGeneratingSpeech) && !isRecording && (
               <button
                 className="input-control-button stop-button"
-                onClick={abort}
+                onClick={handleStopAll}
                 aria-label={t("ui.recording.stop")}
               >
                 <svg

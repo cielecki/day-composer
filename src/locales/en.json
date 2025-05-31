@@ -294,6 +294,7 @@
       "speak": "Read aloud",
       "stopSpeech": "Stop speech",
       "generatingSpeech": "Generating speech",
+      "recordingInProgress": "Recording in progress",
       "attachedImage": "Attached image"
     },
     "todo": {

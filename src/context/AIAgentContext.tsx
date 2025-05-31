@@ -12,6 +12,7 @@ import { getObsidianTools, ObsidianTool } from "../obsidian-tools";
 import { Notice } from "obsidian";
 import type MyPlugin from "../main";
 import { useTextToSpeech } from "./TextToSpeechContext";
+import { useSpeechToText } from "./SpeechToTextContext";
 import {
 	Message,
 	ContentBlock,
@@ -70,6 +71,7 @@ export const AIAgentProvider: React.FC<{
 	/* trunk-ignore(eslint/@typescript-eslint/no-unused-vars) */
 	const [_, setForceUpdate] = useState(0);
 	const textToSpeech = useTextToSpeech();
+	const { isRecording } = useSpeechToText();
 	const { activeModeIdRef, lnModesRef } = useLNMode();
 	const app = plugin.app;
 	const clearConversation = useCallback(() => {
@@ -759,6 +761,13 @@ export const AIAgentProvider: React.FC<{
 			signal: AbortSignal,
 		) => {
 			if (!finalAssistantMessageForTTS) return;
+			
+			// Skip automatic TTS if recording is active
+			if (isRecording) {
+				console.log("🚫 Skipping automatic TTS because recording is active");
+				return;
+			}
+			
 			const textForTTS = extractTextForTTS(
 				finalAssistantMessageForTTS.content as ContentBlock[],
 			);
@@ -785,7 +794,7 @@ export const AIAgentProvider: React.FC<{
 				}
 			}
 		},
-		[extractTextForTTS, textToSpeech, lnModesRef, activeModeIdRef],
+		[extractTextForTTS, textToSpeech, lnModesRef, activeModeIdRef, isRecording],
 	);
 
 	const addUserMessage = useCallback(
