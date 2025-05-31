@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { Anthropic, APIUserAbortError } from "@anthropic-ai/sdk";
 import { getPluginSettings } from "../settings/PluginSettings";
-import { getObsidianTools, ObsidianTool, NavigationTarget } from "../obsidian-tools";
+import { getObsidianTools, ObsidianTool } from "../obsidian-tools";
 import { Notice } from "obsidian";
 import type MyPlugin from "../main";
 import { useTextToSpeech } from "./TextToSpeechContext";
@@ -79,35 +79,16 @@ export const AIAgentProvider: React.FC<{
 	const app = plugin.app;
 	const clearConversation = useCallback(() => {
 		conversationRef.current = [];
-		navigationTargetsRef.current.clear();
 		setForceUpdate((prev) => prev + 1);
 	}, []);
-
-	// Store navigationTargets separately since they can't be sent to the Claude API
-	const navigationTargetsRef = useRef<Map<string, NavigationTarget[]>>(new Map());
 
 	const addUserOrToolResultMessage = useCallback(
 		(role: "user" | "assistant", content: string | ContentBlock[]) => {
 			// Ensure content is always ContentBlock[]
-			let contentBlocks: ContentBlock[] =
+			const contentBlocks: ContentBlock[] =
 				typeof content === "string"
 					? [{ type: "text", text: content }]
 					: ensureContentBlocks(content);
-			
-			// If this is a user message with tool results, add navigationTargets from our ref
-			if (role === "user" && Array.isArray(content)) {
-				contentBlocks = contentBlocks.map(block => {
-					if (block.type === "tool_result") {
-						const navigationTargets = navigationTargetsRef.current.get(block.tool_use_id);
-						return {
-							...block,
-							navigationTargets
-						} as ToolResultBlock;
-					}
-					return block;
-				});
-			}
-			
 			const newMessage: Message = { role, content: contentBlocks };
 			
 			// For assistant messages, ensure we update correctly to avoid duplicates when rebuilding conversation
@@ -695,17 +676,12 @@ export const AIAgentProvider: React.FC<{
 										toolUseBlock.name,
 										toolUseBlock.input,
 									);
-									
-									// Store navigationTargets separately for UI use
-									if (result.navigationTargets) {
-										navigationTargetsRef.current.set(toolUseBlock.id, result.navigationTargets);
-									}
-									
 									toolResults.push({
 										type: "tool_result",
 										tool_use_id: toolUseBlock.id,
 										content: result.result,
-										is_error: result.isError
+										is_error: result.isError,
+										navigationTargets: result.navigationTargets
 									});
 								} catch (error: any) {
 									toolResults.push({
