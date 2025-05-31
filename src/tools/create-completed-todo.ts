@@ -34,13 +34,13 @@ const schema = {
         description: "Optional completion time in HH:MM format. If not provided, current time will be used.",
       }
     },
-    required: ["comment"]
+    required: ["todo_text"]
   }
 };
 
 type CreateCompletedTodoToolInput = {
-  todo_text?: string,
-  comment: string,
+  todo_text: string,
+  comment?: string,
   file_path?: string,
   completion_time?: string
 }
@@ -49,9 +49,9 @@ export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput>
   specification: schema,
   icon: "check-square-2",
   getActionText: (input: CreateCompletedTodoToolInput, output: string, hasResult: boolean, hasError: boolean) => {
-    const contentPreview = input?.comment ? 
-      (input.comment.length > 20 ? input.comment.substring(0, 20) + '...' : input.comment) :
-      'entry';
+    const contentPreview = input?.todo_text ? 
+      (input.todo_text.length > 20 ? input.todo_text.substring(0, 20) + '...' : input.todo_text) :
+      '?';
     
     if (hasResult) {
       return hasError
@@ -63,7 +63,6 @@ export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput>
   },
   execute: async (plugin: MyPlugin, params: CreateCompletedTodoToolInput): Promise<ToolExecutionResult> => {
     try {
-      const { comment } = params;
       
       // Use "Note" as default description if not provided
       const description = params.todo_text || "Note";
@@ -99,7 +98,7 @@ export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput>
 
 
       // Add the content as a comment
-      appendComment(task, comment);
+      appendComment(task, params.comment);
 
       // Find the current spot for insertion
       const currentSpot = findCurrentSpot(note);

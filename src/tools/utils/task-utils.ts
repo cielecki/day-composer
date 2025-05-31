@@ -41,11 +41,16 @@ export const REVERSE_STATUS_MAP = {
  */
 export function addCommentToTask(
   task: Task,
-  comment: string,
+  comment: string | undefined,
   timestamp: string | null = null
 ): Task {
   // Create a copy to avoid modifying the original
   const updatedTask: Task = JSON.parse(JSON.stringify(task));
+  
+  // Skip if no comment provided
+  if (!comment) {
+    return updatedTask;
+  }
   
   // Format comment with timestamp if provided
   const formattedComment = timestamp
@@ -119,7 +124,12 @@ export function isCommentLine(line: string) {
   return line.startsWith("> ") || line.startsWith("    ") || line.startsWith("\t");
 }
 
-export function appendComment(task: Task, comment: string) {
+export function appendComment(task: Task, comment: string | undefined) {
+  // Handle undefined, null, or empty comment
+  if (!comment) {
+    return;
+  }
+  
   // Split the line into individual lines to handle multi-line comments properly
   const lines = comment.split('\n');
   
