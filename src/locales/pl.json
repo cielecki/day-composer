@@ -31,12 +31,15 @@
     "apiKeys": {
       "title": "Klucze API",
       "anthropic": "Klucz API Anthropic",
-      "anthropicDesc": "Twój klucz API Anthropic do głównej funkcjonalności asystenta AI. Zdobądź go z <a href='https://console.anthropic.com/settings/keys'>Konsoli Anthropic</a>.",
+      "anthropicDesc": "Twój klucz API Anthropic dla głównej funkcjonalności asystenta AI. Uzyskaj go z <a href='https://console.anthropic.com/settings/keys'>Konsoli Anthropic</a>.",
       "openai": "Klucz API OpenAI",
-      "openaiDesc": "Twój klucz API OpenAI do funkcji zamiany mowy na tekst. Zdobądź go z <a href='https://platform.openai.com/api-keys'>Platformy OpenAI</a>.",
+      "openaiDesc": "Twój klucz API OpenAI dla funkcjonalności zamiany tekstu na mowę. Uzyskaj go z <a href='https://platform.openai.com/api-keys'>Platformy OpenAI</a>.",
+      "firecrawl": "Klucz API Firecrawl",
+      "firecrawlDesc": "Twój klucz API Firecrawl dla funkcjonalności głębokich badań. Uzyskaj go z <a href='https://firecrawl.dev/'>Panelu Firecrawl</a>.",
       "enterAnthropicKey": "Wprowadź swój klucz API Anthropic",
       "enterOpenAIKey": "Wprowadź swój klucz API OpenAI",
-      "securityNote": "Ważne: Twój klucz API jest przechowywany w folderze konfiguracyjnym Obsidian. Nie udostępniaj swojego sejfu ani folderu konfiguracyjnego innym osobom, jeśli przechowujesz w nim swój klucz API."
+      "enterFirecrawlKey": "Wprowadź swój klucz API Firecrawl",
+      "securityNote": "Ważne: Twój klucz API jest przechowywany w folderze konfiguracyjnym Obsidian. Nie udostępniaj swojego vault'a ani folderu konfiguracyjnego innym, jeśli przechowujesz tutaj swój klucz API."
     },
     "advanced": {
       "title": "Ustawienia zaawansowane"
@@ -76,6 +79,42 @@
         "quotaExceeded": "Przekroczono limit API OpenAI. Proszę sprawdzić rozliczenia i limity użytkowania.",
         "invalidRequest": "Nieprawidłowe żądanie do API OpenAI: {{error}}",
         "general": "Błąd generowania obrazu: {{error}}"
+      }
+    },
+    "deepResearch": {
+      "success": "Głębokie badania zakończone pomyślnie",
+      "researching": "Prowadzenie głębokich badań na temat \"{{query}}\"...",
+      "headers": {
+        "results": "Wyniki Głębokich Badań",
+        "analysis": "Analiza Badawcza",
+        "sources": "Źródła",
+        "metadata": "Metadane Badań"
+      },
+      "labels": {
+        "query": "Zapytanie",
+        "maxDepth": "Maks. Głębokość",
+        "maxUrls": "Maks. URL-i",
+        "timeout": "Limit Czasu",
+        "sourcesFound": "Znalezione Źródła",
+        "completed": "Zakończono",
+        "url": "URL",
+        "source": "Źródło"
+      },
+      "result": {
+        "message": "Pomyślnie przeprowadzono głębokie badania na temat \"{{query}}\" i zapisano raport w {{path}}. Badania obejmowały {{sourceCount}} źródeł z {{maxDepth}} iteracjami głębokości.",
+        "navigationDescription": "Otwórz raport badawczy"
+      },
+      "errors": {
+        "emptyQuery": "Zapytanie badawcze nie może być puste",
+        "emptyPath": "Ścieżka pliku nie może być pusta",
+        "noApiKey": "Nie ustawiono klucza API Firecrawl. Proszę skonfigurować go w ustawieniach dla funkcjonalności głębokich badań.",
+        "quotaExceeded": "Przekroczono limit API Firecrawl. Proszę sprawdzić rozliczenia i limity użytkowania.",
+        "timeout": "Żądanie badawcze przekroczyło limit czasu. Spróbuj z bardziej konkretnym zapytaniem.",
+        "noResults": "Nie znaleziono odpowiednich informacji dla podanego zapytania.",
+        "libraryLoad": "Nie udało się załadować biblioteki Firecrawl",
+        "researchFailed": "Badania nie powiodły się",
+        "unknownError": "Wystąpił nieznany błąd podczas badań",
+        "general": "Błąd podczas prowadzenia głębokich badań: {{error}}"
       }
     },
     "tasks": {
@@ -159,7 +198,22 @@
       "alreadyInMode": "Już w trybie {{modeName}}. Zmiana nie jest potrzebna.",
       "switching": "Przełączanie na tryb {{modeName}}...",
       "failedToSwitch": "Nie udało się przełączyć na {{modeName}}",
-      "noDescription": "Brak dostępnego opisu"
+      "noDescription": "Brak dostępnego opisu",
+      "invalidModeId": "ID trybu jest wymagane i musi być ciągiem znaków"
+    },
+    "navigation": {
+      "openCreatedDocument": "Otwórz utworzony dokument",
+      "openReadDocument": "Otwórz przeczytany dokument",
+      "openAppendedDocument": "Otwórz zaktualizowany dokument", 
+      "openDownloadedTranscript": "Otwórz pobrany transkrypt",
+      "navigateToUncheckedTodo": "Przejdź do odkręconego zadania",
+      "navigateToEditedTodo": "Przejdź do edytowanego zadania",
+      "navigateToAbandonedTodo": "Przejdź do porzuconego zadania{{count}}",
+      "navigateToMovedTodo": "Przejdź do przeniesionego zadania{{count}}",
+      "navigateToCompletedTodo": "Przejdź do zakończonego zadania",
+      "navigateToRemovedTodo": "Przejdź do usuniętego zadania{{count}}",
+      "navigateToAddedTodo": "Przejdź do dodanego zadania{{count}}",
+      "navigateToCheckedTodo": "Przejdź do zakończonego zadania{{count}}"
     }
   },
   "errors": {

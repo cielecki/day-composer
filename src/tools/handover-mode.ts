@@ -83,7 +83,7 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 
 			// Validate input
 			if (!mode_id || typeof mode_id !== 'string') {
-				throw new ToolExecutionError("Mode ID is required and must be a string");
+				throw new ToolExecutionError(t("tools.handover.invalidModeId"));
 			}
 
 			// Check if the mode manager service is available

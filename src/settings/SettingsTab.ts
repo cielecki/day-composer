@@ -48,6 +48,20 @@ export class SampleSettingTab extends PluginSettingTab {
 		// Set HTML description to enable the link
 		openAISetting.descEl.innerHTML = t('settings.apiKeys.openaiDesc');
 
+		// Firecrawl API Key setting
+		const firecrawlSetting = new Setting(containerEl)
+			.setName(t('settings.apiKeys.firecrawl'))
+			.addText(text => text
+				.setPlaceholder(t('settings.apiKeys.enterFirecrawlKey'))
+				.setValue(settings.firecrawlApiKey)
+				.onChange(async (value) => {
+					settings.firecrawlApiKey = value;
+					await settings.saveSettings();
+				}));
+
+		// Set HTML description to enable the link
+		firecrawlSetting.descEl.innerHTML = t('settings.apiKeys.firecrawlDesc');
+
 		// Add a note about API key security
 		const securityNoteEl = containerEl.createEl('div', { 
 			cls: 'setting-item-description',

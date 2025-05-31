@@ -14,6 +14,7 @@ import { editTodoTool } from "./tools/edit-todo";
 import { removeTodoTool } from "./tools/remove-todo";
 import { downloadYoutubeTranscriptTool } from "./tools/download-youtube-transcript";
 import { generateImageTool } from "./tools/generate-image";
+import { deepResearchTool } from "./tools/deep-research";
 import { ToolExecutionError } from "./tools/utils/ToolExecutionError";
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tool-filter";
@@ -88,6 +89,7 @@ export class ObsidianTools {
 		removeTodoTool,
 		downloadYoutubeTranscriptTool,
 		generateImageTool,
+		deepResearchTool,
 	];
 
 	constructor(plugin: MyPlugin) {

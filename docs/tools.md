@@ -135,4 +135,68 @@ This allows you to create specialized modes that only have access to relevant to
 
 5. **Integration**: Tools work together seamlessly - you can search for content, read it, and then create new documents based on what you found
 
-For more information about configuring tool access in different modes, see the [tool-filtering documentation](tool-filtering.md). 
+For more information about configuring tool access in different modes, see the [tool-filtering documentation](tool-filtering.md).
+
+## Deep Research Tool
+
+The `deep_research` tool provides comprehensive web research capabilities using Firecrawl's AI-powered research engine. It automatically searches multiple sources, extracts relevant information, and synthesizes findings into detailed reports with proper citations.
+
+### Features
+
+- **Multi-source Research**: Automatically searches and analyzes multiple web sources
+- **AI-Powered Extraction**: Uses AI to extract relevant information from web pages
+- **Synthesis & Analysis**: Combines findings into comprehensive reports
+- **Source Citations**: Provides proper citations for all sources used
+- **Real-time Progress**: Shows research progress with activity indicators
+- **Configurable Parameters**: Adjust research depth, URL limits, and timeouts
+
+### Configuration
+
+Before using the deep research tool, you need to configure your Firecrawl API key:
+
+1. Go to [Firecrawl Dashboard](https://firecrawl.dev/) and sign up for an account
+2. Generate an API key from your dashboard
+3. In Obsidian, go to Settings → Life Navigator → API Keys
+4. Enter your Firecrawl API key in the "Firecrawl API Key" field
+
+### Usage
+
+The AI can use this tool automatically when you ask research-related questions. You can also explicitly request deep research:
+
+**Example prompts:**
+- "Conduct deep research on the latest developments in quantum computing"
+- "Research the current state of renewable energy adoption globally"
+- "Do a comprehensive analysis of remote work trends in 2024"
+
+### Parameters
+
+The tool accepts several optional parameters to customize the research:
+
+- **max_depth** (1-10, default: 3): Number of research iterations to perform
+- **max_urls** (5-50, default: 20): Maximum number of URLs to analyze
+- **timeout** (60-300 seconds, default: 180): Maximum time for research process
+
+### Output Format
+
+The tool generates structured reports with:
+
+1. **Research Analysis**: Comprehensive synthesis of findings
+2. **Sources**: List of all sources with titles, URLs, and descriptions
+3. **Research Metadata**: Query details, parameters used, and completion time
+4. **Research Process**: Log of research activities and progress
+
+### Error Handling
+
+The tool provides clear error messages for common issues:
+
+- **Missing API Key**: Prompts to configure Firecrawl API key in settings
+- **Quota Exceeded**: Indicates when API limits are reached
+- **Timeout**: Suggests using more specific queries for better results
+- **No Results**: Indicates when no relevant information is found
+
+### Best Practices
+
+1. **Be Specific**: More specific queries yield better results
+2. **Adjust Parameters**: Use higher depth for complex topics, lower for quick overviews
+3. **Monitor Usage**: Keep track of API usage to avoid quota limits
+4. **Review Sources**: Always verify important information from the provided sources

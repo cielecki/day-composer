@@ -15,25 +15,7 @@ import path from "path";
 import { getDefaultLNMode, mergeWithDefaultMode, DEFAULT_VOICE_INSTRUCTIONS } from "./defaults/ln-mode-defaults";
 import { STARTER_KIT_DATA } from "./generated/starter-kit-data";
 import { ConfirmReloadModal } from "./components/ConfirmReloadModal";
-
-/**
- * Generates a unique directory name by appending a number suffix if the directory already exists
- * @param app Obsidian app instance
- * @param baseName Base directory name
- * @returns Promise<string> Unique directory name
- */
-const generateUniqueDirectoryName = async (app: App, baseName: string): Promise<string> => {
-	let directoryName = baseName;
-	let counter = 2;
-
-	// Check if the base directory exists
-	while (app.vault.getAbstractFileByPath(directoryName)) {
-		directoryName = `${baseName} ${counter}`;
-		counter++;
-	}
-
-	return directoryName;
-};
+import { generateUniqueDirectoryName } from "./tools/utils/generateUniqueDirectoryName";
 
 /**
  * Recursively creates nested directories, ensuring parent directories exist first

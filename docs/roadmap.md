@@ -16,8 +16,8 @@ Add support for Gemini model from Google, and add a model selection option from 
 **User-Defined Tools:**
 Introduce the ability for the user to add extra tools to the system. Investigate methods for loading extra tools (e.g., eval, JSON, MCP). This could allow accessing calendar for example.
 
-**Deep Research Tool:**
-Implement a tool for deep research using firecrawl api.
+**Deep Research Tool:** ✅ COMPLETED
+Implement a tool for deep research using firecrawl api. Implemented as `deep_research` tool with configurable research depth, URL limits, and timeout settings.
 
 **Mode Settings Editor:**
 Create a comprehensive mode settings editor that allows users to configure all mode parameters through a user-friendly interface.

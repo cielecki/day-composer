@@ -3,6 +3,7 @@ import { modifyFile } from "./utils/modifyFile";
 import { readFile } from "./utils/readFile";
 import { getFile } from "./utils/getFile";
 import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
+import { t } from "../i18n";
 
 const schema = {
   name: "append_to_document",
@@ -63,10 +64,10 @@ export const appendToDocumentTool: ObsidianTool<AppendToDocumentToolInput> = {
       await modifyFile(file, newContent, plugin.app);
       
       return {
-        result: `Successfully appended content to ${path}`,
+        result: `Content appended to ${path}`,
         navigationTargets: [{
           filePath: path,
-          description: "Open appended document"
+          description: t("tools.navigation.openAppendedDocument")
         }]
       };
     } catch (error) {

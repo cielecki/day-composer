@@ -3,6 +3,7 @@ import { createFile } from "./utils/createFile";
 import { fileExists } from "./utils/fileExists";
 import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
+import { t } from "../i18n";
 
 const schema = {
   name: "create_document",
@@ -59,7 +60,7 @@ export const createDocumentTool: ObsidianTool<CreateDocumentToolInput> = {
       result: `Successfully created document at ${path}`,
       navigationTargets: [{
         filePath: path,
-        description: "Open created document"
+        description: t("tools.navigation.openCreatedDocument")
       }]
     };
   }

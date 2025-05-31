@@ -4,6 +4,7 @@ import { fileExists } from "./utils/fileExists";
 import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { requestUrl } from "obsidian";
+import { t } from "../i18n";
 
 const schema = {
   name: "download_youtube_transcript",
@@ -256,7 +257,7 @@ export const downloadYoutubeTranscriptTool: ObsidianTool<DownloadYoutubeTranscri
       // Create navigation target for the downloaded transcript
       const navigationTargets: NavigationTarget[] = [{
         filePath: path,
-        description: "Open downloaded transcript"
+        description: t("tools.navigation.openDownloadedTranscript")
       }];
 
       return {

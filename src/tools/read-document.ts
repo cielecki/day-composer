@@ -56,7 +56,7 @@ export const readDocumentTool: ObsidianTool<ReadDocumentToolInput> = {
         result: content,
         navigationTargets: [{
           filePath: path,
-          description: "Open read document"
+          description: t("tools.navigation.openReadDocument")
         }]
       };
     } catch (error) {

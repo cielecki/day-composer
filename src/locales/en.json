@@ -34,8 +34,11 @@
       "anthropicDesc": "Your Anthropic API key for the main AI assistant functionality. Get it from <a href='https://console.anthropic.com/settings/keys'>Anthropic Console</a>.",
       "openai": "OpenAI API Key",
       "openaiDesc": "Your OpenAI API key for text-to-speech functionality. Get it from <a href='https://platform.openai.com/api-keys'>OpenAI Platform</a>.",
+      "firecrawl": "Firecrawl API Key",
+      "firecrawlDesc": "Your Firecrawl API key for deep research functionality. Get it from <a href='https://firecrawl.dev/'>Firecrawl Dashboard</a>.",
       "enterAnthropicKey": "Enter your Anthropic API key",
       "enterOpenAIKey": "Enter your OpenAI API key",
+      "enterFirecrawlKey": "Enter your Firecrawl API key",
       "securityNote": "Important: Your API key is stored in your Obsidian config folder. Do not share your vault or config folder with others if you store your API key here."
     },
     "advanced": {
@@ -76,6 +79,42 @@
         "quotaExceeded": "OpenAI API quota exceeded. Please check your billing and usage limits.",
         "invalidRequest": "Invalid request to OpenAI API: {{error}}",
         "general": "Error generating image: {{error}}"
+      }
+    },
+    "deepResearch": {
+      "success": "Deep research completed successfully",
+      "researching": "Conducting deep research on \"{{query}}\"...",
+      "headers": {
+        "results": "Deep Research Results",
+        "analysis": "Research Analysis",
+        "sources": "Sources",
+        "metadata": "Research Metadata"
+      },
+      "labels": {
+        "query": "Query",
+        "maxDepth": "Max Depth",
+        "maxUrls": "Max URLs",
+        "timeout": "Timeout",
+        "sourcesFound": "Sources Found",
+        "completed": "Completed",
+        "url": "URL",
+        "source": "Source"
+      },
+      "result": {
+        "message": "Successfully conducted deep research on \"{{query}}\" and saved report to {{path}}. Research included {{sourceCount}} sources with {{maxDepth}} depth iterations.",
+        "navigationDescription": "Open research report"
+      },
+      "errors": {
+        "emptyQuery": "Research query cannot be empty",
+        "emptyPath": "File path cannot be empty",
+        "noApiKey": "Firecrawl API Key not set. Please configure it in settings for deep research functionality.",
+        "quotaExceeded": "Firecrawl API quota exceeded. Please check your billing and usage limits.",
+        "timeout": "Research request timed out. Please try with a more specific query.",
+        "noResults": "No relevant information found for the given query.",
+        "libraryLoad": "Failed to load Firecrawl library",
+        "researchFailed": "Research failed",
+        "unknownError": "Unknown error occurred during research",
+        "general": "Error conducting deep research: {{error}}"
       }
     },
     "tasks": {
@@ -159,7 +198,22 @@
       "alreadyInMode": "Already in {{modeName}} mode. No change needed.",
       "switching": "Switching to {{modeName}} mode...",
       "failedToSwitch": "Failed to switch to {{modeName}}",
-      "noDescription": "No description available"
+      "noDescription": "No description available",
+      "invalidModeId": "Mode ID is required and must be a string"
+    },
+    "navigation": {
+      "openCreatedDocument": "Open created document",
+      "openReadDocument": "Open read document", 
+      "openAppendedDocument": "Open appended document",
+      "openDownloadedTranscript": "Open downloaded transcript",
+      "navigateToUncheckedTodo": "Navigate to unchecked todo",
+      "navigateToEditedTodo": "Navigate to edited todo",
+      "navigateToAbandonedTodo": "Navigate to abandoned todo{{count}}",
+      "navigateToMovedTodo": "Navigate to moved todo{{count}}",
+      "navigateToCompletedTodo": "Navigate to completed todo",
+      "navigateToRemovedTodo": "Navigate to removed todo{{count}}",
+      "navigateToAddedTodo": "Navigate to added todo{{count}}",
+      "navigateToCheckedTodo": "Navigate to checked todo{{count}}"
     }
   },
   "errors": {

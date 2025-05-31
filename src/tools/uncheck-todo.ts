@@ -87,7 +87,7 @@ export const uncheckTodoTool: ObsidianTool<UncheckTodoToolInput> = {
       note,
       [task],
       filePath,
-      `Navigate to unchecked todo`
+      t('tools.navigation.navigateToUncheckedTodo')
     );
 
     const resultMessage = t('tools.success.uncheck', {

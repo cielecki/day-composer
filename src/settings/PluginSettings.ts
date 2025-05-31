@@ -12,6 +12,7 @@ export interface TutorialSettings {
 export class PluginSettings {
 	openAIApiKey = '';
 	anthropicApiKey = '';
+	firecrawlApiKey = '';
 	speechToTextPrompt = '';
 	activeModeId = '';
 	tutorial: TutorialSettings = {
@@ -29,6 +30,7 @@ export class PluginSettings {
 
         this.openAIApiKey = data?.openAIApiKey ?? '';
         this.anthropicApiKey = data?.anthropicApiKey ?? '';
+        this.firecrawlApiKey = data?.firecrawlApiKey ?? '';
         this.speechToTextPrompt = data?.speechToTextPrompt ?? '';
         this.activeModeId = data?.activeModeId ?? '';
         
@@ -50,6 +52,7 @@ export class PluginSettings {
         const settingsToSave = {
             openAIApiKey: this.openAIApiKey,
             anthropicApiKey: this.anthropicApiKey,
+            firecrawlApiKey: this.firecrawlApiKey,
             speechToTextPrompt: this.speechToTextPrompt,
             activeModeId: this.activeModeId,
             tutorial: this.tutorial,
