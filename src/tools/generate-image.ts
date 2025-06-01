@@ -117,7 +117,6 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
         prompt: prompt,
         size: size,
         quality: quality,
-        response_format: "b64_json",
         n: 1
       });
 
