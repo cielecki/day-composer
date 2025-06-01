@@ -198,12 +198,15 @@
     },
     "deepResearch": {
       "errors": {
+        "aborted": "Operacja badawcza została anulowana przez użytkownika",
         "emptyPath": "Ścieżka pliku nie może być pusta",
         "emptyQuery": "Zapytanie badawcze nie może być puste",
         "general": "Błąd podczas prowadzenia głębokich badań: {{error}}",
+        "libraryLoad": "Nie udało się załadować biblioteki Firecrawl",
         "noApiKey": "Nie ustawiono klucza API Firecrawl. Proszę skonfigurować go w ustawieniach dla funkcjonalności głębokich badań.",
         "noResults": "Nie znaleziono odpowiednich informacji dla podanego zapytania.",
         "quotaExceeded": "Przekroczono limit API Firecrawl. Proszę sprawdzić rozliczenia i limity użytkowania.",
+        "researchFailed": "Operacja badawcza nie powiodła się",
         "timeout": "Żądanie badawcze przekroczyło limit czasu. Spróbuj z bardziej konkretnym zapytaniem.",
         "unknownError": "Wystąpił nieznany błąd podczas badań"
       },
@@ -224,6 +227,7 @@
         "url": "URL"
       },
       "preparing": "Badanie \"{{query}}\"",
+      "preparingGeneric": "Przygotowywanie badań...",
       "progress": {
         "loading": "Ładowanie biblioteki Firecrawl...",
         "processing": "Przetwarzanie wyników badań...",
@@ -232,16 +236,19 @@
         "validating": "Walidacja parametrów badawczych..."
       },
       "researching": "Prowadzenie głębokich badań na temat \"{{query}}\"...",
+      "researchingGeneric": "Prowadzenie głębokich badań...",
       "result": {
         "message": "Pomyślnie przeprowadzono głębokie badania na temat \"{{query}}\" i zapisano raport w {{path}}. Badania obejmowały {{sourceCount}} źródeł z {{maxDepth}} iteracjami głębokości.",
         "navigationDescription": "Otwórz raport badawczy"
       },
-      "success": "Głębokie badania zakończone pomyślnie"
+      "success": "Głębokie badania zakończone pomyślnie",
+      "successWithQuery": "Głębokie badania zakończone pomyślnie dla \"{{query}}\""
     },
     "findFilesByTag": {
       "errors": {
         "general": "Błąd podczas wyszukiwania plików według tagu: {{error}}",
-        "tagRequired": "Parametr tagu jest wymagany"
+        "tagRequired": "Parametr tagu jest wymagany",
+        "unknown": "Wystąpił nieznany błąd"
       },
       "navigation": {
         "description": "Przejdź do pliku {{index}}: {{name}}"
@@ -265,13 +272,14 @@
     },
     "generateImage": {
       "errors": {
+        "aborted": "Generowanie obrazu zostało anulowane przez użytkownika",
         "emptyPath": "Ścieżka obrazu nie może być pusta",
         "emptyPrompt": "Prompt obrazu nie może być pusty",
         "fileExists": "Plik już istnieje w {{path}}. Proszę wybrać inną ścieżkę lub usunąć istniejący plik.",
-        "general": "Błąd generowania obrazu: {{error}}",
+        "general": "Błąd podczas generowania obrazu: {{error}}",
         "invalidRequest": "Nieprawidłowe żądanie do API OpenAI: {{error}}",
-        "noApiKey": "Nie ustawiono klucza API OpenAI. Proszę skonfigurować go w ustawieniach do generowania obrazów.",
-        "noBase64Data": "Otrzymano nieprawidłowy format danych obrazu z API OpenAI",
+        "noApiKey": "Nie ustawiono klucza API OpenAI. Proszę skonfigurować go w ustawieniach dla generowania obrazów.",
+        "noBase64Data": "Nieprawidłowy format danych obrazu otrzymany z API OpenAI",
         "noImageData": "Nie otrzymano danych obrazu z API OpenAI",
         "quotaExceeded": "Przekroczono limit API OpenAI. Proszę sprawdzić rozliczenia i limity użytkowania."
       },

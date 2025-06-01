@@ -198,12 +198,15 @@
     },
     "deepResearch": {
       "errors": {
+        "aborted": "Research operation was cancelled by user",
         "emptyPath": "File path cannot be empty",
         "emptyQuery": "Research query cannot be empty",
         "general": "Error conducting deep research: {{error}}",
+        "libraryLoad": "Failed to load Firecrawl library",
         "noApiKey": "Firecrawl API Key not set. Please configure it in settings for deep research functionality.",
         "noResults": "No relevant information found for the given query.",
         "quotaExceeded": "Firecrawl API quota exceeded. Please check your billing and usage limits.",
+        "researchFailed": "Research operation failed",
         "timeout": "Research request timed out. Please try with a more specific query.",
         "unknownError": "Unknown error occurred during research"
       },
@@ -224,6 +227,7 @@
         "url": "URL"
       },
       "preparing": "Research \"{{query}}\"",
+      "preparingGeneric": "Preparing research...",
       "progress": {
         "loading": "Loading Firecrawl library...",
         "processing": "Processing research results...",
@@ -232,16 +236,19 @@
         "validating": "Validating research parameters..."
       },
       "researching": "Conducting deep research on \"{{query}}\"...",
+      "researchingGeneric": "Conducting deep research...",
       "result": {
         "message": "Successfully conducted deep research on \"{{query}}\" and saved report to {{path}}. Research included {{sourceCount}} sources with {{maxDepth}} depth iterations.",
         "navigationDescription": "Open research report"
       },
-      "success": "Deep research completed successfully"
+      "success": "Deep research completed successfully",
+      "successWithQuery": "Deep research completed successfully for \"{{query}}\""
     },
     "findFilesByTag": {
       "errors": {
         "general": "Error finding files by tag: {{error}}",
-        "tagRequired": "Tag parameter is required"
+        "tagRequired": "Tag parameter is required",
+        "unknown": "Unknown error occurred"
       },
       "navigation": {
         "description": "Navigate to file {{index}}: {{name}}"
@@ -265,6 +272,7 @@
     },
     "generateImage": {
       "errors": {
+        "aborted": "Image generation was cancelled by user",
         "emptyPath": "Image path cannot be empty",
         "emptyPrompt": "Image prompt cannot be empty",
         "fileExists": "File already exists at {{path}}. Please choose a different path or delete the existing file.",

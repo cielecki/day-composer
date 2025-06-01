@@ -245,6 +245,59 @@ function extractUsedKeys() {
         }
       }
       
+      // Additional pattern: Look for nested t() calls within other function calls
+      // This handles cases like: t('outer.key', { error: t('inner.key') })
+      const nestedTCallRegex = /\bt\s*\(\s*[^)]*?\bt\s*\(\s*(['"`])([^'"`\n]+?)\1[^)]*\)[^)]*\)/g;
+      while ((match = nestedTCallRegex.exec(content)) !== null) {
+        const key = match[2];
+        const lineNumber = content.substring(0, match.index).split('\n').length;
+        
+        if (isValidTranslationKey(key)) {
+          usedKeys.add(key);
+          if (!keyUsageMap.has(key)) {
+            keyUsageMap.set(key, []);
+          }
+          keyUsageMap.get(key).push({
+            file: relativePath,
+            line: lineNumber,
+            call: `nested t() call: ${match[0].trim()}`
+          });
+        }
+      }
+      
+      // Enhanced pattern: Find all t() calls in a line (to catch multiple nested calls)
+      const lines = content.split('\n');
+      lines.forEach((line, lineIndex) => {
+        if (line.includes('t(')) {
+          const simpleCallRegex = /\bt\s*\(\s*(['"`])([^'"`\n]+?)\1/g;
+          let simpleMatch;
+          
+          while ((simpleMatch = simpleCallRegex.exec(line)) !== null) {
+            const key = simpleMatch[2];
+            
+            if (isValidTranslationKey(key)) {
+              usedKeys.add(key);
+              if (!keyUsageMap.has(key)) {
+                keyUsageMap.set(key, []);
+              }
+              
+              // Check if this key is already tracked for this line
+              const existingEntry = keyUsageMap.get(key).find(entry => 
+                entry.file === relativePath && entry.line === lineIndex + 1
+              );
+              
+              if (!existingEntry) {
+                keyUsageMap.get(key).push({
+                  file: relativePath,
+                  line: lineIndex + 1,
+                  call: `t('${key}')`
+                });
+              }
+            }
+          }
+        }
+      });
+      
       // Also check for template literals that might contain translation keys
       const templateLiteralRegex = /\bt\s*\(\s*`([^`\n]+?)`[^)]*\)/g;
       while ((match = templateLiteralRegex.exec(content)) !== null) {

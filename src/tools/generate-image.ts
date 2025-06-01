@@ -64,8 +64,11 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
     }
   },
   execute: async (context: ToolExecutionContext<GenerateImageToolInput>): Promise<void> => {
-    const { plugin, params } = context;
+    const { plugin, params, signal } = context;
     const { prompt, path, size = "1024x1024", quality = "auto" } = params;
+
+    // Check abort signal at start
+    if (signal.aborted) throw new ToolExecutionError(t('tools.generateImage.errors.aborted'));
 
     // Validate inputs
     if (!prompt || prompt.trim().length === 0) {
@@ -96,6 +99,9 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
       throw new ToolExecutionError(t('tools.generateImage.errors.noApiKey'));
     }
 
+    // Check abort signal before starting generation
+    if (signal.aborted) throw new ToolExecutionError(t('tools.generateImage.errors.aborted'));
+
     try {
       // Create OpenAI client
       const openai = new OpenAI({
@@ -107,14 +113,19 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
         prompt: prompt.substring(0, 50) + (prompt.length > 50 ? '...' : '') 
       }));
 
-      // Generate image using GPT-4o image model
+      // Generate image using GPT-4o image model with abort signal
       const response = await openai.images.generate({
         model: "gpt-image-1",
         prompt: prompt,
         size: size,
         quality: quality,
         n: 1
+      }, {
+        signal
       });
+
+      // Check abort signal after API call
+      if (signal.aborted) throw new ToolExecutionError(t('tools.generateImage.errors.aborted'));
 
       if (!response.data || response.data.length === 0) {
         throw new ToolExecutionError(t('tools.generateImage.errors.noImageData'));
@@ -127,16 +138,22 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
 
       context.progress(t('tools.generateImage.progress.processing'));
 
+      // Check abort signal before processing
+      if (signal.aborted) throw new ToolExecutionError(t('tools.generateImage.errors.aborted'));
+
       // Convert base64 to binary
       const imageBuffer = Buffer.from(imageData.b64_json, 'base64');
 
       context.progress(t('tools.generateImage.progress.saving'));
-  
+
       // Ensure directory exists
       const directoryPath = normalizedPath.substring(0, normalizedPath.lastIndexOf('/'));
       if (directoryPath) {
         await ensureDirectoryExists(directoryPath, plugin.app);
       }
+
+      // Check abort signal one more time before final save
+      if (signal.aborted) throw new ToolExecutionError(t('tools.generateImage.errors.aborted'));
 
       // Create the binary file using Obsidian's vault API
       await plugin.app.vault.createBinary(normalizedPath, imageBuffer);
@@ -151,6 +168,12 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
 
     } catch (error: any) {
       console.error('Error generating image:', error);
+      
+      // Handle abort errors specifically - throw ToolExecutionError for user-facing message
+      if (error.name === 'AbortError' || signal.aborted) {
+        console.log('Image generation was aborted');
+        throw new ToolExecutionError(t('tools.generateImage.errors.aborted'));
+      }
       
       if (error instanceof ToolExecutionError) {
         throw error;
