@@ -28,7 +28,7 @@ import { MessageCreateParamsStreaming } from "@anthropic-ai/sdk/resources/messag
 import { t } from '../i18n';
 import { getDefaultLNMode, resolveAutoModel } from "../utils/mode/ln-mode-defaults";
 import { ConversationDatabase } from "../services/conversation-database";
-import { Conversation } from '../utils/chat/conversation_';
+import { Conversation } from '../utils/chat/conversation';
 import { generateConversationId } from "../utils/chat/generate-conversation-id";
 import { App } from "obsidian";
 import { DEFAULT_VOICE_INSTRUCTIONS } from "../utils/mode/ln-mode-defaults";

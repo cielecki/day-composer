@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ConversationDatabase } from '../services/conversation-database';
-import { ConversationMeta } from '../utils/chat/conversation_';
+import { ConversationMeta } from '../utils/chat/conversation';
 import { LucideIcon } from './LucideIcon';
 
 interface ConversationHistoryDropdownProps {

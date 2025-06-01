@@ -5,7 +5,7 @@ import { App, normalizePath } from 'obsidian';
 import { generateConversationTitle } from '../utils/chat/generate-conversation-title';
 import { ensureDirectoryExists } from '../utils/fs/ensure-directory-exists';
 import { escapeFilename } from '../utils/fs/escape-filename';
-import { Conversation, StoredConversation, CURRENT_SCHEMA_VERSION, ConversationMeta } from '../utils/chat/conversation_';
+import { Conversation, StoredConversation, CURRENT_SCHEMA_VERSION, ConversationMeta } from '../utils/chat/conversation';
 import { chatFileNameToIdAndTitle } from '../utils/chat/chat-file-name-to-id-and-title';
 
 
