@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { ContentBlock } from 'src/types/types';
-import { NavigationTarget } from 'src/obsidian-tools';
+import { ContentBlock } from '../utils/chat/types';
+import { NavigationTarget } from '../obsidian-tools';
 import { ThinkingCollapsibleBlock, RedactedThinkingBlock as RedactedThinking, ToolBlock } from './CollapsibleBlock';
-import { getObsidianTools } from 'src/obsidian-tools';
-import { useAIAgent } from 'src/context/AIAgentContext';
-import { useTextToSpeech } from 'src/context/TextToSpeechContext';
-import { useSpeechToText } from 'src/context/SpeechToTextContext';
-import { t } from 'src/i18n';
+import { getObsidianTools } from '../obsidian-tools';
+import { useAIAgent } from '../context/AIAgentContext';
+import { useTextToSpeech } from '../context/TextToSpeechContext';
+import { useSpeechToText } from '../context/SpeechToTextContext';
+import { t } from '../i18n';
 import { LucideIcon } from './LucideIcon';
 
 interface MessageDisplayProps {

@@ -1,12 +1,12 @@
 import MyPlugin from "../main";
 import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
 import { findTaskByDescription, updateNote, readNote } from "../utils/tools/note-utils";
-import { getDailyNotePath } from "../utils/tools/get-daily-note-path";
-import { getCurrentTime } from "../utils/tools/get-current-time";
-import { appendComment, Task } from "../utils/tools/task-utils";
+import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
+import { getCurrentTime } from "../utils/time/get-current-time";
+import { appendComment, Task } from "../utils/task/task-utils";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { validateTasks } from "../utils/tools/task-validation";
-import { moveTaskToPosition } from "../utils/tools/move-task-to-position";
+import { validateTasks } from "../utils/task/task-validation";
+import { moveTaskToPosition } from "../utils/task/move-task-to-position";
 import { createNavigationTargetsForTasks } from "../utils/tools/line-number-utils";
 import { t } from "../i18n";
 

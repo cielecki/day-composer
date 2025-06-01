@@ -1,8 +1,8 @@
-import { Note } from "./note-utils";
+import { Note } from "../tools/note-utils";
 import { Task } from "./task-utils";
-import { determineInsertionPosition } from "./note-utils";
-import { insertTaskAtPosition } from "./task-utils";
-import { removeTaskFromDocument } from "./task-utils";
+import { determineInsertionPosition } from "../tools/note-utils";
+import { insertTaskAtPosition } from "../task/task-utils";
+import { removeTaskFromDocument } from "../task/task-utils";
 
 /**
  * Move a task to a specified position in a document

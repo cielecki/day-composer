@@ -1,4 +1,4 @@
-import { LNMode } from "src/types/types";
+import { LNMode } from '../mode/LNMode';
 
 export function generateFallbackTitle(userMessage: string, mode?: LNMode): string {
     const modePrefix = mode?.ln_name || "Chat";

@@ -1,5 +1,5 @@
 import * as yaml from 'js-yaml';
-import { LNMode } from '../../types/types';
+import { LNMode } from './LNMode';
 
 // Define a type for frontmatter properties to avoid using 'any'
 type FrontmatterValue = string | number | boolean | string[] | undefined;

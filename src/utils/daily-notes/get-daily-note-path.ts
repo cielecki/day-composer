@@ -1,7 +1,8 @@
 import { App } from "obsidian";
 import { getDailyNotesSettings } from "./get-daily-notes-settings";
-import { getFormattedDate } from "./get-formatted-date";
+import { getFormattedDate } from "../time/get-formatted-date";
 import { normalizePath } from "obsidian";
+import moment from "moment";
 
 /**
  * Gets the path to today's daily note

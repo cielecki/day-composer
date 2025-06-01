@@ -1,7 +1,7 @@
 import { App, TFile } from "obsidian";
 import { t } from '../../i18n';
 import { convertToValidTagName } from '../text/xml-tag-converter';
-import { getCurrentChatContent } from '../content/chat-content-extractor';
+import { getCurrentChatContent } from '../chat/chat-content-extractor';
 import { findDailyNotesByDate } from '../fs/daily-note-finder';
 
 declare global {

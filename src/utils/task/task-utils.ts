@@ -1,5 +1,5 @@
-import { ToolExecutionError } from "./tool-execution-error";
-import { Note } from "./note-utils";
+import { ToolExecutionError } from "../tools/tool-execution-error";
+import { Note } from "../tools/note-utils";
 import { t } from "../../i18n";
 
 export interface Task {

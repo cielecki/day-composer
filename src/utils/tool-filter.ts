@@ -1,5 +1,5 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { LNMode } from "../types/types";
+import { LNMode } from './mode/LNMode';
 
 /**
  * Simple wildcard pattern matching

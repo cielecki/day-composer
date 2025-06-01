@@ -7,7 +7,7 @@ import React, {
 	useCallback,
 	useRef,
 } from "react";
-import { LNMode } from "../types/types";
+import { LNMode } from '../utils/mode/LNMode';
 import { App, TFile, EventRef } from "obsidian";
 import {
 	mergeWithDefaultMode,

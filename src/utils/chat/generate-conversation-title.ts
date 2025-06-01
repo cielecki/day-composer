@@ -1,13 +1,18 @@
-import { getPluginSettings } from "src/settings/PluginSettings";
-import { Message, LNMode } from "src/types/types";
+import { getPluginSettings } from "../../settings/PluginSettings";
+import { Message } from "./types";
+import { LNMode } from '../mode/LNMode';
+import { getFirstUserMessage } from "./get-first-user-message";
+import { getFirstAssistantMessage } from "./get-first-assistant-message";
+import { generateAITitle } from "./generate-aititle";
+import { generateFallbackTitle } from "./generate-fallback-title";
 
 
 export async function generateConversationTitle(
     messages: Message[],
     mode?: LNMode
 ): Promise<string> {
-    const userMessage = this.getFirstUserMessage(messages);
-    const assistantMessage = this.getFirstAssistantMessage(messages);
+    const userMessage = getFirstUserMessage(messages);
+    const assistantMessage = getFirstAssistantMessage(messages);
 
     if (!userMessage) {
         return mode?.ln_name ? `${mode.ln_name}: New Chat` : "New Chat";
@@ -17,7 +22,7 @@ export async function generateConversationTitle(
     try {
         const settings = getPluginSettings();
         if (settings.anthropicApiKey && assistantMessage) {
-            const aiTitle = await this.generateAITitle(userMessage, assistantMessage, mode);
+            const aiTitle = await generateAITitle(userMessage, assistantMessage, mode);
             if (aiTitle) return aiTitle;
         }
     } catch (error) {
@@ -25,5 +30,5 @@ export async function generateConversationTitle(
     }
 
     // Fallback to rule-based naming
-    return this.generateFallbackTitle(userMessage, mode);
+    return generateFallbackTitle(userMessage, mode);
 }

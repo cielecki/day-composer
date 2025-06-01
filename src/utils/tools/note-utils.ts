@@ -1,14 +1,14 @@
 import MyPlugin from "../../main";
 import { App, TFile } from "obsidian";
-import { fileExists } from "./file-exists";
-import { getFile } from "./get-file";
-import { modifyFile } from "./modify-file";
+import { fileExists } from "../fs/file-exists";
+import { getFile } from "../fs/get-file";
+import { modifyFile } from "../fs/modify-file";
 import {
 	appendComment,
 	isCommentLine,
 	STATUS_MAP,
 	Task,
-} from "./task-utils";
+} from "../task/task-utils";
 import { ToolExecutionError } from "./tool-execution-error";
 import { formatMarkdown } from "./format-markdown";
 import { t } from "../../i18n";

@@ -3,7 +3,7 @@ import { Notice, moment } from 'obsidian';
 import { getPluginSettings } from '../settings/PluginSettings';
 import OpenAI from 'openai';
 import { t } from '../i18n';
-import { expandLinks } from '../utils/content/link-expander';
+import { expandLinks } from '../utils/links/link-expander';
 
 const MAX_AUDIO_PROMPT_LENGTH = 5000;
 

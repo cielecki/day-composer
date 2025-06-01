@@ -1,5 +1,5 @@
 import { Note } from "./note-utils";
-import { Task } from "./task-utils";
+import { Task } from "../task/task-utils";
 import { NavigationTarget } from "../../obsidian-tools";
 
 /**

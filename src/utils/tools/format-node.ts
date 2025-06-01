@@ -1,4 +1,4 @@
-import { formatTask } from "./task-utils";
+import { formatTask } from "../task/task-utils";
 import { NoteNode } from "./note-utils";
 
 /**

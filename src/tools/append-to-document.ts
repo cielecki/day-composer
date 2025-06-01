@@ -1,7 +1,7 @@
 import MyPlugin from "../main";
-import { modifyFile } from "../utils/tools/modify-file";
+import { modifyFile } from "../utils/fs/modify-file";
 import { readFile } from "../utils/fs/read-file";
-import { getFile } from "../utils/tools/get-file";
+import { getFile } from "../utils/fs/get-file";
 import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
 import { t } from "../i18n";
 

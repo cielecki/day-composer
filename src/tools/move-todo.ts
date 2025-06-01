@@ -1,12 +1,12 @@
 import MyPlugin from "../main";
 import { createFile } from "../utils/fs/create-file";
-import { fileExists } from "../utils/tools/file-exists";
+import { fileExists } from "../utils/fs/file-exists";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
 import { readNote, updateNote, Note, findTaskByDescription, determineInsertionPosition } from "../utils/tools/note-utils";
-import { insertTaskAtPosition, Task } from "../utils/tools/task-utils";
-import { moveTaskToPosition } from "../utils/tools/move-task-to-position";
-import { validateTasks } from "../utils/tools/task-validation";
+import { insertTaskAtPosition, Task } from "../utils/task/task-utils";
+import { moveTaskToPosition } from "../utils/task/move-task-to-position";
+import { validateTasks } from "../utils/task/task-validation";
 import { createNavigationTargetsForTasks, createNavigationTarget, findTaskLineNumbers } from "../utils/tools/line-number-utils";
 import { t } from "../i18n";
 

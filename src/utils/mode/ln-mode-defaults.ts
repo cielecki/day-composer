@@ -1,4 +1,4 @@
-import { LNMode } from "../../types/types";
+import { LNMode } from './LNMode';
 import { TTS_VOICES, TTSVoice } from "../../settings/PluginSettings";
 
 // Available Anthropic models

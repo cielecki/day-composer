@@ -1,4 +1,4 @@
-import { LNMode } from "../types/types";
+import { LNMode } from '../utils/mode/LNMode';
 
 /**
  * Singleton service that provides external access to mode management

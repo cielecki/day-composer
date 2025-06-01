@@ -8,7 +8,7 @@ import { resetObsidianTools } from "./obsidian-tools";
 import { LIFE_NAVIGATOR_VIEW_TYPE, LifeNavigatorView } from "./life-navigator-view";
 import { getObsidianTools } from "./obsidian-tools";
 import { initI18n, t } from "./i18n";
-import { LNMode } from "./types/types";
+import { LNMode } from './utils/mode/LNMode';
 import { modeToNoteContent } from './utils/mode/mode-to-note-content';
 import path from "path";
 import { getDefaultLNMode, mergeWithDefaultMode, DEFAULT_VOICE_INSTRUCTIONS } from "./utils/mode/ln-mode-defaults";

@@ -22,17 +22,17 @@ import {
 	RedactedThinkingBlock,
 	ToolUseBlock,
 	ToolResultBlock,
-} from "src/types/types";
+} from "../utils/chat/types";
 import { useLNMode } from "./LNModeContext";
 import { MessageCreateParamsStreaming } from "@anthropic-ai/sdk/resources/messages/messages";
 import { t } from '../i18n';
 import { getDefaultLNMode, resolveAutoModel } from "../utils/mode/ln-mode-defaults";
 import { ConversationDatabase } from "../services/conversation-database";
-import { Conversation } from '../utils/chat/conversation';
+import { Conversation } from '../utils/chat/conversation_';
 import { generateConversationId } from "../utils/chat/generate-conversation-id";
 import { App } from "obsidian";
 import { DEFAULT_VOICE_INSTRUCTIONS } from "../utils/mode/ln-mode-defaults";
-import { expandLinks } from "src/utils/content/link-expander";
+import { expandLinks } from "../utils/links/link-expander";
 
 export interface AIAgentContextType {
 	conversation: Message[];

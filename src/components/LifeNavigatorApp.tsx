@@ -12,9 +12,9 @@ import { useLNMode } from "../context/LNModeContext";
 import {
 	ToolResultBlock,
 	ContentBlock,
-} from "src/types/types";
-import { NavigationTarget } from "src/obsidian-tools";
-import { useAIAgent } from "src/context/AIAgentContext";
+} from "../utils/chat/types";
+import { NavigationTarget } from "../obsidian-tools";
+import { useAIAgent } from "../context/AIAgentContext";
 import { LucideIcon } from "./LucideIcon";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";

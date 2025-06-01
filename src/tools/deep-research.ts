@@ -4,7 +4,7 @@ import { getPluginSettings } from "../settings/PluginSettings";
 import { t } from "../i18n";
 import { Notice } from "obsidian";
 import { createFile } from "../utils/fs/create-file";
-import { fileExists } from "../utils/tools/file-exists";
+import { fileExists } from "../utils/fs/file-exists";
 import { generateUniqueFileName } from "../utils/tools/generate-unique-file-name";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 

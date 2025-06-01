@@ -1,10 +1,10 @@
 import MyPlugin from "../main";
-import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
 import { findTaskByDescription, updateNote, readNote, NoteNode, TextBlock } from '../utils/tools/note-utils';
-import { getDailyNotePath } from "../utils/tools/get-daily-note-path";
+import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { validateTasks } from "../utils/tools/task-validation";
-import { removeTaskFromDocument, formatTask } from "../utils/tools/task-utils";
+import { validateTasks } from "../utils/task/task-validation";
+import { removeTaskFromDocument, formatTask } from "../utils/task/task-utils";
 import { calculateLineNumberForNode, createNavigationTarget } from "../utils/tools/line-number-utils";
 import { t } from "../i18n";
 

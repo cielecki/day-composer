@@ -1,7 +1,7 @@
 import MyPlugin from "../main";
 import { createFile } from "../utils/fs/create-file";
-import { fileExists } from "../utils/tools/file-exists";
-import { Task } from "../utils/tools/task-utils";
+import { fileExists } from "../utils/fs/file-exists";
+import { Task } from "../utils/task/task-utils";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
 import {
@@ -13,8 +13,8 @@ import {
 	TextBlock,
 	determineInsertionPosition
 } from "../utils/tools/note-utils";
-import { getDailyNotePath } from "../utils/tools/get-daily-note-path";
-import { insertTaskAtPosition } from "../utils/tools/task-utils";
+import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
+import { insertTaskAtPosition } from "../utils/task/task-utils";
 import { calculateLineNumberForNode, createNavigationTarget } from "../utils/tools/line-number-utils";
 import { t } from "../i18n";
 

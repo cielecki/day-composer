@@ -1,7 +1,7 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import * as ReactDOM from "react-dom/client";
 import { LifeNavigatorApp } from "./components/LifeNavigatorApp";
-import { Message } from "./types/types";
+import { Message } from "./utils/chat/types";
 import { AIAgentProvider } from "./context/AIAgentContext";
 import { SpeechToTextProvider } from "./context/SpeechToTextContext";
 import MyPlugin from "./main";

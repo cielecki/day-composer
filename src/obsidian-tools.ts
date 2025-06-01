@@ -18,7 +18,7 @@ import { deepResearchTool } from "./tools/deep-research";
 import { ToolExecutionError } from "./utils/tools/tool-execution-error";
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tool-filter";
-import { LNMode } from "./types/types";
+import { LNMode } from './utils/mode/LNMode';
 
 // Import React
 import React from "react";

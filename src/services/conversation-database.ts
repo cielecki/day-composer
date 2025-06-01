@@ -2,11 +2,11 @@
 // Each conversation stored as separate JSON file with metadata in filename
 
 import { App, normalizePath } from 'obsidian';
-import { generateConversationTitle } from 'src/utils/chat/generate-conversation-title';
-import { ensureDirectoryExists } from 'src/utils/fs/ensure-directory-exists';
-import { escapeFilename } from 'src/utils/fs/escape-filename';
-import { Conversation, StoredConversation, CURRENT_SCHEMA_VERSION, ConversationMeta } from 'src/utils/chat/conversation';
-import { chatFileNameToIdAndTitle } from 'src/utils/chat/chat-file-name-to-id-and-title';
+import { generateConversationTitle } from '../utils/chat/generate-conversation-title';
+import { ensureDirectoryExists } from '../utils/fs/ensure-directory-exists';
+import { escapeFilename } from '../utils/fs/escape-filename';
+import { Conversation, StoredConversation, CURRENT_SCHEMA_VERSION, ConversationMeta } from '../utils/chat/conversation_';
+import { chatFileNameToIdAndTitle } from '../utils/chat/chat-file-name-to-id-and-title';
 
 
 export class ConversationDatabase {

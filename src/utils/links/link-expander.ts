@@ -7,7 +7,7 @@ import {
 	handleCurrentlyOpenFileLink, 
 	handleCurrentChatLink, 
 	handleDayNoteLink 
-} from '../links/special-link-handlers';
+} from './special-link-handlers';
 
 /**
  * Recursively expands [[wikilinks]] in content
