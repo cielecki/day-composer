@@ -35,6 +35,7 @@
       "couldNotResolve": "Could not resolve link target \"{{linkPath}}\""
     },
     "setup": "Setup Error: {{error}}",
+    "startingLifeNavigator": "Error starting Life Navigator",
     "tasks": {
       "insertOutOfBounds": "Cannot insert task at index {{index}}: Index out of bounds (document has {{total}} items)",
       "multipleFound": "Multiple tasks found with description \"{{task}}\" in {{path}}. Please make your task description more specific.",
@@ -66,7 +67,10 @@
   },
   "messages": {
     "checkingForUpdates": "Checking for updates...",
-    "creatingStarterKit": "Creating a Starter Kit..."
+    "creatingStarterKit": "Creating a Starter Kit...",
+    "newVersionFoundDownloading": "New version {{latestVersion}} found! Downloading update from {{currentVersion}}...",
+    "pluginUpToDate": "Life Navigator is up to date (version {{version}})",
+    "updateAvailable": "Update available! Version {{latestVersion}} is now available (you have {{currentVersion}})"
   },
   "settings": {
     "actions": {
@@ -85,7 +89,8 @@
         "confirm": "Are you sure you want to reset the tutorial? This will show the setup screens again next time you open Life Navigator.",
         "desc": "Reset the setup tutorial and onboarding flow. This will show the setup screens again next time you open Life Navigator.",
         "error": "Failed to reset tutorial: {{error}}",
-        "name": "Reset Tutorial"
+        "name": "Reset Tutorial",
+        "success": "Tutorial has been reset successfully"
       },
       "title": "Life Navigator Actions",
       "viewDocs": {
@@ -188,6 +193,7 @@
         "success": "Content added to {{path}}"
       }
     },
+    "checkForUpdates": "Check for Updates",
     "comments": {
       "removedTaskHeader": "REMOVED TASK"
     },
@@ -196,6 +202,8 @@
         "success": "Successfully created document in {{path}}"
       }
     },
+    "createNewMode": "Create New Mode",
+    "createStarterKit": "Create Starter Kit",
     "deepResearch": {
       "errors": {
         "aborted": "Research operation was cancelled by user",
@@ -315,6 +323,7 @@
       "openDownloadedTranscript": "Open downloaded transcript",
       "openReadDocument": "Open read document"
     },
+    "openLifeNavigator": "Open Life Navigator",
     "position": {
       "after": "after \"{{task}}\"",
       "at": "at {{position}} position",
@@ -329,6 +338,7 @@
         "results": "Found {{count}} result{{plural}} for \"{{query}}\""
       }
     },
+    "resetTutorial": "Reset Tutorial",
     "success": {
       "abandon": "✓ Marked {{task}} as abandoned in {{path}}",
       "add": "✓ Added {{task}} to {{path}}",
@@ -384,6 +394,9 @@
     },
     "mode": {
       "createStarterKit": "Create a Starter Kit",
+      "createdError": "Error creating mode: {{error}}",
+      "createdSuccess": "Mode created successfully",
+      "defaultDescription": "Default mode description",
       "files": {
         "noFrontmatter": "File {{filename}} has no frontmatter, using defaults with file content as system prompt"
       },
@@ -453,6 +466,7 @@
     "starterKit": {
       "createdError": "Error creating starter kit: {{error}}",
       "createdSuccess": "Successfully created starter kit",
+      "directoryName": "Starter Kit",
       "noModes": "## Welcome to Life Navigator\n\nTo get started, create a starter kit containing basic modes with the _#ln-mode_ tag."
     },
     "thinking": {

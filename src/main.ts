@@ -59,8 +59,7 @@ const createStarterKit = async (app: App) => {
 		const currentLanguage = window.localStorage.getItem('language') || 'en';
 		const fallbackLanguage = 'en';
 
-		const starterKitDirNameKey = 'ui.starterKit.directoryName';
-		let baseStarterKitDirName = t(starterKitDirNameKey);
+		let baseStarterKitDirName = t('ui.starterKit.directoryName');
 
 		baseStarterKitDirName = baseStarterKitDirName + " v0.8";
 

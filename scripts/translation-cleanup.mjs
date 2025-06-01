@@ -197,6 +197,7 @@ function extractUsedKeys() {
   const sourceFiles = findSourceFiles();
   const usedKeys = new Set();
   const tCallsWithoutKeys = [];
+  const problematicTCalls = []; // New: track t() calls that don't follow expected pattern
   const keyUsageMap = new Map(); // Track where each key is used
   
   sourceFiles.forEach(filePath => {
@@ -205,151 +206,84 @@ function extractUsedKeys() {
       const relativePath = path.relative(projectRoot, filePath);
       
       // Skip files that are obviously not using translations
-      if (!content.includes('from \'../i18n\'') && 
-          !content.includes('from \'./i18n\'') && 
-          !content.includes('from \'../../i18n\'') && 
-          !content.includes('from \'../../../i18n\'') && 
-          !content.includes('from \'../../../../i18n\'') &&
-          !content.includes('import { t }')) {
+      // Check for various import patterns and t() function usage
+      const hasI18nImport = content.includes('from \'../i18n\'') || 
+                           content.includes('from \'./i18n\'') || 
+                           content.includes('from \'../../i18n\'') || 
+                           content.includes('from \'../../../i18n\'') || 
+                           content.includes('from \'../../../../i18n\'') ||
+                           content.includes('from "../i18n"') || 
+                           content.includes('from "./i18n"') || 
+                           content.includes('from "../../i18n"') || 
+                           content.includes('from "../../../i18n"') || 
+                           content.includes('from "../../../../i18n"') ||
+                           content.includes('import { t }') ||
+                           content.includes('t(');
+      
+      if (!hasI18nImport) {
         return;
       }
       
-      // Enhanced regex to match t() calls with string literals
-      const tCallRegex = /\bt\s*\(\s*(['"`])([^'"`\n]+?)\1[^)]*\)/g;
+      // Skip i18n files themselves as they define the translation system
+      const isI18nFile = relativePath.includes('i18n.ts') || relativePath.includes('i18n.js') || relativePath.endsWith('/i18n.ts') || relativePath.endsWith('/i18n.js');
+      
+      // Find ALL t() calls (not just the ones with static strings)
+      const allTCallsRegex = /\bt\s*\([^)]*\)/g;
       let match;
       
-      while ((match = tCallRegex.exec(content)) !== null) {
-        const key = match[2];
+      while ((match = allTCallsRegex.exec(content)) !== null) {
+        const fullCall = match[0];
         const lineNumber = content.substring(0, match.index).split('\n').length;
         
-        if (isValidTranslationKey(key)) {
-          usedKeys.add(key);
-          if (!keyUsageMap.has(key)) {
-            keyUsageMap.set(key, []);
-          }
-          keyUsageMap.get(key).push({
-            file: relativePath,
-            line: lineNumber,
-            call: match[0].trim()
-          });
-        } else {
-          // Only report suspicious calls that might be translations
-          if (key.includes('.') && key.length > 3 && !/^(import|export|from|const|let|var|function|class)/.test(key)) {
-            tCallsWithoutKeys.push({
+        // Extract ALL string literals from this t() call (to handle nested t() calls)
+        const stringLiteralsRegex = /(['"`])([^'"`\n]+?)\1/g;
+        let stringMatch;
+        let foundValidKey = false;
+        
+        while ((stringMatch = stringLiteralsRegex.exec(fullCall)) !== null) {
+          const key = stringMatch[2];
+          
+          if (isValidTranslationKey(key)) {
+            // This is a valid translation key
+            usedKeys.add(key);
+            if (!keyUsageMap.has(key)) {
+              keyUsageMap.set(key, []);
+            }
+            keyUsageMap.get(key).push({
               file: relativePath,
               line: lineNumber,
-              call: match[0].trim(),
-              key: key
+              call: fullCall.trim()
             });
+            foundValidKey = true;
           }
         }
-      }
-      
-      // Additional pattern: Look for nested t() calls within other function calls
-      // This handles cases like: t('outer.key', { error: t('inner.key') })
-      const nestedTCallRegex = /\bt\s*\(\s*[^)]*?\bt\s*\(\s*(['"`])([^'"`\n]+?)\1[^)]*\)[^)]*\)/g;
-      while ((match = nestedTCallRegex.exec(content)) !== null) {
-        const key = match[2];
-        const lineNumber = content.substring(0, match.index).split('\n').length;
         
-        if (isValidTranslationKey(key)) {
-          usedKeys.add(key);
-          if (!keyUsageMap.has(key)) {
-            keyUsageMap.set(key, []);
-          }
-          keyUsageMap.get(key).push({
-            file: relativePath,
-            line: lineNumber,
-            call: `nested t() call: ${match[0].trim()}`
-          });
-        }
-      }
-      
-      // Enhanced pattern: Find all t() calls in a line (to catch multiple nested calls)
-      const lines = content.split('\n');
-      lines.forEach((line, lineIndex) => {
-        if (line.includes('t(')) {
-          const simpleCallRegex = /\bt\s*\(\s*(['"`])([^'"`\n]+?)\1/g;
-          let simpleMatch;
+        // If we didn't find any valid keys, check if this is a problematic t() call
+        if (!foundValidKey && !isI18nFile) {
+          // Check if this follows the expected pattern: t('static.key') or t("static.key")
+          const staticKeyMatch = fullCall.match(/\bt\s*\(\s*(['"`])([^'"`\n]+?)\1[^)]*\)/);
           
-          while ((simpleMatch = simpleCallRegex.exec(line)) !== null) {
-            const key = simpleMatch[2];
+          if (staticKeyMatch) {
+            const key = staticKeyMatch[2];
             
-            if (isValidTranslationKey(key)) {
-              usedKeys.add(key);
-              if (!keyUsageMap.has(key)) {
-                keyUsageMap.set(key, []);
-              }
-              
-              // Check if this key is already tracked for this line
-              const existingEntry = keyUsageMap.get(key).find(entry => 
-                entry.file === relativePath && entry.line === lineIndex + 1
-              );
-              
-              if (!existingEntry) {
-                keyUsageMap.get(key).push({
-                  file: relativePath,
-                  line: lineIndex + 1,
-                  call: `t('${key}')`
-                });
-              }
-            }
-          }
-        }
-      });
-      
-      // Also check for template literals that might contain translation keys
-      const templateLiteralRegex = /\bt\s*\(\s*`([^`\n]+?)`[^)]*\)/g;
-      while ((match = templateLiteralRegex.exec(content)) !== null) {
-        const key = match[1];
-        const lineNumber = content.substring(0, match.index).split('\n').length;
-        
-        // For template literals, we need to be more careful about dynamic parts
-        // If it contains ${...}, we should look for the base key pattern
-        let baseKey = key;
-        if (key.includes('${')) {
-          // Extract the base key before any interpolation
-          baseKey = key.split('${')[0];
-        }
-        
-        if (isValidTranslationKey(baseKey)) {
-          usedKeys.add(baseKey);
-          if (!keyUsageMap.has(baseKey)) {
-            keyUsageMap.set(baseKey, []);
-          }
-          keyUsageMap.get(baseKey).push({
-            file: relativePath,
-            line: lineNumber,
-            call: match[0].trim()
-          });
-        }
-      }
-      
-      // Additional pattern: look for dynamic translation key construction
-      // Like: t(keyBase + ".suffix") or t(`${prefix}.key`)
-      const dynamicKeyRegex = /\bt\s*\(\s*[^)]*\+[^)]*\)/g;
-      while ((match = dynamicKeyRegex.exec(content)) !== null) {
-        const lineNumber = content.substring(0, match.index).split('\n').length;
-        
-        // Extract potential key parts from the dynamic call
-        const callContent = match[0];
-        const keyParts = callContent.match(/(['"`])([a-zA-Z][a-zA-Z0-9]*(?:\.[a-zA-Z][a-zA-Z0-9]*)*)\1/g);
-        
-        if (keyParts) {
-          keyParts.forEach(part => {
-            const key = part.slice(1, -1); // Remove quotes
-            if (isValidTranslationKey(key)) {
-              usedKeys.add(key);
-              if (!keyUsageMap.has(key)) {
-                keyUsageMap.set(key, []);
-              }
-              keyUsageMap.get(key).push({
+            // Static key but not a valid translation key format
+            if (key.includes('.') && key.length > 3 && !/^(import|export|from|const|let|var|function|class)/.test(key)) {
+              tCallsWithoutKeys.push({
                 file: relativePath,
                 line: lineNumber,
-                call: match[0].trim()
+                call: fullCall.trim(),
+                key: key
               });
             }
-          });
+          } else {
+            // This t() call doesn't follow the static pattern - it's problematic
+            problematicTCalls.push({
+              file: relativePath,
+              line: lineNumber,
+              call: fullCall.trim(),
+              reason: 'Non-static translation key usage'
+            });
+          }
         }
       }
       
@@ -358,7 +292,7 @@ function extractUsedKeys() {
     }
   });
   
-  return { usedKeys: Array.from(usedKeys), tCallsWithoutKeys, keyUsageMap };
+  return { usedKeys: Array.from(usedKeys), tCallsWithoutKeys, problematicTCalls, keyUsageMap };
 }
 
 // Find unused translation keys
@@ -465,6 +399,49 @@ function analyzeSuspiciousCalls(tCallsWithoutKeys) {
   }
 }
 
+// Analyze problematic t() calls that don't follow expected patterns
+function analyzeProblematicTCalls(problematicTCalls) {
+  if (problematicTCalls.length === 0) return;
+  
+  log(colors.red, colors.bold, '\n❌ PROBLEMATIC T() CALLS THAT NEED REFACTORING:');
+  console.log();
+  
+  problematicTCalls.slice(0, 20).forEach((call, index) => {
+    log(colors.red, `${index + 1}. ${call.file}:${call.line}`);
+    log(colors.dim, `   Call: ${call.call}`);
+    log(colors.dim, `   Issue: ${call.reason}`);
+    
+    log(colors.cyan, `   💡 Required Action:`);
+    log(colors.white, `   • Refactor to use static translation keys: t('static.key')`);
+    log(colors.white, `   • Avoid dynamic key construction like: t(variable), t(key + '.suffix'), t(\`template\`)`);
+    log(colors.white, `   • If you need dynamic content, use interpolation: t('static.key', { param })`);
+    log(colors.white, `   • If this is a variable assignment, replace with the actual key value`);
+    
+    // Provide specific suggestions based on the call pattern
+    if (call.call.includes('`')) {
+      log(colors.white, `   • Template literals in t() are not supported - use static keys with interpolation`);
+    } else if (call.call.includes('+')) {
+      log(colors.white, `   • String concatenation in t() is not supported - use static keys`);
+    } else if (!call.call.includes('"') && !call.call.includes("'")) {
+      log(colors.white, `   • Variable usage in t() is not supported - use static string literals`);
+    }
+    
+    console.log();
+  });
+  
+  if (problematicTCalls.length > 20) {
+    log(colors.red, `... and ${problematicTCalls.length - 20} more problematic calls`);
+    console.log();
+  }
+  
+  log(colors.cyan, colors.bold, '🔧 WHY THIS MATTERS:');
+  log(colors.cyan, '• Static analysis tools need literal string keys to detect missing translations');
+  log(colors.cyan, '• Dynamic keys make it impossible to verify translation completeness');
+  log(colors.cyan, '• Static keys improve code maintainability and translation management');
+  log(colors.cyan, '• TypeScript and IDE support works better with static keys');
+  console.log();
+}
+
 // Generate summary report
 function generateSummary(results) {
   log(colors.blue, colors.bold, '\n📋 SUMMARY REPORT\n');
@@ -489,6 +466,10 @@ function generateSummary(results) {
   
   if (results.tCallsWithoutKeys.length > 0) {
     issues.push(`${results.tCallsWithoutKeys.length} suspicious t() calls`);
+  }
+  
+  if (results.problematicTCalls && results.problematicTCalls.length > 0) {
+    issues.push(`${results.problematicTCalls.length} problematic t() calls that need refactoring`);
   }
   
   // Show modifications if they were applied
@@ -810,7 +791,7 @@ async function main() {
     const keyComparison = compareTranslationKeys(en, pl, enPath, plPath);
     
     // Extract used keys
-    const { usedKeys, tCallsWithoutKeys, keyUsageMap } = extractUsedKeys();
+    const { usedKeys, tCallsWithoutKeys, problematicTCalls, keyUsageMap } = extractUsedKeys();
     
     // Find unused keys (using English as reference)
     const unusedKeys = findUnusedKeys(keyComparison.allEnKeys, usedKeys, keyComparison.enValues);
@@ -820,6 +801,9 @@ async function main() {
     
     // Analyze suspicious calls
     analyzeSuspiciousCalls(tCallsWithoutKeys);
+    
+    // Analyze problematic t() calls that don't follow expected patterns
+    analyzeProblematicTCalls(problematicTCalls);
     
     // Prompt for modifications
     const shouldModify = await promptForModifications(
@@ -908,6 +892,7 @@ async function main() {
       missingKeys: shouldModify ? [] : missingKeys, // Show as resolved if modified
       usedKeys,
       tCallsWithoutKeys,
+      problematicTCalls,
       modificationsApplied: shouldModify && filesModified,
       addedEntries: modificationResults.added,
       removedEntries: modificationResults.removed,

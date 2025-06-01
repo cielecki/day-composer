@@ -35,6 +35,7 @@
       "couldNotResolve": "Nie można znaleźć celu linku \"{{linkPath}}\""
     },
     "setup": "Błąd konfiguracji: {{error}}",
+    "startingLifeNavigator": "Błąd uruchamiania Life Navigator",
     "tasks": {
       "insertOutOfBounds": "Nie można wstawić zadania w indeksie {{index}}: Indeks poza zakresem (dokument ma {{total}} elementów)",
       "multipleFound": "Znaleziono wiele zadań z opisem \"{{task}}\" w {{path}}. Proszę podać bardziej szczegółowy opis zadania.",
@@ -66,7 +67,10 @@
   },
   "messages": {
     "checkingForUpdates": "Sprawdzanie aktualizacji...",
-    "creatingStarterKit": "Tworzenie pakietu startowego..."
+    "creatingStarterKit": "Tworzenie pakietu startowego...",
+    "newVersionFoundDownloading": "Znaleziono nową wersję {{latestVersion}}! Pobieranie aktualizacji z {{currentVersion}}...",
+    "pluginUpToDate": "Life Navigator jest aktualny (wersja {{version}})",
+    "updateAvailable": "Dostępna aktualizacja! Wersja {{latestVersion}} jest teraz dostępna (masz {{currentVersion}})"
   },
   "settings": {
     "actions": {
@@ -85,7 +89,8 @@
         "confirm": "Czy na pewno chcesz zresetować tutorial? Spowoduje to ponowne wyświetlenie ekranów konfiguracji przy następnym otwarciu Life Navigator.",
         "desc": "Resetuj tutorial konfiguracji i proces wdrażania. Spowoduje to ponowne wyświetlenie ekranów konfiguracji przy następnym otwarciu Life Navigator.",
         "error": "Nie udało się zresetować tutoriala: {{error}}",
-        "name": "Resetuj tutorial"
+        "name": "Resetuj tutorial",
+        "success": "Tutorial został pomyślnie zresetowany"
       },
       "title": "Akcje Life Navigator",
       "viewDocs": {
@@ -188,6 +193,7 @@
         "success": "Zawartość dodana do {{path}}"
       }
     },
+    "checkForUpdates": "Sprawdź aktualizacje",
     "comments": {
       "removedTaskHeader": "USUNIĘTE ZADANIE"
     },
@@ -196,6 +202,8 @@
         "success": "Pomyślnie utworzono dokument w {{path}}"
       }
     },
+    "createNewMode": "Utwórz nowy tryb",
+    "createStarterKit": "Utwórz pakiet startowy",
     "deepResearch": {
       "errors": {
         "aborted": "Operacja badawcza została anulowana przez użytkownika",
@@ -315,6 +323,7 @@
       "openDownloadedTranscript": "Otwórz pobrany transkrypt",
       "openReadDocument": "Otwórz przeczytany dokument"
     },
+    "openLifeNavigator": "Otwórz Life Navigator",
     "position": {
       "after": "po \"{{task}}\"",
       "at": "w pozycji {{position}}",
@@ -329,6 +338,7 @@
         "results": "Znaleziono {{count}} wynik{{plural}} dla \"{{query}}\""
       }
     },
+    "resetTutorial": "Resetuj tutorial",
     "success": {
       "abandon": "✓ Oznaczono {{task}} jako porzucone w {{path}}",
       "add": "✓ Dodano {{task}} do {{path}}",
@@ -384,6 +394,9 @@
     },
     "mode": {
       "createStarterKit": "Utwórz pakiet startowy",
+      "createdError": "Błąd tworzenia trybu: {{error}}",
+      "createdSuccess": "Tryb utworzony pomyślnie",
+      "defaultDescription": "Domyślny opis trybu",
       "files": {
         "noFrontmatter": "Plik {{filename}} nie ma frontmattera, używam wartości domyślnych z treścią pliku jako prompt systemowy"
       },
@@ -453,6 +466,7 @@
     "starterKit": {
       "createdError": "Błąd podczas tworzenia pakietu startowego: {{error}}",
       "createdSuccess": "Pomyślnie utworzono pakiet startowy",
+      "directoryName": "Pakiet Startowy",
       "noModes": "## Witaj w Life Navigator\n\nAby rozpocząć, utwórz pakiet startowy zawierający podstawowe tryby z tagiem _#ln-mode_."
     },
     "thinking": {
