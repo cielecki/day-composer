@@ -90,6 +90,12 @@ export interface DayNoteInfo {
 	descriptiveLabel: string;
 	linkPath: string;
 	found: boolean;
+	offset: number;
+}
+
+export interface DayNoteRangeInfo {
+	notes: DayNoteInfo[];
+	rangeLabel: string;
 }
 
 /**
@@ -111,6 +117,31 @@ export function handleDayNoteLink(app: App, daysOffset: number): DayNoteInfo | n
 	moment.locale(moment.locale());
 	const formattedDate = moment(targetDate).format("YYYY-MM-DD dddd");
 	
+	// Calculate descriptive label (regardless of whether file exists)
+	let descriptiveLabel: string;
+	if (daysOffset > 0) {
+		// Future dates
+		if (daysOffset === 1) {
+			descriptiveLabel = "tomorrow";
+		} else if (daysOffset === 2) {
+			descriptiveLabel = "day after tomorrow";
+		} else {
+			descriptiveLabel = `${daysOffset} days from now`;
+		}
+	} else if (daysOffset < 0) {
+		// Past dates
+		if (daysOffset === -1) {
+			descriptiveLabel = "yesterday";
+		} else if (daysOffset === -2) {
+			descriptiveLabel = "day before yesterday";
+		} else {
+			descriptiveLabel = `${Math.abs(daysOffset)} days ago`;
+		}
+	} else {
+		// Today
+		descriptiveLabel = "today";
+	}
+	
 	// Find a matching daily note
 	const matchingFiles = findDailyNotesByDate(app, dateStr);
 
@@ -118,47 +149,75 @@ export function handleDayNoteLink(app: App, daysOffset: number): DayNoteInfo | n
 		// Use the first matching file
 		const linkPath = matchingFiles[0].basename;
 		
-		// Calculate descriptive label
-		let descriptiveLabel: string;
-		if (daysOffset > 0) {
-			// Future dates
-			if (daysOffset === 1) {
-				descriptiveLabel = "tomorrow";
-			} else if (daysOffset === 2) {
-				descriptiveLabel = "day after tomorrow";
-			} else {
-				descriptiveLabel = `${daysOffset} days from now`;
-			}
-		} else if (daysOffset < 0) {
-			// Past dates
-			if (daysOffset === -1) {
-				descriptiveLabel = "yesterday";
-			} else if (daysOffset === -2) {
-				descriptiveLabel = "day before yesterday";
-			} else {
-				descriptiveLabel = `${Math.abs(daysOffset)} days ago`;
-			}
-		} else {
-			// Today
-			descriptiveLabel = "today";
-		}
-		
 		return {
 			dateStr,
 			formattedDate,
 			descriptiveLabel,
 			linkPath,
-			found: true
+			found: true,
+			offset: daysOffset
 		};
 	} else {
 		// No matching file found
 		console.warn(`No daily note found for date: ${dateStr} (${daysOffset} days offset)`);
 		return {
 			dateStr,
-			formattedDate: "",
-			descriptiveLabel: "",
+			formattedDate,
+			descriptiveLabel,  // Now includes the calculated descriptive label
 			linkPath: "",
-			found: false
+			found: false,
+			offset: daysOffset
 		};
 	}
+}
+
+/**
+ * Handle ln-day-note-(start:end) special links for daily note ranges
+ * @param app The Obsidian App instance
+ * @param startOffset Start day offset from today
+ * @param endOffset End day offset from today
+ * @returns Information about the day note range
+ */
+export function handleDayNoteRangeLink(app: App, startOffset: number, endOffset: number): DayNoteRangeInfo {
+	// Ensure start is less than or equal to end
+	if (startOffset > endOffset) {
+		[startOffset, endOffset] = [endOffset, startOffset];
+	}
+	
+	const notes: DayNoteInfo[] = [];
+	
+	// Process each day in the range
+	for (let offset = startOffset; offset <= endOffset; offset++) {
+		const noteInfo = handleDayNoteLink(app, offset);
+		if (noteInfo) {
+			notes.push(noteInfo);  // Include both found and not found notes
+		}
+	}
+	
+	// Create a descriptive range label
+	let rangeLabel: string;
+	if (startOffset === endOffset) {
+		// Single day
+		rangeLabel = notes[0]?.descriptiveLabel || "unknown date";
+	} else {
+		// Range of days
+		const startDate = new Date();
+		startDate.setDate(startDate.getDate() + startOffset);
+		
+		const endDate = new Date();
+		endDate.setDate(endDate.getDate() + endOffset);
+		
+		const moment = window.moment;
+		moment.locale(moment.locale());
+		
+		const startFormatted = moment(startDate).format("MMM D");
+		const endFormatted = moment(endDate).format("MMM D, YYYY");
+		
+		rangeLabel = `${startFormatted} to ${endFormatted}`;
+	}
+	
+	return {
+		notes,
+		rangeLabel
+	};
 } 

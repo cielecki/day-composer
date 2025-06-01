@@ -18,7 +18,7 @@ import { ConversationDatabase } from "../services/conversation-database";
 import { Conversation } from '../utils/chat/conversation';
 import { generateConversationId } from "../utils/chat/generate-conversation-id";
 import { App } from "obsidian";
-import { expandLinks } from "../utils/links/link-expander";
+import { expandLinks } from "../utils/links/expand-links";
 
 // Import utility functions
 import { ensureContentBlocks } from "../utils/chat/content-blocks";

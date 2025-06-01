@@ -225,6 +225,9 @@
     "setup": "Setup Error: {{error}}",
     "conversationTurn": "Error during conversation: {{error}}",
     "failedToUpdatePlugin": "Failed to update plugin: {{error}}",
+    "linkExpansion": {
+      "couldNotResolve": "Could not resolve link target \"{{linkPath}}\""
+    },
     "tools": {
       "noName": "No tool name provided",
       "unknown": "Unknown tool \"{{tool}}\"",

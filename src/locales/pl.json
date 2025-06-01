@@ -225,6 +225,9 @@
     "setup": "Błąd konfiguracji: {{error}}",
     "conversationTurn": "Błąd podczas konwersacji: {{error}}",
     "failedToUpdatePlugin": "Nie udało się zaktualizować wtyczki: {{error}}",
+    "linkExpansion": {
+      "couldNotResolve": "Nie można znaleźć celu linku \"{{linkPath}}\""
+    },
     "tools": {
       "noName": "Nie podano nazwy narzędzia",
       "unknown": "Nieznane narzędzie \"{{tool}}\"",
