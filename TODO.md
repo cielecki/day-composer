@@ -3,7 +3,7 @@
 # Fixes
 
 - [ ] Make a new release
-- [ ] When I stop during a tool call or thinking it should stop blinking.
+- [ ] Test the release
 
 # Stages
 - [ ] Onboard 5 people to the plugin
