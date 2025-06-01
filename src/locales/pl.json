@@ -224,7 +224,6 @@
     "startingLifeNavigator": "Błąd podczas uruchamiania Life Navigator",
     "setup": "Błąd konfiguracji: {{error}}",
     "conversationTurn": "Błąd podczas konwersacji: {{error}}",
-    "incompleteToolCall": "Wywołanie narzędzia zostało przerwane i usunięte. Spróbuj ponownie swojego żądania.",
     "failedToUpdatePlugin": "Nie udało się zaktualizować wtyczki: {{error}}",
     "tools": {
       "noName": "Nie podano nazwy narzędzia",

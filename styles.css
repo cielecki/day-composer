@@ -2315,3 +2315,163 @@ If your plugin does not need CSS, delete this file.
   position: absolute;
   pointer-events: none;
 }
+
+/* Conversation History Dropdown Container */
+.life-navigator-view .conversation-history-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  min-width: 320px;
+  max-width: 400px;
+  max-height: 400px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.life-navigator-view .conversation-history-dropdown .search-header {
+  padding: 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+}
+
+.life-navigator-view .conversation-history-dropdown .search-input {
+  width: 100%;
+  padding: 8px 12px 8px 32px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-modifier-form-field);
+  color: var(--text-normal);
+  font-size: 13px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 8px center;
+  background-size: 16px 16px;
+  box-shadow: none;
+  outline: none;
+}
+
+.life-navigator-view .conversation-history-dropdown .search-input:focus {
+  outline: none;
+  border: 1px solid var(--interactive-accent);
+  box-shadow: none;
+}
+
+.life-navigator-view .conversation-history-dropdown .conversations-list {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.life-navigator-view .conversation-history-dropdown .conversation-item {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  position: relative;
+}
+
+.life-navigator-view .conversation-history-dropdown .conversation-item:hover {
+  background: var(--background-modifier-hover);
+}
+
+.life-navigator-view .conversation-history-dropdown .conversation-item.current {
+  background: var(--background-modifier-active-hover);
+}
+
+.life-navigator-view .conversation-history-dropdown .conversation-item:last-child {
+  border-bottom: none;
+}
+
+.life-navigator-view .conversation-history-dropdown .conversation-title {
+  font-weight: 500;
+  color: var(--text-normal);
+  font-size: 13px;
+  margin-bottom: 2px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.life-navigator-view .conversation-history-dropdown .conversation-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 0;
+}
+
+.life-navigator-view .conversation-history-dropdown .conversation-mode {
+  font-size: 11px;
+  color: var(--text-accent);
+}
+
+.life-navigator-view .conversation-history-dropdown .conversation-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 1;
+  transition: opacity 0.15s ease;
+  flex-shrink: 0;
+}
+
+.life-navigator-view .conversation-history-dropdown .conversation-item:hover .conversation-actions {
+  opacity: 1;
+}
+.life-navigator-view .conversation-history-dropdown .edit-input {
+  width: 100%;
+  background: var(--background-modifier-form-field);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 3px;
+  padding: 4px 6px;
+  font-size: 13px;
+  color: var(--text-normal);
+  font-weight: 500;
+}
+
+.life-navigator-view .conversation-history-dropdown .edit-input:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
+}
+
+.life-navigator-view .conversation-history-dropdown .empty-state {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.life-navigator-view .conversation-history-dropdown .loading-state {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .life-navigator-view .conversation-history-dropdown {
+    min-width: 280px;
+    max-width: 320px;
+  }
+  
+  .life-navigator-view .conversation-history-dropdown .conversation-item {
+    padding: 6px 10px;
+  }
+}
+
+.life-navigator-view .conversation-history-dropdown .conversation-content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.life-navigator-view .conversation-history-dropdown .conversation-main {
+  flex: 1;
+  min-width: 0;
+}

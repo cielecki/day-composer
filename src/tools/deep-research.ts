@@ -3,7 +3,7 @@ import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian
 import { getPluginSettings } from "../settings/PluginSettings";
 import { t } from "../i18n";
 import { Notice } from "obsidian";
-import { createFile } from "./utils/createFile";
+import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "./utils/fileExists";
 import { generateUniqueFileName } from "./utils/generateUniqueFileName";
 import { ToolExecutionError } from "./utils/ToolExecutionError";

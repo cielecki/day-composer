@@ -8,6 +8,7 @@ import MyPlugin from "./main";
 import { TextToSpeechProvider } from "./context/TextToSpeechContext";
 import { LNModeProvider } from "./context/LNModeContext";
 import { t } from './i18n';
+import { ConversationDatabase } from "./services/conversation-database";
 
 export interface LifeNavigatorViewProps {
 	plugin: MyPlugin;
@@ -20,11 +21,21 @@ export class LifeNavigatorView extends ItemView {
 	private reactRoot: ReactDOM.Root | null = null;
 	private props: LifeNavigatorViewProps;
 	private _conversation: Message[] = [];
+	private conversationDatabase: ConversationDatabase;
 
 	constructor(leaf: WorkspaceLeaf, props: LifeNavigatorViewProps) {
 		super(leaf);
 		this.props = props;
 		this._conversation = props.initialMessages || [];
+
+		if (!this.props.plugin.manifest.dir) {
+			throw new Error('Plugin directory not available');
+		}
+
+		this.conversationDatabase = new ConversationDatabase(this.app, this.props.plugin.manifest.dir);
+		this.conversationDatabase.initialize().then(() => {
+			console.log('Conversation database and naming service initialized');
+		});
 	}
 
 	getViewType(): string {
@@ -73,7 +84,7 @@ export class LifeNavigatorView extends ItemView {
 			<LNModeProvider app={this.app}>
 				<TextToSpeechProvider>
 					<SpeechToTextProvider>
-						<AIAgentProvider plugin={this.props.plugin}>
+						<AIAgentProvider plugin={this.props.plugin} conversationDatabase={this.conversationDatabase}>
 							<LifeNavigatorApp />
 						</AIAgentProvider>
 					</SpeechToTextProvider>

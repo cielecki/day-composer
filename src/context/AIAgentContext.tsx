@@ -27,6 +27,9 @@ import { MessageCreateParamsStreaming } from "@anthropic-ai/sdk/resources/messag
 import { t } from '../i18n';
 import { getDefaultLNMode, resolveAutoModel } from "src/defaults/ln-mode-defaults";
 import { ContextCollector } from "src/context-collector";
+import { ConversationDatabase } from "../services/conversation-database";
+import { Conversation } from 'src/utils/chat/conversation';
+import { generateConversationId } from "src/utils/chat/generate-conversation-id";
 
 export interface AIAgentContextType {
 	conversation: Message[];
@@ -39,6 +42,10 @@ export interface AIAgentContextType {
 	editingMessage: { index: number; content: string; images?: any[] } | null;
 	startEditingMessage: (messageIndex: number) => void;
 	cancelEditingMessage: () => void;
+	saveCurrentConversation: (title?: string, tags?: string[]) => Promise<string | null>;
+	loadConversation: (conversationId: string) => Promise<boolean>;
+	getCurrentConversationId: () => string | null;
+	getConversationDatabase: () => ConversationDatabase;
 }
 
 const AIAgentContext = createContext<AIAgentContextType | undefined>(undefined);
@@ -66,19 +73,89 @@ const ensureContentBlocks = (
 
 export const AIAgentProvider: React.FC<{
 	children?: ReactNode;
+	conversationDatabase: ConversationDatabase;
 	plugin: MyPlugin;
-}> = ({ children, plugin }) => {
-	const conversationRef = useRef<Message[]>([]);
+}> = ({ children, plugin, conversationDatabase }) => {
 	const partialJsonRef = useRef<Record<number, string>>({});
-	const [forceUpdate, setForceUpdate] = useState(0);
+	const [_, setForceUpdate] = useState(0);
 	const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);
 	const [editingMessage, setEditingMessage] = useState<{ index: number; content: string; images?: any[] } | null>(null);
 	const textToSpeech = useTextToSpeech();
 	const { isRecording } = useSpeechToText();
 	const { activeModeIdRef, lnModesRef } = useLNMode();
 	const app = plugin.app;
+
+	// Conversation database and tracking
+	const currentConversationRef = useRef<Conversation>({
+		meta: {
+			id: generateConversationId(),
+			title: "",
+			filePath: "",
+			updatedAt: 0
+		},
+		storedConversation: {
+			version: 0,
+			modeId: "",
+			titleGenerated: false,
+			messages: []
+		}
+	});
+	const conversationChangedRef = useRef<boolean>(false);
+	const [conversationVersion, setConversationVersion] = useState(0); // Add state to track conversation changes
+
+
+	// Auto-save conversation when it changes (debounced)
+	React.useEffect(() => {
+		const saveTimeout = setTimeout(async () => {
+			if (currentConversationRef.current.storedConversation.messages.length > 0 && !isGeneratingResponse) {
+				try {
+					const currentModeId = activeModeIdRef.current;
+					currentConversationRef.current.storedConversation.modeId = currentModeId;
+					const conversationId = await conversationDatabase.saveConversation(
+						currentConversationRef.current
+					);
+					conversationChangedRef.current = false;
+					console.log(`Auto-saved conversation: ${conversationId}`);
+				} catch (error) {
+					console.error('Failed to auto-save conversation:', error);
+				}
+			}
+		}, 2000); // Auto-save 2 seconds after last change
+
+		return () => clearTimeout(saveTimeout);
+	}, [conversationVersion, isGeneratingResponse]); // Use conversationVersion instead of currentConversationRef.current.storedConversation.messages
+
+	// Immediate save after first exchange
+	const saveConversationImmediately = useCallback(async () => {
+		try {
+			currentConversationRef.current.storedConversation.modeId = lnModesRef.current[activeModeIdRef.current].ln_path;
+			
+			// Save conversation with generated title
+			await conversationDatabase.saveConversation(currentConversationRef.current);
+			
+			conversationChangedRef.current = false;
+			console.log(`Immediately saved conversation with title: ${currentConversationRef.current.meta.title}`);
+		} catch (error) {
+			console.error('Failed to immediately save conversation:', error);
+		}
+	}, [activeModeIdRef, lnModesRef]);
+
 	const clearConversation = useCallback(() => {
-		conversationRef.current = [];
+		currentConversationRef.current = {
+			meta: {
+				id: generateConversationId(),
+				title: "",
+				filePath: "",
+				updatedAt: 0
+			},
+			storedConversation: {
+				version: 0,
+				modeId: "",
+				titleGenerated: false,
+				messages: []
+			}
+		};
+		conversationChangedRef.current = false;
 		setForceUpdate((prev) => prev + 1);
 	}, []);
 
@@ -94,16 +171,20 @@ export const AIAgentProvider: React.FC<{
 			// For assistant messages, ensure we update correctly to avoid duplicates when rebuilding conversation
 			if (role === "assistant") {
 				// Check if this is a continuation of an existing assistant message
-				const lastMessage = conversationRef.current[conversationRef.current.length - 1];
+				const lastMessage = currentConversationRef.current.storedConversation.messages[currentConversationRef.current.storedConversation.messages.length - 1];
 				if (lastMessage && lastMessage.role === "assistant") {
 					// Update the existing message instead of adding a new one
 					lastMessage.content = contentBlocks;
+					conversationChangedRef.current = true;
+					setConversationVersion(prev => prev + 1); // Trigger auto-save
 					setForceUpdate((prev) => prev + 1);
 					return;
 				}
 			}
 			
-			conversationRef.current = [...conversationRef.current, newMessage];
+			currentConversationRef.current.storedConversation.messages = [...currentConversationRef.current.storedConversation.messages, newMessage];
+			conversationChangedRef.current = true;
+			setConversationVersion(prev => prev + 1); // Trigger auto-save
 			setForceUpdate((prev) => prev + 1);
 		},
 		[],
@@ -123,36 +204,44 @@ export const AIAgentProvider: React.FC<{
 		[],
 	);
 
+	// Clean and format content blocks
+	const formatContentBlocks = (content: any[]): any[] => {
+		return content.map(block => {
+			if (block.type === "tool_use") {
+				// Clean up properties that Anthropic API doesn't expect
+				/* trunk-ignore(eslint/@typescript-eslint/no-unused-vars) */
+				const { isProcessing, ...cleanedBlock } = block;
+				return cleanedBlock;
+			} else if (block.type === "tool_result") {
+				// Clean up properties that Anthropic API doesn't expect
+				/* trunk-ignore(eslint/@typescript-eslint/no-unused-vars) */
+				const { navigationTargets, ...cleanedBlock } = block;
+				return cleanedBlock;
+			} else if (block.type === "thinking") {
+				// Only include thinking blocks that have a signature (were generated by Anthropic)
+				// If no signature, filter out the block entirely
+				if (!(block as ThinkingBlock).signature) {
+					return null; // This will be filtered out below
+				}
+				/* trunk-ignore(eslint/@typescript-eslint/no-unused-vars) */
+				const { reasoningInProgress, ...cleanedBlock } = block;
+				return cleanedBlock;
+			}
+			return block;
+		}).filter(block => block !== null); // Remove null blocks (incomplete thinking)
+	};
+
 	// Format messages, ensuring content is always ContentBlock[] compatible with API
 	const formatMessagesForAPI = useCallback(
 		(messages: Message[]): Anthropic.Messages.MessageParam[] => {
 			// First, validate and clean the messages to handle incomplete tool calls
-			const validatedMessages = validateAndCleanMessages(messages);
+			const cleanedMessages = validateAndCleanMessages(messages);
 			
-			return validatedMessages.map((msg) => {
+			return cleanedMessages.map((msg) => {
 				let apiContent: Anthropic.Messages.MessageParam["content"];
 				const contentBlocks = ensureContentBlocks(msg.content); // Ensure array of blocks
 
-				apiContent = contentBlocks.map((block) => {
-					if (block.type === "tool_result") {
-						return {
-							type: "tool_result",
-							tool_use_id: block.tool_use_id,
-							content: block.content, // Assuming content is string for now
-							is_error: block.is_error, // Pass error flag
-						} as Anthropic.ToolResultBlockParam;
-					}
-
-					// Clean up properties that Anthropic API doesn't expect
-					if (block.type === "thinking") {
-						/* trunk-ignore(eslint/@typescript-eslint/no-unused-vars) */
-						const { reasoningInProgress, ...cleanedBlock } = block;
-						return cleanedBlock;
-					}
-
-					// For other blocks, pass them through
-					return block as any;
-				});
+				apiContent = formatContentBlocks(contentBlocks);
 
 				// Handle case where content was empty/invalid
 				if (!apiContent || apiContent.length === 0) {
@@ -175,10 +264,21 @@ export const AIAgentProvider: React.FC<{
 		for (let i = 0; i < messages.length; i++) {
 			const currentMessage = messages[i];
 			
-			// If this is an assistant message, check for tool_use blocks
+			// If this is an assistant message, check for tool_use blocks AND incomplete thinking blocks
 			if (currentMessage.role === "assistant") {
 				const contentBlocks = ensureContentBlocks(currentMessage.content);
 				const toolUseBlocks = contentBlocks.filter(block => block.type === "tool_use");
+				
+				// Check for incomplete thinking blocks that shouldn't be sent to API
+				// Incomplete thinking blocks are those without a signature or still in progress
+				const incompleteThinkingBlocks = contentBlocks.filter(block => 
+					block.type === "thinking" && 
+					(!(block as ThinkingBlock).signature || (block as ThinkingBlock).reasoningInProgress)
+				);
+				
+				if (incompleteThinkingBlocks.length > 0) {
+					break; // Stop processing here to avoid incomplete conversation
+				}
 				
 				if (toolUseBlocks.length > 0) {
 					// This assistant message contains tool calls
@@ -188,8 +288,6 @@ export const AIAgentProvider: React.FC<{
 					if (!nextMessage || nextMessage.role !== "user") {
 						// No next message or next message is not a user message
 						// This means we have incomplete tool calls - exclude this message
-						console.warn(`Excluding assistant message with incomplete tool calls at index ${i}`);
-						console.warn("Tool use blocks found:", toolUseBlocks.map(block => ({ id: block.id, name: block.name })));
 						break; // Stop processing here to avoid incomplete conversation
 					}
 					
@@ -204,8 +302,6 @@ export const AIAgentProvider: React.FC<{
 					const missingResults = [...toolUseIds].filter(id => !toolResultIds.has(id));
 					
 					if (missingResults.length > 0) {
-						console.warn(`Excluding assistant message with missing tool results at index ${i}`);
-						console.warn("Missing tool result IDs:", missingResults);
 						break; // Stop processing here to avoid incomplete conversation
 					}
 				}
@@ -219,7 +315,7 @@ export const AIAgentProvider: React.FC<{
 
 	// Function to clean up incomplete tool calls from the conversation
 	const cleanupIncompleteToolCalls = useCallback(() => {
-		const currentConversation = conversationRef.current;
+		const currentConversation = currentConversationRef.current.storedConversation.messages;
 		if (currentConversation.length === 0) return;
 		
 		// Check the last message
@@ -228,16 +324,15 @@ export const AIAgentProvider: React.FC<{
 		if (lastMessage.role === "assistant") {
 			const contentBlocks = ensureContentBlocks(lastMessage.content);
 			const toolUseBlocks = contentBlocks.filter(block => block.type === "tool_use");
+			const incompleteThinkingBlocks = contentBlocks.filter(block => 
+				block.type === "thinking" && block.reasoningInProgress
+			);
 			
-			if (toolUseBlocks.length > 0) {
-				// The last assistant message has tool calls but likely no results
+			if (toolUseBlocks.length > 0 || incompleteThinkingBlocks.length > 0) {
+				// The last assistant message has tool calls or incomplete thinking blocks
 				// Remove this incomplete message
-				console.log("Cleaning up incomplete tool calls from last assistant message");
-				conversationRef.current = currentConversation.slice(0, -1);
+				currentConversationRef.current.storedConversation.messages = currentConversation.slice(0, -1);
 				setForceUpdate((prev) => prev + 1);
-				
-				// Show user feedback about the cleanup
-				new Notice(t('errors.incompleteToolCall') || "Incomplete tool call removed due to interruption");
 			}
 		}
 	}, []);
@@ -252,9 +347,20 @@ export const AIAgentProvider: React.FC<{
 		let localMessage: Message | null = null;
 		let thinkingBlocksInProgress: Record<number, boolean> = {}; // Track thinking blocks in progress
 
+		// Set up immediate abort detection
+		const handleAbort = () => {
+			aborted = true;
+		};
+		
+		if (signal.aborted) {
+			aborted = true;
+		} else {
+			signal.addEventListener('abort', handleAbort);
+		}
+
 		try {
 			for await (const chunk of stream) {
-				if (signal.aborted) {
+				if (signal.aborted || aborted) {
 					aborted = true;
 					break;
 				}
@@ -265,8 +371,8 @@ export const AIAgentProvider: React.FC<{
 						finalContent = [];
 						thinkingBlocksInProgress = {}; // Reset on new message
 						// Add message to conversation directly
-						conversationRef.current = [
-							...conversationRef.current,
+						currentConversationRef.current.storedConversation.messages = [
+							...currentConversationRef.current.storedConversation.messages,
 							localMessage,
 						];
 						setForceUpdate((prev) => prev + 1);
@@ -277,8 +383,8 @@ export const AIAgentProvider: React.FC<{
 						if (!localMessage) {
 							localMessage = { role: "assistant", content: [] };
 							finalContent = [];
-							conversationRef.current = [
-								...conversationRef.current,
+							currentConversationRef.current.storedConversation.messages = [
+								...currentConversationRef.current.storedConversation.messages,
 								localMessage,
 							];
 							setForceUpdate((prev) => prev + 1);
@@ -290,17 +396,16 @@ export const AIAgentProvider: React.FC<{
 							localMessage.content,
 						);
 
+						if (blockType === "thinking") {
+							thinkingBlocksInProgress[blockIndex] = true;
+						}
+
 						// Initialize JSON accumulator for tool_use blocks
 						if (
 							blockType === "tool_use" &&
 							partialJsonRef.current
 						) {
 							partialJsonRef.current[blockIndex] = "";
-						}
-
-						// Mark thinking blocks as in progress
-						if (blockType === "thinking") {
-							thinkingBlocksInProgress[blockIndex] = true;
 						}
 
 						// Prepare new content array
@@ -504,6 +609,13 @@ export const AIAgentProvider: React.FC<{
 								localMessage.content = finalContentCopy;
 								setForceUpdate((prev) => prev + 1);
 							}
+							
+							// Mark conversation as changed and trigger immediate save if this is first exchange
+							conversationChangedRef.current = true;
+							setConversationVersion(prev => prev + 1);
+							
+							// Immediately save after first complete exchange
+							saveConversationImmediately();
 						}
 
 						thinkingBlocksInProgress = {};
@@ -516,20 +628,44 @@ export const AIAgentProvider: React.FC<{
 		} catch (error) {
 			console.error("Error processing Anthropic stream:", error);
 			aborted = true;
+		} finally {
+			// Clean up abort event listener
+			signal.removeEventListener('abort', handleAbort);
+		}
+
+		// Handle cleanup for any abort (both clean aborts and errors)
+		if (aborted && localMessage) {
+			const contentBlocks = ensureContentBlocks(localMessage.content);
+			const hasIncompleteToolCalls = contentBlocks.some(block => 
+				block.type === "tool_use" && (!block.input || Object.keys(block.input).length === 0)
+			);
 			
-			// If aborted and we have a partial message with incomplete tool calls, remove it
-			if (aborted && localMessage) {
-				const contentBlocks = ensureContentBlocks(localMessage.content);
-				const hasIncompleteToolCalls = contentBlocks.some(block => 
-					block.type === "tool_use" && (!block.input || Object.keys(block.input).length === 0)
-				);
-				
-				if (hasIncompleteToolCalls) {
-					console.log("Removing assistant message with incomplete tool calls due to abort");
-					// Remove the incomplete message from conversation
-					conversationRef.current = conversationRef.current.slice(0, -1);
-					setForceUpdate((prev) => prev + 1);
-				}
+			// Also check for incomplete thinking blocks (those without signature or still in progress)
+			const hasIncompleteThinking = contentBlocks.some(block => 
+				block.type === "thinking" && 
+				(!(block as ThinkingBlock).signature || (block as ThinkingBlock).reasoningInProgress)
+			);
+			
+			// Clear any thinking blocks that are still in progress to stop animation
+			if (hasIncompleteThinking) {
+				const updatedContent = contentBlocks.map(block => {
+					if (block.type === "thinking" && (block as ThinkingBlock).reasoningInProgress) {
+						return {
+							...block,
+							reasoningInProgress: false
+						} as ThinkingBlock;
+					}
+					return block;
+				});
+				localMessage.content = updatedContent;
+				finalContent = updatedContent;
+				setForceUpdate((prev) => prev + 1);
+			}
+			
+			if (hasIncompleteToolCalls || hasIncompleteThinking) {
+				// Remove the incomplete message from conversation
+				currentConversationRef.current.storedConversation.messages = currentConversationRef.current.storedConversation.messages.slice(0, -1);
+				setForceUpdate((prev) => prev + 1);
 			}
 		}
 
@@ -563,7 +699,7 @@ export const AIAgentProvider: React.FC<{
 						const apiKey = getPluginSettings().anthropicApiKey;
 						const anthropicClient = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
 
-						const currentHistory = conversationRef.current;
+						const currentHistory = currentConversationRef.current?.storedConversation.messages || [];
 						const messagesForAPI =
 							formatMessagesForAPI(currentHistory);
 
@@ -603,11 +739,6 @@ export const AIAgentProvider: React.FC<{
 							},
 						};
 
-						console.log(
-							`🔄 Making API call (${model}) with parameters:`,
-						);
-						console.log("API parameters:", params);
-
 						const stream = await anthropicClient.messages.create(
 							params,
 							{ signal: signal },
@@ -620,9 +751,6 @@ export const AIAgentProvider: React.FC<{
 						);
 
 						if (turnResult.aborted || signal.aborted) {
-							console.log(
-								"API call or stream processing aborted.",
-							);
 							currentTurnAborted = true;
 							break; // Exit the while loop
 						}
@@ -631,19 +759,15 @@ export const AIAgentProvider: React.FC<{
 							// The message is already in the conversation, don't add it again
 							// Just get a reference to it for TTS
 							assistantMessage =
-								conversationRef.current[
-									conversationRef.current.length - 1
+								currentConversationRef.current.storedConversation.messages[
+									currentConversationRef.current.storedConversation.messages.length - 1
 								];
-							console.log(
-								"API response received:",
-								assistantMessage,
-							);
 						} else {
 							console.warn(
 								"API call completed but no final content received.",
 							);
 							// Remove the empty message from the conversation
-							conversationRef.current = conversationRef.current.slice(0, -1);
+							currentConversationRef.current.storedConversation.messages = currentConversationRef.current.storedConversation.messages.slice(0, -1);
 							setForceUpdate((prev) => prev + 1);
 							currentTurnAborted = true; // Treat as an issue, stop the loop
 							break;
@@ -658,9 +782,6 @@ export const AIAgentProvider: React.FC<{
 						);
 
 						if (toolUseBlocks.length > 0) {
-							console.log(
-								`🛠️ ${toolUseBlocks.length} tool call(s) detected. Processing...`,
-							);
 							const toolResults: ToolResultBlock[] = [];
 							let abortedDuringToolProcessing = false;
 
@@ -694,22 +815,15 @@ export const AIAgentProvider: React.FC<{
 							}
 
 							if (abortedDuringToolProcessing || signal.aborted) {
-								console.log("Tool processing aborted.");
 								currentTurnAborted = true;
 								break; // Exit the while loop
 							}
 
 							// Add tool results message (as 'user' role for the next API call)
 							addUserOrToolResultMessage("user", toolResults);
-							console.log(
-								"Tool results added to conversation. Looping back for next API call.",
-							);
 							// Continue the while loop
 						} else {
 							// No tool calls, this is the final message for this turn
-							console.log(
-								"✅ No tool calls detected. Turn complete.",
-							);
 							finalAssistantMessageForTTS = assistantMessage; // Store for potential TTS
 							currentTurnAborted = true; // End the loop naturally
 							break; // Exit the while loop
@@ -717,7 +831,6 @@ export const AIAgentProvider: React.FC<{
 					} catch (error) {
 						// Catch errors from API/stream/tool handling
 						if (error instanceof APIUserAbortError) {
-							console.log("Conversation turn aborted by user.");
 							// Clean up any incomplete tool calls that may have been partially generated
 							cleanupIncompleteToolCalls();
 						} else {
@@ -736,15 +849,9 @@ export const AIAgentProvider: React.FC<{
 					}
 				} // End of while loop
 
-				// --- Post-Loop Actions ---
-				console.log(
-					"Generation completed, UI updated to reflect completion.",
-				);
-
 				return finalAssistantMessageForTTS;
 			} finally {
 				setIsGeneratingResponse(false);
-				console.log("runConversationTurn finished.");
 			}
 		},
 		[
@@ -755,6 +862,7 @@ export const AIAgentProvider: React.FC<{
 			lnModesRef,
 			activeModeIdRef,
 			cleanupIncompleteToolCalls,
+			saveConversationImmediately,
 		],
 	);
 
@@ -767,7 +875,6 @@ export const AIAgentProvider: React.FC<{
 			
 			// Skip automatic TTS if recording is active
 			if (isRecording) {
-				console.log("🚫 Skipping automatic TTS because recording is active");
 				return;
 			}
 			
@@ -782,9 +889,6 @@ export const AIAgentProvider: React.FC<{
 			
 			// Only auto-play if both the global setting and the mode-specific autoplay are enabled
 			if (autoplayEnabled && textForTTS.trim().length > 0) {
-				console.log(
-					"🗣️ Starting TTS after generation has completed...",
-				);
 				try {
 					await textToSpeech.speakText(textForTTS, signal);
 					if (signal.aborted) {
@@ -819,7 +923,7 @@ export const AIAgentProvider: React.FC<{
 				// Add user message to the conversation immediately
 				if (contentBlocks.length > 0) {
 					const newMessage: Message = { role: "user", content: contentBlocks };
-					conversationRef.current = [...conversationRef.current, newMessage];
+					currentConversationRef.current.storedConversation.messages = [...currentConversationRef.current.storedConversation.messages, newMessage];
 					setForceUpdate((prev) => prev + 1);
 					setIsGeneratingResponse(true);
 
@@ -834,23 +938,11 @@ export const AIAgentProvider: React.FC<{
 							? obsidianTools.getToolsForMode(currentActiveMode) 
 							: obsidianTools.getTools();
 
-						console.log(
-							`🚀 Triggering conversation turn for user message with ${images?.length || 0} images`,
-						);
-						console.log(currentActiveMode.ln_tools_allowed, currentActiveMode.ln_tools_disallowed)
-						console.log(`🔧 Using ${tools.length} tools for mode: ${currentActiveMode?.ln_name || 'default'}`);
-
 						// Call the core loop function - it now handles its own loading state
 						const finalAssistantMessageForTTS =
 							await runConversationTurn(systemPrompt, tools, signal);
 						await handleTTS(finalAssistantMessageForTTS, signal);
 
-						// Logging completion or abortion status after the turn finishes
-						if (signal.aborted) {
-							console.log("User message processing was aborted.");
-						} else {
-							console.log("User message processing finished.");
-						}
 					} catch (error) {
 						// This catch block now primarily handles errors *before* runConversationTurn starts
 						// (e.g., getContext error, getObsidianTools error)
@@ -867,8 +959,6 @@ export const AIAgentProvider: React.FC<{
 						setIsGeneratingResponse(false);
 					}
 				}
-				// *** Removed finally block - cleanup is handled within runConversationTurn's finally ***
-				console.log("addUserMessage function finished.");
 			} catch (error) {
 				// This catch block now primarily handles errors *before* runConversationTurn starts
 				// (e.g., getContext error, getObsidianTools error)
@@ -884,8 +974,6 @@ export const AIAgentProvider: React.FC<{
 				// *** Ensure loading state is reset if setup fails ***
 				setIsGeneratingResponse(false);
 			}
-			// *** Removed finally block - cleanup is handled within runConversationTurn's finally ***
-			console.log("addUserMessage function finished.");
 		},
 		[
 			getContext,
@@ -900,15 +988,15 @@ export const AIAgentProvider: React.FC<{
 	const editUserMessage = useCallback(
 		async (messageIndex: number, newContent: string, signal: AbortSignal, images?: any[]): Promise<void> => {
 			// Check if index is valid and is a user message
-			if (messageIndex < 0 || messageIndex >= conversationRef.current.length) {
-				console.error(`Invalid message index for editing: ${messageIndex}. Conversation length: ${conversationRef.current.length}`);
+			if (messageIndex < 0 || messageIndex >= currentConversationRef.current.storedConversation.messages.length) {
+				console.error(`Invalid message index for editing: ${messageIndex}. Conversation length: ${currentConversationRef.current.storedConversation.messages.length}`);
 				return;
 			}
 
-			const targetMessage = conversationRef.current[messageIndex];
+			const targetMessage = currentConversationRef.current.storedConversation.messages[messageIndex];
 			if (targetMessage.role !== "user") {
 				console.error(`Can only edit user messages. Message at index ${messageIndex} has role: ${targetMessage.role}`);
-				console.error("Current conversation:", conversationRef.current.map((msg, idx) => ({ index: idx, role: msg.role })));
+				console.error("Current conversation:", currentConversationRef.current.storedConversation.messages.map((msg, idx) => ({ index: idx, role: msg.role })));
 				return;
 			}
 
@@ -921,7 +1009,7 @@ export const AIAgentProvider: React.FC<{
 			console.log(`Editing user message at index ${messageIndex} with new content: "${newContent}"`);
 
 			// Create a copy of the conversation up to the edited message
-			const conversationUpToEdit = conversationRef.current.slice(0, messageIndex + 1);
+			const conversationUpToEdit = currentConversationRef.current.storedConversation.messages.slice(0, messageIndex + 1);
 			
 			// Create the new content blocks
 			const newContentBlocks: any[] = [];
@@ -958,7 +1046,7 @@ export const AIAgentProvider: React.FC<{
 			};
 			
 			// Replace the entire conversation reference with the truncated version
-			conversationRef.current = conversationUpToEdit;
+			currentConversationRef.current.storedConversation.messages = conversationUpToEdit;
 			setForceUpdate(prev => prev + 1);
 			
 			// Clear editing state
@@ -1002,27 +1090,68 @@ export const AIAgentProvider: React.FC<{
 			}
 		},
 		[
-			conversationRef,
-			isGeneratingResponse,
-			setEditingMessage,
-			setForceUpdate,
 			getContext,
 			plugin,
 			runConversationTurn,
 			handleTTS,
+			isGeneratingResponse,
 			lnModesRef,
 			activeModeIdRef,
 		]
 	);
 
+	// Conversation history methods
+	const saveCurrentConversation = useCallback(async (title?: string, tags?: string[]): Promise<string | null> => {
+		try {
+			const currentModeId = activeModeIdRef.current;
+			currentConversationRef.current.storedConversation.modeId = currentModeId;
+			
+			// Save the conversation
+			const conversationId = await conversationDatabase.saveConversation(
+				currentConversationRef.current
+			);
+
+			conversationChangedRef.current = false;
+			
+			new Notice('Conversation saved successfully');
+			return conversationId;
+		} catch (error) {
+			console.error('Failed to save conversation:', error);
+			new Notice('Failed to save conversation');
+			return null;
+		}
+	}, [activeModeIdRef]);
+
+	const loadConversation = useCallback(async (conversationId: string): Promise<boolean> => {
+		try {
+			const storedConversation = await conversationDatabase.loadConversation(conversationId);
+			
+			if (!storedConversation) {
+				new Notice('Conversation not found');
+				return false;
+			}
+
+			// Load the conversation into the current state
+			currentConversationRef.current.storedConversation = storedConversation;
+			currentConversationRef.current.meta.id = conversationId;
+			conversationChangedRef.current = false;
+			setForceUpdate((prev) => prev + 1);
+			return true;
+		} catch (error) {
+			console.error('Failed to load conversation:', error);
+			new Notice('Failed to load conversation');
+			return false;
+		}
+	}, []);
+
 	const startEditingMessage = useCallback((messageIndex: number) => {
 		// Check if index is valid and is a user message
-		if (messageIndex < 0 || messageIndex >= conversationRef.current.length) {
+		if (messageIndex < 0 || messageIndex >= currentConversationRef.current.storedConversation.messages.length) {
 			console.error(`Invalid message index for editing: ${messageIndex}`);
 			return;
 		}
 
-		const targetMessage = conversationRef.current[messageIndex];
+		const targetMessage = currentConversationRef.current.storedConversation.messages[messageIndex];
 		if (targetMessage.role !== "user") {
 			console.error(`Can only edit user messages. Message at index ${messageIndex} has role: ${targetMessage.role}`);
 			return;
@@ -1061,8 +1190,16 @@ export const AIAgentProvider: React.FC<{
 		setEditingMessage(null);
 	}, []);
 
+	const getCurrentConversationId = useCallback((): string | null => {
+		return currentConversationRef.current?.meta.id || null;
+	}, []);
+
+	const getConversationDatabase = useCallback((): ConversationDatabase => {
+		return conversationDatabase;
+	}, []);
+
 	const value: AIAgentContextType = {
-		conversation: conversationRef.current,
+		conversation: currentConversationRef.current?.storedConversation.messages || [],
 		clearConversation,
 		addUserMessage,
 		editUserMessage,
@@ -1072,8 +1209,12 @@ export const AIAgentProvider: React.FC<{
 		editingMessage,
 		startEditingMessage,
 		cancelEditingMessage,
-	};
-
+		saveCurrentConversation,
+		loadConversation,
+		getCurrentConversationId,
+		getConversationDatabase
+	}
+	
 	return (
 		<AIAgentContext.Provider value={value}>
 			{children}

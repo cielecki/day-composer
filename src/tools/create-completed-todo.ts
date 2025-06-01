@@ -1,5 +1,5 @@
 import MyPlugin from "../main";
-import { createFile } from "./utils/createFile";
+import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "./utils/fileExists";
 import { getCurrentTime } from "./utils/getCurrentTime";
 import { appendComment, insertTaskAtPosition, Task } from "./utils/task-utils";

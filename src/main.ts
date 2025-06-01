@@ -10,7 +10,7 @@ import { LIFE_NAVIGATOR_VIEW_TYPE, LifeNavigatorView } from "./life-navigator-vi
 import { getObsidianTools } from "./obsidian-tools";
 import { initI18n, t } from "./i18n";
 import { LNMode } from "./types/types";
-import { modeToNoteContent } from "./utils/mode-utils";
+import { modeToNoteContent } from './utils/mode/mode-to-note-content';
 import path from "path";
 import { getDefaultLNMode, mergeWithDefaultMode, DEFAULT_VOICE_INSTRUCTIONS } from "./defaults/ln-mode-defaults";
 import { STARTER_KIT_DATA } from "./generated/starter-kit-data";

@@ -3,7 +3,7 @@ import { fileExists } from "./utils/fileExists";
 import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
 import { ToolExecutionError } from "./utils/ToolExecutionError";
 import { getPluginSettings } from "../settings/PluginSettings";
-import { ensureDirectoryExists } from "./utils/ensure-directory-exists";
+import { ensureDirectoryExists } from "../utils/fs/ensure-directory-exists";
 import { normalizePath } from "obsidian";
 import OpenAI from 'openai';
 import { t } from "../i18n";

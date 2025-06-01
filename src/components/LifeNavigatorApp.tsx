@@ -25,6 +25,7 @@ import { t } from '../i18n';
 import { UnifiedInputArea } from "./UnifiedInputArea";
 import { isSetupComplete } from "../utils/setup-state";
 import { SetupFlow } from "./setup/SetupFlow";
+import { ConversationHistoryDropdown } from './ConversationHistoryDropdown';
 
 declare global {
 	interface Window {
@@ -76,14 +77,20 @@ export const LifeNavigatorApp: React.FC = () => {
 	const menuButtonRef = useRef<HTMLButtonElement>(null);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const [, setForceUpdate] = useState(0);
+	const [conversationHistoryOpen, setConversationHistoryOpen] = useState(false);
+	const conversationHistoryButtonRef = useRef<HTMLButtonElement>(null);
 
 	const {
 		conversation,
 		clearConversation,
-		isGeneratingResponse,
 		addUserMessage,
 		getContext,
-		editingMessage
+		editingMessage,
+		editUserMessage,
+		isGeneratingResponse,
+		loadConversation,
+		getCurrentConversationId,
+		getConversationDatabase,
 	} = useAIAgent();
 
 	// Use LNModes context
@@ -326,6 +333,23 @@ export const LifeNavigatorApp: React.FC = () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
 	}, [menuOpen]);
+
+	const handleConversationSelect = async (conversationId: string) => {
+		try {
+			const success = await loadConversation(conversationId);
+			if (success) {
+				// Clear any current abort controller
+				if (abortController) {
+					abortController.abort();
+					setAbortController(null);
+				}
+				setForceUpdate((prev) => prev + 1);
+			}
+		} catch (error) {
+			console.error('Failed to load conversation:', error);
+		}
+	};
+
 
 	// Render empty conversation content
 	const renderEmptyConversation = () => {
@@ -758,26 +782,24 @@ export const LifeNavigatorApp: React.FC = () => {
 						<LucideIcon name="square-pen" size={18} />
 					</button>
 
-					<button
-						className="chat-bar-button"
-						aria-label={t('ui.chat.history')}
-						style={{ display: "none" }}
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="20"
-							height="20"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							strokeLinecap="round"
-							strokeLinejoin="round"
+					<div style={{ position: "relative" }}>
+						<button
+							className="clickable-icon"
+							aria-label={t('ui.chat.history')}
+							onClick={() => setConversationHistoryOpen(!conversationHistoryOpen)}
+							ref={conversationHistoryButtonRef}
 						>
-							<circle cx="12" cy="12" r="10"></circle>
-							<polyline points="12 6 12 12 16 14"></polyline>
-						</svg>
-					</button>
+							<LucideIcon name="history" size={18} />
+						</button>
+
+						<ConversationHistoryDropdown
+							database={getConversationDatabase()}
+							onConversationSelect={handleConversationSelect}
+							isOpen={conversationHistoryOpen}
+							onToggle={() => setConversationHistoryOpen(!conversationHistoryOpen)}
+							currentConversationId={getCurrentConversationId()}
+						/>
+					</div>
 				</div>
 			</div>
 

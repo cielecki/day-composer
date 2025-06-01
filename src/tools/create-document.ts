@@ -1,5 +1,5 @@
 import MyPlugin from "../main";
-import { createFile } from "./utils/createFile";
+import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "./utils/fileExists";
 import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
 import { ToolExecutionError } from "./utils/ToolExecutionError";

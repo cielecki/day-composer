@@ -1,5 +1,9 @@
 When making changes to the code:
 - After performing fixes also modify CHANGELOG.md (add to unreleased section), .gitmessage (add or create the commit message to git) and genearal documentation in docs/. Note that changelog and commit is cumulative so dont replace content there - add stuff.
+- **Before adding to CHANGELOG.md or .gitmessage, check if the current changes are already documented there. If they are:**
+  - For CHANGELOG.md: Only add if it's a genuinely new feature/fix not already listed in the unreleased section. If the feature/fix is already there, you may update details but don't add duplicate entries
+  - For .gitmessage: Check what's currently being worked on. If making fixes to something already mentioned, don't add the same level fixes again - just update existing details if needed
+  - Read both files first to understand the current implementation scope before adding new content
 - Plan and investigate the implementation first before writing code, always seek aproval of the plan from the user
 - Remove any entries to the translation files that are no longer needed
 - If you made any changes to the starter kit bump the starter kit version in main.ts
