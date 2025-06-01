@@ -499,6 +499,7 @@ If your plugin does not need CSS, delete this file.
   overflow-y: auto;
   font-size: 0.85rem;
   color: var(--code-text);
+  white-space: pre-line; /* Preserve line breaks */
 }
 
 .life-navigator-view .message.user.has-tool-results {
