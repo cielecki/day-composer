@@ -50,7 +50,7 @@
     "prompts": {
       "speechToTextPrompt": "Speech-to-text Prompt",
       "speechToTextPromptDesc": "The prompt that will be sent to the speech-to-text engine. This provides context to the AI model. You can use <a href='https://github.com/cielecki/life-navigator/blob/main/docs/link-expansion.md'>link expansion</a>.",
-      "defaultPrompt": "# Domain\nA message or voice command issued by the user to the AI assistant.\n\n# Examples\n- Check off task ... umm ... I took out the trash\n- I made dinner\n- Add for tomorrow to remind me to reach out to John.\n\n# Glossary\n[[_Index_]] 🔎\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nStart of transcription:"
+      "defaultPrompt": "# Domain\nA message or voice command issued by the user to the AI assistant.\n\n# Examples\n- Check off task ... umm ... I took out the trash\n- I made dinner\n- Add for tomorrow to remind me to reach out to John.\n\n# Glossary\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nStart of transcription:"
     }
   },
   "tools": {
@@ -266,7 +266,11 @@
       "noContent": "No daily note content found for {{date}}"
     },
     "chat": {
-      "noContent": "No chat content available"
+      "empty": "Chat is empty. Start a conversation to see content here.",
+      "current": "Current Chat",
+      "systemPrompt": "System Prompt",
+      "userMessage": "user message",
+      "assistantMessage": "assistant message"
     },
     "todos": {
       "check": "Failed to check off todo: {{error}}",
@@ -472,11 +476,5 @@
   },
   "file": {
     "currentlyOpen": "Currently Open File"
-  },
-  "chat": {
-    "empty": "Chat is empty. Start a conversation to see content here.",
-    "current": "Current Chat",
-    "userMessage": "user message",
-    "assistantMessage": "assistant message"
   }
 } 

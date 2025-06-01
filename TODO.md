@@ -10,6 +10,8 @@
 
 - [ ] Tools Tools for searching the directories maybe like listing files on searching for files. This would enable having prompts AI. This kind of logic where OK every file with a given tag or every file in the given directory is something that you may pull into the context if based on name, it seems interesting. Also actually those listing queries could pass the front matter and extract and some attribute that provides usage so when given files should be added to the context and then adding it to the context, so I can choose based on this content of this attribute.
 
+- [ ] System prompt injection into TTS prompt via current chat expansion? also refactor the way current chat information is gathered.
+
 # Stages
 - [ ] Onboard 5 people to the plugin
 - [ ] Plan for promotion

@@ -50,7 +50,7 @@
     "prompts": {
       "speechToTextPrompt": "Prompt dla zamiany mowy na tekst",
       "speechToTextPromptDesc": "Prompt, który zostanie wysłany do silnika zamiany mowy na tekst. Dostarcza kontekstu dla modelu AI. Możesz użyć <a href='https://github.com/cielecki/life-navigator/blob/main/docs/link-expansion.md'>rozszerzania linków</a>.",
-      "defaultPrompt": "# Domena\nKomunikat lub komenda głosowa wydawana przez użytkownika asystentowi AI.\n\n# Przykłady\n- Odfajcz zadanie ... eeee ... wyrzuciłem śmieci\n- Zrobiłem kolację\n- Dodaj na jutro, żebym pamiętał o odezwaniu się do Jana.\n\n# Słowniczek\n[[_Indeks_]] 🔎\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nPoczątek transkrypcji:"
+      "defaultPrompt": "# Domena\nKomunikat lub komenda głosowa wydawana przez użytkownika asystentowi AI.\n\n# Przykłady\n- Odfajcz zadanie ... eeee ... wyrzuciłem śmieci\n- Zrobiłem kolację\n- Dodaj na jutro, żebym pamiętał o odezwaniu się do Jana.\n\n# Słowniczek\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nPoczątek transkrypcji:"
     }
   },
   "tools": {
@@ -266,7 +266,12 @@
       "noContent": "Nie znaleziono treści notatki dziennej dla {{date}}"
     },
     "chat": {
-      "noContent": "Brak dostępnej zawartości czatu"
+      "noContent": "Brak dostępnej zawartości czatu",
+      "empty": "Czat jest pusty. Rozpocznij rozmowę, aby zobaczyć zawartość tutaj.",
+      "current": "Aktualny czat",
+      "systemPrompt": "Prompt systemowy",
+      "userMessage": "wiadomość użytkownika",
+      "assistantMessage": "wiadomość asystenta"
     },
     "todos": {
       "check": "Nie udało się odznaczyć zadania: {{error}}",
@@ -472,11 +477,5 @@
   },
   "file": {
     "currentlyOpen": "Aktualnie Otwarty Plik"
-  },
-  "chat": {
-    "empty": "Czat jest pusty. Rozpocznij rozmowę, aby zobaczyć tutaj zawartość.",
-    "current": "Aktualny Czat",
-    "userMessage": "wiadomość użytkownika",
-    "assistantMessage": "wiadomość asystenta"
   }
 } 
