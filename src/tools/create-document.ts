@@ -1,8 +1,9 @@
 import MyPlugin from "../main";
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
-import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
+import { ToolExecutionContext } from "../utils/chat/types";
 import { t } from "../i18n";
 
 const schema = {
@@ -32,19 +33,27 @@ type CreateDocumentToolInput = {
 export const createDocumentTool: ObsidianTool<CreateDocumentToolInput> = {
   specification: schema,
   icon: "file-plus",
-  getActionText: (input: CreateDocumentToolInput, output: string, hasResult: boolean) => {
+  getActionText: (input: CreateDocumentToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
     let actionText = '';
-    if (!input || typeof input !== 'object') actionText = '';
+    if (!input || typeof input !== 'object') return '';
     if (input.path) actionText = `"${input.path}"`;
-    if (hasResult) {
+    
+    if (hasError) {
+      return `Failed to create ${actionText}`;
+    } else if (hasCompleted) {
       return `Created ${actionText}`;
-    } else {
+    } else if (hasStarted) {
       return `Creating ${actionText}...`;
+    } else {
+      return `Create ${actionText}`;
     }
   },
-  execute: async (plugin: MyPlugin, params: CreateDocumentToolInput): Promise<ToolExecutionResult> => {
+  execute: async (context: ToolExecutionContext<CreateDocumentToolInput>): Promise<void> => {
+    const { plugin, params } = context;
     const { path, content } = params;
     const documentContent = content || ''; // Default to empty string if content is undefined
+
+    context.progress(`Checking if file exists at ${path}...`);
 
     // Check if the file already exists
     const exists = await fileExists(path, plugin.app);
@@ -53,15 +62,17 @@ export const createDocumentTool: ObsidianTool<CreateDocumentToolInput> = {
       throw new ToolExecutionError(`File already exists at ${path}. Set overwrite to true to replace it.`);
     }
 
+    context.progress(`Creating document at ${path}...`);
+
     // Create the file
     await createFile(path, documentContent, plugin.app);
 
-    return {
-      result: `Successfully created document at ${path}`,
-      navigationTargets: [{
-        filePath: path,
-        description: t("tools.navigation.openCreatedDocument")
-      }]
-    };
+    // Add navigation target
+    context.addNavigationTarget({
+      filePath: path,
+      description: t("tools.navigation.openCreatedDocument")
+    });
+
+    context.progress(`Successfully created document at ${path}`);
   }
 };

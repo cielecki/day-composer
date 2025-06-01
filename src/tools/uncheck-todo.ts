@@ -1,6 +1,7 @@
 import MyPlugin from "../main";
 import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
-import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 import { findTaskByDescription } from "../utils/tools/note-utils";
 import { updateNote } from '../utils/tools/note-utils';
 import { readNote } from '../utils/tools/note-utils';
@@ -41,24 +42,32 @@ type UncheckTodoToolInput = {
 export const uncheckTodoTool: ObsidianTool<UncheckTodoToolInput> = {
   specification: schema,
   icon: "square",
-  getActionText: (input: UncheckTodoToolInput, output: string, hasResult: boolean, hasError: boolean) => {
+  getActionText: (input: UncheckTodoToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
     let actionText = '';
-    if (!input || typeof input !== 'object') actionText = '';
+    if (!input || typeof input !== 'object') return '';
     if (input.todo_text) actionText = `"${input.todo_text}"`;
-    if (hasResult) {
-      return hasError
-        ? t('tools.actions.uncheck.failed').replace('{{task}}', actionText)
-        : t('tools.actions.uncheck.success').replace('{{task}}', actionText);
-    } else {
+    
+    if (hasError) {
+      return t('tools.actions.uncheck.failed').replace('{{task}}', actionText);
+    } else if (hasCompleted) {
+      return t('tools.actions.uncheck.success').replace('{{task}}', actionText);
+    } else if (hasStarted) {
       return t('tools.actions.uncheck.inProgress').replace('{{task}}', actionText);
+    } else {
+      return `Uncheck ${actionText}`;
     }
   },
-  execute: async (plugin: MyPlugin, params: UncheckTodoToolInput): Promise<ToolExecutionResult> => {
+  execute: async (context: ToolExecutionContext<UncheckTodoToolInput>): Promise<void> => {
+    const { plugin, params } = context;
     const todoDescription = params.todo_text;
     const comment = params.comment;
     const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
 
+    context.progress(`Reading note from ${filePath}...`);
+
     const note = await readNote({plugin, filePath})
+
+    context.progress("Finding completed todo to uncheck...");
 
     // Find the task
     const task = findTaskByDescription(note, todoDescription, (task) => task.status !== 'pending');
@@ -71,6 +80,8 @@ export const uncheckTodoTool: ObsidianTool<UncheckTodoToolInput> = {
       }));
     }
 
+    context.progress("Unchecking todo item...");
+
     // Update status directly on the task (it's already part of the note structure)
     task.status = 'pending';
 
@@ -79,8 +90,12 @@ export const uncheckTodoTool: ObsidianTool<UncheckTodoToolInput> = {
       task.comment = task.comment ? task.comment + "\n    " + comment : "    " + comment;
     }
 
+    context.progress("Saving updated note...");
+
     // Update the note with the modified task
     await updateNote({plugin, filePath, updatedNote: note})
+
+    context.progress("Creating navigation targets...");
 
     // Create navigation targets for the unchecked task
     const navigationTargets = createNavigationTargetsForTasks(
@@ -90,14 +105,14 @@ export const uncheckTodoTool: ObsidianTool<UncheckTodoToolInput> = {
       t('tools.navigation.navigateToUncheckedTodo')
     );
 
+    // Add navigation targets
+    navigationTargets.forEach(target => context.addNavigationTarget(target));
+
     const resultMessage = t('tools.success.uncheck', {
       task: todoDescription,
       path: filePath
     });
 
-    return {
-      result: resultMessage,
-      navigationTargets: navigationTargets
-    };
+    context.progress(resultMessage);
   }
 };

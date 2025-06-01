@@ -7,12 +7,13 @@ export interface ToolProcessingResult {
 }
 
 /**
- * Processes tool use blocks and returns tool results
+ * Processes tool use blocks and returns tool results with real-time progress updates
  */
 export const processToolUseBlocks = async (
 	toolUseBlocks: ToolUseBlock[],
 	obsidianTools: ReturnType<typeof import("../../obsidian-tools").getObsidianTools>,
-	signal: AbortSignal
+	signal: AbortSignal,
+	onProgress?: (toolId: string, message: string) => void
 ): Promise<ToolProcessingResult> => {
 	const toolResults: ToolResultBlock[] = [];
 	let abortedDuringProcessing = false;
@@ -27,6 +28,15 @@ export const processToolUseBlocks = async (
 			const result = await obsidianTools.processToolCall(
 				toolUseBlock.name,
 				toolUseBlock.input,
+				signal,
+				(message: string) => {
+					// Call progress callback if provided
+					onProgress?.(toolUseBlock.id, message);
+				},
+				(navigationTarget) => {
+					// Navigation targets are collected within the processToolCall method
+					// and will be included in the final result
+				}
 			);
 			
 			toolResults.push({

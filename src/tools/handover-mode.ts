@@ -1,5 +1,6 @@
 import MyPlugin from "../main";
 import { ObsidianTool } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { modeManagerService } from "../services/ModeManagerService";
 import { t } from "../i18n";
@@ -48,7 +49,7 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 		};
 	},
 	icon: "arrow-right-left",
-	getActionText: (input: HandoverModeToolInput, output: string, hasResult: boolean, hasError: boolean) => {
+	getActionText: (input: HandoverModeToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
 		if (!input || typeof input !== 'object') {
 			return 'Handover mode';
 		}
@@ -69,17 +70,22 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 			// Fall back to mode ID
 		}
 
-		if (hasResult) {
-			return hasError
-				? t("tools.handover.failedToSwitch", { modeName })
-				: t("tools.handover.switched", { modeName });
-		} else {
+		if (hasError) {
+			return t("tools.handover.failedToSwitch", { modeName });
+		} else if (hasCompleted) {
+			return t("tools.handover.switched", { modeName });
+		} else if (hasStarted) {
 			return t("tools.handover.switching", { modeName });
+		} else {
+			return `Handover to ${modeName}`;
 		}
 	},
-	execute: async (plugin: MyPlugin, params: HandoverModeToolInput): Promise<string> => {
+	execute: async (context: ToolExecutionContext<HandoverModeToolInput>): Promise<void> => {
 		try {
+			const { params } = context;
 			const { mode_id } = params;
+
+			context.progress("Validating mode handover request...");
 
 			// Validate input
 			if (!mode_id || typeof mode_id !== 'string') {
@@ -90,6 +96,8 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 			if (!modeManagerService.isContextAvailable()) {
 				throw new ToolExecutionError(t("tools.handover.noModes"));
 			}
+
+			context.progress("Checking available modes...");
 
 			// Get available modes for validation
 			const availableModes = modeManagerService.getAvailableModes();
@@ -104,8 +112,11 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 			
 			// Check if we're already in the requested mode
 			if (currentModeId === mode_id) {
-				return t("tools.handover.alreadyInMode", { modeName: targetMode.name });
+				context.progress(t("tools.handover.alreadyInMode", { modeName: targetMode.name }));
+				return;
 			}
+
+			context.progress(`Switching to ${targetMode.name} mode...`);
 
 			// Perform the mode change
 			await modeManagerService.changeModeById(mode_id);
@@ -113,12 +124,14 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 			// Success message with clear handover instructions for the new mode
 			const currentModeName = availableModes.find(m => m.id === currentModeId)?.name || currentModeId;
 			
-			return `${t("tools.handover.successMessage", { fromMode: currentModeName, toMode: targetMode.name })}
+			const handoverMessage = `${t("tools.handover.successMessage", { fromMode: currentModeName, toMode: targetMode.name })}
 
 ${t("tools.handover.newModeActive", { modeName: targetMode.name })}
 ${t("tools.handover.description")} ${targetMode.description || t("tools.handover.noDescription")}
 
 ${t("tools.handover.handoverInstructions")}`;
+
+			context.progress(handoverMessage);
 
 		} catch (error) {
 			console.error('Error in handover mode tool:', error);

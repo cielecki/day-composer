@@ -1,4 +1,5 @@
 import { NavigationTarget } from '../../obsidian-tools';
+import MyPlugin from '../../main';
 
 export interface Message {
 	role: "user" | "assistant";
@@ -15,6 +16,20 @@ export interface ToolResult {
 export interface MessageWithToolResults {
 	role: "user" | "assistant";
 	content: string | ToolResult[];
+}
+
+// Tool Execution Context for the new context-based tool system
+export interface ToolExecutionContext<TInput = any> {
+	// Execution environment
+	plugin: MyPlugin;
+	params: TInput;
+	signal: AbortSignal;
+	
+	// Progress reporting (final message serves as result)
+	progress(message: string): void;
+	
+	// Navigation targets (can be called multiple times during execution)
+	addNavigationTarget(target: NavigationTarget): void;
 }
 
 // New block types based on Anthropic API for extended thinking

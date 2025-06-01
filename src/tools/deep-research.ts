@@ -1,5 +1,6 @@
 import MyPlugin from "../main";
-import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 import { getPluginSettings } from "../settings/PluginSettings";
 import { t } from "../i18n";
 import { Notice } from "obsidian";
@@ -62,23 +63,28 @@ type DeepResearchToolInput = {
 export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
   specification: schema,
   icon: "search",
-  getActionText: (input: DeepResearchToolInput, output: string, hasResult: boolean, hasError: boolean) => {
+  getActionText: (input: DeepResearchToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
     if (!input || typeof input !== 'object') return '';
     
     if (hasError) {
       return t('tools.deepResearch.errors.general', { error: t('tools.deepResearch.errors.researchFailed') });
     }
     
-    if (hasResult) {
+    if (hasCompleted) {
       return `${t('tools.deepResearch.success')} for "${input.query}"`;
-    } else {
+    } else if (hasStarted) {
       return t('tools.deepResearch.researching', { query: input.query });
+    } else {
+      return `Research "${input.query}"`;
     }
   },
-  execute: async (plugin: MyPlugin, params: DeepResearchToolInput): Promise<ToolExecutionResult> => {
+  execute: async (context: ToolExecutionContext<DeepResearchToolInput>): Promise<void> => {
     try {
+      const { plugin, params, signal } = context;
       const { query, path, max_depth = 3, max_urls = 20, timeout = 180, overwrite = false } = params;
       const settings = getPluginSettings();
+
+      context.progress("Validating research parameters...");
 
       // Validate inputs
       if (!query || query.trim().length === 0) {
@@ -92,6 +98,8 @@ export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
       if (!settings.firecrawlApiKey || settings.firecrawlApiKey.trim().length === 0) {
         throw new ToolExecutionError(t('tools.deepResearch.errors.noApiKey'));
       }
+
+      context.progress("Loading Firecrawl library...");
 
       // Dynamic import of Firecrawl to avoid bundling issues
       let FirecrawlApp;
@@ -115,23 +123,25 @@ export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
 
       console.log(`Starting deep research for query: "${query}" with params:`, researchParams);
 
-      // Show start notice to user
-      new Notice(t('tools.deepResearch.researching', { query }), 4000);
+      context.progress(`Starting deep research for: "${query}"`);
 
       // Activity callback to track progress
       const onActivity = (activity: any) => {
+        if (signal.aborted) return;
+        
         const activityType = activity?.type || '';
         const message = activity?.message || '';
         
         if (message) {
-          // Show progress to user via Notice
-          new Notice(message, 3000); // Show for 3 seconds
+          context.progress(message);
           console.log(`Research Progress [${activityType}]: ${message}`);
         }
       };
 
       // Perform deep research
       const results = await firecrawl.deepResearch(query, researchParams, onActivity);
+
+      if (signal.aborted) return;
 
       if (!results || !results.success) {
         const errorMsg = results?.error || t('tools.deepResearch.errors.unknownError');
@@ -152,6 +162,8 @@ export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
       if (!researchData) {
         throw new ToolExecutionError(t('tools.deepResearch.errors.noResults'));
       }
+
+      context.progress("Processing research results...");
 
       // Format the research results
       let formattedResult = `# ${t('tools.deepResearch.headers.results')}: ${query}\n\n`;
@@ -193,6 +205,8 @@ export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
 
       console.log('Deep research completed successfully');
       
+      context.progress("Saving research report...");
+
       // Generate unique filename if file exists and overwrite is false
       let finalPath = path;
       if (await fileExists(path, plugin.app) && !overwrite) {
@@ -208,6 +222,13 @@ export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
       
       // Count sources for result summary
       const sourceCount = researchData.sources ? researchData.sources.length : 0;
+
+      // Create navigation target for the research report
+      context.addNavigationTarget({
+        filePath: finalPath,
+        description: t('tools.deepResearch.result.navigationDescription')
+      });
+
       const resultMessage = t('tools.deepResearch.result.message', {
         query,
         path: finalPath,
@@ -215,16 +236,7 @@ export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
         maxDepth: researchParams.maxDepth.toString()
       });
 
-      // Create navigation target for the research report
-      const navigationTargets: NavigationTarget[] = [{
-        filePath: finalPath,
-        description: t('tools.deepResearch.result.navigationDescription')
-      }];
-
-      return {
-        result: resultMessage,
-        navigationTargets: navigationTargets
-      };
+      context.progress(resultMessage);
 
     } catch (error) {
       console.error('Error in deep research tool:', error);

@@ -122,7 +122,12 @@ export const runConversationTurn = async (
 						const { toolResults, abortedDuringProcessing } = await processToolUseBlocks(
 							toolUseBlocks,
 							obsidianTools,
-							signal
+							signal,
+							(toolId: string, message: string) => {
+								// Create progress update for UI - this could be handled better with a proper progress system
+								console.log(`Tool Progress [${toolId}]: ${message}`);
+								// TODO: Could add UI progress indicators here
+							}
 						);
 
 						if (abortedDuringProcessing || signal.aborted) {

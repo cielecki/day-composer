@@ -1,7 +1,8 @@
 import MyPlugin from "../main";
 import { readFile } from "../utils/fs/read-file";
 import { getFile } from "../utils/fs/get-file";
-import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 import { t } from "../i18n";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 
@@ -27,20 +28,27 @@ type ReadDocumentToolInput = {
 export const readDocumentTool: ObsidianTool<ReadDocumentToolInput> = {
   specification: schema,
   icon: "file-text",
-  getActionText: (input: ReadDocumentToolInput, output: string, hasResult: boolean) => {
+  getActionText: (input: ReadDocumentToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
     let actionText = '';
-    if (!input || typeof input !== 'object') actionText = '';
+    if (!input || typeof input !== 'object') return '';
     if (input.path) actionText = `"${input.path}"`;
     
-    if (hasResult) {
+    if (hasError) {
+      return `Failed to read ${actionText}`;
+    } else if (hasCompleted) {
       return t('tools.readDocument', { defaultValue: 'Read' }) + ' ' + actionText;
-    } else {
+    } else if (hasStarted) {
       return t('tools.readDocument', { defaultValue: 'Reading' }) + ' ' + actionText + '...';
+    } else {
+      return `Read ${actionText}`;
     }
   },
-  execute: async (plugin: MyPlugin, params: ReadDocumentToolInput): Promise<ToolExecutionResult> => {
+  execute: async (context: ToolExecutionContext<ReadDocumentToolInput>): Promise<void> => {
     try {
+      const { plugin, params } = context;
       const { path } = params;
+      
+      context.progress(`Locating document at ${path}...`);
       
       // Get the file
       const file = getFile(path, plugin.app);
@@ -49,16 +57,18 @@ export const readDocumentTool: ObsidianTool<ReadDocumentToolInput> = {
         throw new ToolExecutionError(t('errors.documents.notFound', { path }));
       }
       
+      context.progress(`Reading document content...`);
+      
       // Read the content
       const content = await readFile(file, plugin.app);
       
-      return {
-        result: content,
-        navigationTargets: [{
-          filePath: path,
-          description: t("tools.navigation.openReadDocument")
-        }]
-      };
+      // Add navigation target
+      context.addNavigationTarget({
+        filePath: path,
+        description: t("tools.navigation.openReadDocument")
+      });
+      
+      context.progress(content);
     } catch (error) {
       console.error('Error reading document:', error);
       throw new Error(`Error reading document: ${error.message || 'Unknown error'}`);

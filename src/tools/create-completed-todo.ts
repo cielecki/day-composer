@@ -5,7 +5,8 @@ import { getCurrentTime } from "../utils/time/get-current-time";
 import { appendComment, insertTaskAtPosition, Task } from "../utils/task/task-utils";
 
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool, NavigationTarget } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 import { findCurrentSpot, readNote, updateNote } from "../utils/tools/note-utils";
 import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
 import { createNavigationTargetsForTasks } from "../utils/tools/line-number-utils";
@@ -48,20 +49,24 @@ type CreateCompletedTodoToolInput = {
 export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput> = {
   specification: schema,
   icon: "check-square-2",
-  getActionText: (input: CreateCompletedTodoToolInput, output: string, hasResult: boolean, hasError: boolean) => {
-    const contentPreview = input?.todo_text ? 
-      (input.todo_text.length > 20 ? input.todo_text.substring(0, 20) + '...' : input.todo_text) :
-      '?';
+  getActionText: (input: CreateCompletedTodoToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
+    if (!input || typeof input !== 'object') return '';
     
-    if (hasResult) {
-      return hasError
-        ? t('tools.actions.complete.failed')
-        : t('tools.actions.complete.success').replace('{{content}}', contentPreview);
+    const todoText = input.todo_text || '';
+    const actionText = todoText ? `"${todoText}"` : '';
+    
+    if (hasError) {
+      return `Failed to create completed todo ${actionText}`;
+    } else if (hasCompleted) {
+      return `Created completed todo ${actionText}`;
+    } else if (hasStarted) {
+      return `Creating completed todo ${actionText}...`;
     } else {
-      return t('tools.actions.complete.inProgress');
+      return `Create completed todo ${actionText}`;
     }
   },
-  execute: async (plugin: MyPlugin, params: CreateCompletedTodoToolInput): Promise<ToolExecutionResult> => {
+  execute: async (context: ToolExecutionContext<CreateCompletedTodoToolInput>): Promise<void> => {
+    const { plugin, params } = context;
     try {
       
       // Use "Note" as default description if not provided
@@ -117,6 +122,9 @@ export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput>
         `Navigate to completed todo`
       );
 
+      // Add navigation targets
+      navigationTargets.forEach(target => context.addNavigationTarget(target));
+
       // Return success message with details
       const timeInfo = completionTime ? ` at ${completionTime}` : '';
       const resultMessage = t('tools.success.complete')
@@ -124,10 +132,7 @@ export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput>
         .replace('{{time}}', timeInfo)
         .replace('{{path}}', filePath);
 
-      return {
-        result: resultMessage,
-        navigationTargets: navigationTargets
-      };
+      context.progress(resultMessage);
 
     } catch (error) {
       console.error('Error creating completed todo:', error);

@@ -1,6 +1,7 @@
 import { prepareFuzzySearch } from "obsidian";
 import MyPlugin from "../main";
 import { ObsidianTool } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 
 const schema = {
   name: "search_vault",
@@ -24,46 +25,54 @@ type SearchVaultToolInput = {
 export const searchVaultTool: ObsidianTool<SearchVaultToolInput> = {
   specification: schema,
   icon: "search",
-  getActionText: (input: SearchVaultToolInput, output: string, hasResult: boolean) => {
+  getActionText: (input: SearchVaultToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
     let actionText = '';
     
-    if (!input || typeof input !== 'object') actionText = '';
+    if (!input || typeof input !== 'object') return '';
     if (input.query) actionText = `"${input.query}"`;
 
-    let resultPreview = '(search complete)';
-    try {
-      const data = JSON.parse(output);
-      if (Array.isArray(data)) {
-        resultPreview = data.length === 0 ? '(no results)' : `(${data.length} results)`;
-      }
-    } catch (e) {
-      // Ignore parsing errors
-    }
-
-    if (hasResult) {
-      return `Searched for ${actionText} ${resultPreview}`;
-    } else {
+    if (hasError) {
+      return `Failed to search for ${actionText}`;
+    } else if (hasCompleted) {
+      return `Searched for ${actionText}`;
+    } else if (hasStarted) {
       return `Searching for ${actionText}...`;
+    } else {
+      return `Search for ${actionText}`;
     }
   },
-  execute: async (plugin: MyPlugin, params: SearchVaultToolInput): Promise<string> => {
+  execute: async (context: ToolExecutionContext<SearchVaultToolInput>): Promise<void> => {
     try {
+      const { plugin, params } = context;
       const { query } = params;
+      
+      context.progress("Preparing search...");
       
       // Ensure query is a string (handle null/undefined)
       const searchQuery = query || '';
 
       if (!searchQuery) {
-        return 'Error: No search query provided';
+        throw new Error('No search query provided');
       }
       
       const fuzzySearch = prepareFuzzySearch(searchQuery);
+      
+      context.progress("Getting files from vault...");
       
       // Get all markdown files from the vault
       const files = plugin.app.vault.getMarkdownFiles();
       const results = [];
 
-      for (const file of files) {
+      context.progress(`Searching through ${files.length} files...`);
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Update progress periodically
+        if (i % 50 === 0) {
+          context.progress(`Processing file ${i + 1}/${files.length}...`);
+        }
+        
         let shouldInclude = false;
         const filename = file.basename;
         const path = file.path;
@@ -112,13 +121,20 @@ export const searchVaultTool: ObsidianTool<SearchVaultToolInput> = {
         }
       }
       
+      context.progress("Sorting search results...");
+      
       // Sort results by score (higher scores first)
       results.sort((a, b) => (b.score || 0) - (a.score || 0));
 
-      return JSON.stringify(results);
+      const resultCount = results.length;
+      const resultMessage = resultCount === 0 
+        ? `No results found for "${query}"` 
+        : `Found ${resultCount} result${resultCount > 1 ? 's' : ''} for "${query}":\n\n${JSON.stringify(results, null, 2)}`;
+
+      context.progress(resultMessage);
     } catch (error) {
       console.error('Error searching vault:', error);
-      return `Error searching vault: ${error.message || 'Unknown error'}`;
+      throw new Error(`Error searching vault: ${error.message || 'Unknown error'}`);
     }
   }
 };

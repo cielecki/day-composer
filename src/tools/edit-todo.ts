@@ -1,6 +1,7 @@
 import MyPlugin from "../main";
-import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
-import { findTaskByDescription, updateNote, readNote, NoteNode } from '../utils/tools/note-utils';
+import { ObsidianTool } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
+import { findTaskByDescription, readNote, updateNote, NoteNode } from "../utils/tools/note-utils";
 import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
 import { getCurrentTime } from "../utils/time/get-current-time";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
@@ -52,18 +53,24 @@ type EditTodoToolInput = {
 export const editTodoTool: ObsidianTool<EditTodoToolInput> = {
   specification: schema,
   icon: "edit",
-  getActionText: (input: EditTodoToolInput, output: string, hasResult: boolean, hasError: boolean) => {
-    if (hasResult) {
-      const actionText = input?.original_todo_text ? `"${input.original_todo_text}"` : 'todo';
-      
-      return hasError
-        ? t('tools.actions.edit.failed').replace('{{task}}', actionText)
-        : t('tools.actions.edit.success').replace('{{task}}', actionText);
+  getActionText: (input: EditTodoToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
+    if (!input || typeof input !== 'object') return '';
+    
+    const todoText = input.original_todo_text || '';
+    const actionText = todoText ? `"${todoText}"` : '';
+    
+    if (hasError) {
+      return `Failed to edit todo ${actionText}`;
+    } else if (hasCompleted) {
+      return `Edited todo ${actionText}`;
+    } else if (hasStarted) {
+      return `Editing todo ${actionText}...`;
     } else {
-      return t('tools.actions.edit.inProgress').replace('{{task}}', '');
+      return `Edit todo ${actionText}`;
     }
   },
-  execute: async (plugin: MyPlugin, params: EditTodoToolInput): Promise<ToolExecutionResult> => {
+  execute: async (context: ToolExecutionContext<EditTodoToolInput>): Promise<void> => {
+    const { plugin, params } = context;
     const { original_todo_text } = params;
     
     if (!original_todo_text) {
@@ -137,14 +144,12 @@ export const editTodoTool: ObsidianTool<EditTodoToolInput> = {
     const commentText = params.replacement_comment ? ` with comment` : '';
     
     const resultMessage = t('tools.success.edit')
-      .replace('{{originalTask}}', `"${original_todo_text}"`)
-      .replace('{{newTask}}', `"${params.replacement_todo_text}"`)
-      .replace('{{path}}', filePath)
+      .replace('{{task}}', original_todo_text)
       .replace('{{details}}', `${statusText}${commentText}`);
 
-    return {
-      result: resultMessage,
-      navigationTargets: navigationTargets
-    };
+    // Add navigation targets
+    navigationTargets.forEach(target => context.addNavigationTarget(target));
+
+    context.progress(resultMessage);
   }
 }; 

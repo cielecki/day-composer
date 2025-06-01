@@ -1,5 +1,6 @@
 import MyPlugin from "../main";
-import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool, NavigationTarget } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 import { findTaskByDescription, updateNote, readNote, NoteNode, TextBlock } from '../utils/tools/note-utils';
 import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
@@ -49,38 +50,30 @@ type RemoveTodoToolInput = {
 export const removeTodoTool: ObsidianTool<RemoveTodoToolInput> = {
   specification: schema,
   icon: "trash-2",
-  getActionText: (input: RemoveTodoToolInput, output: string, hasResult: boolean, hasError: boolean) => {
-    if (hasResult) {
-      let actionText = '';
-      if (!input || typeof input !== 'object') actionText = '';
-      const todoCount = input.todos?.length || 0;
-      
-      if (todoCount === 1) {
-        actionText = `"${input.todos[0].todo_text}"`;
-      } else {
-        // Use proper pluralization based on count
-        const countKey = todoCount === 0 ? 'zero' :
-                         todoCount === 1 ? 'one' :
-                         todoCount % 10 >= 2 && todoCount % 10 <= 4 && (todoCount % 100 < 10 || todoCount % 100 >= 20) ? 'few' : 'many';
-        
-        // Check if the translation key exists
-        try {
-          const translation = t(`tools.tasks.count.${countKey}`, { count: todoCount });
-          actionText = translation !== `tools.tasks.count.${countKey}` ? translation : `${todoCount} ${t('tools.tasks.plural')}`;
-        } catch (e) {
-          // Fallback to simple pluralization if the count format is not available
-          actionText = `${todoCount} ${t('tools.tasks.plural')}`;
-        }
-      }
-      
-      return hasError
-        ? t('tools.actions.remove.failed').replace('{{task}}', actionText)
-        : t('tools.actions.remove.success').replace('{{task}}', actionText);
+  getActionText: (input: RemoveTodoToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
+    if (!input || typeof input !== 'object') return '';
+    
+    const todoCount = input.todos?.length || 0;
+    let actionText = '';
+    
+    if (todoCount === 1) {
+      actionText = `"${input.todos[0].todo_text}"`;
     } else {
-      return t('tools.actions.remove.inProgress').replace('{{task}}', '');
+      actionText = `${todoCount} todos`;
+    }
+    
+    if (hasError) {
+      return `Failed to remove ${actionText}`;
+    } else if (hasCompleted) {
+      return `Removed ${actionText}`;
+    } else if (hasStarted) {
+      return `Removing ${actionText}...`;
+    } else {
+      return `Remove ${actionText}`;
     }
   },
-  execute: async (plugin: MyPlugin, params: RemoveTodoToolInput): Promise<ToolExecutionResult> => {
+  execute: async (context: ToolExecutionContext<RemoveTodoToolInput>): Promise<void> => {
+    const { plugin, params } = context;
     const { todos } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
@@ -158,6 +151,9 @@ ${originalTaskText}
       `Navigate to removed todo${removedTasks.length > 1 ? 's' : ''}`
     )];
     
+    // Add navigation targets
+    navigationTargets.forEach(target => context.addNavigationTarget(target));
+    
     // Prepare success message
     const tasksDescription = removedTasks.length === 1 
       ? `"${removedTasks[0]}"`
@@ -167,9 +163,6 @@ ${originalTaskText}
       .replace('{{task}}', tasksDescription)
       .replace('{{path}}', filePath);
 
-    return {
-      result: resultMessage,
-      navigationTargets: navigationTargets
-    };
+    context.progress(resultMessage);
   }
 }; 

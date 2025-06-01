@@ -2,7 +2,8 @@ import MyPlugin from "../main";
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool, NavigationTarget } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 import { readNote, updateNote, Note, findTaskByDescription, determineInsertionPosition } from "../utils/tools/note-utils";
 import { insertTaskAtPosition, Task } from "../utils/task/task-utils";
 import { moveTaskToPosition } from "../utils/task/move-task-to-position";
@@ -70,52 +71,48 @@ type MoveTodoToolInput = {
 export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
   specification: schema,
   icon: "move",
-  getActionText: (input: MoveTodoToolInput, output: string, hasResult: boolean, hasError: boolean) => {
-    if (hasResult) {
-      // Only process task text for completed operations
-      let actionText = '';
-      if (!input || typeof input !== 'object') actionText = '';
-      const todoCount = input.todos?.length || 0;
-      
-      if (todoCount === 1) {
-        actionText = `"${input.todos[0].todo_text}"`;
-      } else {
-        // Use proper pluralization based on count
-        const countKey = todoCount === 0 ? 'zero' :
-                         todoCount === 1 ? 'one' :
-                         todoCount % 10 >= 2 && todoCount % 10 <= 4 && (todoCount % 100 < 10 || todoCount % 100 >= 20) ? 'few' : 'many';
-        
-        // Check if the translation key exists
-        try {
-          const translation = t(`tools.tasks.count.${countKey}`, { count: todoCount });
-          actionText = translation !== `tools.tasks.count.${countKey}` ? translation : `${todoCount} ${t('tools.tasks.plural')}`;
-        } catch (e) {
-          // Fallback to simple pluralization if the count format is not available
-          actionText = `${todoCount} ${t('tools.tasks.plural')}`;
-        }
-      }
-      
-      return hasError
-        ? t('tools.actions.move.failed').replace('{{task}}', actionText)
-        : t('tools.actions.move.success').replace('{{task}}', actionText);
+  getActionText: (input: MoveTodoToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
+    if (!input || typeof input !== 'object') return '';
+    
+    const todoCount = input.todos?.length || 0;
+    let actionText = '';
+    
+    if (todoCount === 1) {
+      actionText = `"${input.todos[0].todo_text}"`;
     } else {
-      // For in-progress operations, don't show task details
-      return t('tools.actions.move.inProgress').replace('{{task}}', '');
+      actionText = `${todoCount} todos`;
+    }
+    
+    if (hasError) {
+      return `Failed to move ${actionText}`;
+    } else if (hasCompleted) {
+      return `Moved ${actionText}`;
+    } else if (hasStarted) {
+      return `Moving ${actionText}...`;
+    } else {
+      return `Move ${actionText}`;
     }
   },
-  execute: async (plugin: MyPlugin, params: MoveTodoToolInput): Promise<ToolExecutionResult> => {
+  execute: async (context: ToolExecutionContext<MoveTodoToolInput>): Promise<void> => {
+    const { plugin, params } = context;
     // Extract parameters
     const { todos, source_path, position, reference_todo_text, target_path } = params;
+    
+    context.progress("Validating move parameters...");
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
       throw new ToolExecutionError("No to-do items provided");
     }
+
+    context.progress("Checking source file...");
   
     // Make sure source file exists
     const sourceExists = await fileExists(source_path, plugin.app);
     if (!sourceExists) {
       throw new ToolExecutionError(t('errors.files.sourceNotFound', { path: source_path }));
     }
+    
+    context.progress("Preparing target file...");
     
     // Check if target file exists, create it if not
     const targetExists = await fileExists(target_path, plugin.app);
@@ -130,16 +127,22 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       }
     }
     
+    context.progress("Reading source document...");
+    
     // Read the source note
     const sourceNote = await readNote({plugin, filePath: source_path});
     
     // Check if moving within the same document
     const isMovingWithinSameDocument = source_path === target_path;
     
+    context.progress("Reading target document...");
+    
     // Read the target note (if different from source)
     const targetNote = isMovingWithinSameDocument 
       ? JSON.parse(JSON.stringify(sourceNote)) // Deep copy to avoid reference issues
       : await readNote({plugin, filePath: target_path});
+    
+    context.progress("Validating todos exist...");
     
     // Validate all tasks upfront - will throw if any validation fails
     validateTasks(
@@ -160,6 +163,8 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
         }));
       }
     }
+    
+    context.progress(`Moving ${todos.length} todo item${todos.length > 1 ? 's' : ''}...`);
     
     // Track tasks that will be moved
     const movedTasks: string[] = [];
@@ -237,6 +242,8 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       }
     }
     
+    context.progress("Updating documents...");
+    
     // Update the files with all the changes
     if (isMovingWithinSameDocument) {
       await updateNote({plugin, filePath: source_path, updatedNote: updatedSourceNote});
@@ -244,6 +251,8 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       await updateNote({plugin, filePath: source_path, updatedNote: updatedSourceNote});
       await updateNote({plugin, filePath: target_path, updatedNote: updatedTargetNote});
     }
+    
+    context.progress("Creating navigation targets...");
     
     // Calculate line numbers for navigation targets
     const navigationTargets: NavigationTarget[] = [];
@@ -281,6 +290,9 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       }
     }
     
+    // Add navigation targets
+    navigationTargets.forEach(target => context.addNavigationTarget(target));
+    
     // Include positioning details in the success message
     const positionDetail = (position === "after" || position === "before")
       ? t(`tools.position.${position}`).replace('{{task}}', reference_todo_text || '')
@@ -296,9 +308,6 @@ export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
       .replace('{{target}}', target_path)
       .replace('{{position}}', positionDetail);
 
-    return {
-      result: resultMessage,
-      navigationTargets: navigationTargets
-    };
+    context.progress(resultMessage);
   }
 };

@@ -1,8 +1,10 @@
 import MyPlugin from "../main";
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
-import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool, NavigationTarget } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
+import { generateUniqueFileName } from "../utils/tools/generate-unique-file-name";
 import { requestUrl } from "obsidian";
 import { t } from "../i18n";
 
@@ -198,17 +200,18 @@ async function fetchYouTubeTranscript(videoId: string, language: string = 'en'):
 export const downloadYoutubeTranscriptTool: ObsidianTool<DownloadYoutubeTranscriptInput> = {
   specification: schema,
   icon: "download",
-  getActionText: (input: DownloadYoutubeTranscriptInput, output: string, hasResult: boolean) => {
+  getActionText: (input: DownloadYoutubeTranscriptInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
     let actionText = '';
     if (!input || typeof input !== 'object') actionText = '';
     if (input.path) actionText = `transcript to "${input.path}"`;
-    if (hasResult) {
+    if (hasCompleted) {
       return `Downloaded ${actionText}`;
     } else {
       return `Downloading ${actionText}...`;
     }
   },
-  execute: async (plugin: MyPlugin, params: DownloadYoutubeTranscriptInput): Promise<ToolExecutionResult> => {
+  execute: async (context: ToolExecutionContext<DownloadYoutubeTranscriptInput>): Promise<void> => {
+    const { plugin, params } = context;
     const { url, path, language = 'en', includeTimestamps = true, overwrite = false } = params;
 
     try {
@@ -255,15 +258,12 @@ export const downloadYoutubeTranscriptTool: ObsidianTool<DownloadYoutubeTranscri
       const resultMessage = `Successfully downloaded YouTube transcript to ${path}. Contains ${transcriptLength} segments covering approximately ${totalDuration} minutes of video content.`;
 
       // Create navigation target for the downloaded transcript
-      const navigationTargets: NavigationTarget[] = [{
+      context.addNavigationTarget({
         filePath: path,
         description: t("tools.navigation.openDownloadedTranscript")
-      }];
+      });
 
-      return {
-        result: resultMessage,
-        navigationTargets: navigationTargets
-      };
+      context.progress(resultMessage);
     } catch (error) {
       if (error instanceof ToolExecutionError) {
         throw error;

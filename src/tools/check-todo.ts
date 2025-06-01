@@ -3,7 +3,8 @@ import { getCurrentTime } from "../utils/time/get-current-time";
 import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
 import { appendComment, Task } from "../utils/task/task-utils";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 import { findTaskByDescription, readNote, updateNote } from '../utils/tools/note-utils';
 import { moveTaskToPosition } from "../utils/task/move-task-to-position";
 import { validateTasks } from "../utils/task/task-validation";
@@ -60,34 +61,46 @@ type CheckTodoToolInput = {
 export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
   specification: schema,
   icon: "check-circle",
-  getActionText: (input: CheckTodoToolInput, output: string, hasResult: boolean, hasError: boolean) => {
+  getActionText: (input: CheckTodoToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
     if (!input || typeof input !== 'object' || !input.todos) {
-      return hasResult ? 'Checked todos' : 'Checking todos...';
+      return hasCompleted ? 'Checked todos' : 'Checking todos...';
     }
 
     const count = input.todos.length;
     const todoText = count === 1 ? input.todos[0].todo_text : `${count} todos`;
 
-    if (hasResult) {
-      return hasError 
-        ? `Failed to check ${todoText}`
-        : `Checked ${todoText}`;
-    } else {
+    if (hasError) {
+      return `Failed to check ${todoText}`;
+    } else if (hasCompleted) {
+      return `Checked ${todoText}`;
+    } else if (hasStarted) {
       return `Checking ${todoText}...`;
+    } else {
+      return `Check ${todoText}`;
     }
   },
-  execute: async (plugin: MyPlugin, params: CheckTodoToolInput): Promise<ToolExecutionResult> => {
+  execute: async (context: ToolExecutionContext<CheckTodoToolInput>): Promise<void> => {
+    const { plugin, params } = context;
     const { todos, time } = params;
+    
+    context.progress("Validating todo items...");
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
       throw new ToolExecutionError("No to-do items provided");
     }
 
+    context.progress("Preparing time formatting...");
+
     // Format the current time if provided (common for all tasks)
     const currentTime = getCurrentTime(time);
     
     const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
+    
+    context.progress(`Reading note from ${filePath}...`);
+    
     const note = await readNote({plugin, filePath});
+    
+    context.progress("Validating tasks exist and are pending...");
     
     // Use the validation utility to check all tasks upfront - will throw if validation fails
     // Tasks must be in pending state to be checked off
@@ -98,6 +111,8 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
         taskPredicate: (task) => task.status === 'pending'
       }))
     );
+    
+    context.progress(`Checking off ${todos.length} todo item${todos.length > 1 ? 's' : ''}...`);
     
     // If we get here, all tasks were validated successfully
     let updatedNote = JSON.parse(JSON.stringify(note));
@@ -132,8 +147,12 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
       checkedTasks.push(todo_text);
     }
     
+    context.progress("Updating note with completed tasks...");
+    
     // Update the note with all completed tasks
     await updateNote({plugin, filePath, updatedNote});
+    
+    context.progress("Creating navigation targets...");
     
     // Create navigation targets for the moved tasks
     const navigationTargets = createNavigationTargetsForTasks(
@@ -143,15 +162,15 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
       `Navigate to checked todo{{count}}`
     );
 
+    // Add navigation targets
+    navigationTargets.forEach(target => context.addNavigationTarget(target));
+
     // Create result message
     const resultMessage = checkedTasks.length === 1 
-      ? `✅ Checked off: "${checkedTasks[0]}"`
+      ? `✅ Checked off: "${checkedTasks[0]}"` 
       : `✅ Checked off ${checkedTasks.length} todos:\n${checkedTasks.map(task => `• ${task}`).join('\n')}`;
 
-    return {
-      result: resultMessage,
-      navigationTargets: navigationTargets
-    };
+    context.progress(resultMessage);
   }
 };
 

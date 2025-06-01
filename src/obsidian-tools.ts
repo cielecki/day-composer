@@ -19,6 +19,7 @@ import { ToolExecutionError } from "./utils/tools/tool-execution-error";
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tool-filter";
 import { LNMode } from './utils/mode/LNMode';
+import { ToolExecutionContext } from './utils/chat/types';
 
 // Import React
 import React from "react";
@@ -56,11 +57,12 @@ export interface ObsidianTool<TInput> {
 	icon: string; // Lucide icon name
 	getActionText: (
 		input: TInput,
-		output: string,
-		hasResult: boolean,
+		hasStarted: boolean,
+		hasCompleted: boolean,
 		hasError: boolean,
 	) => string;
-	execute: (plugin: MyPlugin, params: TInput) => Promise<string | ToolExecutionResult>;
+	// Context-based execution - no return value
+	execute: (context: ToolExecutionContext<TInput>) => Promise<void>;
 	// Optional method to render the tool result as a React component
 	// If provided, this will be used instead of the default text rendering
 	renderResult?: (result: string, input: TInput) => React.ReactNode;
@@ -120,14 +122,20 @@ export class ObsidianTools {
 	}
 
 	/**
-	 * Process a tool call from Claude
+	 * Process a tool call from Claude with context-based execution
 	 */
 	async processToolCall(
 		toolName: string,
 		toolInput: any,
-	): Promise<{ result: string; isError: boolean; navigationTargets?: NavigationTarget[] }> {
+		signal: AbortSignal,
+		onProgress: (message: string) => void,
+		onNavigationTarget: (target: NavigationTarget) => void
+	): Promise<{ result: string; isError: boolean; navigationTargets: NavigationTarget[] }> {
 		console.group(`🔄 Processing Tool Call: ${toolName}`);
 		console.log("Tool Input:", toolInput);
+
+		const navigationTargets: NavigationTarget[] = [];
+		const progressMessages: string[] = [];
 
 		try {
 			// Validate tool name
@@ -146,21 +154,35 @@ export class ObsidianTools {
 				);
 			}
 
-			const executionResult = await tool.execute(this.plugin, input);
+			// Create the execution context
+			const context: ToolExecutionContext = {
+				plugin: this.plugin,
+				params: input,
+				signal,
+				progress: (message: string) => {
+					progressMessages.push(message);
+					onProgress(message);
+				},
+				addNavigationTarget: (target: NavigationTarget) => {
+					navigationTargets.push(target);
+					onNavigationTarget(target);
+				}
+			};
+
+			// Execute the tool with context
+			await tool.execute(context);
 			
-			// Handle both string and ToolExecutionResult return types
-			if (typeof executionResult === 'string') {
-				console.log("Tool Execution Result:", executionResult);
-				return { result: executionResult, isError: false };
-			} else {
-				console.log("Tool Execution Result:", executionResult.result);
-				console.log("Navigation Targets:", executionResult.navigationTargets);
-				return { 
-					result: executionResult.result, 
-					isError: false, 
-					navigationTargets: executionResult.navigationTargets 
-				};
-			}
+			// Combine all progress messages into the final result
+			const finalResult = progressMessages.join('\n');
+			
+			console.log("Tool Execution Completed. Final Result:", finalResult);
+			console.log("Navigation Targets:", navigationTargets);
+			
+			return { 
+				result: finalResult || `${toolName} completed successfully`, 
+				isError: false, 
+				navigationTargets 
+			};
 		} catch (error) {
 			const errorMessage =
 				error instanceof ToolExecutionError
@@ -171,7 +193,7 @@ export class ObsidianTools {
 					});
 
 			console.error(errorMessage, error);
-			return { result: `❌ ${errorMessage}`, isError: true };
+			return { result: `❌ ${errorMessage}`, isError: true, navigationTargets };
 		} finally {
 			console.groupEnd();
 		}

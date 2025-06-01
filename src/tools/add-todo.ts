@@ -3,7 +3,8 @@ import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { Task } from "../utils/task/task-utils";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 import {
 	findCurrentSpot,
 	readNote,
@@ -77,44 +78,47 @@ export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
 	icon: "list-plus",
 	getActionText: (
 		input: AddTodoToolInput,
-		output: string,
-		hasResult: boolean,
+		hasStarted: boolean,
+		hasCompleted: boolean,
 		hasError: boolean,
 	) => {
-		if (hasResult) {
-			// Only process task text for completed operations
-			let actionText = "";
-			if (!input || typeof input !== "object") actionText = "";
-			const todoCount = input.todos?.length || 0;
-			
-			if (todoCount === 1) {
-				actionText = `"${input.todos[0].todo_text}"`;
-			} else {
-				// Use proper pluralization based on count
-				const countKey = todoCount === 0 ? 'zero' :
-									todoCount === 1 ? 'one' :
-									todoCount % 10 >= 2 && todoCount % 10 <= 4 && (todoCount % 100 < 10 || todoCount % 100 >= 20) ? 'few' : 'many';
-				
-				// Check if the translation key exists
-				try {
-					const translation = t(`tools.tasks.count.${countKey}`, { count: todoCount });
-					actionText = translation !== `tools.tasks.count.${countKey}` ? translation : `${todoCount} ${t('tools.tasks.plural')}`;
-				} catch (e) {
-					// Fallback to simple pluralization
-					actionText = `${todoCount} ${t('tools.tasks.plural')}`;
-				}
-			}
-
-			return hasError
-				? t('tools.actions.add.failed', { defaultValue: `Failed to add ${actionText}` }).replace('{{task}}', actionText)
-				: t('tools.actions.add.success', { defaultValue: `Added ${actionText}` }).replace('{{task}}', actionText);
+		let actionText = "";
+		if (!input || typeof input !== "object") return '';
+		const todoCount = input.todos?.length || 0;
+		
+		if (todoCount === 1) {
+			actionText = `"${input.todos[0].todo_text}"`;
 		} else {
-			// For in-progress operations, don't show task details
+			// Use proper pluralization based on count
+			const countKey = todoCount === 0 ? 'zero' :
+								todoCount === 1 ? 'one' :
+								todoCount % 10 >= 2 && todoCount % 10 <= 4 && (todoCount % 100 < 10 || todoCount % 100 >= 20) ? 'few' : 'many';
+			
+			// Check if the translation key exists
+			try {
+				const translation = t(`tools.tasks.count.${countKey}`, { count: todoCount });
+				actionText = translation !== `tools.tasks.count.${countKey}` ? translation : `${todoCount} ${t('tools.tasks.plural')}`;
+			} catch (e) {
+				// Fallback to simple pluralization
+				actionText = `${todoCount} ${t('tools.tasks.plural')}`;
+			}
+		}
+
+		if (hasError) {
+			return t('tools.actions.add.failed', { defaultValue: `Failed to add ${actionText}` }).replace('{{task}}', actionText);
+		} else if (hasCompleted) {
+			return t('tools.actions.add.success', { defaultValue: `Added ${actionText}` }).replace('{{task}}', actionText);
+		} else if (hasStarted) {
 			return t('tools.actions.add.inProgress', { defaultValue: 'Adding todo...' }).replace('{{task}}', '');
+		} else {
+			return `Add ${actionText}`;
 		}
 	},
-	execute: async (plugin: MyPlugin, params: AddTodoToolInput): Promise<ToolExecutionResult> => {
+	execute: async (context: ToolExecutionContext<AddTodoToolInput>): Promise<void> => {
+		const { plugin, params } = context;
 		const { todos, path, position, reference_todo_text } = params;
+
+		context.progress("Validating todo input...");
 
 		if (!todos || !Array.isArray(todos) || todos.length === 0) {
 			throw new ToolExecutionError("No to-do items provided");
@@ -122,14 +126,21 @@ export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
 
 		const filePath = path ? path : await getDailyNotePath(plugin.app);
 
+		context.progress(`Preparing document at ${filePath}...`);
+
 		// Check if file exists, create if it doesn't
 		const exists = await fileExists(filePath, plugin.app);
 		if (!exists) {
+			context.progress("Creating new document...");
 			await createFile(filePath, "", plugin.app);
 		}
 
+		context.progress("Reading document structure...");
+
 		// Read the note
 		const note = await readNote({ plugin, filePath });
+
+		context.progress("Determining insertion position...");
 
 		// Determine insertion position
 		const insertionIndex = determineInsertionPosition(
@@ -137,6 +148,8 @@ export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
 			position,
 			reference_todo_text,
 		);
+
+		context.progress(`Adding ${todos.length} todo item${todos.length > 1 ? 's' : ''}...`);
 
 		// Create task objects and insert them
 		let updatedNote = JSON.parse(JSON.stringify(note));
@@ -163,8 +176,12 @@ export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
 			addedTaskObjects.push(task);
 		}
 
+		context.progress("Saving updated document...");
+
 		// Update the note
 		await updateNote({ plugin, filePath, updatedNote });
+
+		context.progress("Calculating navigation targets...");
 
 		// Calculate line numbers for the added tasks
 		const lineNumbers: number[] = [];
@@ -173,11 +190,13 @@ export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
 		}
 
 		// Create navigation target
-		const navigationTargets = [createNavigationTarget(
+		const navigationTarget = createNavigationTarget(
 			filePath,
 			lineNumbers,
 			`Navigate to added todo${addedTasks.length > 1 ? 's' : ''}`
-		)];
+		);
+
+		context.addNavigationTarget(navigationTarget);
 
 		// Prepare success message
 		const tasksDescription = addedTasks.length === 1 
@@ -188,9 +207,6 @@ export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
 			.replace('{{task}}', tasksDescription)
 			.replace('{{path}}', filePath);
 
-		return {
-			result: resultMessage,
-			navigationTargets: navigationTargets
-		};
+		context.progress(resultMessage);
 	}
 };

@@ -101,7 +101,7 @@ export const ToolBlock: React.FC<ToolBlockProps> = ({
   const tool = obsidianTools.getToolByName(toolName);
   const actionText = tool?.getActionText(
     toolInput, 
-    hasResult && result ? result : '',
+    false,
     hasResult,
     effectiveIsError
   );

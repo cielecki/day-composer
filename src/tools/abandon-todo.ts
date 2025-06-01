@@ -1,5 +1,6 @@
 import MyPlugin from "../main";
-import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 import { findTaskByDescription, updateNote, readNote } from "../utils/tools/note-utils";
 import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
 import { getCurrentTime } from "../utils/time/get-current-time";
@@ -61,51 +62,61 @@ type AbandonTodoToolInput = {
 export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
   specification: schema,
   icon: "x-square",
-  getActionText: (input: AbandonTodoToolInput, output: string, hasResult: boolean, hasError: boolean) => {
-    if (hasResult) {
-      // Only process task text for completed operations
-      let actionText = '';
-      if (!input || typeof input !== 'object') actionText = '';
-      const todoCount = input.todos?.length || 0;
-      
-      if (todoCount === 1) {
-        actionText = `"${input.todos[0].todo_text}"`;
-      } else {
-        // Use proper pluralization based on count
-        const countKey = todoCount === 0 ? 'zero' :
-                         todoCount === 1 ? 'one' :
-                         todoCount % 10 >= 2 && todoCount % 10 <= 4 && (todoCount % 100 < 10 || todoCount % 100 >= 20) ? 'few' : 'many';
-        
-        // Check if the translation key exists
-        try {
-          const translation = t(`tools.tasks.count.${countKey}`, { count: todoCount });
-          actionText = translation !== `tools.tasks.count.${countKey}` ? translation : `${todoCount} ${t('tools.tasks.plural')}`;
-        } catch (e) {
-          // Fallback to simple pluralization if the count format is not available
-          actionText = `${todoCount} ${t('tools.tasks.plural')}`;
-        }
-      }
-      
-      return hasError
-        ? t('tools.actions.abandon.failed').replace('{{task}}', actionText)
-        : t('tools.actions.abandon.success').replace('{{task}}', actionText);
+  getActionText: (input: AbandonTodoToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
+    let actionText = '';
+    if (!input || typeof input !== 'object') return '';
+    const todoCount = input.todos?.length || 0;
+    
+    if (todoCount === 1) {
+      actionText = `"${input.todos[0].todo_text}"`;
     } else {
-      // For in-progress operations, don't show task details
+      // Use proper pluralization based on count
+      const countKey = todoCount === 0 ? 'zero' :
+                       todoCount === 1 ? 'one' :
+                       todoCount % 10 >= 2 && todoCount % 10 <= 4 && (todoCount % 100 < 10 || todoCount % 100 >= 20) ? 'few' : 'many';
+      
+      // Check if the translation key exists
+      try {
+        const translation = t(`tools.tasks.count.${countKey}`, { count: todoCount });
+        actionText = translation !== `tools.tasks.count.${countKey}` ? translation : `${todoCount} ${t('tools.tasks.plural')}`;
+      } catch (e) {
+        // Fallback to simple pluralization if the count format is not available
+        actionText = `${todoCount} ${t('tools.tasks.plural')}`;
+      }
+    }
+    
+    if (hasError) {
+      return t('tools.actions.abandon.failed').replace('{{task}}', actionText);
+    } else if (hasCompleted) {
+      return t('tools.actions.abandon.success').replace('{{task}}', actionText);
+    } else if (hasStarted) {
       return t('tools.actions.abandon.inProgress').replace('{{task}}', '');
+    } else {
+      return `Abandon ${actionText}`;
     }
   },
-  execute: async (plugin: MyPlugin, params: AbandonTodoToolInput): Promise<ToolExecutionResult> => {
+  execute: async (context: ToolExecutionContext<AbandonTodoToolInput>): Promise<void> => {
+    const { plugin, params } = context;
     const { todos, time } = params;
+    
+    context.progress("Validating todo items...");
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
       throw new ToolExecutionError("No to-do items provided");
     }
     
+    context.progress("Preparing time formatting...");
+    
     // Format the current time if provided (common for all tasks)
     const currentTime = getCurrentTime(time);
     
     const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
+    
+    context.progress(`Reading note from ${filePath}...`);
+    
     const note = await readNote({plugin, filePath});
+    
+    context.progress("Validating tasks exist and can be abandoned...");
     
     // Validate all tasks upfront - will throw if any validation fails
     validateTasks(
@@ -115,6 +126,8 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
         taskPredicate: (task) => task.status !== 'abandoned'
       }))
     );
+    
+    context.progress(`Abandoning ${todos.length} todo item${todos.length > 1 ? 's' : ''}...`);
     
     // Track tasks that will be abandoned
     const abandonedTasks: string[] = [];
@@ -151,8 +164,12 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
       abandonedTasks.push(todo_text);
     }
     
+    context.progress("Updating note with abandoned tasks...");
+    
     // Update the note with all abandoned tasks
     await updateNote({plugin, filePath, updatedNote});
+    
+    context.progress("Creating navigation targets...");
     
     // Create navigation targets for the moved tasks
     const navigationTargets = createNavigationTargetsForTasks(
@@ -161,6 +178,9 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
       filePath,
       `Navigate to abandoned todo{{count}}`
     );
+    
+    // Add navigation targets
+    navigationTargets.forEach(target => context.addNavigationTarget(target));
     
     // Prepare success message
     const tasksDescription = abandonedTasks.length === 1 
@@ -171,9 +191,6 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
       .replace('{{task}}', tasksDescription)
       .replace('{{path}}', filePath);
 
-    return {
-      result: resultMessage,
-      navigationTargets: navigationTargets
-    };
+    context.progress(resultMessage);
   }
 };

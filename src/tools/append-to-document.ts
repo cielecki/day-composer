@@ -2,7 +2,8 @@ import MyPlugin from "../main";
 import { modifyFile } from "../utils/fs/modify-file";
 import { readFile } from "../utils/fs/read-file";
 import { getFile } from "../utils/fs/get-file";
-import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 import { t } from "../i18n";
 
 const schema = {
@@ -32,20 +33,28 @@ type AppendToDocumentToolInput = {
 export const appendToDocumentTool: ObsidianTool<AppendToDocumentToolInput> = {
   specification: schema,
   icon: "file-plus-2",
-  getActionText: (input: AppendToDocumentToolInput, output: string, hasResult: boolean) => {
+  getActionText: (input: AppendToDocumentToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
     let actionText = '';
-    if (!input || typeof input !== 'object') actionText = '';
+    if (!input || typeof input !== 'object') return '';
     if (input.path) actionText = `"${input.path}"`;
-    if (hasResult) {
+    
+    if (hasError) {
+      return `Failed to append to ${actionText}`;
+    } else if (hasCompleted) {
       return `Appended to ${actionText}`;
-    } else {
+    } else if (hasStarted) {
       return `Appending to ${actionText}...`;
+    } else {
+      return `Append to ${actionText}`;
     }
   },
-  execute: async (plugin: MyPlugin, params: AppendToDocumentToolInput): Promise<ToolExecutionResult> => {
+  execute: async (context: ToolExecutionContext<AppendToDocumentToolInput>): Promise<void> => {
     try {
+      const { plugin, params } = context;
       const { path, content } = params;
       const appendContent = content || ''; // Default to empty string if content is undefined
+
+      context.progress(`Locating document at ${path}...`);
 
       // Get the file
       const file = getFile(path, plugin.app);
@@ -54,8 +63,12 @@ export const appendToDocumentTool: ObsidianTool<AppendToDocumentToolInput> = {
         throw new Error(`File not found at ${path}`);
       }
       
+      context.progress(`Reading current document content...`);
+      
       // Read the current content
       const currentContent = await readFile(file, plugin.app);
+      
+      context.progress(`Appending new content to document...`);
       
       // Append the new content
       const newContent = currentContent + appendContent;
@@ -63,13 +76,13 @@ export const appendToDocumentTool: ObsidianTool<AppendToDocumentToolInput> = {
       // Update the file
       await modifyFile(file, newContent, plugin.app);
       
-      return {
-        result: `Content appended to ${path}`,
-        navigationTargets: [{
-          filePath: path,
-          description: t("tools.navigation.openAppendedDocument")
-        }]
-      };
+      // Add navigation target
+      context.addNavigationTarget({
+        filePath: path,
+        description: t("tools.navigation.openAppendedDocument")
+      });
+      
+      context.progress(`Content appended to ${path}`);
     } catch (error) {
       console.error('Error appending to document:', error);
       throw new Error(`Error appending to document: ${error.message || 'Unknown error'}`);

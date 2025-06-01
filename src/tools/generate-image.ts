@@ -1,6 +1,7 @@
 import MyPlugin from "../main";
 import { fileExists } from "../utils/fs/file-exists";
-import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
+import { ObsidianTool } from "../obsidian-tools";
+import { ToolExecutionContext } from "../utils/chat/types";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { getPluginSettings } from "../settings/PluginSettings";
 import { ensureDirectoryExists } from "../utils/fs/ensure-directory-exists";
@@ -47,18 +48,26 @@ type GenerateImageToolInput = {
 export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
   specification: schema,
   icon: "image",
-  getActionText: (input: GenerateImageToolInput, output: string, hasResult: boolean) => {
+  getActionText: (input: GenerateImageToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
     let actionText = '';
-    if (!input || typeof input !== 'object') actionText = '';
+    if (!input || typeof input !== 'object') return '';
     if (input.path) actionText = `"${input.path}"`;
-    if (hasResult) {
+    
+    if (hasError) {
+      return `Failed to generate image ${actionText}`;
+    } else if (hasCompleted) {
       return t('tools.generateImage.success', { path: actionText });
-    } else {
+    } else if (hasStarted) {
       return t('tools.generateImage.generating', { path: actionText });
+    } else {
+      return `Generate image ${actionText}`;
     }
   },
-  execute: async (plugin: MyPlugin, params: GenerateImageToolInput): Promise<ToolExecutionResult> => {
+  execute: async (context: ToolExecutionContext<GenerateImageToolInput>): Promise<void> => {
+    const { plugin, params } = context;
     const { prompt, path, size = "1024x1024", quality = "auto" } = params;
+
+    context.progress("Validating image generation parameters...");
 
     // Validate inputs
     if (!prompt || prompt.trim().length === 0) {
@@ -77,6 +86,8 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
 
     normalizedPath = normalizePath(normalizedPath);
 
+    context.progress(`Checking if file exists at ${normalizedPath}...`);
+
     // Check if the file already exists
     const exists = await fileExists(normalizedPath, plugin.app);
     if (exists) {
@@ -90,11 +101,15 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
     }
 
     try {
+      context.progress("Initializing OpenAI client...");
+
       // Create OpenAI client
       const openai = new OpenAI({
         apiKey: settings.openAIApiKey,
         dangerouslyAllowBrowser: true
       });
+
+      context.progress(`Generating image with GPT-4o: "${prompt.substring(0, 50)}${prompt.length > 50 ? '...' : ''}"`);
 
       // Generate image using GPT-4o image model
       const response = await openai.images.generate({
@@ -115,8 +130,12 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
         throw new ToolExecutionError(t('tools.generateImage.errors.noBase64Data'));
       }
 
+      context.progress("Processing generated image...");
+
       // Convert base64 to binary
       const imageBuffer = Buffer.from(imageData.b64_json, 'base64');
+
+      context.progress("Creating directory structure...");
 
       // Ensure directory exists
       const directoryPath = normalizedPath.substring(0, normalizedPath.lastIndexOf('/'));
@@ -124,16 +143,18 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
         await ensureDirectoryExists(directoryPath, plugin.app);
       }
 
+      context.progress("Saving image to vault...");
+
       // Create the binary file using Obsidian's vault API
       await plugin.app.vault.createBinary(normalizedPath, imageBuffer);
 
-      return {
-        result: t('tools.generateImage.success', { path: normalizedPath }),
-        navigationTargets: [{
-          filePath: normalizedPath,
-          description: t('tools.generateImage.openImage')
-        }]
-      };
+      // Add navigation target
+      context.addNavigationTarget({
+        filePath: normalizedPath,
+        description: t('tools.generateImage.openImage')
+      });
+
+      context.progress(t('tools.generateImage.success', { path: normalizedPath }));
 
     } catch (error: any) {
       console.error('Error generating image:', error);
