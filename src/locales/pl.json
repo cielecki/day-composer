@@ -223,6 +223,7 @@
         "timeout": "Limit Czasu",
         "url": "URL"
       },
+      "preparing": "Badanie \"{{query}}\"",
       "progress": {
         "loading": "Ładowanie biblioteki Firecrawl...",
         "processing": "Przetwarzanie wyników badań...",

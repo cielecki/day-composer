@@ -223,6 +223,7 @@
         "timeout": "Timeout",
         "url": "URL"
       },
+      "preparing": "Research \"{{query}}\"",
       "progress": {
         "loading": "Loading Firecrawl library...",
         "processing": "Processing research results...",

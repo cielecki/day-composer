@@ -75,7 +75,9 @@ export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
     } else if (hasStarted) {
       return t('tools.deepResearch.researching', { query: input.query });
     } else {
-      return `Research "${input.query}"`;
+      // Handle undefined query and use translation
+      const query = input.query || 'undefined';
+      return t('tools.deepResearch.preparing', { query });
     }
   },
   execute: async (context: ToolExecutionContext<DeepResearchToolInput>): Promise<void> => {
