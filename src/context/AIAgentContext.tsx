@@ -5,6 +5,7 @@ import React, {
 	ReactNode,
 	useCallback,
 	useRef,
+	useEffect,
 } from "react";
 import { Anthropic, APIUserAbortError } from "@anthropic-ai/sdk";
 import { getPluginSettings } from "../settings/PluginSettings";
@@ -25,11 +26,13 @@ import {
 import { useLNMode } from "./LNModeContext";
 import { MessageCreateParamsStreaming } from "@anthropic-ai/sdk/resources/messages/messages";
 import { t } from '../i18n';
-import { getDefaultLNMode, resolveAutoModel } from "src/defaults/ln-mode-defaults";
-import { ContextCollector } from "src/context-collector";
+import { getDefaultLNMode, resolveAutoModel } from "../utils/mode/ln-mode-defaults";
+import { ContextCollector } from "../context-collector";
 import { ConversationDatabase } from "../services/conversation-database";
-import { Conversation } from 'src/utils/chat/conversation';
-import { generateConversationId } from "src/utils/chat/generate-conversation-id";
+import { Conversation } from '../utils/chat/conversation';
+import { generateConversationId } from "../utils/chat/generate-conversation-id";
+import { App } from "obsidian";
+import { DEFAULT_VOICE_INSTRUCTIONS } from "../utils/mode/ln-mode-defaults";
 
 export interface AIAgentContextType {
 	conversation: Message[];
@@ -105,7 +108,7 @@ export const AIAgentProvider: React.FC<{
 
 
 	// Auto-save conversation when it changes (debounced)
-	React.useEffect(() => {
+	useEffect(() => {
 		const saveTimeout = setTimeout(async () => {
 			if (currentConversationRef.current.storedConversation.messages.length > 0 && !isGeneratingResponse) {
 				try {

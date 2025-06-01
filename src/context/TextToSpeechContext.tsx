@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
-import { Notice } from 'obsidian';
+import { Notice, App } from 'obsidian';
 import OpenAI from 'openai';
 import { getPluginSettings, TTSVoice } from "../settings/PluginSettings";
 import { TTS_VOICES } from "../settings/PluginSettings";
 import { t } from '../i18n';
-import { DEFAULT_VOICE_INSTRUCTIONS } from 'src/defaults/ln-mode-defaults';
+import { DEFAULT_VOICE_INSTRUCTIONS } from "../utils/mode/ln-mode-defaults";
 import { useLNMode } from './LNModeContext';
-import { getDefaultLNMode } from 'src/defaults/ln-mode-defaults';
+import { getDefaultLNMode } from '../utils/mode/ln-mode-defaults';
 import { TTSStreamingService } from '../services/TTSStreamingService';
 
 interface TextToSpeechContextType {

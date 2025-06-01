@@ -1,5 +1,5 @@
-import { LNMode } from "../types/types";
-import { TTS_VOICES, TTSVoice } from "../settings/PluginSettings";
+import { LNMode } from "../../types/types";
+import { TTS_VOICES, TTSVoice } from "../../settings/PluginSettings";
 
 // Available Anthropic models
 export const ANTHROPIC_MODELS = [

@@ -1,5 +1,5 @@
 import { findTaskByDescription } from "./note-utils";
-import { ToolExecutionError } from "./ToolExecutionError";
+import { ToolExecutionError } from "./tool-execution-error";
 import { Note } from "./note-utils";
 import { Task } from "./task-utils";
 

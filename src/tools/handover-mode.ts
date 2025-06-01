@@ -1,6 +1,6 @@
 import MyPlugin from "../main";
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionError } from "./utils/ToolExecutionError";
+import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { modeManagerService } from "../services/ModeManagerService";
 import { t } from "../i18n";
 

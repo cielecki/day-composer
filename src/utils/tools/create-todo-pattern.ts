@@ -1,4 +1,4 @@
-import { escapeRegExp } from "./escapeRegExp";
+import { escapeRegExp } from "./escape-reg-exp";
 
 /**
  * Utility functions for working with todo items

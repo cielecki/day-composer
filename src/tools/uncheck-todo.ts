@@ -1,12 +1,12 @@
 import MyPlugin from "../main";
-import { getDailyNotePath } from "./utils/getDailyNotePath";
+import { getDailyNotePath } from "../utils/tools/get-daily-note-path";
 import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
-import { findTaskByDescription } from "./utils/note-utils";
-import { updateNote } from './utils/note-utils';
-import { readNote } from './utils/note-utils';
-import { Task } from "./utils/task-utils";
-import { ToolExecutionError } from "./utils/ToolExecutionError";
-import { createNavigationTargetsForTasks } from "./utils/line-number-utils";
+import { findTaskByDescription } from "../utils/tools/note-utils";
+import { updateNote } from '../utils/tools/note-utils';
+import { readNote } from '../utils/tools/note-utils';
+import { Task } from "../utils/tools/task-utils";
+import { ToolExecutionError } from "../utils/tools/tool-execution-error";
+import { createNavigationTargetsForTasks } from "../utils/tools/line-number-utils";
 import { t } from "../i18n";
 
 const schema = {

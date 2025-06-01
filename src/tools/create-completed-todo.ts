@@ -1,14 +1,14 @@
 import MyPlugin from "../main";
 import { createFile } from "../utils/fs/create-file";
-import { fileExists } from "./utils/fileExists";
-import { getCurrentTime } from "./utils/getCurrentTime";
-import { appendComment, insertTaskAtPosition, Task } from "./utils/task-utils";
+import { fileExists } from "../utils/tools/file-exists";
+import { getCurrentTime } from "../utils/tools/get-current-time";
+import { appendComment, insertTaskAtPosition, Task } from "../utils/tools/task-utils";
 
-import { ToolExecutionError } from "./utils/ToolExecutionError";
+import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
-import { findCurrentSpot, readNote, updateNote } from "./utils/note-utils";
-import { getDailyNotePath } from "./utils/getDailyNotePath";
-import { createNavigationTargetsForTasks } from "./utils/line-number-utils";
+import { findCurrentSpot, readNote, updateNote } from "../utils/tools/note-utils";
+import { getDailyNotePath } from "../utils/tools/get-daily-note-path";
+import { createNavigationTargetsForTasks } from "../utils/tools/line-number-utils";
 import { t } from "../i18n";
 
 const schema = {

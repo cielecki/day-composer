@@ -1,7 +1,7 @@
 import MyPlugin from "../main";
-import { fileExists } from "./utils/fileExists";
+import { fileExists } from "../utils/tools/file-exists";
 import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
-import { ToolExecutionError } from "./utils/ToolExecutionError";
+import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { getPluginSettings } from "../settings/PluginSettings";
 import { ensureDirectoryExists } from "../utils/fs/ensure-directory-exists";
 import { normalizePath } from "obsidian";

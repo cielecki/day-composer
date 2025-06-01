@@ -1,4 +1,4 @@
-import { ToolExecutionError } from "./ToolExecutionError";
+import { ToolExecutionError } from "./tool-execution-error";
 import { Note } from "./note-utils";
 import { t } from "../../i18n";
 

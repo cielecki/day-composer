@@ -1,15 +1,16 @@
 import MyPlugin from "../../main";
-import { fileExists } from "./fileExists";
-import { getFile } from "./getFile";
-import { modifyFile } from "./modifyFile";
+import { App, TFile } from "obsidian";
+import { fileExists } from "./file-exists";
+import { getFile } from "./get-file";
+import { modifyFile } from "./modify-file";
 import {
 	appendComment,
 	isCommentLine,
 	STATUS_MAP,
 	Task,
 } from "./task-utils";
-import { ToolExecutionError } from "./ToolExecutionError";
-import { formatMarkdown } from "./formatMarkdown";
+import { ToolExecutionError } from "./tool-execution-error";
+import { formatMarkdown } from "./format-markdown";
 import { t } from "../../i18n";
 
 export type NoteNode = Task | TextBlock;

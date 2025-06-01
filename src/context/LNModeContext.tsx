@@ -12,11 +12,12 @@ import { App, TFile, EventRef } from "obsidian";
 import {
 	mergeWithDefaultMode,
 	getDefaultLNMode,
-} from "../defaults/ln-mode-defaults";
+} from "../utils/mode/ln-mode-defaults";
 import * as yaml from "js-yaml";
 import { t } from '../i18n';
 import { getPluginSettings } from "../settings/PluginSettings";
 import { modeManagerService } from "../services/ModeManagerService";
+import { DEFAULT_VOICE_INSTRUCTIONS } from "../utils/mode/ln-mode-defaults";
 
 
 

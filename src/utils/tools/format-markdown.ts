@@ -1,4 +1,4 @@
-import { formatNode } from "./formatNode";
+import { formatNode } from "./format-node";
 import { Note } from "./note-utils";
 
 /**

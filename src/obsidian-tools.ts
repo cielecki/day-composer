@@ -15,7 +15,7 @@ import { removeTodoTool } from "./tools/remove-todo";
 import { downloadYoutubeTranscriptTool } from "./tools/download-youtube-transcript";
 import { generateImageTool } from "./tools/generate-image";
 import { deepResearchTool } from "./tools/deep-research";
-import { ToolExecutionError } from "./tools/utils/ToolExecutionError";
+import { ToolExecutionError } from "./utils/tools/tool-execution-error";
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tool-filter";
 import { LNMode } from "./types/types";

@@ -24,3 +24,6 @@ If asked to release a new version:
 
 To regenerate starter kit data:
 node scripts/generate-starter-kit.mjs
+
+To check if the plugin builds correctly:
+npm run build

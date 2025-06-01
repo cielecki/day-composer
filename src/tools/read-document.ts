@@ -1,9 +1,9 @@
 import MyPlugin from "../main";
-import { readFile } from "./utils/readFile";
-import { getFile } from "./utils/getFile";
+import { readFile } from "../utils/fs/read-file";
+import { getFile } from "../utils/tools/get-file";
 import { ObsidianTool, ToolExecutionResult } from "../obsidian-tools";
 import { t } from "../i18n";
-import { ToolExecutionError } from "./utils/ToolExecutionError";
+import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 
 const schema = {
   name: "read_document",

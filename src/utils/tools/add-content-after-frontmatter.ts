@@ -1,4 +1,4 @@
-import { getFrontmatter } from "./getFrontmatter";
+import { getFrontmatter } from "./get-frontmatter";
 
 /**
  * Adds content after frontmatter or at the beginning of the file

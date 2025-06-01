@@ -1,14 +1,13 @@
 import MyPlugin from "../main";
 import { ObsidianTool, NavigationTarget, ToolExecutionResult } from "../obsidian-tools";
-import { findTaskByDescription, updateNote } from './utils/note-utils';
-import { readNote } from './utils/note-utils';
-import { getDailyNotePath } from "./utils/getDailyNotePath";
-import { getCurrentTime } from "./utils/getCurrentTime";
-import { appendComment, Task } from "./utils/task-utils";
-import { ToolExecutionError } from "./utils/ToolExecutionError";
-import { validateTasks } from "./utils/task-validation";
-import { moveTaskToPosition } from "./utils/moveTaskToPosition";
-import { createNavigationTargetsForTasks } from "./utils/line-number-utils";
+import { findTaskByDescription, updateNote, readNote } from "../utils/tools/note-utils";
+import { getDailyNotePath } from "../utils/tools/get-daily-note-path";
+import { getCurrentTime } from "../utils/tools/get-current-time";
+import { appendComment, Task } from "../utils/tools/task-utils";
+import { ToolExecutionError } from "../utils/tools/tool-execution-error";
+import { validateTasks } from "../utils/tools/task-validation";
+import { moveTaskToPosition } from "../utils/tools/move-task-to-position";
+import { createNavigationTargetsForTasks } from "../utils/tools/line-number-utils";
 import { t } from "../i18n";
 
 const schema = {

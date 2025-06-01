@@ -1,4 +1,4 @@
-import { App, Notice, Plugin, requestUrl, WorkspaceLeaf } from "obsidian";
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, requestUrl, WorkspaceLeaf } from 'obsidian';
 import { SampleSettingTab } from "./settings/SettingsTab";
 import { ContextCollector } from "./context-collector";
 import {
@@ -12,10 +12,10 @@ import { initI18n, t } from "./i18n";
 import { LNMode } from "./types/types";
 import { modeToNoteContent } from './utils/mode/mode-to-note-content';
 import path from "path";
-import { getDefaultLNMode, mergeWithDefaultMode, DEFAULT_VOICE_INSTRUCTIONS } from "./defaults/ln-mode-defaults";
+import { getDefaultLNMode, mergeWithDefaultMode, DEFAULT_VOICE_INSTRUCTIONS } from "./utils/mode/ln-mode-defaults";
 import { STARTER_KIT_DATA } from "./generated/starter-kit-data";
 import { ConfirmReloadModal } from "./components/ConfirmReloadModal";
-import { generateUniqueDirectoryName } from "./tools/utils/generateUniqueDirectoryName";
+import { generateUniqueDirectoryName } from "./utils/tools/generate-unique-directory-name";
 
 /**
  * Recursively creates nested directories, ensuring parent directories exist first
