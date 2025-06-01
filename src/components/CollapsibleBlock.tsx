@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { LucideIcon } from './LucideIcon';
 import { getObsidianTools, NavigationTarget } from '../obsidian-tools';
 import { t } from '../i18n';
@@ -11,6 +11,8 @@ interface CollapsibleBlockProps {
   iconColor?: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
+  isOpen?: boolean; // Allow external control of open state
+  onToggle?: (isOpen: boolean) => void; // Callback when state changes
   className?: string;
   dataAttributes?: Record<string, string>;
   onClick?: () => void;
@@ -26,11 +28,28 @@ export const CollapsibleBlock: React.FC<CollapsibleBlockProps> = ({
   iconColor,
   children,
   defaultOpen = false,
+  isOpen,
+  onToggle,
   className = '',
   dataAttributes = {},
   onClick,
   isClickable = false
 }) => {
+  // Internal state for when no external control is provided
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  
+  // Use external state if provided, otherwise use internal state
+  const isCurrentlyOpen = isOpen !== undefined ? isOpen : internalOpen;
+  
+  const handleToggle = useCallback((newOpen: boolean) => {
+    if (isOpen === undefined) {
+      // Using internal state
+      setInternalOpen(newOpen);
+    }
+    onToggle?.(newOpen);
+  }, [isOpen, onToggle]);
+
   // Convert data attributes to props format for spread operator
   const dataProps: Record<string, string> = {};
   Object.entries(dataAttributes).forEach(([key, value]) => {
@@ -46,8 +65,23 @@ export const CollapsibleBlock: React.FC<CollapsibleBlockProps> = ({
     }
   }, [onClick, isClickable]);
 
+  // Handle native details toggle event
+  const handleDetailsToggle = useCallback((e: React.SyntheticEvent<HTMLDetailsElement>) => {
+    if (!isClickable) {
+      // Only handle native toggle for non-clickable blocks
+      const details = e.currentTarget;
+      handleToggle(details.open);
+    }
+  }, [isClickable, handleToggle]);
+
   return (
-    <details className={`collapsible-block ${className} ${isClickable ? 'clickable-tool-block' : ''}`} open={defaultOpen} {...dataProps}>
+    <details 
+      ref={detailsRef}
+      className={`collapsible-block ${className} ${isClickable ? 'clickable-tool-block' : ''}`} 
+      open={isCurrentlyOpen} 
+      onToggle={handleDetailsToggle}
+      {...dataProps}
+    >
       <summary 
         className={`collapsible-summary ${isClickable ? 'clickable-summary' : ''}`}
         onClick={handleSummaryClick}
@@ -93,6 +127,7 @@ export const ToolBlock: React.FC<ToolBlockProps> = ({
 }) => {
   const obsidianTools = getObsidianTools(undefined!);
   const [currentTargetIndex, setCurrentTargetIndex] = useState(0);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   
   // Auto-detect errors from content
   const contentHasErrorIndicator = typeof result === 'string' && result.trim().startsWith('❌');
@@ -117,6 +152,11 @@ export const ToolBlock: React.FC<ToolBlockProps> = ({
       // Get the current target
       const target = navigationTargets[currentTargetIndex];
       
+      // Close the block if it's currently open
+      if (isOpen) {
+        setIsOpen(false);
+      }
+      
       // Navigate to the target
       const navigationService = getEditorNavigationService(window.app);
       await navigationService.navigateToTarget(target);
@@ -128,7 +168,7 @@ export const ToolBlock: React.FC<ToolBlockProps> = ({
     } catch (error) {
       console.error('Error navigating to target:', error);
     }
-  }, [isClickable, navigationTargets, currentTargetIndex]);
+  }, [isClickable, navigationTargets, currentTargetIndex, isOpen]);
   
   // Build summary with target indicator
   const summary = (
@@ -143,7 +183,8 @@ export const ToolBlock: React.FC<ToolBlockProps> = ({
       lucideIcon={effectiveIsError ? "alert-circle" : iconName}
       iconColor={effectiveIsError ? "var(--color-red)" : "var(--color-blue)"}
       className={`${!isComplete ? "pulsing" : ""} ${effectiveIsError ? "tool-error" : ""}`}
-      defaultOpen={defaultOpen}
+      isOpen={isOpen}
+      onToggle={setIsOpen}
       onClick={handleToolClick}
       isClickable={isClickable}
       dataAttributes={{ 

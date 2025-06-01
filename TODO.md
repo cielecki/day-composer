@@ -2,8 +2,8 @@
 
 # Fixes
 
-- [ ] when I open a tool call that will get a navigation target I can no longer close it.
 - [ ] Make a new release
+- [ ] When I stop during a tool call or thinking it should stop blinking.
 
 # Stages
 - [ ] Onboard 5 people to the plugin
