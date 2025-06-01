@@ -228,6 +228,82 @@ const createNewMode = async (app: App) => {
 	}
 }
 
+// Compare versions helper
+function compareVersions(a: string, b: string): number {
+	const pa = a.split('.').map(Number);
+	const pb = b.split('.').map(Number);
+	for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+		const na = pa[i] || 0, nb = pb[i] || 0;
+		if (na > nb) return 1;
+		if (na < nb) return -1;
+	}
+	return 0;
+}
+
+// Shared function to check for available updates
+const checkForAvailableUpdate = async (app: App): Promise<{
+	currentVersion: string;
+	latestVersion: string;
+	hasUpdate: boolean;
+	releaseInfo?: any;
+} | null> => {
+	try {
+		const repo = "cielecki/life-navigator";
+		const apiUrl = `https://api.github.com/repos/${repo}/releases/latest`;
+
+		// Read current version from manifest.json
+		const manifestPath = app.vault.configDir + "/plugins/life-navigator/manifest.json";
+		// @ts-ignore
+		const manifestContent = await app.vault.adapter.read(manifestPath);
+		const manifest = JSON.parse(manifestContent);
+		const currentVersion = manifest.version;
+
+		// Get latest release info
+		const response = await fetch(apiUrl, {
+			headers: {
+				'Accept': 'application/vnd.github+json',
+				'User-Agent': 'Life-Navigator-Plugin'
+			}
+		});
+
+		if (!response.ok) {
+			return null;
+		}
+
+		const release = await response.json();
+		const latestVersion = release.tag_name.startsWith('v') ? release.tag_name.slice(1) : release.tag_name;
+
+		const cmp = compareVersions(latestVersion, currentVersion);
+		const hasUpdate = cmp > 0;
+
+		return {
+			currentVersion,
+			latestVersion,
+			hasUpdate,
+			releaseInfo: release
+		};
+	} catch (error) {
+		console.log('Version check failed:', error);
+		return null;
+	}
+};
+
+// Check for updates on startup if enabled and not checked recently
+const checkForUpdatesOnStartup = async (plugin: Plugin) => {
+	try {
+		const updateInfo = await checkForAvailableUpdate(plugin.app);
+		if (updateInfo && updateInfo.hasUpdate) {
+			new Notice(t("messages.updateAvailable", { 
+				latestVersion: updateInfo.latestVersion, 
+				currentVersion: updateInfo.currentVersion 
+			}), 10000);
+		}
+	} catch (error) {
+		console.log('Startup update check failed silently:', error);
+		// Fail silently to avoid interrupting user experience
+	}
+};
+
 export default class MyPlugin extends Plugin {
 	view: LifeNavigatorView | null = null;
 
@@ -340,55 +416,33 @@ export default class MyPlugin extends Plugin {
 			}
 		});
 
-		// Compare versions helper
-		function compareVersions(a: string, b: string): number {
-			const pa = a.split('.').map(Number);
-			const pb = b.split('.').map(Number);
-			for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-				const na = pa[i] || 0, nb = pb[i] || 0;
-				if (na > nb) return 1;
-				if (na < nb) return -1;
-			}
-			return 0;
-		}
-
 		// Add command to update the plugin from the latest GitHub release with version checks
 		this.addCommand({
 			id: "check-for-updates",
 			name: t("tools.checkForUpdates"),
 			callback: async () => {
-				const repo = "cielecki/life-navigator";
-				const apiUrl = `https://api.github.com/repos/${repo}/releases/latest`;
 				new Notice(t("messages.checkingForUpdates"));
 
 				try {
-					// Read current version from manifest.json
-					const manifestPath = this.app.vault.configDir + "/plugins/life-navigator/manifest.json";
-					// @ts-ignore
-					const manifestContent = await this.app.vault.adapter.read(manifestPath);
-					const manifest = JSON.parse(manifestContent);
-					const currentVersion = manifest.version;
-
-					// Get latest release info
-					const release = await fetch(apiUrl, {
-						headers: {
-							'Accept': 'application/vnd.github+json',
-							'User-Agent': 'Obsidian-Day-Composer'
-						}
-					}).then(res => res.json());
+					const updateInfo = await checkForAvailableUpdate(this.app);
 					
-					console.log("Latest release info:", release);
-					const assets = release.assets;
-					const latestVersion = release.tag_name.startsWith('v') ? release.tag_name.slice(1) : release.tag_name;
+					if (!updateInfo) {
+						// silently fail
+						return;
+					}
 
-					const cmp = compareVersions(latestVersion, currentVersion);
-					if (cmp <= 0) {
-						new Notice(t("messages.pluginUpToDate", { version: currentVersion }));
+					if (!updateInfo.hasUpdate) {
+						new Notice(t("messages.pluginUpToDate", { version: updateInfo.currentVersion }));
 						return;
 					}
 
 					// Notify user that a new version is found and download is starting
-					new Notice(t("messages.newVersionFoundDownloading", { latestVersion, currentVersion }));
+					new Notice(t("messages.newVersionFoundDownloading", { 
+						latestVersion: updateInfo.latestVersion, 
+						currentVersion: updateInfo.currentVersion 
+					}));
+
+					const assets = updateInfo.releaseInfo.assets;
 
 					// Helper to download and save an asset
 					const saveAsset = async (assetName: string) => {
@@ -439,7 +493,7 @@ export default class MyPlugin extends Plugin {
 					new ConfirmReloadModal(this.app, () => {
 						// @ts-ignore
 						this.app.commands.executeCommandById('app:reload');
-					}, currentVersion, latestVersion).open();
+					}, updateInfo.currentVersion, updateInfo.latestVersion).open();
 
 				} catch (e) {
 					new Notice(t("errors.failedToUpdatePlugin", { error: e instanceof Error ? e.message : String(e) }));
@@ -449,6 +503,9 @@ export default class MyPlugin extends Plugin {
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
+
+		// Check for updates on startup
+		await checkForUpdatesOnStartup(this);
 	}
 
 	onunload() {

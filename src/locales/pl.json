@@ -317,7 +317,8 @@
     "creatingstarterKit": "Tworzenie pakietu startowego...",
     "checkingForUpdates": "Sprawdzanie aktualizacji...",
     "pluginUpToDate": "Wtyczka jest już aktualna (wersja {{version}}).",
-    "newVersionFoundDownloading": "Znaleziono nową wersję {{latestVersion}} (masz {{currentVersion}}). Pobieranie aktualizacji..."
+    "newVersionFoundDownloading": "Znaleziono nową wersję {{latestVersion}} (masz {{currentVersion}}). Pobieranie aktualizacji...",
+    "updateAvailable": "Life Navigator v{{latestVersion}} jest dostępny! Masz v{{currentVersion}}. Przejdź do ustawień wtyczki, aby zaktualizować."
   },
   "view": {
     "title": "Life Navigator"

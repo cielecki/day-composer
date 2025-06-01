@@ -317,7 +317,8 @@
     "creatingStarterKit": "Creating a Starter Kit...",
     "checkingForUpdates": "Checking for updates...",
     "pluginUpToDate": "Plugin is already up to date (version {{version}}).",
-    "newVersionFoundDownloading": "New version {{latestVersion}} found (you have {{currentVersion}}). Downloading update..."
+    "newVersionFoundDownloading": "New version {{latestVersion}} found (you have {{currentVersion}}). Downloading update...",
+    "updateAvailable": "Life Navigator v{{latestVersion}} is available! You have v{{currentVersion}}. Go to plugin settings to update."
   },
   "view": {
     "title": "Life Navigator"
