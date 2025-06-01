@@ -1,10 +1,5 @@
 # TODO
 
-# Fixes
-
-- [ ] Make a new release
-- [ ] Test the release
-
 # Stages
 - [ ] Onboard 5 people to the plugin
 - [ ] Plan for promotion
