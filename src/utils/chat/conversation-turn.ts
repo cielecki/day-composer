@@ -48,6 +48,9 @@ export const runConversationTurn = async (
 	let currentTurnAborted = false;
 	let finalAssistantMessageForTTS: Message | null = null;
 
+	// Clear any previous aborted tool results when starting a new turn
+	context.clearLiveToolResults();
+
 	try {
 		// Outer try for the whole turn process
 		while (!signal.aborted && !currentTurnAborted) {
@@ -113,6 +116,8 @@ export const runConversationTurn = async (
 				const turnResult = await processAnthropicStream(stream, signal, callbacks);
 
 				if (turnResult.aborted || signal.aborted) {
+					// Handle cleanup for aborted stream
+					handleStreamAbortCleanup(context);
 					currentTurnAborted = true;
 					break; // Exit the while loop
 				}
@@ -139,6 +144,8 @@ export const runConversationTurn = async (
 						);
 
 						if (abortedDuringProcessing || signal.aborted) {
+							// Handle cleanup for aborted tool processing
+							handleStreamAbortCleanup(context);
 							currentTurnAborted = true;
 							break; // Exit the while loop
 						}
@@ -184,8 +191,11 @@ export const runConversationTurn = async (
 		return finalAssistantMessageForTTS;
 	} finally {
 		context.setIsGeneratingResponse(false);
-		// Clear live tool results when conversation turn ends
-		context.clearLiveToolResults();
+		// Only clear live tool results if the turn completed successfully
+		// If there were aborted tool calls, keep the live results to show their aborted status
+		if (!currentTurnAborted && !signal.aborted) {
+			context.clearLiveToolResults();
+		}
 	}
 };
 
@@ -205,6 +215,29 @@ const handleStreamAbortCleanup = (context: ConversationTurnContext): void => {
 			const updatedContent = clearThinkingInProgress(contentBlocks);
 			const updatedMessage = { ...lastMessage, content: updatedContent };
 			context.updateMessage(updatedMessage);
+		}
+		
+		// Mark any incomplete live tool results as complete to stop pulsing animation
+		// This prevents the visual blinking when tool execution is aborted
+		const toolUseBlocks = contentBlocks.filter(block => 
+			typeof block === "object" && block !== null && "type" in block && block.type === "tool_use"
+		);
+		
+		for (const toolBlock of toolUseBlocks) {
+			// Check if this tool has an incomplete live result
+			const toolId = (toolBlock as any).id;
+			if (toolId) {
+				// Force mark as complete with aborted status
+				const abortedResult: ToolResultBlock = {
+					type: "tool_result",
+					tool_use_id: toolId,
+					content: "❌ Operation aborted by user",
+					is_error: true,
+					is_complete: true,
+					navigationTargets: []
+				};
+				context.updateLiveToolResult(toolId, abortedResult);
+			}
 		}
 		
 		if (hasIncompleteTools || hasIncompleteThink) {

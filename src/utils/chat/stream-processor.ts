@@ -236,6 +236,27 @@ export const processAnthropicStream = async (
 	} finally {
 		// Clean up abort event listener
 		signal.removeEventListener('abort', handleAbort);
+		
+		// If stream was aborted or ended with incomplete thinking blocks, clean them up
+		if ((aborted || signal.aborted) && localMessage && Object.keys(thinkingBlocksInProgress).length > 0) {
+			console.log("Cleaning up incomplete thinking blocks after stream abort");
+			const finalContentCopy = ensureContentBlocks(localMessage.content);
+			let hasChanges = false;
+
+			finalContentCopy.forEach((block, idx) => {
+				if (block.type === "thinking" && thinkingBlocksInProgress[idx]) {
+					(finalContentCopy[idx] as ThinkingBlock).reasoningInProgress = false;
+					delete thinkingBlocksInProgress[idx];
+					hasChanges = true;
+				}
+			});
+
+			if (hasChanges) {
+				finalContent = finalContentCopy;
+				localMessage.content = finalContentCopy;
+				callbacks.onMessageUpdate?.(localMessage);
+			}
+		}
 	}
 
 	return {
