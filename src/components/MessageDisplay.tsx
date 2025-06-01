@@ -228,7 +228,9 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   }
 
   const hasTextContent = contentBlocksToRender.some(block => block.type === 'text');
-  const hasAnyContent = contentBlocksToRender.length > 0;
+  const shouldShowUserActions = role === 'user' && contentBlocksToRender.length > 0;
+  const shouldShowAssistantActions = role === 'assistant' && hasTextContent;
+  const shouldShowActions = shouldShowUserActions || shouldShowAssistantActions;
 
   return (
     <div className={messageClasses.join(' ')}>
@@ -237,7 +239,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
           {contentBlocksToRender.map(renderContentBlock)}
         </div>
 
-        {hasAnyContent && (
+        {shouldShowActions && (
           <div className="message-actions">
             {!isGeneratingResponse && <>
               {role === 'user' && (
