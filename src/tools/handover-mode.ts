@@ -77,7 +77,7 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 		} else if (hasStarted) {
 			return t("tools.handover.switching", { modeName });
 		} else {
-			return `Handover to ${modeName}`;
+			return t("tools.actions.handover.default", { modeName });
 		}
 	},
 	execute: async (context: ToolExecutionContext<HandoverModeToolInput>): Promise<void> => {

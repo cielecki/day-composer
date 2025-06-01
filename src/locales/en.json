@@ -135,17 +135,25 @@
   "tools": {
     "actions": {
       "abandon": {
+        "default": "Abandon {{task}}",
         "failed": "Failed to abandon todo {{task}}",
         "inProgress": "Abandoning todo {{task}}...",
         "success": "Abandoned todo {{task}}"
       },
       "add": {
+        "default": "Add {{task}}",
         "failed": "Failed to add todo {{task}}",
         "inProgress": "Adding todo...",
         "success": "Added {{task}}"
       },
       "appendDocument": {
         "failed": "Failed to append to {{path}}"
+      },
+      "createCompletedTodo": {
+        "default": "Create completed todo {{task}}",
+        "failed": "Failed to create completed todo {{task}}",
+        "inProgress": "Creating completed todo {{task}}...",
+        "success": "Created completed todo {{task}}"
       },
       "createDocument": {
         "completed": "Created {{path}}",
@@ -170,11 +178,17 @@
         "default": "Generate image {{path}}",
         "failed": "Failed to generate image {{path}}"
       },
+      "handover": {
+        "default": "Handover to {{modeName}}"
+      },
       "listDirectory": {
         "failed": "Failed to list directory: {{path}}"
       },
       "readDocument": {
-        "failed": "Failed to read {{path}}"
+        "default": "Read {{path}}",
+        "failed": "Failed to read {{path}}",
+        "inProgress": "Reading {{path}}...",
+        "success": "Read {{path}}"
       },
       "searchVault": {
         "completed": "Searched for {{query}}",

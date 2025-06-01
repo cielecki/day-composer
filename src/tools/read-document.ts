@@ -36,11 +36,11 @@ export const readDocumentTool: ObsidianTool<ReadDocumentToolInput> = {
     if (hasError) {
       return t('tools.actions.readDocument.failed', { path: actionText });
     } else if (hasCompleted) {
-      return `Read ${actionText}`;
+      return t('tools.actions.readDocument.success', { path: actionText });
     } else if (hasStarted) {
-      return `Reading ${actionText}...`;
+      return t('tools.actions.readDocument.inProgress', { path: actionText });
     } else {
-      return `Read ${actionText}`;
+      return t('tools.actions.readDocument.default', { path: actionText });
     }
   },
   execute: async (context: ToolExecutionContext<ReadDocumentToolInput>): Promise<void> => {

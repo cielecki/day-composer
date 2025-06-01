@@ -97,7 +97,7 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
     } else if (hasStarted) {
       return t('tools.actions.abandon.inProgress').replace('{{task}}', '');
     } else {
-      return `Abandon ${actionText}`;
+      return t('tools.actions.abandon.default').replace('{{task}}', actionText);
     }
   },
   execute: async (context: ToolExecutionContext<AbandonTodoToolInput>): Promise<void> => {

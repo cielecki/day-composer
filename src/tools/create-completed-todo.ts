@@ -56,13 +56,13 @@ export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput>
     const actionText = todoText ? `"${todoText}"` : '';
     
     if (hasError) {
-      return `Failed to create completed todo ${actionText}`;
+      return t('tools.actions.createCompletedTodo.failed', { task: actionText });
     } else if (hasCompleted) {
-      return `Created completed todo ${actionText}`;
+      return t('tools.actions.createCompletedTodo.success', { task: actionText });
     } else if (hasStarted) {
-      return `Creating completed todo ${actionText}...`;
+      return t('tools.actions.createCompletedTodo.inProgress', { task: actionText });
     } else {
-      return `Create completed todo ${actionText}`;
+      return t('tools.actions.createCompletedTodo.default', { task: actionText });
     }
   },
   execute: async (context: ToolExecutionContext<CreateCompletedTodoToolInput>): Promise<void> => {

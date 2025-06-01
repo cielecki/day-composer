@@ -135,17 +135,25 @@
   "tools": {
     "actions": {
       "abandon": {
+        "default": "Porzuć {{task}}",
         "failed": "Nie udało się porzucić zadania {{task}}",
         "inProgress": "Porzucanie zadania {{task}}...",
         "success": "Porzucono zadanie {{task}}"
       },
       "add": {
+        "default": "Dodaj {{task}}",
         "failed": "Nie udało się dodać zadania {{task}}",
         "inProgress": "Dodawanie zadania...",
         "success": "Dodano {{task}}"
       },
       "appendDocument": {
         "failed": "Nie udało się dodać do {{path}}"
+      },
+      "createCompletedTodo": {
+        "default": "Utwórz zakończone zadanie {{task}}",
+        "failed": "Nie udało się utworzyć zakończonego zadania {{task}}",
+        "inProgress": "Tworzenie zakończonego zadania {{task}}...",
+        "success": "Utworzono zakończone zadanie {{task}}"
       },
       "createDocument": {
         "completed": "Utworzono {{path}}",
@@ -170,11 +178,17 @@
         "default": "Generuj obraz {{path}}",
         "failed": "Nie udało się wygenerować obrazu {{path}}"
       },
+      "handover": {
+        "default": "Przekaż sterowanie do {{modeName}}"
+      },
       "listDirectory": {
         "failed": "Nie udało się wyświetlić katalogu: {{path}}"
       },
       "readDocument": {
-        "failed": "Nie udało się odczytać {{path}}"
+        "default": "Odczytaj {{path}}",
+        "failed": "Nie udało się odczytać {{path}}",
+        "inProgress": "Odczytywanie {{path}}...",
+        "success": "Odczytano {{path}}"
       },
       "searchVault": {
         "completed": "Wyszukano {{query}}",
@@ -470,7 +484,7 @@
       "noModes": "## Witaj w Life Navigator\n\nAby rozpocząć, utwórz pakiet startowy zawierający podstawowe tryby z tagiem _#ln-mode_."
     },
     "thinking": {
-      "completed": "Pomyślałem przez chwilę",
+      "completed": "Myślano przez chwilę",
       "inProgress": "Myślę...",
       "redacted": "[Rozumowanie asystenta automatycznie ukryte ze względów bezpieczeństwa]"
     },

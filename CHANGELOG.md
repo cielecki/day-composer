@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Polish Translation Completeness**: Fixed missing Polish translations for task unchecking and other tool actions. All tool action text (create completed todo, handover mode, read document, abandon todo, add todo) now properly displays in Polish instead of showing English text when Polish is selected as the language.
+
 ## [0.9.0] - 2025-06-01
 
 ### Added

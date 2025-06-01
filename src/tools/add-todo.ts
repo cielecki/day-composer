@@ -116,7 +116,7 @@ export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
 		} else if (hasStarted) {
 			return t('tools.actions.add.inProgress', { defaultValue: 'Adding todo...' }).replace('{{task}}', '');
 		} else {
-			return `Add ${actionText}`;
+			return t('tools.actions.add.default').replace('{{task}}', actionText);
 		}
 	},
 	execute: async (context: ToolExecutionContext<AddTodoToolInput>): Promise<void> => {
