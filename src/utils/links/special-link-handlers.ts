@@ -38,6 +38,13 @@ export async function handleCurrentlyOpenFileLink(app: App): Promise<string> {
 	// Get the active file using Obsidian API
 	const file = app.workspace.getActiveFile();
 	if (file && file instanceof TFile) {
+		// Skip if this is not a markdown file (e.g., images)
+		if (file.extension !== 'md') {
+			// Keep the original link for non-markdown files
+			console.debug(`Skipping non-markdown file: ${file.path}`);
+			return `[Non-markdown file currently open: ${file.path}] 🔎`;
+		}
+		
 		try {
 			// Read the file content
 			const fileContent = await app.vault.read(file);
