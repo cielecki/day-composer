@@ -34,11 +34,11 @@ export const readDocumentTool: ObsidianTool<ReadDocumentToolInput> = {
     if (input.path) actionText = `"${input.path}"`;
     
     if (hasError) {
-      return `Failed to read ${actionText}`;
+      return t('tools.actions.readDocument.failed', { path: actionText });
     } else if (hasCompleted) {
-      return t('tools.readDocument', { defaultValue: 'Read' }) + ' ' + actionText;
+      return `Read ${actionText}`;
     } else if (hasStarted) {
-      return t('tools.readDocument', { defaultValue: 'Reading' }) + ' ' + actionText + '...';
+      return `Reading ${actionText}...`;
     } else {
       return `Read ${actionText}`;
     }
@@ -48,16 +48,12 @@ export const readDocumentTool: ObsidianTool<ReadDocumentToolInput> = {
       const { plugin, params } = context;
       const { path } = params;
       
-      context.progress(`Locating document at ${path}...`);
-      
       // Get the file
       const file = getFile(path, plugin.app);
       
       if (!file) {
         throw new ToolExecutionError(t('errors.documents.notFound', { path }));
       }
-      
-      context.progress(`Reading document content...`);
       
       // Read the content
       const content = await readFile(file, plugin.app);

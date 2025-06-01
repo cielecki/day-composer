@@ -214,8 +214,9 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   }
 
   const hasTextContent = contentBlocksToRender.some(block => block.type === 'text');
+  const isTextContentLast = contentBlocksToRender.length > 0 && contentBlocksToRender[contentBlocksToRender.length - 1].type === 'text';
   const shouldShowUserActions = role === 'user' && contentBlocksToRender.length > 0;
-  const shouldShowAssistantActions = role === 'assistant' && hasTextContent;
+  const shouldShowAssistantActions = role === 'assistant' && isTextContentLast;
   const shouldShowActions = shouldShowUserActions || shouldShowAssistantActions;
 
   return (

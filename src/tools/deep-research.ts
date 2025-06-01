@@ -84,7 +84,7 @@ export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
       const { query, path, max_depth = 3, max_urls = 20, timeout = 180, overwrite = false } = params;
       const settings = getPluginSettings();
 
-      context.progress("Validating research parameters...");
+      context.progress(t('tools.deepResearch.progress.validating'));
 
       // Validate inputs
       if (!query || query.trim().length === 0) {
@@ -99,7 +99,7 @@ export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
         throw new ToolExecutionError(t('tools.deepResearch.errors.noApiKey'));
       }
 
-      context.progress("Loading Firecrawl library...");
+      context.progress(t('tools.deepResearch.progress.loading'));
 
       // Dynamic import of Firecrawl to avoid bundling issues
       let FirecrawlApp;
@@ -123,7 +123,7 @@ export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
 
       console.log(`Starting deep research for query: "${query}" with params:`, researchParams);
 
-      context.progress(`Starting deep research for: "${query}"`);
+      context.progress(t('tools.deepResearch.progress.starting', { query }));
 
       // Activity callback to track progress
       const onActivity = (activity: any) => {
@@ -163,7 +163,7 @@ export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
         throw new ToolExecutionError(t('tools.deepResearch.errors.noResults'));
       }
 
-      context.progress("Processing research results...");
+      context.progress(t('tools.deepResearch.progress.processing'));
 
       // Format the research results
       let formattedResult = `# ${t('tools.deepResearch.headers.results')}: ${query}\n\n`;
@@ -205,7 +205,7 @@ export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
 
       console.log('Deep research completed successfully');
       
-      context.progress("Saving research report...");
+      context.progress(t('tools.deepResearch.progress.saving'));
 
       // Generate unique filename if file exists and overwrite is false
       let finalPath = path;

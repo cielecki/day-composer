@@ -205,9 +205,9 @@ export const downloadYoutubeTranscriptTool: ObsidianTool<DownloadYoutubeTranscri
     if (!input || typeof input !== 'object') actionText = '';
     if (input.path) actionText = `transcript to "${input.path}"`;
     if (hasCompleted) {
-      return `Downloaded ${actionText}`;
+      return t('tools.actions.downloadTranscript.completed', { actionText });
     } else {
-      return `Downloading ${actionText}...`;
+      return t('tools.actions.downloadTranscript.inProgress', { actionText });
     }
   },
   execute: async (context: ToolExecutionContext<DownloadYoutubeTranscriptInput>): Promise<void> => {
@@ -255,7 +255,11 @@ export const downloadYoutubeTranscriptTool: ObsidianTool<DownloadYoutubeTranscri
       const transcriptLength = transcript.length;
       const totalDuration = transcript.length > 0 ? Math.round(transcript[transcript.length - 1].offset / 60) : 0;
       
-      const resultMessage = `Successfully downloaded YouTube transcript to ${path}. Contains ${transcriptLength} segments covering approximately ${totalDuration} minutes of video content.`;
+      const resultMessage = t('tools.progress.downloadTranscript.success', {
+        path,
+        segments: transcriptLength.toString(),
+        duration: totalDuration.toString()
+      });
 
       // Create navigation target for the downloaded transcript
       context.addNavigationTarget({

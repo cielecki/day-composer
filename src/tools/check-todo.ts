@@ -83,24 +83,16 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
     const { plugin, params } = context;
     const { todos, time } = params;
     
-    context.progress("Validating todo items...");
-    
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
       throw new ToolExecutionError("No to-do items provided");
     }
-
-    context.progress("Preparing time formatting...");
 
     // Format the current time if provided (common for all tasks)
     const currentTime = getCurrentTime(time);
     
     const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
     
-    context.progress(`Reading note from ${filePath}...`);
-    
     const note = await readNote({plugin, filePath});
-    
-    context.progress("Validating tasks exist and are pending...");
     
     // Use the validation utility to check all tasks upfront - will throw if validation fails
     // Tasks must be in pending state to be checked off
@@ -111,8 +103,6 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
         taskPredicate: (task) => task.status === 'pending'
       }))
     );
-    
-    context.progress(`Checking off ${todos.length} todo item${todos.length > 1 ? 's' : ''}...`);
     
     // If we get here, all tasks were validated successfully
     let updatedNote = JSON.parse(JSON.stringify(note));
@@ -147,12 +137,8 @@ export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
       checkedTasks.push(todo_text);
     }
     
-    context.progress("Updating note with completed tasks...");
-    
     // Update the note with all completed tasks
     await updateNote({plugin, filePath, updatedNote});
-    
-    context.progress("Creating navigation targets...");
     
     // Create navigation targets for the moved tasks
     const navigationTargets = createNavigationTargetsForTasks(

@@ -39,13 +39,13 @@ export const createDocumentTool: ObsidianTool<CreateDocumentToolInput> = {
     if (input.path) actionText = `"${input.path}"`;
     
     if (hasError) {
-      return `Failed to create ${actionText}`;
+      return t('tools.actions.createDocument.failed', { path: actionText });
     } else if (hasCompleted) {
-      return `Created ${actionText}`;
+      return t('tools.actions.createDocument.completed', { path: actionText });
     } else if (hasStarted) {
-      return `Creating ${actionText}...`;
+      return t('tools.actions.createDocument.inProgress', { path: actionText });
     } else {
-      return `Create ${actionText}`;
+      return t('tools.actions.createDocument.default', { path: actionText });
     }
   },
   execute: async (context: ToolExecutionContext<CreateDocumentToolInput>): Promise<void> => {
@@ -53,16 +53,12 @@ export const createDocumentTool: ObsidianTool<CreateDocumentToolInput> = {
     const { path, content } = params;
     const documentContent = content || ''; // Default to empty string if content is undefined
 
-    context.progress(`Checking if file exists at ${path}...`);
-
     // Check if the file already exists
     const exists = await fileExists(path, plugin.app);
 
     if (exists) {
       throw new ToolExecutionError(`File already exists at ${path}. Set overwrite to true to replace it.`);
     }
-
-    context.progress(`Creating document at ${path}...`);
 
     // Create the file
     await createFile(path, documentContent, plugin.app);
@@ -73,6 +69,6 @@ export const createDocumentTool: ObsidianTool<CreateDocumentToolInput> = {
       description: t("tools.navigation.openCreatedDocument")
     });
 
-    context.progress(`Successfully created document at ${path}`);
+    context.progress(t('tools.createDocument.progress.success', { path }));
   }
 };

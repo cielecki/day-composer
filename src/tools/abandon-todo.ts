@@ -70,17 +70,22 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
     if (todoCount === 1) {
       actionText = `"${input.todos[0].todo_text}"`;
     } else {
-      // Use proper pluralization based on count
-      const countKey = todoCount === 0 ? 'zero' :
-                       todoCount === 1 ? 'one' :
-                       todoCount % 10 >= 2 && todoCount % 10 <= 4 && (todoCount % 100 < 10 || todoCount % 100 >= 20) ? 'few' : 'many';
+      // Use proper pluralization based on count with static translation keys
+      let translation = '';
+      if (todoCount === 0) {
+        translation = t('tools.tasks.count.zero', { count: todoCount });
+      } else if (todoCount === 1) {
+        translation = t('tools.tasks.count.one', { count: todoCount });
+      } else if (todoCount % 10 >= 2 && todoCount % 10 <= 4 && (todoCount % 100 < 10 || todoCount % 100 >= 20)) {
+        translation = t('tools.tasks.count.few', { count: todoCount });
+      } else {
+        translation = t('tools.tasks.count.many', { count: todoCount });
+      }
       
-      // Check if the translation key exists
-      try {
-        const translation = t(`tools.tasks.count.${countKey}`, { count: todoCount });
-        actionText = translation !== `tools.tasks.count.${countKey}` ? translation : `${todoCount} ${t('tools.tasks.plural')}`;
-      } catch (e) {
-        // Fallback to simple pluralization if the count format is not available
+      // Check if translation was successful, fallback to simple pluralization if not
+      if (translation && !translation.startsWith('tools.tasks.count.')) {
+        actionText = translation;
+      } else {
         actionText = `${todoCount} ${t('tools.tasks.plural')}`;
       }
     }
@@ -99,24 +104,16 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
     const { plugin, params } = context;
     const { todos, time } = params;
     
-    context.progress("Validating todo items...");
-    
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
       throw new ToolExecutionError("No to-do items provided");
     }
-    
-    context.progress("Preparing time formatting...");
     
     // Format the current time if provided (common for all tasks)
     const currentTime = getCurrentTime(time);
     
     const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
     
-    context.progress(`Reading note from ${filePath}...`);
-    
     const note = await readNote({plugin, filePath});
-    
-    context.progress("Validating tasks exist and can be abandoned...");
     
     // Validate all tasks upfront - will throw if any validation fails
     validateTasks(
@@ -126,8 +123,6 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
         taskPredicate: (task) => task.status !== 'abandoned'
       }))
     );
-    
-    context.progress(`Abandoning ${todos.length} todo item${todos.length > 1 ? 's' : ''}...`);
     
     // Track tasks that will be abandoned
     const abandonedTasks: string[] = [];
@@ -164,12 +159,8 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
       abandonedTasks.push(todo_text);
     }
     
-    context.progress("Updating note with abandoned tasks...");
-    
     // Update the note with all abandoned tasks
     await updateNote({plugin, filePath, updatedNote});
-    
-    context.progress("Creating navigation targets...");
     
     // Create navigation targets for the moved tasks
     const navigationTargets = createNavigationTargetsForTasks(
@@ -186,11 +177,10 @@ export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
     const tasksDescription = abandonedTasks.length === 1 
       ? `"${abandonedTasks[0]}"`
       : `${abandonedTasks.length} ${t('tools.tasks.plural')}`;
-      
-    const resultMessage = t('tools.success.abandon')
-      .replace('{{task}}', tasksDescription)
-      .replace('{{path}}', filePath);
-
-    context.progress(resultMessage);
+    
+    context.progress(t('tools.success.abandon', {
+      task: tasksDescription,
+      path: filePath
+    }));
   }
 };

@@ -1,480 +1,466 @@
 {
-  "settings": {
-    "title": "Life Navigator Settings",
-    "description": "Configure your Life Navigator plugin settings here",
-    "actions": {
-      "title": "Life Navigator Actions",
-      "checkUpdates": {
-        "name": "Check for Updates",
-        "desc": "Check if there's a newer version of Life Navigator available and download it automatically.",
-        "button": "Check for Updates"
-      },
-      "createStarterKit": {
-        "name": "Create Starter Kit",
-        "desc": "Create a new starter kit with pre-configured AI modes and templates to get you started quickly.",
-        "button": "Create Starter Kit"
-      },
-      "resetTutorial": {
-        "name": "Reset Tutorial",
-        "desc": "Reset the setup tutorial and onboarding flow. This will show the setup screens again next time you open Life Navigator.",
-        "button": "Reset Tutorial",
-        "confirm": "Are you sure you want to reset the tutorial? This will show the setup screens again next time you open Life Navigator.",
-        "success": "Tutorial has been reset. The setup screens will appear next time you open Life Navigator.",
-        "error": "Failed to reset tutorial: {{error}}"
-      },
-      "viewDocs": {
-        "name": "View Documentation",
-        "desc": "Open the Life Navigator user guide and documentation on GitHub in your browser.",
-        "button": "View Documentation"
-      }
-    },
-    "apiKeys": {
-      "title": "API Keys",
-      "anthropic": "Anthropic API Key",
-      "anthropicDesc": "Your Anthropic API key for the main AI assistant functionality. Get it from <a href='https://console.anthropic.com/settings/keys'>Anthropic Console</a>.",
-      "openai": "OpenAI API Key",
-      "openaiDesc": "Your OpenAI API key for text-to-speech functionality. Get it from <a href='https://platform.openai.com/api-keys'>OpenAI Platform</a>.",
-      "firecrawl": "Firecrawl API Key",
-      "firecrawlDesc": "Your Firecrawl API key for deep research functionality. Get it from <a href='https://firecrawl.dev/'>Firecrawl Dashboard</a>.",
-      "enterAnthropicKey": "Enter your Anthropic API key",
-      "enterOpenAIKey": "Enter your OpenAI API key",
-      "enterFirecrawlKey": "Enter your Firecrawl API key",
-      "securityNote": "Important: Your API key is stored in your Obsidian config folder. Do not share your vault or config folder with others if you store your API key here."
-    },
-    "advanced": {
-      "title": "Advanced Settings"
-    },
-    "security": {
-      "title": "Security Notice"
-    },
-    "prompts": {
-      "speechToTextPrompt": "Speech-to-text Prompt",
-      "speechToTextPromptDesc": "The prompt that will be sent to the speech-to-text engine. This provides context to the AI model. You can use <a href='https://github.com/cielecki/life-navigator/blob/main/docs/link-expansion.md'>link expansion</a>.",
-      "defaultPrompt": "# Domain\nA message or voice command issued by the user to the AI assistant.\n\n# Examples\n- Check off task ... umm ... I took out the trash\n- I made dinner\n- Add for tomorrow to remind me to reach out to John.\n\n# Glossary\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nStart of transcription:"
-    }
-  },
-  "tools": {
-    "title": "Tools",
-    "description": "Available tools and utilities",
-    "createStarterKit": "Create a Starter Kit",
-    "createNewMode": "Create a New Mode",
-    "checkForUpdates": "Check for updates",
-    "resetTutorial": "Reset Tutorial",
-    "openLifeNavigator": "Life Navigator",
-    "readDocument": "Reading document",
-    "createDocument": "Creating document",
-    "appendToDocument": "Appending to document",
-    "addTodo": "Adding task",
-    "generateImage": {
-      "success": "Successfully created image at {{path}}",
-      "generating": "Generating image for {{path}}...",
-      "openImage": "Open generated image",
-      "errors": {
-        "emptyPrompt": "Image prompt cannot be empty",
-        "emptyPath": "Image path cannot be empty",
-        "fileExists": "File already exists at {{path}}. Please choose a different path or delete the existing file.",
-        "noApiKey": "OpenAI API Key not set. Please configure it in settings for image generation.",
-        "noImageData": "No image data received from OpenAI API",
-        "noBase64Data": "Invalid image data format received from OpenAI API",
-        "quotaExceeded": "OpenAI API quota exceeded. Please check your billing and usage limits.",
-        "invalidRequest": "Invalid request to OpenAI API: {{error}}",
-        "general": "Error generating image: {{error}}"
-      }
-    },
-    "deepResearch": {
-      "success": "Deep research completed successfully",
-      "researching": "Conducting deep research on \"{{query}}\"...",
-      "headers": {
-        "results": "Deep Research Results",
-        "analysis": "Research Analysis",
-        "sources": "Sources",
-        "metadata": "Research Metadata"
-      },
-      "labels": {
-        "query": "Query",
-        "maxDepth": "Max Depth",
-        "maxUrls": "Max URLs",
-        "timeout": "Timeout",
-        "sourcesFound": "Sources Found",
-        "completed": "Completed",
-        "url": "URL",
-        "source": "Source"
-      },
-      "result": {
-        "message": "Successfully conducted deep research on \"{{query}}\" and saved report to {{path}}. Research included {{sourceCount}} sources with {{maxDepth}} depth iterations.",
-        "navigationDescription": "Open research report"
-      },
-      "errors": {
-        "emptyQuery": "Research query cannot be empty",
-        "emptyPath": "File path cannot be empty",
-        "noApiKey": "Firecrawl API Key not set. Please configure it in settings for deep research functionality.",
-        "quotaExceeded": "Firecrawl API quota exceeded. Please check your billing and usage limits.",
-        "timeout": "Research request timed out. Please try with a more specific query.",
-        "noResults": "No relevant information found for the given query.",
-        "libraryLoad": "Failed to load Firecrawl library",
-        "researchFailed": "Research failed",
-        "unknownError": "Unknown error occurred during research",
-        "general": "Error conducting deep research: {{error}}"
-      }
-    },
-    "tasks": {
-      "single": "task",
-      "plural": "tasks",
-      "count": {
-        "one": "{{count}} task",
-        "few": "{{count}} tasks",
-        "many": "{{count}} tasks",
-        "zero": "no tasks"
-      }
-    },
-    "position": {
-      "before": "before \"{{task}}\"",
-      "after": "after \"{{task}}\"",
-      "at": "at {{position}} position"
-    },
-    "actions": {
-      "move": {
-        "failed": "Failed to move todo {{task}}",
-        "success": "Moved todo {{task}}",
-        "inProgress": "Moving todo {{task}}..."
-      },
-      "complete": {
-        "failed": "Failed to add completed todo",
-        "success": "Added completed todo: \"{{content}}\"",
-        "inProgress": "Adding completed todo..."
-      },
-      "check": {
-        "failed": "Failed to check off todo {{task}}",
-        "success": "Checked off todo {{task}}",
-        "inProgress": "Checking off todo {{task}}..."
-      },
-      "uncheck": {
-        "failed": "Failed to uncheck todo {{task}}",
-        "success": "Unchecked todo {{task}}",
-        "inProgress": "Unchecking todo {{task}}..."
-      },
-      "abandon": {
-        "failed": "Failed to abandon todo {{task}}",
-        "success": "Abandoned todo {{task}}",
-        "inProgress": "Abandoning todo {{task}}..."
-      },
-      "add": {
-        "failed": "Failed to add todo {{task}}",
-        "success": "Added {{task}}",
-        "inProgress": "Adding todo..."
-      },
-      "edit": {
-        "failed": "Failed to edit todo {{task}}",
-        "success": "Edited todo {{task}}",
-        "inProgress": "Editing todo..."
-      },
-      "remove": {
-        "failed": "Failed to remove todo {{task}}",
-        "success": "Removed todo {{task}}",
-        "inProgress": "Removing todo..."
-      }
-    },
-    "success": {
-      "move": "✓ Moved to-do {{task}} from {{source}} to {{target}} {{position}}",
-      "complete": "✓ Added completed todo \"{{task}}\"{{time}} to {{path}}",
-      "check": "✓ Checked off {{task}} in {{path}} ({{time}})",
-      "uncheck": "✓ Unchecked \"{{task}}\" in {{path}}",
-      "abandon": "✓ Marked {{task}} as abandoned in {{path}}",
-      "edit": "✓ Edited {{originalTask}} to {{newTask}} in {{path}}{{details}}",
-      "remove": "✓ Removed {{task}} from {{path}} (converted to comment)"
-    },
-    "comments": {
-      "removedTaskHeader": "REMOVED TASK"
-    },
-    "handover": {
-      "switched": "Switched to {{modeName}} mode",
-      "successMessage": "Successfully switched from {{fromMode}} to {{toMode}} mode.",
-      "newModeActive": "You are now operating as {{modeName}} mode.",
-      "description": "Description:",
-      "handoverInstructions": "You have been handed control of this conversation. Please continue executing the user's task using your specialized capabilities and personality. Take over from here and provide appropriate assistance based on your mode's purpose.",
-      "noModes": "No modes available for switching.",
-      "modeNotFound": "Mode with ID \"{{modeId}}\" not found.",
-      "switchFailed": "Failed to switch mode: {{error}}",
-      "alreadyInMode": "Already in {{modeName}} mode. No change needed.",
-      "switching": "Switching to {{modeName}} mode...",
-      "failedToSwitch": "Failed to switch to {{modeName}}",
-      "noDescription": "No description available",
-      "invalidModeId": "Mode ID is required and must be a string"
-    },
-    "navigation": {
-      "openCreatedDocument": "Open created document",
-      "openReadDocument": "Open read document", 
-      "openAppendedDocument": "Open appended document",
-      "openDownloadedTranscript": "Open downloaded transcript",
-      "navigateToUncheckedTodo": "Navigate to unchecked todo",
-      "navigateToEditedTodo": "Navigate to edited todo",
-      "navigateToAbandonedTodo": "Navigate to abandoned todo{{count}}",
-      "navigateToMovedTodo": "Navigate to moved todo{{count}}",
-      "navigateToCompletedTodo": "Navigate to completed todo",
-      "navigateToRemovedTodo": "Navigate to removed todo{{count}}",
-      "navigateToAddedTodo": "Navigate to added todo{{count}}",
-      "navigateToCheckedTodo": "Navigate to checked todo{{count}}"
-    }
-  },
-  "errors": {
-    "general": "An error occurred",
-    "notFound": "Resource not found",
-    "invalidInput": "Invalid input provided",
-    "creatingNewMode": "Error creating a new mode",
-    "startingLifeNavigator": "Error starting Life Navigator",
-    "setup": "Setup Error: {{error}}",
-    "conversationTurn": "Error during conversation: {{error}}",
-    "failedToUpdatePlugin": "Failed to update plugin: {{error}}",
-    "linkExpansion": {
-      "couldNotResolve": "Could not resolve link target \"{{linkPath}}\""
-    },
-    "tools": {
-      "noName": "No tool name provided",
-      "unknown": "Unknown tool \"{{tool}}\"",
-      "execution": "Error executing tool {{tool}}: {{error}}"
-    },
-    "tts": {
-      "noApiKey": "OpenAI API Key not set. Please configure it in settings for text-to-speech.",
-      "invalidVoice": "Invalid voice selected: {{voice}}. Please choose a valid voice.",
-      "transcriptionFailed": "Text-to-speech failed: {{error}}",
-      "microphone": {
-        "accessDenied": "Microphone access denied. Please allow microphone access in your browser settings.",
-        "notFound": "No microphone found. Please connect a microphone and try again.",
-        "inUse": "Cannot access microphone. It might be in use by another application.",
-        "general": "Cannot access microphone"
-      }
-    },
-    "clipboard": {
-      "read": "Failed to read from clipboard: {{error}}",
-      "paste": {
-        "success": "Content pasted from clipboard",
-        "noTarget": "No active input or editor to paste into"
-      }
-    },
-    "context": {
-      "save": "Context saved to {{path}}",
-      "saveError": "Error saving context to {{path}}"
-    },
-    "audio": {
-      "playback": "Failed to play audio chunk.",
-      "playbackError": "Error playing audio: {{error}}",
-      "noData": "No audio stream received from API."
-    },
-    "notes": {
-      "multipleFound": "Multiple daily notes found for date: {{date}}",
-      "notFound": "Daily note not found for date: {{date}}",
-      "noContent": "No daily note content found for {{date}}"
-    },
-    "chat": {
-      "empty": "Chat is empty. Start a conversation to see content here.",
-      "current": "Current Chat",
-      "systemPrompt": "System Prompt",
-      "userMessage": "user message",
-      "assistantMessage": "assistant message"
-    },
-    "todos": {
-      "check": "Failed to check off todo: {{error}}",
-      "uncheck": "Failed to uncheck todo: {{error}}",
-      "abandon": "Failed to abandon todo: {{error}}",
-      "display": "Error displaying todos: {{error}}",
-      "invalidData": "Invalid data",
-      "createError": "Error creating completed todo: {{error}}"
-    },
-    "files": {
-      "notFound": "File not found at {{path}}",
-      "getFailed": "Failed to get file at {{path}}",
-      "formatFailed": "Failed to format document after task operation",
-      "sourceNotFound": "Source file not found at {{path}}",
-      "createFailed": "Could not create target file at {{path}}: {{error}}",
-      "todayNotExists": "Today's note doesn't exist yet."
-    },
-    "voice": {
-      "invalid": "Invalid voice selected: {{voice}}, falling back to default"
-    },
-    "config": {
-      "dailyNotes": "Error reading daily notes config: {{error}}"
-    },
-    "plugin": {
-      "notFound": "Plugin not found"
-    },
-    "tasks": {
-      "notFound": "To-do item \"{{task}}\" not found in {{path}}. If the task is in another file, please specify it in the file_path parameter.",
-      "multipleFound": "Multiple tasks found with description \"{{task}}\" in {{path}}. Please make your task description more specific.",
-      "insertOutOfBounds": "Cannot insert task at index {{index}}: Index out of bounds (document has {{total}} items)",
-      "removeNotFound": "Task \"{{task}}\" not found in document",
-      "invalidState": "Cannot check off \"{{task}}\" because it is not in a pending state. Its current state is '{{state}}'. Please uncheck it first if it's already completed, abandoned, or moved."
-    },
-    "documents": {
-      "notFound": "File not found: {{path}}",
-      "readError": "Error reading document: {{error}}"
-    }
-  },
   "buttons": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "apply": "Apply",
-    "reset": "Reset"
+    "cancel": "Cancel"
   },
-  "messages": {
-    "settingsSaved": "Settings saved successfully",
-    "settingsReset": "Settings have been reset to defaults",
-    "creatingStarterKit": "Creating a Starter Kit...",
-    "checkingForUpdates": "Checking for updates...",
-    "pluginUpToDate": "Plugin is already up to date (version {{version}}).",
-    "newVersionFoundDownloading": "New version {{latestVersion}} found (you have {{currentVersion}}). Downloading update...",
-    "updateAvailable": "Life Navigator v{{latestVersion}} is available! You have v{{currentVersion}}. Go to plugin settings to update."
-  },
-  "view": {
-    "title": "Life Navigator"
-  },
-  "ui": {
-    "recording": {
-      "start": "Start Recording",
-      "stop": "Stop",
-      "cancel": "Cancel Recording",
-      "transcribing": "Transcribing",
-      "confirm": "Confirm Recording"
-    },
-    "chat": {
-      "new": "New Chat",
-      "history": "Chat History"
-    },
-    "input": {
-      "placeholder": "Type your message...",
-      "send": "Send",
-      "save": "Save",
-      "cancel": "Cancel",
-      "stop": "Stop",
-      "addFile": "Add File",
-      "attachImage": "Attach Image",
-      "removeFile": "Remove {{filename}}",
-      "maxFiles": "Max files attached: {{max}}"
-    },
-    "message": {
-      "edit": "Edit message",
-      "copy": "Copy message",
-      "speak": "Read aloud",
-      "stopSpeech": "Stop speech",
-      "generatingSpeech": "Generating speech",
-      "recordingInProgress": "Recording in progress",
-      "attachedImage": "Attached image",
-      "editing": "Editing message"
-    },
-    "todo": {
-      "clickToChange": "Click to change status",
-      "readOnly": "Read only",
-      "abandon": "Abandon task",
-      "noTodos": "No matching tasks found in {{filename}}",
-      "selectedFrom": "Selected tasks from {{filename}}",
-      "showMore": "Show {{count}} more items"
-    },
-    "thinking": {
-      "inProgress": "Thinking...",
-      "completed": "Thought for a moment",
-      "redacted": "[Assistant reasoning automatically redacted for security]"
-    },
-    "mode": {
-      "openInEditor": "Open in editor",
-      "viewSettings": "View mode settings",
-      "viewSystemPrompt": "View system prompt",
-      "switchTo": "Switch to:",
-      "createStarterKit": "Create a Starter Kit",
-      "newMode": "New mode",
-      "createdSuccess": "Successfully created new mode",
-      "createdError": "Error creating new mode: {{error}}",
-      "defaultDescription": "New AI assistant mode",
-      "files": {
-        "noFrontmatter": "File {{filename}} has no frontmatter, using defaults with file content as system prompt"
-      }
-    },
-    "attachments": {
-      "imagePasted": "Image pasted successfully",
-      "imagesAttached": "{{count}} images attached: {{filenames}}",
-      "pastedImage": "Pasted image"
-    },
-    "modal": {
-      "copyToClipboard": "Copy to clipboard",
-      "copied": "Copied!",
-      "modeSettings": "Settings for mode {{modeName}}",
-      "systemPrompt": "System prompt for \"{{modeName}}\"",
-      "reloadRequiredTitle": "Reload Required",
-      "reloadRequiredMessage": "The plugin has been updated. Please restart Obsidian to apply changes.",
-      "reloadRequiredMessageWithVersions": "Plugin updated from version {{currentVersion}} to {{latestVersion}}.\nWould you like to restart Obsidian to apply changes?",
-      "reloadButton": "Restart Obsidian"
-    },
-    "starterKit": {
-      "noModes": "## Welcome to Life Navigator\n\nTo get started, create a starter kit containing basic modes with the _#ln-mode_ tag.",
-      "createdSuccess": "Successfully created starter kit",
-      "createdError": "Error creating starter kit: {{error}}",
-      "directoryName": "Starter Kit"
-    },
-    "setup": {
-      "saving": "Saving...",
-      "openSettings": "Open Settings",
-      "language": {
-        "title": "Configure Language",
-        "description": "Life Navigator works best when your Obsidian interface language matches the language you write your notes in. Select your preferred language below - if it's different from your current setting, Obsidian will restart automatically to apply the change. Voice features (speech-to-text and text-to-speech) will automatically use your selected language.",
-        "currentLanguage": "Current Obsidian language:",
-        "supportedLanguages": "Available Language Options",
-        "continueButton": "Continue with Current Language",
-        "useEnglish": "Use English",
-        "skipButton": "Skip Language Setup",
-        "current": "Current",
-        "note": "If you select a different language than currently configured, Obsidian will automatically restart to apply the changes. All Life Navigator content, AI interactions, and starter kit files will then be in your selected language. Voice features will automatically work in your chosen language.",
-        "manualRestart": "Please restart Obsidian to apply the language changes."
-      },
-      "starterKit": {
-        "title": "Welcome to Life Navigator",
-        "description": "Get started by creating your starter kit with pre-configured AI modes and templates.",
-        "button": "Create Starter Kit",
-        "features": {
-          "modes": "Multiple AI personalities",
-          "templates": "Information templates",
-          "examples": "Usage examples"
-        }
-      },
-      "anthropicKey": {
-        "title": "Configure Anthropic API Key",
-        "description": "Anthropic Claude powers the main AI functionality. You'll need an API key to continue.",
-        "placeholder": "Paste your Anthropic API key here",
-        "inputLabel": "Paste your API key here:",
-        "saveButton": "Save and Continue",
-        "getKey": "Get your Anthropic API key",
-        "steps": {
-          "visit": "Visit console.anthropic.com/settings/keys",
-          "create": "Create a new API key",
-          "paste": "Paste it here"
-        }
-      },
-      "openaiKey": {
-        "title": "Configure OpenAI API Key",
-        "description": "OpenAI powers voice features like text-to-speech. This is optional but recommended.",
-        "placeholder": "Paste your OpenAI API key here",
-        "inputLabel": "Paste your API key here:",
-        "saveButton": "Save and Continue",
-        "skipButton": "Skip for now",
-        "getKey": "Get your OpenAI API key",
-        "note": "You can always add this later in settings to enable voice features.",
-        "steps": {
-          "visit": "Visit platform.openai.com/api-keys",
-          "create": "Create a new API key",
-          "paste": "Paste it here"
-        }
-      }
-    }
-  },
-  "tasks": {
-    "format": {
-      "completedAt": " (completed at {{time}})",
-      "abandonedAt": " (abandoned at {{time}})",
-      "movedTo": " (→ {{target}})",
-      "movedFrom": " (from {{source}})"
-    }
+  "chat": {
+    "assistantMessage": "assistant message",
+    "current": "Current Chat",
+    "empty": "Chat is empty. Start a conversation to see content here.",
+    "userMessage": "user message"
   },
   "dateTime": {
     "current": "Current Date and Time"
   },
+  "errors": {
+    "audio": {
+      "noData": "No audio stream received from API.",
+      "playbackError": "Error playing audio: {{error}}"
+    },
+    "chat": {
+      "noContent": "No chat content available"
+    },
+    "conversationTurn": "Error during conversation: {{error}}",
+    "documents": {
+      "notFound": "File not found: {{path}}"
+    },
+    "failedToUpdatePlugin": "Failed to update plugin: {{error}}",
+    "files": {
+      "createFailed": "Could not create target file at {{path}}: {{error}}",
+      "formatFailed": "Failed to format document after task operation",
+      "getFailed": "Failed to get file at {{path}}",
+      "notFound": "File not found at {{path}}",
+      "sourceNotFound": "Source file not found at {{path}}"
+    },
+    "linkExpansion": {
+      "couldNotResolve": "Could not resolve link target \"{{linkPath}}\""
+    },
+    "setup": "Setup Error: {{error}}",
+    "tasks": {
+      "insertOutOfBounds": "Cannot insert task at index {{index}}: Index out of bounds (document has {{total}} items)",
+      "multipleFound": "Multiple tasks found with description \"{{task}}\" in {{path}}. Please make your task description more specific.",
+      "notFound": "To-do item \"{{task}}\" not found in {{path}}. If the task is in another file, please specify it in the file_path parameter.",
+      "removeNotFound": "Task \"{{task}}\" not found in document"
+    },
+    "todos": {
+      "createError": "Error creating completed todo: {{error}}"
+    },
+    "tools": {
+      "execution": "Error executing tool {{tool}}: {{error}}",
+      "noName": "No tool name provided",
+      "unknown": "Unknown tool \"{{tool}}\""
+    },
+    "tts": {
+      "invalidVoice": "Invalid voice selected: {{voice}}. Please choose a valid voice.",
+      "microphone": {
+        "accessDenied": "Microphone access denied. Please allow microphone access in your browser settings.",
+        "general": "Cannot access microphone",
+        "inUse": "Cannot access microphone. It might be in use by another application.",
+        "notFound": "No microphone found. Please connect a microphone and try again."
+      },
+      "noApiKey": "OpenAI API Key not set. Please configure it in settings for text-to-speech.",
+      "transcriptionFailed": "Text-to-speech failed: {{error}}"
+    }
+  },
   "file": {
     "currentlyOpen": "Currently Open File"
+  },
+  "messages": {
+    "checkingForUpdates": "Checking for updates...",
+    "creatingStarterKit": "Creating a Starter Kit..."
+  },
+  "settings": {
+    "actions": {
+      "checkUpdates": {
+        "button": "Check for Updates",
+        "desc": "Check if there's a newer version of Life Navigator available and download it automatically.",
+        "name": "Check for Updates"
+      },
+      "createStarterKit": {
+        "button": "Create Starter Kit",
+        "desc": "Create a new starter kit with pre-configured AI modes and templates to get you started quickly.",
+        "name": "Create Starter Kit"
+      },
+      "resetTutorial": {
+        "button": "Reset Tutorial",
+        "confirm": "Are you sure you want to reset the tutorial? This will show the setup screens again next time you open Life Navigator.",
+        "desc": "Reset the setup tutorial and onboarding flow. This will show the setup screens again next time you open Life Navigator.",
+        "error": "Failed to reset tutorial: {{error}}",
+        "name": "Reset Tutorial"
+      },
+      "title": "Life Navigator Actions",
+      "viewDocs": {
+        "button": "View Documentation",
+        "desc": "Open the Life Navigator user guide and documentation on GitHub in your browser.",
+        "name": "View Documentation"
+      }
+    },
+    "advanced": {
+      "title": "Advanced Settings"
+    },
+    "apiKeys": {
+      "anthropic": "Anthropic API Key",
+      "anthropicDesc": "Your Anthropic API key for the main AI assistant functionality. Get it from <a href='https://console.anthropic.com/settings/keys'>Anthropic Console</a>.",
+      "enterAnthropicKey": "Enter your Anthropic API key",
+      "enterFirecrawlKey": "Enter your Firecrawl API key",
+      "enterOpenAIKey": "Enter your OpenAI API key",
+      "firecrawl": "Firecrawl API Key",
+      "firecrawlDesc": "Your Firecrawl API key for deep research functionality. Get it from <a href='https://firecrawl.dev/'>Firecrawl Dashboard</a>.",
+      "openai": "OpenAI API Key",
+      "openaiDesc": "Your OpenAI API key for text-to-speech functionality. Get it from <a href='https://platform.openai.com/api-keys'>OpenAI Platform</a>.",
+      "securityNote": "Important: Your API key is stored in your Obsidian config folder. Do not share your vault or config folder with others if you store your API key here.",
+      "title": "API Keys"
+    },
+    "prompts": {
+      "defaultPrompt": "# Domain\nA message or voice command issued by the user to the AI assistant.\n\n# Examples\n- Check off task ... umm ... I took out the trash\n- I made dinner\n- Add for tomorrow to remind me to reach out to John.\n\n# Glossary\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nStart of transcription:",
+      "speechToTextPrompt": "Speech-to-text Prompt",
+      "speechToTextPromptDesc": "The prompt that will be sent to the speech-to-text engine. This provides context to the AI model. You can use <a href='https://github.com/cielecki/life-navigator/blob/main/docs/link-expansion.md'>link expansion</a>."
+    },
+    "security": {
+      "title": "Security Notice"
+    }
+  },
+  "tasks": {
+    "format": {
+      "abandonedAt": " (abandoned at {{time}})",
+      "completedAt": " (completed at {{time}})",
+      "movedFrom": " (from {{source}})",
+      "movedTo": " (→ {{target}})"
+    }
+  },
+  "tools": {
+    "actions": {
+      "abandon": {
+        "failed": "Failed to abandon todo {{task}}",
+        "inProgress": "Abandoning todo {{task}}...",
+        "success": "Abandoned todo {{task}}"
+      },
+      "add": {
+        "failed": "Failed to add todo {{task}}",
+        "inProgress": "Adding todo...",
+        "success": "Added {{task}}"
+      },
+      "appendDocument": {
+        "failed": "Failed to append to {{path}}"
+      },
+      "createDocument": {
+        "completed": "Created {{path}}",
+        "default": "Create {{path}}",
+        "failed": "Failed to create {{path}}",
+        "inProgress": "Creating {{path}}..."
+      },
+      "downloadTranscript": {
+        "completed": "Downloaded transcript for {{url}}",
+        "inProgress": "Downloading transcript for {{url}}..."
+      },
+      "editTodo": {
+        "failed": "Failed to edit todo {{task}}"
+      },
+      "findFilesByTag": {
+        "completed": "Found files with tag {{tag}}",
+        "failed": "Failed to find files with tag {{tag}}",
+        "ready": "Find files with tag {{tag}}",
+        "started": "Finding files with tag {{tag}}..."
+      },
+      "generateImage": {
+        "default": "Generate image {{path}}",
+        "failed": "Failed to generate image {{path}}"
+      },
+      "listDirectory": {
+        "failed": "Failed to list directory: {{path}}"
+      },
+      "readDocument": {
+        "failed": "Failed to read {{path}}"
+      },
+      "searchVault": {
+        "completed": "Searched for {{query}}",
+        "default": "Search for {{query}}",
+        "failed": "Failed to search for {{query}}",
+        "inProgress": "Searching for {{query}}..."
+      },
+      "uncheck": {
+        "failed": "Failed to uncheck todo {{task}}",
+        "inProgress": "Unchecking todo {{task}}...",
+        "success": "Unchecked todo {{task}}"
+      }
+    },
+    "appendDocument": {
+      "progress": {
+        "success": "Content added to {{path}}"
+      }
+    },
+    "comments": {
+      "removedTaskHeader": "REMOVED TASK"
+    },
+    "createDocument": {
+      "progress": {
+        "success": "Successfully created document in {{path}}"
+      }
+    },
+    "deepResearch": {
+      "errors": {
+        "emptyPath": "File path cannot be empty",
+        "emptyQuery": "Research query cannot be empty",
+        "general": "Error conducting deep research: {{error}}",
+        "noApiKey": "Firecrawl API Key not set. Please configure it in settings for deep research functionality.",
+        "noResults": "No relevant information found for the given query.",
+        "quotaExceeded": "Firecrawl API quota exceeded. Please check your billing and usage limits.",
+        "timeout": "Research request timed out. Please try with a more specific query.",
+        "unknownError": "Unknown error occurred during research"
+      },
+      "headers": {
+        "analysis": "Research Analysis",
+        "metadata": "Research Metadata",
+        "results": "Deep Research Results",
+        "sources": "Sources"
+      },
+      "labels": {
+        "completed": "Completed",
+        "maxDepth": "Max Depth",
+        "maxUrls": "Max URLs",
+        "query": "Query",
+        "source": "Source",
+        "sourcesFound": "Sources Found",
+        "timeout": "Timeout",
+        "url": "URL"
+      },
+      "progress": {
+        "loading": "Loading Firecrawl library...",
+        "processing": "Processing research results...",
+        "saving": "Saving research report...",
+        "starting": "Starting deep research for: \"{{query}}\"",
+        "validating": "Validating research parameters..."
+      },
+      "researching": "Conducting deep research on \"{{query}}\"...",
+      "result": {
+        "message": "Successfully conducted deep research on \"{{query}}\" and saved report to {{path}}. Research included {{sourceCount}} sources with {{maxDepth}} depth iterations.",
+        "navigationDescription": "Open research report"
+      },
+      "success": "Deep research completed successfully"
+    },
+    "findFilesByTag": {
+      "errors": {
+        "general": "Error finding files by tag: {{error}}",
+        "tagRequired": "Tag parameter is required"
+      },
+      "navigation": {
+        "description": "Navigate to file {{index}}: {{name}}"
+      },
+      "results": {
+        "andMore": "and {{count}} more",
+        "content": "content",
+        "contentExcluded": "Content tags were excluded.",
+        "contentSnippet": "Content",
+        "frontmatter": "frontmatter",
+        "frontmatterExcluded": "Frontmatter tags were excluded.",
+        "header": "Found {{count}} file{{plural}} with tag \"{{searchTag}}\":",
+        "headings": "Headings",
+        "limitedResults": "Results limited to {{maxResults}} files. There may be more files with this tag.",
+        "line": "line",
+        "noFiles": "No files found with tag \"{{searchTag}}\".",
+        "path": "Path",
+        "scopeLimited": "Note: Search scope was limited.",
+        "tags": "Tags"
+      }
+    },
+    "generateImage": {
+      "errors": {
+        "emptyPath": "Image path cannot be empty",
+        "emptyPrompt": "Image prompt cannot be empty",
+        "fileExists": "File already exists at {{path}}. Please choose a different path or delete the existing file.",
+        "general": "Error generating image: {{error}}",
+        "invalidRequest": "Invalid request to OpenAI API: {{error}}",
+        "noApiKey": "OpenAI API Key not set. Please configure it in settings for image generation.",
+        "noBase64Data": "Invalid image data format received from OpenAI API",
+        "noImageData": "No image data received from OpenAI API",
+        "quotaExceeded": "OpenAI API quota exceeded. Please check your billing and usage limits."
+      },
+      "generating": "Generating image for {{path}}...",
+      "openImage": "Open generated image",
+      "progress": {
+        "generatingWithModel": "Generating image with GPT-4o: \"{{prompt}}\"",
+        "processing": "Processing generated image...",
+        "saving": "Saving image to vault..."
+      },
+      "success": "Successfully created image at {{path}}"
+    },
+    "handover": {
+      "alreadyInMode": "Already in {{modeName}} mode. No change needed.",
+      "description": "Description:",
+      "failedToSwitch": "Failed to switch to {{modeName}}",
+      "handoverInstructions": "You have been handed control of this conversation. Please continue executing the user's task using your specialized capabilities and personality. Take over from here and provide appropriate assistance based on your mode's purpose.",
+      "invalidModeId": "Mode ID is required and must be a string",
+      "modeNotFound": "Mode with ID \"{{modeId}}\" not found.",
+      "newModeActive": "You are now operating as {{modeName}} mode.",
+      "noDescription": "No description available",
+      "noModes": "No modes available for switching.",
+      "successMessage": "Successfully switched from {{fromMode}} to {{toMode}} mode.",
+      "switchFailed": "Failed to switch mode: {{error}}",
+      "switched": "Switched to {{modeName}} mode",
+      "switching": "Switching to {{modeName}} mode..."
+    },
+    "navigation": {
+      "navigateToEditedTodo": "Navigate to edited todo",
+      "navigateToUncheckedTodo": "Navigate to unchecked todo",
+      "openAppendedDocument": "Open appended document",
+      "openCreatedDocument": "Open created document",
+      "openDownloadedTranscript": "Open downloaded transcript",
+      "openReadDocument": "Open read document"
+    },
+    "position": {
+      "after": "after \"{{task}}\"",
+      "at": "at {{position}} position",
+      "before": "before \"{{task}}\""
+    },
+    "progress": {
+      "downloadTranscript": {
+        "success": "Successfully downloaded YouTube transcript to {{path}}. Contains {{segments}} segments covering approximately {{duration}} minutes of video content."
+      },
+      "searchVault": {
+        "noResults": "No results found for \"{{query}}\"",
+        "results": "Found {{count}} result{{plural}} for \"{{query}}\""
+      }
+    },
+    "success": {
+      "abandon": "✓ Marked {{task}} as abandoned in {{path}}",
+      "add": "✓ Added {{task}} to {{path}}",
+      "complete": "✓ Added completed todo \"{{task}}\"{{time}} to {{path}}",
+      "edit": "✓ Edited {{originalTask}} to {{newTask}} in {{path}}{{details}}",
+      "move": "✓ Moved to-do {{task}} from {{source}} to {{target}} {{position}}",
+      "remove": "✓ Removed {{task}} from {{path}} (converted to comment)",
+      "uncheck": "✓ Unchecked \"{{task}}\" in {{path}}"
+    },
+    "tasks": {
+      "count": {
+        "few": "{{count}} tasks",
+        "many": "{{count}} tasks",
+        "one": "{{count}} task",
+        "zero": "no tasks"
+      },
+      "plural": "tasks"
+    }
+  },
+  "ui": {
+    "attachments": {
+      "pastedImage": "Pasted image"
+    },
+    "chat": {
+      "history": "Chat History",
+      "new": "New Chat"
+    },
+    "input": {
+      "attachImage": "Attach Image",
+      "placeholder": "Type your message...",
+      "removeFile": "Remove {{filename}}",
+      "save": "Save",
+      "send": "Send"
+    },
+    "message": {
+      "attachedImage": "Attached image",
+      "copy": "Copy message",
+      "edit": "Edit message",
+      "editing": "Editing message",
+      "generatingSpeech": "Generating speech",
+      "recordingInProgress": "Recording in progress",
+      "speak": "Read aloud",
+      "stopSpeech": "Stop speech"
+    },
+    "modal": {
+      "copied": "Copied!",
+      "copyToClipboard": "Copy to clipboard",
+      "modeSettings": "Settings for mode {{modeName}}",
+      "reloadButton": "Restart Obsidian",
+      "reloadRequiredMessageWithVersions": "Plugin updated from version {{currentVersion}} to {{latestVersion}}.\nWould you like to restart Obsidian to apply changes?",
+      "reloadRequiredTitle": "Reload Required",
+      "systemPrompt": "System prompt for \"{{modeName}}\""
+    },
+    "mode": {
+      "createStarterKit": "Create a Starter Kit",
+      "files": {
+        "noFrontmatter": "File {{filename}} has no frontmatter, using defaults with file content as system prompt"
+      },
+      "newMode": "New mode",
+      "openInEditor": "Open in editor",
+      "switchTo": "Switch to:",
+      "viewSettings": "View mode settings",
+      "viewSystemPrompt": "View system prompt"
+    },
+    "recording": {
+      "cancel": "Cancel Recording",
+      "confirm": "Confirm Recording",
+      "start": "Start Recording",
+      "stop": "Stop"
+    },
+    "setup": {
+      "anthropicKey": {
+        "description": "Anthropic Claude powers the main AI functionality. You'll need an API key to continue.",
+        "getKey": "Get your Anthropic API key",
+        "inputLabel": "Paste your API key here:",
+        "placeholder": "Paste your Anthropic API key here",
+        "saveButton": "Save and Continue",
+        "steps": {
+          "create": "Create a new API key",
+          "paste": "Paste it here",
+          "visit": "Visit console.anthropic.com/settings/keys"
+        },
+        "title": "Configure Anthropic API Key"
+      },
+      "language": {
+        "current": "Current",
+        "currentLanguage": "Current Obsidian language:",
+        "description": "Life Navigator works best when your Obsidian interface language matches the language you write your notes in. Select your preferred language below - if it's different from your current setting, Obsidian will restart automatically to apply the change. Voice features (speech-to-text and text-to-speech) will automatically use your selected language.",
+        "manualRestart": "Please restart Obsidian to apply the language changes.",
+        "note": "If you select a different language than currently configured, Obsidian will automatically restart to apply the changes. All Life Navigator content, AI interactions, and starter kit files will then be in your selected language. Voice features will automatically work in your chosen language.",
+        "supportedLanguages": "Available Language Options",
+        "title": "Configure Language"
+      },
+      "openSettings": "Open Settings",
+      "openaiKey": {
+        "description": "OpenAI powers voice features like text-to-speech. This is optional but recommended.",
+        "getKey": "Get your OpenAI API key",
+        "inputLabel": "Paste your API key here:",
+        "note": "You can always add this later in settings to enable voice features.",
+        "placeholder": "Paste your OpenAI API key here",
+        "saveButton": "Save and Continue",
+        "skipButton": "Skip for now",
+        "steps": {
+          "create": "Create a new API key",
+          "paste": "Paste it here",
+          "visit": "Visit platform.openai.com/api-keys"
+        },
+        "title": "Configure OpenAI API Key"
+      },
+      "saving": "Saving...",
+      "starterKit": {
+        "button": "Create Starter Kit",
+        "description": "Get started by creating your starter kit with pre-configured AI modes and templates.",
+        "features": {
+          "examples": "Usage examples",
+          "modes": "Multiple AI personalities",
+          "templates": "Information templates"
+        },
+        "title": "Welcome to Life Navigator"
+      }
+    },
+    "starterKit": {
+      "createdError": "Error creating starter kit: {{error}}",
+      "createdSuccess": "Successfully created starter kit",
+      "noModes": "## Welcome to Life Navigator\n\nTo get started, create a starter kit containing basic modes with the _#ln-mode_ tag."
+    },
+    "thinking": {
+      "completed": "Thought for a moment",
+      "inProgress": "Thinking...",
+      "redacted": "[Assistant reasoning automatically redacted for security]"
+    },
+    "todo": {
+      "abandon": "Abandon task",
+      "clickToChange": "Click to change status",
+      "noTodos": "No matching tasks found in {{filename}}",
+      "readOnly": "Read only",
+      "selectedFrom": "Selected tasks from {{filename}}",
+      "showMore": "Show {{count}} more items"
+    }
+  },
+  "view": {
+    "title": "Life Navigator"
   }
-} 
+}

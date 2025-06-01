@@ -6,8 +6,15 @@ This document outlines potential future features and improvements for the Life N
 
 **User-Defined Tools:** Introduce the ability for the user to add extra tools to the system. Investigate methods for loading extra tools (e.g., eval, JSON, MCP). This could allow accessing calendar for example.
 
+**AI-Assisted Knowledge Base Editing:** Explore functionality for the AI to directly suggest or make additions/modifications to the user's core knowledge files (e.g., `About Me.md`, `Relationships.md`) based on conversations or insights. The user need is to streamline the process of updating personal context, allowing the AI to help maintain and expand the knowledge base it uses.
+
 **Introduce support for weekly and monthly summaries:**
 via ln-monthly-note and ln-weekly-note.
+
+**Interactive Creator Mode:** How to create guidance for users when creating their materials? Some nice mode? or docs? Maybe a tutorial agent? Create a creator mode that generates sections/files based on dialogue with the user instead of using standard starter kits. This would provide a more personalized and interactive setup experience. Maybe this should allow for downloading files from github based on needs of the user.
+
+**User-Defined Tools:** Introduce the ability for the user to add extra tools to the system. Investigate methods for loading extra tools (e.g., eval, JSON, MCP). This could allow accessing calendar for example.
+
 
 ## Floating Ideas
 

@@ -25,5 +25,8 @@ If asked to release a new version:
 To regenerate starter kit data:
 node scripts/generate-starter-kit.mjs
 
+To clean up unused translation keys:
+node scripts/translation-cleanup.mjs - it automatically analyzes translation key consistency between EN/PL files, scans TypeScript source files for t() translation calls, and identifies unused translation keys (removes them) and missing translation keys (adds them with placeholders). Also detects inconsistencies between EN/PL translation files, sorts all translation keys alphabetically, and provides detailed reports with suggestions for manual fixes.
+
 To check if the plugin builds correctly:
 npm run build

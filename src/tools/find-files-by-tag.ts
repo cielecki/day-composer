@@ -72,16 +72,18 @@ export const findFilesByTagTool: ObsidianTool<FindFilesByTagToolInput> = {
   specification: schema,
   icon: "tag",
   getActionText: (input: FindFilesByTagToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    const tag = input?.tag ? `"${input.tag}"` : "";
-    
+    let tag = '';
+    if (!input || typeof input !== 'object') return '';
+    if (input.tag) tag = input.tag;
+
     if (hasError) {
-      return `Failed to find files with tag ${tag}`;
+      return t('tools.actions.findFilesByTag.failed', { tag });
     } else if (hasCompleted) {
-      return `Found files with tag ${tag}`;
+      return t('tools.actions.findFilesByTag.completed', { tag });
     } else if (hasStarted) {
-      return `Finding files with tag ${tag}...`;
+      return t('tools.actions.findFilesByTag.started', { tag });
     } else {
-      return `Find files with tag ${tag}`;
+      return t('tools.actions.findFilesByTag.ready', { tag });
     }
   },
   execute: async (context: ToolExecutionContext<FindFilesByTagToolInput>): Promise<void> => {
@@ -97,28 +99,18 @@ export const findFilesByTagTool: ObsidianTool<FindFilesByTagToolInput> = {
       } = params;
 
       if (!tag) {
-        throw new Error('Tag parameter is required');
+        throw new Error(t('tools.findFilesByTag.errors.tagRequired'));
       }
-
-      context.progress("Preparing tag search...");
 
       // Normalize the tag - remove # if present and add it for searching
       const normalizedTag = tag.startsWith('#') ? tag.slice(1) : tag;
       const searchTag = `#${normalizedTag}`;
 
-      context.progress(`Searching for tag: ${searchTag}...`);
-
       // Get all markdown files from the vault
       const files = plugin.app.vault.getMarkdownFiles();
       const results: TaggedFileResult[] = [];
-      let processedCount = 0;
-
+      
       for (const file of files) {
-        // Update progress periodically
-        if (processedCount % 25 === 0) {
-          context.progress(`Processing file ${processedCount + 1}/${files.length}...`);
-        }
-        processedCount++;
 
         // Check if we've reached max results
         if (max_results > 0 && results.length >= max_results) {
@@ -190,18 +182,20 @@ export const findFilesByTagTool: ObsidianTool<FindFilesByTagToolInput> = {
         }
       }
 
-      context.progress("Formatting results...");
-
       // Format the results
       const formatResults = (): string => {
-        let output = `Found ${results.length} file${results.length !== 1 ? 's' : ''} with tag "${searchTag}":\n\n`;
+        let output = t('tools.findFilesByTag.results.header', { 
+          count: results.length, 
+          searchTag,
+          plural: results.length !== 1 ? 's' : ''
+        }) + '\n\n';
 
         if (results.length === 0) {
-          output += `No files found with tag "${searchTag}".`;
+          output += t('tools.findFilesByTag.results.noFiles', { searchTag });
           if (!include_frontmatter || !include_content) {
-            output += '\n\nNote: Search scope was limited. ';
-            if (!include_frontmatter) output += 'Frontmatter tags were excluded. ';
-            if (!include_content) output += 'Content tags were excluded. ';
+            output += '\n\n' + t('tools.findFilesByTag.results.scopeLimited') + ' ';
+            if (!include_frontmatter) output += t('tools.findFilesByTag.results.frontmatterExcluded') + ' ';
+            if (!include_content) output += t('tools.findFilesByTag.results.contentExcluded') + ' ';
           }
           return output;
         }
@@ -209,38 +203,38 @@ export const findFilesByTagTool: ObsidianTool<FindFilesByTagToolInput> = {
         for (let i = 0; i < results.length; i++) {
           const result = results[i];
           output += `${i + 1}. **${result.name}**\n`;
-          output += `   📍 Path: ${result.path}\n`;
+          output += `   📍 ${t('tools.findFilesByTag.results.path')}: ${result.path}\n`;
           
           // Show matched tags
-          output += `   🏷️  Tags: `;
+          output += `   🏷️  ${t('tools.findFilesByTag.results.tags')}: `;
           const tagsByLocation = result.matchedTags.reduce((acc, match) => {
             if (!acc[match.location]) acc[match.location] = [];
-            const tagStr = match.lineNumber ? `${match.tag} (line ${match.lineNumber})` : match.tag;
+            const tagStr = match.lineNumber ? `${match.tag} (${t('tools.findFilesByTag.results.line')} ${match.lineNumber})` : match.tag;
             acc[match.location].push(tagStr);
             return acc;
           }, {} as Record<string, string[]>);
 
           const tagParts: string[] = [];
           if (tagsByLocation.frontmatter) {
-            tagParts.push(`frontmatter: ${tagsByLocation.frontmatter.join(', ')}`);
+            tagParts.push(`${t('tools.findFilesByTag.results.frontmatter')}: ${tagsByLocation.frontmatter.join(', ')}`);
           }
           if (tagsByLocation.content) {
-            tagParts.push(`content: ${tagsByLocation.content.join(', ')}`);
+            tagParts.push(`${t('tools.findFilesByTag.results.content')}: ${tagsByLocation.content.join(', ')}`);
           }
           output += tagParts.join(' | ') + '\n';
 
           // Show headings if available
           if (result.headings && result.headings.length > 0) {
-            output += `   📋 Headings: ${result.headings.slice(0, 3).map(h => h.text).join(', ')}`;
+            output += `   📋 ${t('tools.findFilesByTag.results.headings')}: ${result.headings.slice(0, 3).map(h => h.text).join(', ')}`;
             if (result.headings.length > 3) {
-              output += ` (and ${result.headings.length - 3} more)`;
+              output += ` (${t('tools.findFilesByTag.results.andMore', { count: result.headings.length - 3 })})`;
             }
             output += '\n';
           }
 
           // Show content snippet if included
           if (result.contentSnippet) {
-            output += `   📄 Content: ${result.contentSnippet}\n`;
+            output += `   📄 ${t('tools.findFilesByTag.results.contentSnippet')}: ${result.contentSnippet}\n`;
           }
 
           output += '\n';
@@ -248,7 +242,7 @@ export const findFilesByTagTool: ObsidianTool<FindFilesByTagToolInput> = {
 
         // Add search summary
         if (max_results > 0 && results.length >= max_results) {
-          output += `\n⚠️  Results limited to ${max_results} files. There may be more files with this tag.\n`;
+          output += `\n⚠️  ${t('tools.findFilesByTag.results.limitedResults', { maxResults: max_results })}\n`;
         }
 
         return output;
@@ -261,13 +255,18 @@ export const findFilesByTagTool: ObsidianTool<FindFilesByTagToolInput> = {
       results.slice(0, 10).forEach((result, index) => { // Limit navigation targets to first 10
         context.addNavigationTarget({
           filePath: result.path,
-          description: `Navigate to file ${index + 1}: ${result.name}`
+          description: t('tools.findFilesByTag.navigation.description', { 
+            index: index + 1, 
+            name: result.name 
+          })
         });
       });
 
     } catch (error) {
       console.error('Error finding files by tag:', error);
-      throw new Error(`Error finding files by tag: ${error.message || 'Unknown error'}`);
+      throw new Error(t('tools.findFilesByTag.errors.general', { 
+        error: error.message || t('tools.findFilesByTag.errors.unknown') 
+      }));
     }
   }
 };

@@ -54,13 +54,12 @@ export const editTodoTool: ObsidianTool<EditTodoToolInput> = {
   specification: schema,
   icon: "edit",
   getActionText: (input: EditTodoToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
+    let actionText = '';
     if (!input || typeof input !== 'object') return '';
-    
-    const todoText = input.original_todo_text || '';
-    const actionText = todoText ? `"${todoText}"` : '';
+    if (input.original_todo_text) actionText = input.original_todo_text;
     
     if (hasError) {
-      return `Failed to edit todo ${actionText}`;
+      return t('tools.actions.editTodo.failed', { task: actionText });
     } else if (hasCompleted) {
       return `Edited todo ${actionText}`;
     } else if (hasStarted) {

@@ -39,7 +39,7 @@ export const appendToDocumentTool: ObsidianTool<AppendToDocumentToolInput> = {
     if (input.path) actionText = `"${input.path}"`;
     
     if (hasError) {
-      return `Failed to append to ${actionText}`;
+      return t('tools.actions.appendDocument.failed', { path: actionText });
     } else if (hasCompleted) {
       return `Appended to ${actionText}`;
     } else if (hasStarted) {
@@ -54,8 +54,6 @@ export const appendToDocumentTool: ObsidianTool<AppendToDocumentToolInput> = {
       const { path, content } = params;
       const appendContent = content || ''; // Default to empty string if content is undefined
 
-      context.progress(`Locating document at ${path}...`);
-
       // Get the file
       const file = getFile(path, plugin.app);
       
@@ -63,12 +61,8 @@ export const appendToDocumentTool: ObsidianTool<AppendToDocumentToolInput> = {
         throw new Error(`File not found at ${path}`);
       }
       
-      context.progress(`Reading current document content...`);
-      
       // Read the current content
       const currentContent = await readFile(file, plugin.app);
-      
-      context.progress(`Appending new content to document...`);
       
       // Append the new content
       const newContent = currentContent + appendContent;
@@ -82,7 +76,7 @@ export const appendToDocumentTool: ObsidianTool<AppendToDocumentToolInput> = {
         description: t("tools.navigation.openAppendedDocument")
       });
       
-      context.progress(`Content appended to ${path}`);
+      context.progress(t('tools.appendDocument.progress.success', { path }));
     } catch (error) {
       console.error('Error appending to document:', error);
       throw new Error(`Error appending to document: ${error.message || 'Unknown error'}`);

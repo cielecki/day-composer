@@ -67,7 +67,7 @@ export const listDirectoryTool: ObsidianTool<ListDirectoryToolInput> = {
     const recursive = input?.recursive ? " (recursive)" : "";
     
     if (hasError) {
-      return `Failed to list directory: ${path}`;
+      return t('tools.actions.listDirectory.failed', { path: `${path}${recursive}` });
     } else if (hasCompleted) {
       return `Listed directory: ${path}${recursive}`;
     } else if (hasStarted) {
@@ -86,8 +86,6 @@ export const listDirectoryTool: ObsidianTool<ListDirectoryToolInput> = {
         include_folders = true,
         file_types = []
       } = params;
-
-      context.progress("Preparing directory listing...");
 
       // Normalize the directory path
       const targetPath = directory_path?.trim() || "";
@@ -108,8 +106,6 @@ export const listDirectoryTool: ObsidianTool<ListDirectoryToolInput> = {
         }
         targetFolder = abstractFile;
       }
-
-      context.progress(`Scanning directory: ${targetFolder.path || "vault root"}...`);
 
       // Build the directory listing
       const listDirectory = (folder: TFolder, currentDepth: number = 0): DirectoryItem[] => {

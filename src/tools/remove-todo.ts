@@ -159,10 +159,9 @@ ${originalTaskText}
       ? `"${removedTasks[0]}"`
       : `${removedTasks.length} ${t('tools.tasks.plural')}`;
       
-    const resultMessage = t('tools.success.remove')
-      .replace('{{task}}', tasksDescription)
-      .replace('{{path}}', filePath);
-
-    context.progress(resultMessage);
+    context.progress(t('tools.success.remove', {
+      task: tasksDescription,
+      path: filePath
+    }));
   }
 }; 

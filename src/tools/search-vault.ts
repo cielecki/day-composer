@@ -2,6 +2,7 @@ import { prepareFuzzySearch } from "obsidian";
 import MyPlugin from "../main";
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
+import { t } from "../i18n";
 
 const schema = {
   name: "search_vault",
@@ -29,24 +30,22 @@ export const searchVaultTool: ObsidianTool<SearchVaultToolInput> = {
     let actionText = '';
     
     if (!input || typeof input !== 'object') return '';
-    if (input.query) actionText = `"${input.query}"`;
+    if (input.query) actionText = input.query;
 
     if (hasError) {
-      return `Failed to search for ${actionText}`;
+      return t('tools.actions.searchVault.failed', { query: actionText });
     } else if (hasCompleted) {
-      return `Searched for ${actionText}`;
+      return t('tools.actions.searchVault.completed', { query: actionText });
     } else if (hasStarted) {
-      return `Searching for ${actionText}...`;
+      return t('tools.actions.searchVault.inProgress', { query: actionText });
     } else {
-      return `Search for ${actionText}`;
+      return t('tools.actions.searchVault.default', { query: actionText });
     }
   },
   execute: async (context: ToolExecutionContext<SearchVaultToolInput>): Promise<void> => {
     try {
       const { plugin, params } = context;
       const { query } = params;
-      
-      context.progress("Preparing search...");
       
       // Ensure query is a string (handle null/undefined)
       const searchQuery = query || '';
@@ -57,21 +56,12 @@ export const searchVaultTool: ObsidianTool<SearchVaultToolInput> = {
       
       const fuzzySearch = prepareFuzzySearch(searchQuery);
       
-      context.progress("Getting files from vault...");
-      
       // Get all markdown files from the vault
       const files = plugin.app.vault.getMarkdownFiles();
       const results = [];
 
-      context.progress(`Searching through ${files.length} files...`);
-
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        
-        // Update progress periodically
-        if (i % 50 === 0) {
-          context.progress(`Processing file ${i + 1}/${files.length}...`);
-        }
         
         let shouldInclude = false;
         const filename = file.basename;
@@ -121,15 +111,14 @@ export const searchVaultTool: ObsidianTool<SearchVaultToolInput> = {
         }
       }
       
-      context.progress("Sorting search results...");
-      
       // Sort results by score (higher scores first)
       results.sort((a, b) => (b.score || 0) - (a.score || 0));
 
       const resultCount = results.length;
+      const plural = resultCount > 1 ? 's' : '';
       const resultMessage = resultCount === 0 
-        ? `No results found for "${query}"` 
-        : `Found ${resultCount} result${resultCount > 1 ? 's' : ''} for "${query}":\n\n${JSON.stringify(results, null, 2)}`;
+        ? t('tools.progress.searchVault.noResults', { query })
+        : t('tools.progress.searchVault.results', { count: resultCount, plural, query }) + `:\n\n${JSON.stringify(results, null, 2)}`;
 
       context.progress(resultMessage);
     } catch (error) {

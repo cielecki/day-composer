@@ -714,8 +714,6 @@ If your plugin does not need CSS, delete this file.
 
 /* Collapsible block styles */
 .life-navigator-view .collapsible-block {
-  border-radius: 0.5rem;
-  margin-bottom: 0.5rem;
   overflow: hidden;
   border: none;
 }
@@ -1707,15 +1705,6 @@ If your plugin does not need CSS, delete this file.
 
 .life-navigator-view .tool-custom-content {
   padding: 0;
-}
-
-/* Error state */
-.life-navigator-view .todo-render-error {
-  padding: 1rem;
-  color: var(--text-error);
-  background-color: var(--background-modifier-error-hover);
-  border-radius: 4px;
-  margin: 0.5rem 0;
 }
 
 /* Button styles */

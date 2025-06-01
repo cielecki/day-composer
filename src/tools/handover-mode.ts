@@ -85,8 +85,6 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 			const { params } = context;
 			const { mode_id } = params;
 
-			context.progress("Validating mode handover request...");
-
 			// Validate input
 			if (!mode_id || typeof mode_id !== 'string') {
 				throw new ToolExecutionError(t("tools.handover.invalidModeId"));
@@ -96,8 +94,6 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 			if (!modeManagerService.isContextAvailable()) {
 				throw new ToolExecutionError(t("tools.handover.noModes"));
 			}
-
-			context.progress("Checking available modes...");
 
 			// Get available modes for validation
 			const availableModes = modeManagerService.getAvailableModes();
@@ -116,22 +112,18 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 				return;
 			}
 
-			context.progress(`Switching to ${targetMode.name} mode...`);
-
 			// Perform the mode change
 			await modeManagerService.changeModeById(mode_id);
 
 			// Success message with clear handover instructions for the new mode
 			const currentModeName = availableModes.find(m => m.id === currentModeId)?.name || currentModeId;
 			
-			const handoverMessage = `${t("tools.handover.successMessage", { fromMode: currentModeName, toMode: targetMode.name })}
-
-${t("tools.handover.newModeActive", { modeName: targetMode.name })}
-${t("tools.handover.description")} ${targetMode.description || t("tools.handover.noDescription")}
-
-${t("tools.handover.handoverInstructions")}`;
-
-			context.progress(handoverMessage);
+			context.progress(t("tools.handover.successMessage", { fromMode: currentModeName, toMode: targetMode.name }));
+			context.progress("");
+			context.progress(t("tools.handover.newModeActive", { modeName: targetMode.name }));
+			context.progress(t("tools.handover.description") + " " + targetMode.description || t("tools.handover.noDescription"));
+			context.progress("");
+			context.progress(t("tools.handover.handoverInstructions"));
 
 		} catch (error) {
 			console.error('Error in handover mode tool:', error);

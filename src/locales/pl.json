@@ -1,481 +1,466 @@
 {
-  "settings": {
-    "title": "Ustawienia Life Navigator",
-    "description": "Skonfiguruj ustawienia wtyczki Life Navigator",
-    "actions": {
-      "title": "Akcje Life Navigator",
-      "checkUpdates": {
-        "name": "Sprawdź aktualizacje",
-        "desc": "Sprawdź, czy dostępna jest nowsza wersja Life Navigator i pobierz ją automatycznie.",
-        "button": "Sprawdź aktualizacje"
-      },
-      "createStarterKit": {
-        "name": "Utwórz pakiet startowy",
-        "desc": "Utwórz nowy pakiet startowy z predefiniowanymi trybami AI i szablonami, aby szybko rozpocząć pracę.",
-        "button": "Utwórz pakiet startowy"
-      },
-      "resetTutorial": {
-        "name": "Resetuj tutorial",
-        "desc": "Resetuj tutorial konfiguracji i proces wdrażania. Spowoduje to ponowne wyświetlenie ekranów konfiguracji przy następnym otwarciu Life Navigator.",
-        "button": "Resetuj tutorial",
-        "confirm": "Czy na pewno chcesz zresetować tutorial? Spowoduje to ponowne wyświetlenie ekranów konfiguracji przy następnym otwarciu Life Navigator.",
-        "success": "Tutorial został zresetowany. Ekrany konfiguracji pojawią się przy następnym otwarciu Life Navigator.",
-        "error": "Nie udało się zresetować tutoriala: {{error}}"
-      },
-      "viewDocs": {
-        "name": "Zobacz dokumentację",
-        "desc": "Otwórz przewodnik użytkownika i dokumentację Life Navigator na GitHub w przeglądarce.",
-        "button": "Zobacz dokumentację"
-      }
-    },
-    "apiKeys": {
-      "title": "Klucze API",
-      "anthropic": "Klucz API Anthropic",
-      "anthropicDesc": "Twój klucz API Anthropic dla głównej funkcjonalności asystenta AI. Uzyskaj go z <a href='https://console.anthropic.com/settings/keys'>Konsoli Anthropic</a>.",
-      "openai": "Klucz API OpenAI",
-      "openaiDesc": "Twój klucz API OpenAI dla funkcjonalności zamiany tekstu na mowę. Uzyskaj go z <a href='https://platform.openai.com/api-keys'>Platformy OpenAI</a>.",
-      "firecrawl": "Klucz API Firecrawl",
-      "firecrawlDesc": "Twój klucz API Firecrawl dla funkcjonalności głębokich badań. Uzyskaj go z <a href='https://firecrawl.dev/'>Panelu Firecrawl</a>.",
-      "enterAnthropicKey": "Wprowadź swój klucz API Anthropic",
-      "enterOpenAIKey": "Wprowadź swój klucz API OpenAI",
-      "enterFirecrawlKey": "Wprowadź swój klucz API Firecrawl",
-      "securityNote": "Ważne: Twój klucz API jest przechowywany w folderze konfiguracyjnym Obsidian. Nie udostępniaj swojego vault'a ani folderu konfiguracyjnego innym, jeśli przechowujesz tutaj swój klucz API."
-    },
-    "advanced": {
-      "title": "Ustawienia zaawansowane"
-    },
-    "security": {
-      "title": "Informacja o bezpieczeństwie"
-    },
-    "prompts": {
-      "speechToTextPrompt": "Prompt dla zamiany mowy na tekst",
-      "speechToTextPromptDesc": "Prompt, który zostanie wysłany do silnika zamiany mowy na tekst. Dostarcza kontekstu dla modelu AI. Możesz użyć <a href='https://github.com/cielecki/life-navigator/blob/main/docs/link-expansion.md'>rozszerzania linków</a>.",
-      "defaultPrompt": "# Domena\nKomunikat lub komenda głosowa wydawana przez użytkownika asystentowi AI.\n\n# Przykłady\n- Odfajcz zadanie ... eeee ... wyrzuciłem śmieci\n- Zrobiłem kolację\n- Dodaj na jutro, żebym pamiętał o odezwaniu się do Jana.\n\n# Słowniczek\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nPoczątek transkrypcji:"
-    }
-  },
-  "tools": {
-    "title": "Narzędzia",
-    "description": "Dostępne narzędzia i funkcje",
-    "createStarterKit": "Utwórz pakiet startowy",
-    "createNewMode": "Utwórz nowy tryb",
-    "checkForUpdates": "Sprawdź aktualizacje",
-    "resetTutorial": "Resetuj tutorial",
-    "openLifeNavigator": "Life Navigator",
-    "readDocument": "Czytanie dokumentu",
-    "createDocument": "Tworzenie dokumentu",
-    "appendToDocument": "Dodawanie do dokumentu",
-    "addTodo": "Dodawanie zadania",
-    "generateImage": {
-      "success": "Pomyślnie utworzono obraz w {{path}}",
-      "generating": "Generowanie obrazu dla {{path}}...",
-      "openImage": "Otwórz wygenerowany obraz",
-      "errors": {
-        "emptyPrompt": "Prompt obrazu nie może być pusty",
-        "emptyPath": "Ścieżka obrazu nie może być pusta",
-        "fileExists": "Plik już istnieje w {{path}}. Proszę wybrać inną ścieżkę lub usunąć istniejący plik.",
-        "noApiKey": "Nie ustawiono klucza API OpenAI. Proszę skonfigurować go w ustawieniach do generowania obrazów.",
-        "noImageData": "Nie otrzymano danych obrazu z API OpenAI",
-        "noBase64Data": "Otrzymano nieprawidłowy format danych obrazu z API OpenAI",
-        "quotaExceeded": "Przekroczono limit API OpenAI. Proszę sprawdzić rozliczenia i limity użytkowania.",
-        "invalidRequest": "Nieprawidłowe żądanie do API OpenAI: {{error}}",
-        "general": "Błąd generowania obrazu: {{error}}"
-      }
-    },
-    "deepResearch": {
-      "success": "Głębokie badania zakończone pomyślnie",
-      "researching": "Prowadzenie głębokich badań na temat \"{{query}}\"...",
-      "headers": {
-        "results": "Wyniki Głębokich Badań",
-        "analysis": "Analiza Badawcza",
-        "sources": "Źródła",
-        "metadata": "Metadane Badań"
-      },
-      "labels": {
-        "query": "Zapytanie",
-        "maxDepth": "Maks. Głębokość",
-        "maxUrls": "Maks. URL-i",
-        "timeout": "Limit Czasu",
-        "sourcesFound": "Znalezione Źródła",
-        "completed": "Zakończono",
-        "url": "URL",
-        "source": "Źródło"
-      },
-      "result": {
-        "message": "Pomyślnie przeprowadzono głębokie badania na temat \"{{query}}\" i zapisano raport w {{path}}. Badania obejmowały {{sourceCount}} źródeł z {{maxDepth}} iteracjami głębokości.",
-        "navigationDescription": "Otwórz raport badawczy"
-      },
-      "errors": {
-        "emptyQuery": "Zapytanie badawcze nie może być puste",
-        "emptyPath": "Ścieżka pliku nie może być pusta",
-        "noApiKey": "Nie ustawiono klucza API Firecrawl. Proszę skonfigurować go w ustawieniach dla funkcjonalności głębokich badań.",
-        "quotaExceeded": "Przekroczono limit API Firecrawl. Proszę sprawdzić rozliczenia i limity użytkowania.",
-        "timeout": "Żądanie badawcze przekroczyło limit czasu. Spróbuj z bardziej konkretnym zapytaniem.",
-        "noResults": "Nie znaleziono odpowiednich informacji dla podanego zapytania.",
-        "libraryLoad": "Nie udało się załadować biblioteki Firecrawl",
-        "researchFailed": "Badania nie powiodły się",
-        "unknownError": "Wystąpił nieznany błąd podczas badań",
-        "general": "Błąd podczas prowadzenia głębokich badań: {{error}}"
-      }
-    },
-    "tasks": {
-      "single": "zadanie",
-      "plural": "zadania",
-      "count": {
-        "one": "{{count}} zadanie",
-        "few": "{{count}} zadania",
-        "many": "{{count}} zadań",
-        "zero": "brak zadań"
-      }
-    },
-    "position": {
-      "before": "przed \"{{task}}\"",
-      "after": "po \"{{task}}\"",
-      "at": "w pozycji {{position}}"
-    },
-    "actions": {
-      "move": {
-        "failed": "Nie udało się przenieść zadania {{task}}",
-        "success": "Przeniesiono zadanie {{task}}",
-        "inProgress": "Przenoszenie zadania {{task}}..."
-      },
-      "complete": {
-        "failed": "Nie udało się dodać zakończonego zadania",
-        "success": "Dodano zakończone zadanie: \"{{content}}\"",
-        "inProgress": "Dodawanie zakończonego zadania..."
-      },
-      "check": {
-        "failed": "Nie udało się oznaczyć zadania {{task}} jako zakończone",
-        "success": "Oznaczono zadanie {{task}} jako zakończone",
-        "inProgress": "Oznaczanie zadania {{task}} jako zakończone..."
-      },
-      "uncheck": {
-        "failed": "Nie udało się cofnąć oznaczenia zadania {{task}} jako zakończone",
-        "success": "Cofnięto oznaczenie zadania {{task}} jako zakończone",
-        "inProgress": "Cofanie oznaczenia zadania {{task}} jako zakończone..."
-      },
-      "abandon": {
-        "failed": "Nie udało się porzucić zadania {{task}}",
-        "success": "Porzucono zadanie {{task}}",
-        "inProgress": "Porzucanie zadania {{task}}..."
-      },
-      "add": {
-        "failed": "Nie udało się dodać zadania {{task}}",
-        "success": "Dodano {{task}}",
-        "inProgress": "Dodawanie zadania..."
-      },
-      "edit": {
-        "failed": "Nie udało się edytować zadania {{task}}",
-        "success": "Edytowano zadanie {{task}}",
-        "inProgress": "Edytowanie zadania..."
-      },
-      "remove": {
-        "failed": "Nie udało się usunąć zadania {{task}}",
-        "success": "Usunięto zadanie {{task}}",
-        "inProgress": "Usuwanie zadania..."
-      }
-    },
-    "success": {
-      "move": "✓ Przeniesiono zadanie {{task}} z {{source}} do {{target}} {{position}}",
-      "complete": "✓ Dodano zakończone zadanie \"{{task}}\"{{time}} do {{path}}",
-      "check": "✓ Oznaczono {{task}} jako zakończone w {{path}} ({{time}})",
-      "uncheck": "✓ Cofnięto oznaczenie \"{{task}}\" jako zakończone w {{path}}",
-      "abandon": "✓ Oznaczono {{task}} jako porzucone w {{path}}",
-      "edit": "✓ Edytowano {{originalTask}} na {{newTask}} w {{path}}{{details}}",
-      "remove": "✓ Usunięto {{task}} z {{path}} (przekonwertowano na komentarz)"
-     },
-    "comments": {
-      "removedTaskHeader": "USUNIĘTE ZADANIE"
-    },
-    "handover": {
-      "switched": "Przełączono na tryb {{modeName}}",
-      "successMessage": "Pomyślnie przełączono z trybu {{fromMode}} na {{toMode}}.",
-      "newModeActive": "Teraz działasz jako tryb {{modeName}}.",
-      "description": "Opis:",
-      "handoverInstructions": "Przejąłeś kontrolę nad tą rozmową. Kontynuuj wykonywanie zadania użytkownika, używając swoich specjalistycznych możliwości i osobowości. Przejmij kontrolę i zapewnij odpowiednią pomoc zgodnie z celem swojego trybu.",
-      "noModes": "Brak dostępnych trybów do przełączenia.",
-      "modeNotFound": "Nie znaleziono trybu o ID \"{{modeId}}\".",
-      "switchFailed": "Nie udało się przełączyć trybu: {{error}}",
-      "alreadyInMode": "Już w trybie {{modeName}}. Zmiana nie jest potrzebna.",
-      "switching": "Przełączanie na tryb {{modeName}}...",
-      "failedToSwitch": "Nie udało się przełączyć na {{modeName}}",
-      "noDescription": "Brak dostępnego opisu",
-      "invalidModeId": "ID trybu jest wymagane i musi być ciągiem znaków"
-    },
-    "navigation": {
-      "openCreatedDocument": "Otwórz utworzony dokument",
-      "openReadDocument": "Otwórz przeczytany dokument",
-      "openAppendedDocument": "Otwórz zaktualizowany dokument", 
-      "openDownloadedTranscript": "Otwórz pobrany transkrypt",
-      "navigateToUncheckedTodo": "Przejdź do odkręconego zadania",
-      "navigateToEditedTodo": "Przejdź do edytowanego zadania",
-      "navigateToAbandonedTodo": "Przejdź do porzuconego zadania{{count}}",
-      "navigateToMovedTodo": "Przejdź do przeniesionego zadania{{count}}",
-      "navigateToCompletedTodo": "Przejdź do zakończonego zadania",
-      "navigateToRemovedTodo": "Przejdź do usuniętego zadania{{count}}",
-      "navigateToAddedTodo": "Przejdź do dodanego zadania{{count}}",
-      "navigateToCheckedTodo": "Przejdź do zakończonego zadania{{count}}"
-    }
-  },
-  "errors": {
-    "general": "Wystąpił błąd",
-    "notFound": "Nie znaleziono zasobu",
-    "invalidInput": "Nieprawidłowe dane wejściowe",
-    "creatingNewMode": "Błąd podczas tworzenia nowego trybu",
-    "startingLifeNavigator": "Błąd podczas uruchamiania Life Navigator",
-    "setup": "Błąd konfiguracji: {{error}}",
-    "conversationTurn": "Błąd podczas konwersacji: {{error}}",
-    "failedToUpdatePlugin": "Nie udało się zaktualizować wtyczki: {{error}}",
-    "linkExpansion": {
-      "couldNotResolve": "Nie można znaleźć celu linku \"{{linkPath}}\""
-    },
-    "tools": {
-      "noName": "Nie podano nazwy narzędzia",
-      "unknown": "Nieznane narzędzie \"{{tool}}\"",
-      "execution": "Błąd wykonania narzędzia {{tool}}: {{error}}"
-    },
-    "tts": {
-      "noApiKey": "Nie znaleziono klucza API OpenAI dla syntezy mowy. Skonfiguruj go w ustawieniach.",
-      "invalidVoice": "Nieprawidłowy głos: {{voice}}",
-      "transcriptionFailed": "Transkrypcja nie powiodła się: {{error}}",
-      "microphone": {
-        "accessDenied": "Odmowa dostępu do mikrofonu. Zezwól na dostęp do mikrofonu w ustawieniach przeglądarki.",
-        "notFound": "Nie znaleziono mikrofonu. Podłącz mikrofon i spróbuj ponownie.",
-        "inUse": "Nie można uzyskać dostępu do mikrofonu. Może być używany przez inną aplikację.",
-        "general": "Nie można uzyskać dostępu do mikrofonu"
-      }
-    },
-    "clipboard": {
-      "read": "Nie udało się odczytać ze schowka: {{error}}",
-      "paste": {
-        "success": "Zawartość wklejona ze schowka",
-        "noTarget": "Brak aktywnego pola wprowadzania lub edytora do wklejenia"
-      }
-    },
-    "context": {
-      "save": "Kontekst zapisany w {{path}}",
-      "saveError": "Błąd podczas zapisywania kontekstu w {{path}}"
-    },
-    "audio": {
-      "playback": "Nie można odtworzyć dźwięku. Spróbuj ponownie.",
-      "playbackError": "Błąd odtwarzania audio: {{error}}",
-      "noData": "Nie otrzymano danych audio. Spróbuj ponownie."
-    },
-    "notes": {
-      "multipleFound": "Znaleziono wiele notatek dziennych dla daty: {{date}}",
-      "notFound": "Nie znaleziono notatki dziennej dla daty: {{date}}",
-      "noContent": "Nie znaleziono treści notatki dziennej dla {{date}}"
-    },
-    "chat": {
-      "noContent": "Brak dostępnej zawartości czatu",
-      "empty": "Czat jest pusty. Rozpocznij rozmowę, aby zobaczyć zawartość tutaj.",
-      "current": "Aktualny czat",
-      "systemPrompt": "Prompt systemowy",
-      "userMessage": "wiadomość użytkownika",
-      "assistantMessage": "wiadomość asystenta"
-    },
-    "todos": {
-      "check": "Nie udało się odznaczyć zadania: {{error}}",
-      "uncheck": "Nie udało się zaznaczyć zadania: {{error}}",
-      "abandon": "Nie udało się porzucić zadania: {{error}}",
-      "display": "Błąd wyświetlania zadań: {{error}}",
-      "invalidData": "Nieprawidłowe dane",
-      "createError": "Błąd tworzenia zakończonego zadania: {{error}}"
-    },
-    "files": {
-      "notFound": "Nie znaleziono pliku w {{path}}",
-      "getFailed": "Nie udało się pobrać pliku z {{path}}",
-      "formatFailed": "Nie udało się sformatować dokumentu po operacji na zadaniu",
-      "sourceNotFound": "Nie znaleziono pliku źródłowego w {{path}}",
-      "createFailed": "Nie można utworzyć pliku docelowego w {{path}}: {{error}}",
-      "todayNotExists": "Notatka na dzisiaj jeszcze nie istnieje."
-    },
-    "voice": {
-      "invalid": "Nieprawidłowy głos: {{voice}}, powrót do domyślnego"
-    },
-    "config": {
-      "dailyNotes": "Błąd odczytu konfiguracji notatek dziennych: {{error}}"
-    },
-    "plugin": {
-      "notFound": "Nie znaleziono wtyczki"
-    },
-    "tasks": {
-      "notFound": "Nie znaleziono zadania \"{{task}}\" w {{path}}. Jeśli zadanie znajduje się w innym pliku, określ go w parametrze file_path.",
-      "multipleFound": "Znaleziono wiele zadań z opisem \"{{task}}\" w {{path}}. Proszę podać bardziej szczegółowy opis zadania.",
-      "insertOutOfBounds": "Nie można wstawić zadania w indeksie {{index}}: Indeks poza zakresem (dokument ma {{total}} elementów)",
-      "removeNotFound": "Nie znaleziono zadania \"{{task}}\" w dokumencie",
-      "invalidState": "Nie można odznaczyć \"{{task}}\", ponieważ nie jest w stanie oczekującym. Jego obecny stan to '{{state}}'. Proszę najpierw odznaczyć, jeśli jest już zakończone, porzucone lub przeniesione."
-    },
-    "documents": {
-      "notFound": "Nie znaleziono pliku: {{path}}",
-      "readError": "Błąd odczytu dokumentu: {{error}}"
-    }
-  },
   "buttons": {
-    "save": "Zapisz",
-    "cancel": "Anuluj",
-    "apply": "Zastosuj",
-    "reset": "Resetuj"
+    "cancel": "Anuluj"
   },
-  "messages": {
-    "settingsSaved": "Ustawienia zostały zapisane",
-    "settingsReset": "Ustawienia zostały zresetowane do domyślnych",
-    "creatingstarterKit": "Tworzenie pakietu startowego...",
-    "checkingForUpdates": "Sprawdzanie aktualizacji...",
-    "pluginUpToDate": "Wtyczka jest już aktualna (wersja {{version}}).",
-    "newVersionFoundDownloading": "Znaleziono nową wersję {{latestVersion}} (masz {{currentVersion}}). Pobieranie aktualizacji...",
-    "updateAvailable": "Life Navigator v{{latestVersion}} jest dostępny! Masz v{{currentVersion}}. Przejdź do ustawień wtyczki, aby zaktualizować."
-  },
-  "view": {
-    "title": "Life Navigator"
-  },
-  "ui": {
-    "recording": {
-      "start": "Rozpocznij nagrywanie",
-      "stop": "Zatrzymaj",
-      "cancel": "Anuluj nagrywanie",
-      "transcribing": "Transkrybowanie",
-      "confirm": "Potwierdź nagranie"
-    },
-    "chat": {
-      "new": "Nowa rozmowa",
-      "history": "Historia rozmów"
-    },
-    "input": {
-      "placeholder": "Napisz wiadomość...",
-      "send": "Wyślij",
-      "save": "Zapisz",
-      "cancel": "Anuluj",
-      "stop": "Zatrzymaj",
-      "addFile": "Dodaj plik",
-      "attachImage": "Załącz obraz",
-      "removeFile": "Usuń {{filename}}",
-      "maxFiles": "Maksymalna liczba załączonych plików: {{max}}"
-    },
-    "message": {
-      "edit": "Edytuj wiadomość",
-      "copy": "Kopiuj wiadomość", 
-      "speak": "Przeczytaj na głos",
-      "stopSpeech": "Zatrzymaj odtwarzanie",
-      "generatingSpeech": "Generowanie mowy",
-      "recordingInProgress": "Nagrywanie w toku",
-      "attachedImage": "Załączony obraz",
-      "editing": "Edytowanie wiadomości"
-    },
-    "todo": {
-      "clickToChange": "Kliknij, aby zmienić status",
-      "readOnly": "Tylko do odczytu",
-      "abandon": "Porzuć zadanie",
-      "noTodos": "Nie znaleziono pasujących zadań w {{filename}}",
-      "selectedFrom": "Wybrane zadania z {{filename}}",
-      "showMore": "Pokaż {{count}} więcej elementów"
-    },
-    "thinking": {
-      "inProgress": "Myślę...",
-      "completed": "Pomyślałem przez chwilę",
-      "redacted": "[Rozumowanie asystenta automatycznie ukryte ze względów bezpieczeństwa]"
-    },
-    "mode": {
-      "openInEditor": "Otwórz w edytorze",
-      "viewSettings": "Pokaż ustawienia trybu",
-      "viewSystemPrompt": "Pokaż prompt systemowy",
-      "switchTo": "Przełącz na:",
-      "createStarterKit": "Utwórz pakiet startowy",
-      "newMode": "Nowy tryb",
-      "createdSuccess": "Pomyślnie utworzono nowy tryb",
-      "createdError": "Błąd podczas tworzenia nowego trybu: {{error}}",
-      "defaultDescription": "Nowy tryb asystenta AI",
-      "files": {
-        "noFrontmatter": "Plik {{filename}} nie ma frontmattera, używam wartości domyślnych z treścią pliku jako prompt systemowy"
-      }
-    },
-    "attachments": {
-      "imagePasted": "Obraz został wklejony pomyślnie",
-      "imagesAttached": "{{count}} załączonych obrazów: {{filenames}}",
-      "pastedImage": "Wklejony obraz"
-    },
-    "modal": {
-      "copyToClipboard": "Kopiuj do schowka",
-      "copied": "Skopiowano!",
-      "modeSettings": "Ustawienia trybu {{modeName}}",
-      "systemPrompt": "Prompt systemowy dla \"{{modeName}}\"",
-      "reloadRequiredTitle": "Wymagane ponowne uruchomienie",
-      "reloadRequiredMessage": "Wtyczka została zaktualizowana. Uruchom ponownie Obsidian, aby zastosować zmiany.",
-      "reloadRequiredMessageWithVersions": "Wtyczka zaktualizowana z wersji {{currentVersion}} do {{latestVersion}}.\nCzy chcesz ponownie uruchomić Obsidian, aby zastosować zmiany?",
-      "reloadButton": "Uruchom ponownie Obsidian"
-    },
-    "starterKit": {
-      "noModes": "## Witaj w Life Navigator\n\nAby rozpocząć, utwórz pakiet startowy zawierający podstawowe tryby z tagiem _#ln-mode_.",
-      "createdSuccess": "Pomyślnie utworzono pakiet startowy",
-      "createdError": "Błąd podczas tworzenia pakietu startowego: {{error}}",
-      "directoryName": "Pakiet startowy"
-    },
-    "setup": {
-      "saving": "Zapisywanie...",
-      "openSettings": "Otwórz ustawienia",
-      "language": {
-        "title": "Konfiguracja języka",
-        "description": "Life Navigator działa najlepiej, gdy język interfejsu Obsidiana pasuje do języka, w którym piszesz notatki. Wybierz preferowany język poniżej - jeśli różni się od aktualnego ustawienia, Obsidian automatycznie się zrestartuje, aby zastosować zmianę. Funkcje głosowe (mowa na tekst i tekst na mowę) automatycznie użyją wybranego języka.",
-        "currentLanguage": "Aktualny język Obsidiana:",
-        "supportedLanguages": "Dostępne opcje językowe",
-        "continueButton": "Kontynuuj z obecnym językiem",
-        "useEnglish": "Użyj angielskiego",
-        "skipButton": "Pomiń konfigurację języka",
-        "current": "Aktualny",
-        "note": "Jeśli wybierzesz inny język niż aktualnie skonfigurowany, Obsidian automatycznie się zrestartuje, aby zastosować zmiany. Cała zawartość Life Navigator, interakcje z AI i pliki pakietu startowego będą wtedy w wybranym języku. Funkcje głosowe automatycznie będą działać w wybranym języku.",
-        "manualRestart": "Proszę zrestartować Obsidiana, aby zastosować zmiany języka."
-      },
-      "starterKit": {
-        "title": "Witaj w Life Navigator",
-        "description": "Zacznij od utworzenia pakietu startowego z predefiniowanymi trybami AI i szablonami.",
-        "button": "Utwórz pakiet startowy",
-        "features": {
-          "modes": "Wiele osobowości AI",
-          "templates": "Szablony informacji",
-          "examples": "Przykłady użycia"
-        }
-      },
-      "anthropicKey": {
-        "title": "Skonfiguruj klucz API Anthropic",
-        "description": "Anthropic Claude zasila główną funkcjonalność AI. Potrzebujesz klucza API, aby kontynuować.",
-        "placeholder": "Wklej tutaj swój klucz API Anthropic",
-        "inputLabel": "Wklej tutaj swój klucz API:",
-        "saveButton": "Zapisz i kontynuuj",
-        "getKey": "Pobierz swój klucz API Anthropic",
-        "steps": {
-          "visit": "Odwiedź console.anthropic.com/settings/keys",
-          "create": "Utwórz nowy klucz API",
-          "paste": "Wklej go tutaj"
-        }
-      },
-      "openaiKey": {
-        "title": "Skonfiguruj klucz API OpenAI",
-        "description": "OpenAI zasila funkcje głosowe takie jak synteza mowy. To jest opcjonalne, ale zalecane.",
-        "placeholder": "Wklej tutaj swój klucz API OpenAI",
-        "inputLabel": "Wklej tutaj swój klucz API:",
-        "saveButton": "Zapisz i kontynuuj",
-        "skipButton": "Pomiń na razie",
-        "getKey": "Pobierz swój klucz API OpenAI",
-        "note": "Możesz zawsze dodać to później w ustawieniach, aby włączyć funkcje głosowe.",
-        "steps": {
-          "visit": "Odwiedź platform.openai.com/api-keys",
-          "create": "Utwórz nowy klucz API",
-          "paste": "Wklej go tutaj"
-        }
-      }
-    }
-  },
-  "tasks": {
-    "format": {
-      "completedAt": " (zakończone o {{time}})",
-      "abandonedAt": " (porzucone o {{time}})",
-      "movedTo": " (→ {{target}})",
-      "movedFrom": " (z {{source}})"
-    }
+  "chat": {
+    "assistantMessage": "wiadomość asystenta",
+    "current": "Bieżąca rozmowa",
+    "empty": "Rozmowa jest pusta. Rozpocznij konwersację, aby zobaczyć zawartość.",
+    "userMessage": "wiadomość użytkownika"
   },
   "dateTime": {
     "current": "Aktualna Data i Czas"
   },
+  "errors": {
+    "audio": {
+      "noData": "Nie otrzymano danych audio. Spróbuj ponownie.",
+      "playbackError": "Błąd odtwarzania audio: {{error}}"
+    },
+    "chat": {
+      "noContent": "Brak dostępnej zawartości czatu"
+    },
+    "conversationTurn": "Błąd podczas konwersacji: {{error}}",
+    "documents": {
+      "notFound": "Nie znaleziono pliku: {{path}}"
+    },
+    "failedToUpdatePlugin": "Nie udało się zaktualizować wtyczki: {{error}}",
+    "files": {
+      "createFailed": "Nie można utworzyć pliku docelowego w {{path}}: {{error}}",
+      "formatFailed": "Nie udało się sformatować dokumentu po operacji na zadaniu",
+      "getFailed": "Nie udało się pobrać pliku z {{path}}",
+      "notFound": "Nie znaleziono pliku w {{path}}",
+      "sourceNotFound": "Nie znaleziono pliku źródłowego w {{path}}"
+    },
+    "linkExpansion": {
+      "couldNotResolve": "Nie można znaleźć celu linku \"{{linkPath}}\""
+    },
+    "setup": "Błąd konfiguracji: {{error}}",
+    "tasks": {
+      "insertOutOfBounds": "Nie można wstawić zadania w indeksie {{index}}: Indeks poza zakresem (dokument ma {{total}} elementów)",
+      "multipleFound": "Znaleziono wiele zadań z opisem \"{{task}}\" w {{path}}. Proszę podać bardziej szczegółowy opis zadania.",
+      "notFound": "Nie znaleziono zadania \"{{task}}\" w {{path}}. Jeśli zadanie znajduje się w innym pliku, określ go w parametrze file_path.",
+      "removeNotFound": "Nie znaleziono zadania \"{{task}}\" w dokumencie"
+    },
+    "todos": {
+      "createError": "Błąd tworzenia zakończonego zadania: {{error}}"
+    },
+    "tools": {
+      "execution": "Błąd wykonania narzędzia {{tool}}: {{error}}",
+      "noName": "Nie podano nazwy narzędzia",
+      "unknown": "Nieznane narzędzie \"{{tool}}\""
+    },
+    "tts": {
+      "invalidVoice": "Nieprawidłowy głos: {{voice}}",
+      "microphone": {
+        "accessDenied": "Odmowa dostępu do mikrofonu. Zezwól na dostęp do mikrofonu w ustawieniach przeglądarki.",
+        "general": "Nie można uzyskać dostępu do mikrofonu",
+        "inUse": "Nie można uzyskać dostępu do mikrofonu. Może być używany przez inną aplikację.",
+        "notFound": "Nie znaleziono mikrofonu. Podłącz mikrofon i spróbuj ponownie."
+      },
+      "noApiKey": "Nie znaleziono klucza API OpenAI dla syntezy mowy. Skonfiguruj go w ustawieniach.",
+      "transcriptionFailed": "Transkrypcja nie powiodła się: {{error}}"
+    }
+  },
   "file": {
     "currentlyOpen": "Aktualnie Otwarty Plik"
+  },
+  "messages": {
+    "checkingForUpdates": "Sprawdzanie aktualizacji...",
+    "creatingStarterKit": "Tworzenie pakietu startowego..."
+  },
+  "settings": {
+    "actions": {
+      "checkUpdates": {
+        "button": "Sprawdź aktualizacje",
+        "desc": "Sprawdź, czy dostępna jest nowsza wersja Life Navigator i pobierz ją automatycznie.",
+        "name": "Sprawdź aktualizacje"
+      },
+      "createStarterKit": {
+        "button": "Utwórz pakiet startowy",
+        "desc": "Utwórz nowy pakiet startowy z predefiniowanymi trybami AI i szablonami, aby szybko rozpocząć pracę.",
+        "name": "Utwórz pakiet startowy"
+      },
+      "resetTutorial": {
+        "button": "Resetuj tutorial",
+        "confirm": "Czy na pewno chcesz zresetować tutorial? Spowoduje to ponowne wyświetlenie ekranów konfiguracji przy następnym otwarciu Life Navigator.",
+        "desc": "Resetuj tutorial konfiguracji i proces wdrażania. Spowoduje to ponowne wyświetlenie ekranów konfiguracji przy następnym otwarciu Life Navigator.",
+        "error": "Nie udało się zresetować tutoriala: {{error}}",
+        "name": "Resetuj tutorial"
+      },
+      "title": "Akcje Life Navigator",
+      "viewDocs": {
+        "button": "Zobacz dokumentację",
+        "desc": "Otwórz przewodnik użytkownika i dokumentację Life Navigator na GitHub w przeglądarce.",
+        "name": "Zobacz dokumentację"
+      }
+    },
+    "advanced": {
+      "title": "Ustawienia zaawansowane"
+    },
+    "apiKeys": {
+      "anthropic": "Klucz API Anthropic",
+      "anthropicDesc": "Twój klucz API Anthropic dla głównej funkcjonalności asystenta AI. Uzyskaj go z <a href='https://console.anthropic.com/settings/keys'>Konsoli Anthropic</a>.",
+      "enterAnthropicKey": "Wprowadź swój klucz API Anthropic",
+      "enterFirecrawlKey": "Wprowadź swój klucz API Firecrawl",
+      "enterOpenAIKey": "Wprowadź swój klucz API OpenAI",
+      "firecrawl": "Klucz API Firecrawl",
+      "firecrawlDesc": "Twój klucz API Firecrawl dla funkcjonalności głębokich badań. Uzyskaj go z <a href='https://firecrawl.dev/'>Panelu Firecrawl</a>.",
+      "openai": "Klucz API OpenAI",
+      "openaiDesc": "Twój klucz API OpenAI dla funkcjonalności zamiany tekstu na mowę. Uzyskaj go z <a href='https://platform.openai.com/api-keys'>Platformy OpenAI</a>.",
+      "securityNote": "Ważne: Twój klucz API jest przechowywany w folderze konfiguracyjnym Obsidian. Nie udostępniaj swojego vault'a ani folderu konfiguracyjnego innym, jeśli przechowujesz tutaj swój klucz API.",
+      "title": "Klucze API"
+    },
+    "prompts": {
+      "defaultPrompt": "# Domena\nKomunikat lub komenda głosowa wydawana przez użytkownika asystentowi AI.\n\n# Przykłady\n- Odfajcz zadanie ... eeee ... wyrzuciłem śmieci\n- Zrobiłem kolację\n- Dodaj na jutro, żebym pamiętał o odezwaniu się do Jana.\n\n# Słowniczek\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nPoczątek transkrypcji:",
+      "speechToTextPrompt": "Prompt dla zamiany mowy na tekst",
+      "speechToTextPromptDesc": "Prompt, który zostanie wysłany do silnika zamiany mowy na tekst. Dostarcza kontekstu dla modelu AI. Możesz użyć <a href='https://github.com/cielecki/life-navigator/blob/main/docs/link-expansion.md'>rozszerzania linków</a>."
+    },
+    "security": {
+      "title": "Informacja o bezpieczeństwie"
+    }
+  },
+  "tasks": {
+    "format": {
+      "abandonedAt": " (porzucone o {{time}})",
+      "completedAt": " (zakończone o {{time}})",
+      "movedFrom": " (z {{source}})",
+      "movedTo": " (→ {{target}})"
+    }
+  },
+  "tools": {
+    "actions": {
+      "abandon": {
+        "failed": "Nie udało się porzucić zadania {{task}}",
+        "inProgress": "Porzucanie zadania {{task}}...",
+        "success": "Porzucono zadanie {{task}}"
+      },
+      "add": {
+        "failed": "Nie udało się dodać zadania {{task}}",
+        "inProgress": "Dodawanie zadania...",
+        "success": "Dodano {{task}}"
+      },
+      "appendDocument": {
+        "failed": "Nie udało się dodać do {{path}}"
+      },
+      "createDocument": {
+        "completed": "Utworzono {{path}}",
+        "default": "Utwórz {{path}}",
+        "failed": "Nie udało się utworzyć {{path}}",
+        "inProgress": "Tworzenie {{path}}..."
+      },
+      "downloadTranscript": {
+        "completed": "Pobrano {{actionText}}",
+        "inProgress": "Pobieranie {{actionText}}..."
+      },
+      "editTodo": {
+        "failed": "Nie udało się edytować zadania {{task}}"
+      },
+      "findFilesByTag": {
+        "completed": "Znaleziono pliki z tagiem {{tag}}",
+        "failed": "Nie udało się znaleźć plików z tagiem {{tag}}",
+        "ready": "Znajdź pliki z tagiem {{tag}}",
+        "started": "Wyszukiwanie plików z tagiem {{tag}}..."
+      },
+      "generateImage": {
+        "default": "Generuj obraz {{path}}",
+        "failed": "Nie udało się wygenerować obrazu {{path}}"
+      },
+      "listDirectory": {
+        "failed": "Nie udało się wyświetlić katalogu: {{path}}"
+      },
+      "readDocument": {
+        "failed": "Nie udało się odczytać {{path}}"
+      },
+      "searchVault": {
+        "completed": "Wyszukano {{query}}",
+        "default": "Wyszukaj {{query}}",
+        "failed": "Nie udało się wyszukać {{query}}",
+        "inProgress": "Wyszukiwanie {{query}}..."
+      },
+      "uncheck": {
+        "failed": "Nie udało się cofnąć oznaczenia zadania {{task}} jako zakończone",
+        "inProgress": "Cofanie oznaczenia zadania {{task}} jako zakończone...",
+        "success": "Cofnięto oznaczenie zadania {{task}} jako zakończone"
+      }
+    },
+    "appendDocument": {
+      "progress": {
+        "success": "Zawartość dodana do {{path}}"
+      }
+    },
+    "comments": {
+      "removedTaskHeader": "USUNIĘTE ZADANIE"
+    },
+    "createDocument": {
+      "progress": {
+        "success": "Pomyślnie utworzono dokument w {{path}}"
+      }
+    },
+    "deepResearch": {
+      "errors": {
+        "emptyPath": "Ścieżka pliku nie może być pusta",
+        "emptyQuery": "Zapytanie badawcze nie może być puste",
+        "general": "Błąd podczas prowadzenia głębokich badań: {{error}}",
+        "noApiKey": "Nie ustawiono klucza API Firecrawl. Proszę skonfigurować go w ustawieniach dla funkcjonalności głębokich badań.",
+        "noResults": "Nie znaleziono odpowiednich informacji dla podanego zapytania.",
+        "quotaExceeded": "Przekroczono limit API Firecrawl. Proszę sprawdzić rozliczenia i limity użytkowania.",
+        "timeout": "Żądanie badawcze przekroczyło limit czasu. Spróbuj z bardziej konkretnym zapytaniem.",
+        "unknownError": "Wystąpił nieznany błąd podczas badań"
+      },
+      "headers": {
+        "analysis": "Analiza Badawcza",
+        "metadata": "Metadane Badań",
+        "results": "Wyniki Głębokich Badań",
+        "sources": "Źródła"
+      },
+      "labels": {
+        "completed": "Zakończono",
+        "maxDepth": "Maks. Głębokość",
+        "maxUrls": "Maks. URL-i",
+        "query": "Zapytanie",
+        "source": "Źródło",
+        "sourcesFound": "Znalezione Źródła",
+        "timeout": "Limit Czasu",
+        "url": "URL"
+      },
+      "progress": {
+        "loading": "Ładowanie biblioteki Firecrawl...",
+        "processing": "Przetwarzanie wyników badań...",
+        "saving": "Zapisywanie raportu badawczego...",
+        "starting": "Rozpoczynanie głębokich badań dla: \"{{query}}\"",
+        "validating": "Walidacja parametrów badawczych..."
+      },
+      "researching": "Prowadzenie głębokich badań na temat \"{{query}}\"...",
+      "result": {
+        "message": "Pomyślnie przeprowadzono głębokie badania na temat \"{{query}}\" i zapisano raport w {{path}}. Badania obejmowały {{sourceCount}} źródeł z {{maxDepth}} iteracjami głębokości.",
+        "navigationDescription": "Otwórz raport badawczy"
+      },
+      "success": "Głębokie badania zakończone pomyślnie"
+    },
+    "findFilesByTag": {
+      "errors": {
+        "general": "Błąd podczas wyszukiwania plików według tagu: {{error}}",
+        "tagRequired": "Parametr tagu jest wymagany"
+      },
+      "navigation": {
+        "description": "Przejdź do pliku {{index}}: {{name}}"
+      },
+      "results": {
+        "andMore": "i {{count}} więcej",
+        "content": "zawartość",
+        "contentExcluded": "Tagi w zawartości zostały wykluczone.",
+        "contentSnippet": "Zawartość",
+        "frontmatter": "frontmatter",
+        "frontmatterExcluded": "Tagi frontmatter zostały wykluczone.",
+        "header": "Znaleziono {{count}} plik{{plural}} z tagiem \"{{searchTag}}\":",
+        "headings": "Nagłówki",
+        "limitedResults": "Wyniki ograniczone do {{maxResults}} plików. Może być więcej plików z tym tagiem.",
+        "line": "linia",
+        "noFiles": "Nie znaleziono plików z tagiem \"{{searchTag}}\".",
+        "path": "Ścieżka",
+        "scopeLimited": "Uwaga: Zakres wyszukiwania był ograniczony.",
+        "tags": "Tagi"
+      }
+    },
+    "generateImage": {
+      "errors": {
+        "emptyPath": "Ścieżka obrazu nie może być pusta",
+        "emptyPrompt": "Prompt obrazu nie może być pusty",
+        "fileExists": "Plik już istnieje w {{path}}. Proszę wybrać inną ścieżkę lub usunąć istniejący plik.",
+        "general": "Błąd generowania obrazu: {{error}}",
+        "invalidRequest": "Nieprawidłowe żądanie do API OpenAI: {{error}}",
+        "noApiKey": "Nie ustawiono klucza API OpenAI. Proszę skonfigurować go w ustawieniach do generowania obrazów.",
+        "noBase64Data": "Otrzymano nieprawidłowy format danych obrazu z API OpenAI",
+        "noImageData": "Nie otrzymano danych obrazu z API OpenAI",
+        "quotaExceeded": "Przekroczono limit API OpenAI. Proszę sprawdzić rozliczenia i limity użytkowania."
+      },
+      "generating": "Generowanie obrazu dla {{path}}...",
+      "openImage": "Otwórz wygenerowany obraz",
+      "progress": {
+        "generatingWithModel": "Generowanie obrazu za pomocą GPT-4o: \"{{prompt}}\"",
+        "processing": "Przetwarzanie wygenerowanego obrazu...",
+        "saving": "Zapisywanie obrazu do sejfu..."
+      },
+      "success": "Pomyślnie utworzono obraz w {{path}}"
+    },
+    "handover": {
+      "alreadyInMode": "Już w trybie {{modeName}}. Zmiana nie jest potrzebna.",
+      "description": "Opis:",
+      "failedToSwitch": "Nie udało się przełączyć na {{modeName}}",
+      "handoverInstructions": "Przejąłeś kontrolę nad tą rozmową. Kontynuuj wykonywanie zadania użytkownika, używając swoich specjalistycznych możliwości i osobowości. Przejmij kontrolę i zapewnij odpowiednią pomoc zgodnie z celem swojego trybu.",
+      "invalidModeId": "ID trybu jest wymagane i musi być ciągiem znaków",
+      "modeNotFound": "Nie znaleziono trybu o ID \"{{modeId}}\".",
+      "newModeActive": "Teraz działasz jako tryb {{modeName}}.",
+      "noDescription": "Brak dostępnego opisu",
+      "noModes": "Brak dostępnych trybów do przełączenia.",
+      "successMessage": "Pomyślnie przełączono z trybu {{fromMode}} na {{toMode}}.",
+      "switchFailed": "Nie udało się przełączyć trybu: {{error}}",
+      "switched": "Przełączono na tryb {{modeName}}",
+      "switching": "Przełączanie na tryb {{modeName}}..."
+    },
+    "navigation": {
+      "navigateToEditedTodo": "Przejdź do edytowanego zadania",
+      "navigateToUncheckedTodo": "Przejdź do odkręconego zadania",
+      "openAppendedDocument": "Otwórz zaktualizowany dokument",
+      "openCreatedDocument": "Otwórz utworzony dokument",
+      "openDownloadedTranscript": "Otwórz pobrany transkrypt",
+      "openReadDocument": "Otwórz przeczytany dokument"
+    },
+    "position": {
+      "after": "po \"{{task}}\"",
+      "at": "w pozycji {{position}}",
+      "before": "przed \"{{task}}\""
+    },
+    "progress": {
+      "downloadTranscript": {
+        "success": "Pomyślnie pobrano transkrypcję YouTube do {{path}}. Zawiera {{segments}} segmentów obejmujących około {{duration}} minut treści wideo."
+      },
+      "searchVault": {
+        "noResults": "Nie znaleziono wyników dla \"{{query}}\"",
+        "results": "Znaleziono {{count}} wynik{{plural}} dla \"{{query}}\""
+      }
+    },
+    "success": {
+      "abandon": "✓ Oznaczono {{task}} jako porzucone w {{path}}",
+      "add": "✓ Dodano {{task}} do {{path}}",
+      "complete": "✓ Dodano zakończone zadanie \"{{task}}\"{{time}} do {{path}}",
+      "edit": "✓ Edytowano {{originalTask}} na {{newTask}} w {{path}}{{details}}",
+      "move": "✓ Przeniesiono zadanie {{task}} z {{source}} do {{target}} {{position}}",
+      "remove": "✓ Usunięto {{task}} z {{path}} (przekonwertowano na komentarz)",
+      "uncheck": "✓ Cofnięto oznaczenie \"{{task}}\" jako zakończone w {{path}}"
+    },
+    "tasks": {
+      "count": {
+        "few": "{{count}} zadania",
+        "many": "{{count}} zadań",
+        "one": "{{count}} zadanie",
+        "zero": "brak zadań"
+      },
+      "plural": "zadania"
+    }
+  },
+  "ui": {
+    "attachments": {
+      "pastedImage": "Wklejony obraz"
+    },
+    "chat": {
+      "history": "Historia rozmów",
+      "new": "Nowa rozmowa"
+    },
+    "input": {
+      "attachImage": "Załącz obraz",
+      "placeholder": "Napisz wiadomość...",
+      "removeFile": "Usuń {{filename}}",
+      "save": "Zapisz",
+      "send": "Wyślij"
+    },
+    "message": {
+      "attachedImage": "Załączony obraz",
+      "copy": "Kopiuj wiadomość",
+      "edit": "Edytuj wiadomość",
+      "editing": "Edytowanie wiadomości",
+      "generatingSpeech": "Generowanie mowy",
+      "recordingInProgress": "Nagrywanie w toku",
+      "speak": "Przeczytaj na głos",
+      "stopSpeech": "Zatrzymaj odtwarzanie"
+    },
+    "modal": {
+      "copied": "Skopiowano!",
+      "copyToClipboard": "Kopiuj do schowka",
+      "modeSettings": "Ustawienia trybu {{modeName}}",
+      "reloadButton": "Uruchom ponownie Obsidian",
+      "reloadRequiredMessageWithVersions": "Wtyczka zaktualizowana z wersji {{currentVersion}} do {{latestVersion}}.\nCzy chcesz ponownie uruchomić Obsidian, aby zastosować zmiany?",
+      "reloadRequiredTitle": "Wymagane ponowne uruchomienie",
+      "systemPrompt": "Prompt systemowy dla \"{{modeName}}\""
+    },
+    "mode": {
+      "createStarterKit": "Utwórz pakiet startowy",
+      "files": {
+        "noFrontmatter": "Plik {{filename}} nie ma frontmattera, używam wartości domyślnych z treścią pliku jako prompt systemowy"
+      },
+      "newMode": "Nowy tryb",
+      "openInEditor": "Otwórz w edytorze",
+      "switchTo": "Przełącz na:",
+      "viewSettings": "Pokaż ustawienia trybu",
+      "viewSystemPrompt": "Pokaż prompt systemowy"
+    },
+    "recording": {
+      "cancel": "Anuluj nagrywanie",
+      "confirm": "Potwierdź nagranie",
+      "start": "Rozpocznij nagrywanie",
+      "stop": "Zatrzymaj"
+    },
+    "setup": {
+      "anthropicKey": {
+        "description": "Anthropic Claude zasila główną funkcjonalność AI. Potrzebujesz klucza API, aby kontynuować.",
+        "getKey": "Pobierz swój klucz API Anthropic",
+        "inputLabel": "Wklej tutaj swój klucz API:",
+        "placeholder": "Wklej tutaj swój klucz API Anthropic",
+        "saveButton": "Zapisz i kontynuuj",
+        "steps": {
+          "create": "Utwórz nowy klucz API",
+          "paste": "Wklej go tutaj",
+          "visit": "Odwiedź console.anthropic.com/settings/keys"
+        },
+        "title": "Skonfiguruj klucz API Anthropic"
+      },
+      "language": {
+        "current": "Aktualny",
+        "currentLanguage": "Aktualny język Obsidiana:",
+        "description": "Life Navigator działa najlepiej, gdy język interfejsu Obsidiana pasuje do języka, w którym piszesz notatki. Wybierz preferowany język poniżej - jeśli różni się od aktualnego ustawienia, Obsidian automatycznie się zrestartuje, aby zastosować zmianę. Funkcje głosowe (mowa na tekst i tekst na mowę) automatycznie użyją wybranego języka.",
+        "manualRestart": "Proszę zrestartować Obsidiana, aby zastosować zmiany języka.",
+        "note": "Jeśli wybierzesz inny język niż aktualnie skonfigurowany, Obsidian automatycznie się zrestartuje, aby zastosować zmiany. Cała zawartość Life Navigator, interakcje z AI i pliki pakietu startowego będą wtedy w wybranym języku. Funkcje głosowe automatycznie będą działać w wybranym języku.",
+        "supportedLanguages": "Dostępne opcje językowe",
+        "title": "Konfiguracja języka"
+      },
+      "openSettings": "Otwórz ustawienia",
+      "openaiKey": {
+        "description": "OpenAI zasila funkcje głosowe takie jak synteza mowy. To jest opcjonalne, ale zalecane.",
+        "getKey": "Pobierz swój klucz API OpenAI",
+        "inputLabel": "Wklej tutaj swój klucz API:",
+        "note": "Możesz zawsze dodać to później w ustawieniach, aby włączyć funkcje głosowe.",
+        "placeholder": "Wklej tutaj swój klucz API OpenAI",
+        "saveButton": "Zapisz i kontynuuj",
+        "skipButton": "Pomiń na razie",
+        "steps": {
+          "create": "Utwórz nowy klucz API",
+          "paste": "Wklej go tutaj",
+          "visit": "Odwiedź platform.openai.com/api-keys"
+        },
+        "title": "Skonfiguruj klucz API OpenAI"
+      },
+      "saving": "Zapisywanie...",
+      "starterKit": {
+        "button": "Utwórz pakiet startowy",
+        "description": "Zacznij od utworzenia pakietu startowego z predefiniowanymi trybami AI i szablonami.",
+        "features": {
+          "examples": "Przykłady użycia",
+          "modes": "Wiele osobowości AI",
+          "templates": "Szablony informacji"
+        },
+        "title": "Witaj w Life Navigator"
+      }
+    },
+    "starterKit": {
+      "createdError": "Błąd podczas tworzenia pakietu startowego: {{error}}",
+      "createdSuccess": "Pomyślnie utworzono pakiet startowy",
+      "noModes": "## Witaj w Life Navigator\n\nAby rozpocząć, utwórz pakiet startowy zawierający podstawowe tryby z tagiem _#ln-mode_."
+    },
+    "thinking": {
+      "completed": "Pomyślałem przez chwilę",
+      "inProgress": "Myślę...",
+      "redacted": "[Rozumowanie asystenta automatycznie ukryte ze względów bezpieczeństwa]"
+    },
+    "todo": {
+      "abandon": "Porzuć zadanie",
+      "clickToChange": "Kliknij, aby zmienić status",
+      "noTodos": "Nie znaleziono pasujących zadań w {{filename}}",
+      "readOnly": "Tylko do odczytu",
+      "selectedFrom": "Wybrane zadania z {{filename}}",
+      "showMore": "Pokaż {{count}} więcej elementów"
+    }
+  },
+  "view": {
+    "title": "Life Navigator"
   }
-} 
+}
