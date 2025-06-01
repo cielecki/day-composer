@@ -42,39 +42,34 @@ export async function processFileLink(
 		return null;
 	}
 
-	try {
-		// Read the linked file
-		const linkedContent = await app.vault.read(linkFile);
+	// Read the linked file
+	const linkedContent = await app.vault.read(linkFile);
 
-		// Process frontmatter and extract just the content section
-		const frontmatterMatch = linkedContent.match(
-			/^---\n([\s\S]*?)\n---\n([\s\S]*)$/
-		);
-		const contentToExpand = frontmatterMatch
-			? frontmatterMatch[2].trim()
-			: linkedContent.trim();
+	// Process frontmatter and extract just the content section
+	const frontmatterMatch = linkedContent.match(
+		/^---\n([\s\S]*?)\n---\n([\s\S]*)$/
+	);
+	const contentToExpand = frontmatterMatch
+		? frontmatterMatch[2].trim()
+		: linkedContent.trim();
 
-		// Track this path as visited
-		visitedPaths.add(linkFile.path);
+	// Track this path as visited
+	visitedPaths.add(linkFile.path);
 
-		// Recursively expand any links in the linked content
-		const expandedLinkedContent = await expandLinks(
-			app,
-			contentToExpand,
-			visitedPaths
-		);
+	// Recursively expand any links in the linked content
+	const expandedLinkedContent = await expandLinks(
+		app,
+		contentToExpand,
+		visitedPaths
+	);
 
-		const tabbedContent = expandedLinkedContent.split('\n').map(line => '  ' + line).join('\n');
+	const tabbedContent = expandedLinkedContent.split('\n').map(line => '  ' + line).join('\n');
 
-		// Format the content based on whether it's a day note or regular link
-		if (isDayNote && dayNoteInfo) {
-			return `<daily_note date="${dayNoteInfo.formattedDate}" file="${linkFile.path}" label="${dayNoteInfo.descriptiveLabel}" >\n\n${tabbedContent}\n\n</daily_note>\n`;
-		} else {
-			const tagName = convertToValidTagName(linkText);
-			return `<${tagName} file="${linkFile.path}">\n\n${tabbedContent}\n\n</${tagName}>\n`;
-		}
-	} catch (error) {
-		console.error(`Error expanding link to ${linkFile.path}:`, error);
-		return `[Error: ${linkText}] 🔎`;
+	// Format the content based on whether it's a day note or regular link
+	if (isDayNote && dayNoteInfo) {
+		return `<daily_note date="${dayNoteInfo.formattedDate}" file="${linkFile.path}" label="${dayNoteInfo.descriptiveLabel}" >\n\n${tabbedContent}\n\n</daily_note>\n`;
+	} else {
+		const tagName = convertToValidTagName(linkText);
+		return `<${tagName} file="${linkFile.path}">\n\n${tabbedContent}\n\n</${tagName}>\n`;
 	}
 }
