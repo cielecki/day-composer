@@ -1,6 +1,5 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, requestUrl, WorkspaceLeaf } from 'obsidian';
+import { App,  Notice, Plugin, requestUrl } from 'obsidian';
 import { SampleSettingTab } from "./settings/SettingsTab";
-import { ContextCollector } from "./context-collector";
 import {
 	getPluginSettings,
 	resetPluginSettings,
@@ -230,7 +229,6 @@ const createNewMode = async (app: App) => {
 }
 
 export default class MyPlugin extends Plugin {
-	contextCollector: ContextCollector;
 	view: LifeNavigatorView | null = null;
 
 	async onload() {
@@ -248,9 +246,6 @@ export default class MyPlugin extends Plugin {
 
 		// Initialize the obsidian tools with this plugin instance
 		getObsidianTools(this);
-
-		// Initialize context collector
-		this.contextCollector = new ContextCollector(this.app);
 
 		// Register the view type
 		this.registerView(LIFE_NAVIGATOR_VIEW_TYPE, (leaf) => {

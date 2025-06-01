@@ -3,7 +3,7 @@ import { Notice, moment } from 'obsidian';
 import { getPluginSettings } from '../settings/PluginSettings';
 import OpenAI from 'openai';
 import { t } from '../i18n';
-import { ContextCollector } from '../context-collector';
+import { expandLinks } from '../utils/content/link-expander';
 
 const MAX_AUDIO_PROMPT_LENGTH = 5000;
 
@@ -137,8 +137,7 @@ export const SpeechToTextProvider: React.FC<{
       // List of Whisper supported languages could be checked here if more robustness is needed.
       // For now, we'll pass the derived targetLanguageForApi.
 
-      const contextCollector = new ContextCollector(window.app);
-      const expandedPrompt = await contextCollector.expandLinks(promptToUse);
+      const expandedPrompt = await expandLinks(window.app, promptToUse);
       const trimmedPrompt = expandedPrompt.length > MAX_AUDIO_PROMPT_LENGTH 
         ? expandedPrompt.substring(0, Math.floor(MAX_AUDIO_PROMPT_LENGTH / 2)) + "..." + expandedPrompt.substring(expandedPrompt.length - Math.floor(MAX_AUDIO_PROMPT_LENGTH / 2))
         : expandedPrompt;
