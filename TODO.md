@@ -1,5 +1,9 @@
 # TODO
 
+- [x] 📱 Poprawić highlight na mobilce w Life Navigatorze
+- [ ] 💡 Zrobić kreator narzędzi w Obsidianie (nie przez MCP, tylko bezpośrednio tworzone)
+- [ ] ▶️ Dodać możliwość pauzowania i odpauzowywania audio w Life Navigatorze
+
 # Stages
 - [ ] Onboard 5 people to the plugin
 - [ ] Plan for promotion

@@ -2465,3 +2465,21 @@ If your plugin does not need CSS, delete this file.
   flex: 1;
   min-width: 0;
 }
+
+.life-navigator-highlight {
+  background-color: var(--text-selection);
+  animation: highlight-pulse 1s ease-in-out;
+}
+
+/* Pulse animation for highlighted text background only */
+@keyframes highlight-pulse {
+  0% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: var(--interactive-accent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}

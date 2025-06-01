@@ -14,7 +14,7 @@ Commit message format (conventional commits):
 - Types: feat, fix, docs, style, refactor, test, chore
 - Scope: component/area affected (chat, ui, tools, etc.)
 - Description: concise summary under 50 chars
-- Body: detailed explanation of problem, solution, and technical details
+- Body: up to one paragraph explanation of problem, solution, and/or technical details
 - Example: "fix(chat): improve autoscroll during streaming"
 
 If asked to release a new version:
