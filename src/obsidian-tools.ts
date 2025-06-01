@@ -15,6 +15,8 @@ import { removeTodoTool } from "./tools/remove-todo";
 import { downloadYoutubeTranscriptTool } from "./tools/download-youtube-transcript";
 import { generateImageTool } from "./tools/generate-image";
 import { deepResearchTool } from "./tools/deep-research";
+import { listDirectoryTool } from "./tools/list-directory";
+import { findFilesByTagTool } from "./tools/find-files-by-tag";
 import { ToolExecutionError } from "./utils/tools/tool-execution-error";
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tool-filter";
@@ -77,6 +79,8 @@ export class ObsidianTools {
 	private tools: ObsidianTool<any>[] = [
 		createDocumentTool,
 		searchVaultTool,
+		listDirectoryTool,
+		findFilesByTagTool,
 		readDocumentTool,
 		appendToDocumentTool,
 		checkTodoTool,

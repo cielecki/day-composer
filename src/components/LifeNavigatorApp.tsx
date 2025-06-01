@@ -16,8 +16,6 @@ import {
 import { NavigationTarget } from "../obsidian-tools";
 import { useAIAgent } from "../context/AIAgentContext";
 import { LucideIcon } from "./LucideIcon";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { LNModePill } from "./LNModePills";
 import { TFile } from "obsidian";
 import { Modal } from "obsidian";
@@ -26,6 +24,7 @@ import { UnifiedInputArea } from "./UnifiedInputArea";
 import { isSetupComplete } from "../utils/setup-state";
 import { SetupFlow } from "./setup/SetupFlow";
 import { ConversationHistoryDropdown } from './ConversationHistoryDropdown';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 declare global {
 	interface Window {
@@ -91,6 +90,7 @@ export const LifeNavigatorApp: React.FC = () => {
 		loadConversation,
 		getCurrentConversationId,
 		getConversationDatabase,
+		liveToolResults,
 	} = useAIAgent();
 
 	// Use LNModes context
@@ -101,12 +101,14 @@ export const LifeNavigatorApp: React.FC = () => {
 
 	const { isPlayingAudio, stopAudio } = useTextToSpeech();
 
-	// Build a map of tool results (tool_use_id -> result content and navigation targets)
+	// Build a map of tool results (tool_use_id -> ToolResultBlock)
+	// Merge stored results with live results for real-time updates
 	const toolResultsMap = useMemo(() => {
-		const resultsMap = new Map<string, { content: string; navigationTargets?: NavigationTarget[] }>();
+		const resultsMap = new Map<string, ToolResultBlock>();
 
+		// First, add all stored tool results from the conversation
 		conversation.forEach((message) => {
-			if (message.role === "user" && Array.isArray(message.content)) {
+			if (Array.isArray(message.content)) {
 				message.content.forEach((item) => {
 					if (
 						typeof item === "object" &&
@@ -115,20 +117,19 @@ export const LifeNavigatorApp: React.FC = () => {
 						item.type === "tool_result"
 					) {
 						const toolResult = item as ToolResultBlock;
-						resultsMap.set(
-							toolResult.tool_use_id,
-							{
-								content: toolResult.content,
-								navigationTargets: toolResult.navigationTargets
-							}
-						);
+						resultsMap.set(toolResult.tool_use_id, toolResult);
 					}
 				});
 			}
 		});
 
+		// Then, overlay live tool results (these will take precedence for ongoing executions)
+		for (const [toolId, liveResult] of liveToolResults) {
+			resultsMap.set(toolId, liveResult);
+		}
+
 		return resultsMap;
-	}, [conversation]);
+	}, [conversation, liveToolResults]);
 
 	// Filter out user messages that contain only tool results
 	const filteredConversation = useMemo(() => {
@@ -361,38 +362,9 @@ export const LifeNavigatorApp: React.FC = () => {
 			return (
 				<div className="empty-conversation">
 					<div className="markdown-content">
-						<ReactMarkdown
-							remarkPlugins={[remarkGfm]}
-							components={{
-								code: ({
-									node,
-									inline,
-									className,
-									children,
-									...props
-								}: any) => {
-									return !inline ? (
-										<pre className="code-block">
-											<code
-												className={className}
-												{...props}
-											>
-												{children}
-											</code>
-										</pre>
-									) : (
-										<code
-											className={className}
-											{...props}
-										>
-											{children}
-										</code>
-									);
-								},
-							}}
-						>
-							{activeMode ? activeMode.ln_description : t('ui.starterKit.noModes')}
-						</ReactMarkdown>
+						<MarkdownRenderer
+							content={activeMode ? activeMode.ln_description : t('ui.starterKit.noModes')}
+						/>
 					</div>
 
 						{Object.keys(lnModesRef.current).length === 0 && (

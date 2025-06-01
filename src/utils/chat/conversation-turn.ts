@@ -1,7 +1,7 @@
 import { Anthropic, APIUserAbortError } from "@anthropic-ai/sdk";
 import { Notice } from "obsidian";
 import { MessageCreateParamsStreaming } from "@anthropic-ai/sdk/resources/messages/messages";
-import { Message, ContentBlock } from "./types";
+import { Message, ContentBlock, ToolResultBlock } from "./types";
 import { formatMessagesForAPI } from "./api-formatting";
 import { processAnthropicStream, StreamProcessorCallbacks } from "./stream-processor";
 import { processToolUseBlocks } from "./tool-processing";
@@ -28,6 +28,10 @@ export interface ConversationTurnContext {
 	// State management
 	setIsGeneratingResponse: (generating: boolean) => void;
 	onConversationChange: () => void;
+	
+	// Live tool results for real-time progress updates
+	updateLiveToolResult: (toolId: string, result: ToolResultBlock) => void;
+	clearLiveToolResults: () => void;
 }
 
 /**
@@ -82,6 +86,8 @@ export const runConversationTurn = async (
 					},
 				};
 
+				console.log("🔥 API Params:", params);
+
 				const stream = await anthropicClient.messages.create(params, { signal: signal });
 
 				// Set up stream processor callbacks
@@ -119,14 +125,16 @@ export const runConversationTurn = async (
 						const { getObsidianTools } = await import("../../obsidian-tools");
 						const obsidianTools = getObsidianTools(context.plugin);
 						
+						// Clear any previous live tool results when starting new tool execution
+						context.clearLiveToolResults();
+						
 						const { toolResults, abortedDuringProcessing } = await processToolUseBlocks(
 							toolUseBlocks,
 							obsidianTools,
 							signal,
-							(toolId: string, message: string) => {
-								// Create progress update for UI - this could be handled better with a proper progress system
-								console.log(`Tool Progress [${toolId}]: ${message}`);
-								// TODO: Could add UI progress indicators here
+							(toolId: string, updatedResult: ToolResultBlock) => {
+								// Update the live tool results for real-time UI display
+								context.updateLiveToolResult(toolId, updatedResult);
 							}
 						);
 
@@ -176,6 +184,8 @@ export const runConversationTurn = async (
 		return finalAssistantMessageForTTS;
 	} finally {
 		context.setIsGeneratingResponse(false);
+		// Clear live tool results when conversation turn ends
+		context.clearLiveToolResults();
 	}
 };
 

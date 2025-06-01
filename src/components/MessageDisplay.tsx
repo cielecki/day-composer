@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { ContentBlock } from '../utils/chat/types';
 import { NavigationTarget } from '../obsidian-tools';
 import { ThinkingCollapsibleBlock, RedactedThinkingBlock as RedactedThinking, ToolBlock } from './CollapsibleBlock';
@@ -10,11 +8,13 @@ import { useTextToSpeech } from '../context/TextToSpeechContext';
 import { useSpeechToText } from '../context/SpeechToTextContext';
 import { t } from '../i18n';
 import { LucideIcon } from './LucideIcon';
+import { ToolResultBlock } from '../utils/chat/types';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface MessageDisplayProps {
   role: 'user' | 'assistant';
   content: string | ContentBlock[];
-  toolResults?: Map<string, { content: string; navigationTargets?: NavigationTarget[] }>;
+  toolResults?: Map<string, ToolResultBlock>;
   messageIndex?: number;
   isLastMessage?: boolean;
   isGeneratingResponse?: boolean;
@@ -104,25 +104,9 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
       case 'text': {
         return (
           <div key={`block-${index}`} className="markdown-content">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                code: ({inline, className, children, ...props}: any) => {
-                  return !inline ? (
-                    <pre className="code-block">
-                      <code className={className} {...props}>
-                        {children}
-                      </code>
-                    </pre>
-                  ) : (
-                    <code className={className} {...props}>{children}</code>
-                  );
-                }
-              }}
-            >
-              {/* block.text is guaranteed by TextBlock type */}
-              {block.text}
-            </ReactMarkdown>
+            <MarkdownRenderer
+              content={block.text}
+            />
           </div>
         );
       }
@@ -158,11 +142,13 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
         );
       case 'tool_use': {
         const resultData = toolResultsMap.get(block.id);
-        const hasResult = !!resultData;
         const tool = getObsidianTools(undefined!).getToolByName(block.name);
         
-        // Extract content and navigation targets from the result data
+        // Determine if we have any result content and if it's complete
+        const hasContent = resultData && resultData.content && resultData.content.length > 0;
+        const isComplete = resultData?.is_complete ?? false;
         const resultContent = resultData?.content || '';
+        
         const navigationTargets = resultData?.navigationTargets;
         
         // Detect error based on result content starting with ❌
@@ -179,12 +165,12 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
         const isError = isErrorByFlag || isErrorByContent;
         
         // Check if the tool has a custom rendering method
-        if (tool && tool.renderResult && hasResult) {
+        if (tool && tool.renderResult && isComplete) {
           return (
             <div key={`block-${index}`} className={`tool-custom-renderer ${isError ? 'tool-error' : ''}`}>
               <div className="tool-custom-header">
                 <span className="tool-custom-title">
-                  {tool.getActionText(block.input, resultContent, true, !!isError)}
+                  {tool.getActionText(block.input, true, isComplete, !!isError)}
                 </span>
               </div>
               <div className="tool-custom-content">
@@ -199,7 +185,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
             key={`block-${index}`}
             toolName={block.name}
             toolInput={block.input}
-            hasResult={hasResult}
+            isComplete={isComplete}
             result={resultContent}
             isError={!!isError}
             navigationTargets={navigationTargets}

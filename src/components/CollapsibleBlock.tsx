@@ -75,8 +75,8 @@ export const CollapsibleBlock: React.FC<CollapsibleBlockProps> = ({
 interface ToolBlockProps {
   toolName: string;
   toolInput: any;
-  hasResult: boolean;
-  result?: string;
+  isComplete: boolean;
+  result: string;
   defaultOpen?: boolean;
   isError?: boolean;
   navigationTargets?: NavigationTarget[];
@@ -85,7 +85,7 @@ interface ToolBlockProps {
 export const ToolBlock: React.FC<ToolBlockProps> = ({
   toolName,
   toolInput,
-  hasResult,
+  isComplete,
   result,
   defaultOpen = false,
   isError = false,
@@ -102,7 +102,7 @@ export const ToolBlock: React.FC<ToolBlockProps> = ({
   const actionText = tool?.getActionText(
     toolInput, 
     false,
-    hasResult,
+    isComplete,
     effectiveIsError
   );
   const iconName = tool?.icon;
@@ -142,13 +142,13 @@ export const ToolBlock: React.FC<ToolBlockProps> = ({
       summary={summary}
       lucideIcon={effectiveIsError ? "alert-circle" : iconName}
       iconColor={effectiveIsError ? "var(--color-red)" : "var(--color-blue)"}
-      className={`${!hasResult ? "pulsing" : ""} ${effectiveIsError ? "tool-error" : ""}`}
+      className={`${!isComplete ? "pulsing" : ""} ${effectiveIsError ? "tool-error" : ""}`}
       defaultOpen={defaultOpen}
       onClick={handleToolClick}
       isClickable={isClickable}
       dataAttributes={{ 
         tool: toolName,
-        'has-result': hasResult.toString(),
+        'has-result': isComplete.toString(),
         'has-error': effectiveIsError.toString(),
         'is-clickable': isClickable.toString()
       }}
@@ -157,19 +157,9 @@ export const ToolBlock: React.FC<ToolBlockProps> = ({
         <ToolInputDisplay toolName={toolName} toolInput={toolInput} />
       </div>
       
-      {!hasResult ? (
-        <div className="tool-in-progress">
-          <div className="thinking-indicator">
-            <div className="thinking-dot"></div>
-            <div className="thinking-dot"></div>
-            <div className="thinking-dot"></div>
-          </div>
-        </div>
-      ) : (
-        <div className={`tool-result-content ${effectiveIsError ? "tool-result-error" : ""}`}>
-          {result}
-        </div>
-      )}
+      <div className={`tool-result-content ${effectiveIsError ? "tool-result-error" : ""}`}>
+        {result}
+      </div>
     </CollapsibleBlock>
   );
 };

@@ -13,7 +13,7 @@ export const processToolUseBlocks = async (
 	toolUseBlocks: ToolUseBlock[],
 	obsidianTools: ReturnType<typeof import("../../obsidian-tools").getObsidianTools>,
 	signal: AbortSignal,
-	onProgress?: (toolId: string, message: string) => void
+	onToolResultUpdate?: (toolId: string, result: ToolResultBlock) => void
 ): Promise<ToolProcessingResult> => {
 	const toolResults: ToolResultBlock[] = [];
 	let abortedDuringProcessing = false;
@@ -24,35 +24,59 @@ export const processToolUseBlocks = async (
 			break;
 		}
 		
+		// Create initial incomplete result
+		const initialResult: ToolResultBlock = {
+			type: "tool_result",
+			tool_use_id: toolUseBlock.id,
+			content: "",
+			is_complete: false,
+			navigationTargets: []
+		};
+		
 		try {
 			const result = await obsidianTools.processToolCall(
 				toolUseBlock.name,
 				toolUseBlock.input,
 				signal,
 				(message: string) => {
-					// Call progress callback if provided
-					onProgress?.(toolUseBlock.id, message);
+					// Update the result content progressively
+					initialResult.content = initialResult.content ? `${initialResult.content}\n${message}` : message;
+					// Notify the UI about the update
+					onToolResultUpdate?.(toolUseBlock.id, { ...initialResult });
 				},
 				(navigationTarget) => {
-					// Navigation targets are collected within the processToolCall method
-					// and will be included in the final result
+					// Add navigation targets as they become available
+					initialResult.navigationTargets = initialResult.navigationTargets || [];
+					initialResult.navigationTargets.push(navigationTarget);
+					// Notify the UI about the update
+					onToolResultUpdate?.(toolUseBlock.id, { ...initialResult });
 				}
 			);
 			
-			toolResults.push({
+			// Mark as complete with final result
+			const finalResult: ToolResultBlock = {
 				type: "tool_result",
 				tool_use_id: toolUseBlock.id,
 				content: result.result,
 				is_error: result.isError,
+				is_complete: true,
 				navigationTargets: result.navigationTargets
-			});
+			};
+			
+			toolResults.push(finalResult);
+			// Final update to mark as complete
+			onToolResultUpdate?.(toolUseBlock.id, finalResult);
 		} catch (error: any) {
-			toolResults.push({
+			const errorResult: ToolResultBlock = {
 				type: "tool_result",
 				tool_use_id: toolUseBlock.id,
 				content: `Error: ${error.message || "Unknown error"}`,
 				is_error: true,
-			});
+				is_complete: true,
+			};
+			toolResults.push(errorResult);
+			// Update with error result
+			onToolResultUpdate?.(toolUseBlock.id, errorResult);
 		}
 	}
 

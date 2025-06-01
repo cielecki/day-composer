@@ -22,11 +22,59 @@ Life Navigator provides AI assistants with a comprehensive set of tools to help 
 - Perfect for adding new entries to journals, logs, or ongoing notes
 - Maintains existing content while extending it
 
+## Vault Exploration Tools
+
 ### Search Vault
 **Tool:** `search_vault`
 - Searches through all files in your vault for specific content
 - Helps find relevant information across your entire knowledge base
 - Supports both text content and file name searches
+
+
+### List Directory
+**Tool:** `list_directory`
+- Provides structured directory and file listing for any vault path
+- Essential for understanding vault organization and helping with navigation
+- **Recursive Option**: Can show complete directory trees when needed
+- **File Type Filtering**: Filter by extensions (md, pdf, png, etc.)
+- **Flexible Inclusion**: Toggle files and/or folders independently
+- **File Information**: Shows file sizes and uses visual icons
+- **Navigation Support**: Provides direct links to directories and files
+
+**Example Usage:**
+```
+List vault root: directory_path="", recursive=false
+List all markdown files: recursive=true, include_folders=false, file_types=["md"]
+Browse project folder: directory_path="Projects/Work", recursive=true
+```
+
+### Find Files by Tag
+**Tool:** `find_files_by_tag`
+- Searches for files containing specific tags across the entire vault
+- Comprehensive tag discovery and content organization tool
+- **Dual Tag Support**: Searches both in-content tags (#tag) and frontmatter tags
+- **Flexible Matching**: Exact match or nested tag matching (e.g., 'project' matches 'project/work')
+- **Location Reporting**: Shows line numbers for content tags
+- **Content Preview**: Optional file content snippets for context
+- **Metadata Extraction**: Includes heading information and file details
+- **Result Control**: Configurable limits to manage output size
+
+**Tag Matching Examples:**
+- `exact_match=false`: "project" matches #project, #project/work, #project/personal
+- `exact_match=true`: "project" matches only #project
+
+**Example Usage:**
+```
+Find project files: tag="project", exact_match=false, include_file_content=true
+Find exact meetings: tag="meeting", exact_match=true, max_results=20
+Frontmatter only: tag="important", include_content=false
+```
+
+**Use Cases:**
+- **Content Discovery**: Find files you've tagged but can't remember
+- **Vault Overview**: Understand your tagging patterns and organization
+- **Project Navigation**: Locate all files related to specific topics
+- **Tag Management**: Find inconsistencies or similar tags
 
 ## Task Management Tools
 

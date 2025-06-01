@@ -4,12 +4,12 @@ This document outlines potential future features and improvements for the Life N
 
 ## Accepted/Implemented Ideas
 
-(in [TODO.md](TODO.md))
+**User-Defined Tools:** Introduce the ability for the user to add extra tools to the system. Investigate methods for loading extra tools (e.g., eval, JSON, MCP). This could allow accessing calendar for example.
+
+**Introduce support for weekly and monthly summaries:**
+via ln-monthly-note and ln-weekly-note.
 
 ## Floating Ideas
-
-**Introduce support for weekly and monthly summaries**:
-via ln-monthly-note and ln-weekly-note.
 
 **Mode Settings Editor:**
 Create a comprehensive mode settings editor that allows users to configure all mode parameters through a user-friendly interface.

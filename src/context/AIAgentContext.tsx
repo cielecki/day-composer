@@ -11,14 +11,14 @@ import { Notice } from "obsidian";
 import type MyPlugin from "../main";
 import { useTextToSpeech } from "./TextToSpeechContext";
 import { useSpeechToText } from "./SpeechToTextContext";
-import { Message, ContentBlock } from "../utils/chat/types";
+import { Message } from "../utils/chat/types";
 import { useLNMode } from "./LNModeContext";
 import { t } from '../i18n';
 import { ConversationDatabase } from "../services/conversation-database";
 import { Conversation } from '../utils/chat/conversation';
 import { generateConversationId } from "../utils/chat/generate-conversation-id";
-import { App } from "obsidian";
 import { expandLinks } from "../utils/links/expand-links";
+import { ToolResultBlock } from "../utils/chat/types";
 
 // Import utility functions
 import { ensureContentBlocks } from "../utils/chat/content-blocks";
@@ -50,6 +50,10 @@ export interface AIAgentContextType {
 	loadConversation: (conversationId: string) => Promise<boolean>;
 	getCurrentConversationId: () => string | null;
 	getConversationDatabase: () => ConversationDatabase;
+	// Real-time tool results for live progress updates
+	liveToolResults: Map<string, ToolResultBlock>;
+	updateLiveToolResult: (toolId: string, result: ToolResultBlock) => void;
+	clearLiveToolResults: () => void;
 }
 
 const AIAgentContext = createContext<AIAgentContextType | undefined>(undefined);
@@ -62,6 +66,7 @@ export const AIAgentProvider: React.FC<{
 	const [_, setForceUpdate] = useState(0);
 	const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);
 	const [editingMessage, setEditingMessage] = useState<{ index: number; content: string; images?: any[] } | null>(null);
+	const [liveToolResults, setLiveToolResults] = useState<Map<string, ToolResultBlock>>(new Map());
 	const textToSpeech = useTextToSpeech();
 	const { isRecording } = useSpeechToText();
 	const { activeModeIdRef, lnModesRef } = useLNMode();
@@ -123,14 +128,12 @@ export const AIAgentProvider: React.FC<{
 			}
 		};
 		conversationChangedRef.current = false;
+		setLiveToolResults(new Map());
 		setForceUpdate((prev) => prev + 1);
 	}, []);
 
 	const addMessageToConversation = useCallback((message: Message) => {
-		currentConversationRef.current.storedConversation.messages = [
-			...currentConversationRef.current.storedConversation.messages,
-			message
-		];
+		currentConversationRef.current.storedConversation.messages.push(message);
 		setForceUpdate((prev) => prev + 1);
 		triggerConversationChange();
 	}, [triggerConversationChange]);
@@ -148,6 +151,71 @@ export const AIAgentProvider: React.FC<{
 		return (await expandLinks(app, currentActiveMode.ln_system_prompt)).trim();
 	}, [lnModesRef, activeModeIdRef, app]);
 
+	// Extract common conversation turn logic
+	const runConversationTurnWithContext = useCallback(async (signal: AbortSignal): Promise<void> => {
+		try {
+			// Prepare context and tools
+			const systemPrompt = await getContext();
+			const obsidianTools = getObsidianTools(plugin);
+			const currentActiveMode = lnModesRef.current[activeModeIdRef.current];
+			const tools = currentActiveMode 
+				? obsidianTools.getToolsForMode(currentActiveMode) 
+				: obsidianTools.getTools();
+
+			// Set up conversation turn context
+			const turnContext: ConversationTurnContext = {
+				messages: currentConversationRef.current.storedConversation.messages,
+				addMessage: addMessageToConversation,
+				updateMessage: updateLastMessage,
+				lnModesRef,
+				activeModeIdRef,
+				plugin,
+				setIsGeneratingResponse,
+				onConversationChange: () => {
+					const persistenceContext: ConversationPersistenceContext = {
+						conversationDatabase,
+						getCurrentConversation: () => currentConversationRef.current,
+						activeModeIdRef,
+						lnModesRef
+					};
+					saveConversationImmediately(persistenceContext);
+				},
+				updateLiveToolResult,
+				clearLiveToolResults
+			};
+
+			// Run conversation turn
+			const finalAssistantMessage = await runConversationTurn(
+				systemPrompt,
+				tools,
+				signal,
+				turnContext
+			);
+
+			// Handle TTS
+			const ttsContext: TTSContext = {
+				textToSpeech,
+				lnModesRef,
+				activeModeIdRef,
+				isRecording
+			};
+			await handleTTS(finalAssistantMessage, signal, ttsContext);
+		} catch (error) {
+			console.error("Error in conversation turn:", error);
+			new Notice(t('errors.setup', { error: error instanceof Error ? error.message : "Unknown error" }));
+			setIsGeneratingResponse(false);
+		}
+	}, [
+		getContext,
+		plugin,
+		lnModesRef,
+		activeModeIdRef,
+		addMessageToConversation,
+		updateLastMessage,
+		textToSpeech,
+		isRecording
+	]);
+
 	const addUserMessage = useCallback(
 		async (userMessage: string, signal: AbortSignal, images?: any[]): Promise<void> => {
 			try {
@@ -156,58 +224,7 @@ export const AIAgentProvider: React.FC<{
 				if (newMessage.content.length > 0) {
 					addMessageToConversation(newMessage);
 					setIsGeneratingResponse(true);
-
-					try {
-						// Prepare context and tools
-						const systemPrompt = await getContext();
-						const obsidianTools = getObsidianTools(plugin);
-						const currentActiveMode = lnModesRef.current[activeModeIdRef.current];
-						const tools = currentActiveMode 
-							? obsidianTools.getToolsForMode(currentActiveMode) 
-							: obsidianTools.getTools();
-
-						// Set up conversation turn context
-						const turnContext: ConversationTurnContext = {
-							messages: currentConversationRef.current.storedConversation.messages,
-							addMessage: addMessageToConversation,
-							updateMessage: updateLastMessage,
-							lnModesRef,
-							activeModeIdRef,
-							plugin,
-							setIsGeneratingResponse,
-							onConversationChange: () => {
-								const persistenceContext: ConversationPersistenceContext = {
-									conversationDatabase,
-									getCurrentConversation: () => currentConversationRef.current,
-									activeModeIdRef,
-									lnModesRef
-								};
-								saveConversationImmediately(persistenceContext);
-							}
-						};
-
-						// Run conversation turn
-						const finalAssistantMessage = await runConversationTurn(
-							systemPrompt,
-							tools,
-							signal,
-							turnContext
-						);
-
-						// Handle TTS
-						const ttsContext: TTSContext = {
-							textToSpeech,
-							lnModesRef,
-							activeModeIdRef,
-							isRecording
-						};
-						await handleTTS(finalAssistantMessage, signal, ttsContext);
-
-					} catch (error) {
-						console.error("Error in conversation turn:", error);
-						new Notice(t('errors.setup', { error: error instanceof Error ? error.message : "Unknown error" }));
-						setIsGeneratingResponse(false);
-					}
+					await runConversationTurnWithContext(signal);
 				}
 			} catch (error) {
 				console.error("Error preparing conversation turn:", error);
@@ -215,16 +232,7 @@ export const AIAgentProvider: React.FC<{
 				setIsGeneratingResponse(false);
 			}
 		},
-		[
-			addMessageToConversation,
-			getContext,
-			plugin,
-			lnModesRef,
-			activeModeIdRef,
-			textToSpeech,
-			isRecording,
-			updateLastMessage
-		],
+		[addMessageToConversation, runConversationTurnWithContext]
 	);
 
 	const editUserMessage = useCallback(
@@ -257,10 +265,11 @@ export const AIAgentProvider: React.FC<{
 
 			// Trigger new AI response if there's content
 			if (newMessage.content.length > 0) {
-				await addUserMessage("", signal); // This will trigger the AI response
+				setIsGeneratingResponse(true);
+				await runConversationTurnWithContext(signal);
 			}
 		},
-		[addUserMessage, isGeneratingResponse]
+		[isGeneratingResponse, runConversationTurnWithContext]
 	);
 
 	const startEditingMessage = useCallback((messageIndex: number) => {
@@ -328,8 +337,21 @@ export const AIAgentProvider: React.FC<{
 		return conversationDatabase;
 	}, []);
 
+	// Live tool results management
+	const updateLiveToolResult = useCallback((toolId: string, result: ToolResultBlock) => {
+		setLiveToolResults(prev => {
+			const newMap = new Map(prev);
+			newMap.set(toolId, result);
+			return newMap;
+		});
+	}, []);
+
+	const clearLiveToolResults = useCallback(() => {
+		setLiveToolResults(new Map());
+	}, []);
+
 	const value: AIAgentContextType = {
-		conversation: currentConversationRef.current?.storedConversation.messages || [],
+		conversation: [...(currentConversationRef.current?.storedConversation.messages || [])],
 		clearConversation,
 		addUserMessage,
 		editUserMessage,
@@ -342,7 +364,10 @@ export const AIAgentProvider: React.FC<{
 		saveCurrentConversation,
 		loadConversation,
 		getCurrentConversationId,
-		getConversationDatabase
+		getConversationDatabase,
+		liveToolResults,
+		updateLiveToolResult,
+		clearLiveToolResults,
 	}
 	
 	return (

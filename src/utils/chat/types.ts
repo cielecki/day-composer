@@ -71,6 +71,7 @@ export interface ToolResultBlock {
 	tool_use_id: string;
 	content: string;
 	is_error?: boolean;
+	is_complete?: boolean; // Flag to track if tool execution is finished
 	navigationTargets?: NavigationTarget[];
 }
 
