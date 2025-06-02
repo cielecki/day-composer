@@ -4,7 +4,7 @@ import { ToolExecutionContext } from "../utils/chat/types";
 import { t } from "../i18n";
 
 const schema = {
-  name: "find_files_by_tag",
+  name: "vault_find_files_by_tag",
   description: "Finds all files in the vault that contain specific tags. Supports both in-content tags (#tag) and frontmatter tags.",
   input_schema: {
     type: "object",
@@ -43,7 +43,7 @@ const schema = {
   }
 };
 
-type FindFilesByTagToolInput = {
+type VaultFindFilesByTagToolInput = {
   tag: string;
   include_frontmatter?: boolean;
   include_content?: boolean;
@@ -67,11 +67,11 @@ interface TaggedFileResult {
   }>;
 }
 
-export const findFilesByTagTool: ObsidianTool<FindFilesByTagToolInput> = {
+export const vaultFindFilesByTagTool: ObsidianTool<VaultFindFilesByTagToolInput> = {
   specification: schema,
   icon: "tag",
   initialLabel: t('tools.findFilesByTag.label'),
-  execute: async (context: ToolExecutionContext<FindFilesByTagToolInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<VaultFindFilesByTagToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { tag } = params;
     

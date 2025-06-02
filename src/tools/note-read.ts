@@ -5,7 +5,7 @@ import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { TFile } from "obsidian";
 
 const schema = {
-  name: "read_document",
+  name: "note_read",
   description: "Reads the content of a document from the vault",
   input_schema: {
     type: "object",
@@ -19,15 +19,15 @@ const schema = {
   }
 };
 
-type ReadDocumentToolInput = {
+type NoteReadToolInput = {
   path: string
 }
 
-export const readDocumentTool: ObsidianTool<ReadDocumentToolInput> = {
+export const noteReadTool: ObsidianTool<NoteReadToolInput> = {
   specification: schema,
   icon: "file-text",
   initialLabel: t('tools.read.label'),
-  execute: async (context: ToolExecutionContext<ReadDocumentToolInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<NoteReadToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { path } = params;
 

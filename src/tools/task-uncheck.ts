@@ -9,7 +9,7 @@ import { createNavigationTargetsForTasks } from "../utils/tools/line-number-util
 import { t } from "../i18n";
 
 const schema = {
-  name: "uncheck_todo",
+  name: "task_uncheck",
   description: "Unchecks a completed to-do item in a specified document or today's daily note",
   input_schema: {
     type: "object",
@@ -31,17 +31,17 @@ const schema = {
   }
 };
 
-type UncheckTodoToolInput = {
+type TaskUncheckToolInput = {
   todo_text: string,
   file_path?: string,
   comment?: string
 }
 
-export const uncheckTodoTool: ObsidianTool<UncheckTodoToolInput> = {
+export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
   specification: schema,
   icon: "square",
   initialLabel: t('tools.uncheck.label'),
-  execute: async (context: ToolExecutionContext<UncheckTodoToolInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<TaskUncheckToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const todoDescription = params.todo_text;
     const comment = params.comment;

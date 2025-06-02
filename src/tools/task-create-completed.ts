@@ -12,7 +12,7 @@ import { createNavigationTargetsForTasks } from "../utils/tools/line-number-util
 import { t } from "../i18n";
 
 const schema = {
-  name: "create_completed_todo",
+  name: "task_create_completed",
   description: "Creates a completed todo entry. This can be used both for recording a completion of a task that has not been planned or for storing thoughts, observations, or events in your daily log.",
   input_schema: {
     type: "object",
@@ -38,18 +38,18 @@ const schema = {
   }
 };
 
-type CreateCompletedTodoToolInput = {
+type TaskCreateCompletedToolInput = {
   todo_text: string,
   comment?: string,
   file_path?: string,
   completion_time?: string
 }
 
-export const createCompletedTodoTool: ObsidianTool<CreateCompletedTodoToolInput> = {
+export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput> = {
   specification: schema,
   icon: "check-circle",
   initialLabel: t('tools.createCompleted.label'),
-  execute: async (context: ToolExecutionContext<CreateCompletedTodoToolInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<TaskCreateCompletedToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todo_text, comment, file_path, completion_time } = params;
 

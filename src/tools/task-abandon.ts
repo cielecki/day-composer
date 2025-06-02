@@ -11,7 +11,7 @@ import { createNavigationTargetsForTasks } from "../utils/tools/line-number-util
 import { t } from "../i18n";
 
 const schema = {
-  name: "abandon_todo",
+  name: "task_abandon",
   description: "Marks one or more to-do items as abandoned / skipped in a specified document or today's daily note",
   input_schema: {
     type: "object",
@@ -47,22 +47,22 @@ const schema = {
   }
 };
 
-type TodoItem = {
+type TaskItem = {
   todo_text: string,
   comment?: string
 }
 
-type AbandonTodoToolInput = {
-  todos: TodoItem[],
+type TaskAbandonToolInput = {
+  todos: TaskItem[],
   time?: string,
   file_path?: string
 }
 
-export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
+export const taskAbandonTool: ObsidianTool<TaskAbandonToolInput> = {
   specification: schema,
   icon: "x-square",
   initialLabel: t('tools.abandon.label'),
-  execute: async (context: ToolExecutionContext<AbandonTodoToolInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<TaskAbandonToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos, time } = params;
     

@@ -5,7 +5,7 @@ import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { t } from "../i18n";
 
 const schema = {
-  name: "list_directory",
+  name: "vault_list_directory",
   description: "Lists files and directories in a given vault path. Can list recursively to show the complete directory structure.",
   input_schema: {
     type: "object",
@@ -42,7 +42,7 @@ const schema = {
   }
 };
 
-type ListDirectoryToolInput = {
+type VaultListDirectoryToolInput = {
   directory_path?: string;
   recursive?: boolean;
   include_files?: boolean;
@@ -59,11 +59,11 @@ interface DirectoryItem {
   children?: DirectoryItem[];
 }
 
-export const listDirectoryTool: ObsidianTool<ListDirectoryToolInput> = {
+export const vaultListDirectoryTool: ObsidianTool<VaultListDirectoryToolInput> = {
   specification: schema,
   icon: "folder",
   initialLabel: t('tools.listDirectory.label'),
-  execute: async (context: ToolExecutionContext<ListDirectoryToolInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<VaultListDirectoryToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { directory_path = "", recursive = false, include_files = true, include_folders = true, file_types = [] } = params;
     

@@ -10,7 +10,7 @@ import { createNavigationTargetsForTasks, createNavigationTarget, findTaskLineNu
 import { t } from "../i18n";
 
 const schema = {
-  name: "move_todo",
+  name: "task_move",
   description: "Moves one or more to-do items within the same document or from one document to another",
   input_schema: {
     type: "object",
@@ -58,7 +58,7 @@ type TodoItem = {
   todo_text: string
 }
 
-type MoveTodoToolInput = {
+type TaskMoveToolInput = {
   todos: TodoItem[],
   source_path: string,
   target_path: string,
@@ -66,11 +66,11 @@ type MoveTodoToolInput = {
   reference_todo_text?: string
 }
 
-export const moveTodoTool: ObsidianTool<MoveTodoToolInput> = {
+export const taskMoveTool: ObsidianTool<TaskMoveToolInput> = {
   specification: schema,
   icon: "move",
   initialLabel: t('tools.move.label'),
-  execute: async (context: ToolExecutionContext<MoveTodoToolInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<TaskMoveToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos, position, reference_todo_text } = params;
     

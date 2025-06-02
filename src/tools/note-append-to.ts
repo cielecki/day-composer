@@ -7,7 +7,7 @@ import { fileExists } from "../utils/fs/file-exists";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 
 const schema = {
-  name: "append_to_document",
+  name: "note_append_to",
   description: "Appends content to an existing document in the vault",
   input_schema: {
     type: "object",
@@ -25,16 +25,16 @@ const schema = {
   }
 };
 
-type AppendToDocumentToolInput = {
+type NoteAppendToToolInput = {
   path: string,
   content: string
 }
 
-export const appendToDocumentTool: ObsidianTool<AppendToDocumentToolInput> = {
+export const noteAppendToTool: ObsidianTool<NoteAppendToToolInput> = {
   specification: schema,
   icon: "file-plus",
   initialLabel: t('tools.append.label'),
-  execute: async (context: ToolExecutionContext<AppendToDocumentToolInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<NoteAppendToToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { path, content } = params;
 

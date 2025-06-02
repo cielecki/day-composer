@@ -15,7 +15,7 @@ import { calculateLineNumberForNode, createNavigationTarget } from "../utils/too
 import { t } from "../i18n";
 
 const schema = {
-	name: "add_todo",
+	name: "task_add",
 	description:
 		"Adds one or more to-do items to a specified document or today's daily note",
 	input_schema: {
@@ -61,18 +61,18 @@ type TodoItem = {
 	todo_text: string;
 };
 
-type AddTodoToolInput = {
+type TaskAddToolInput = {
 	todos: TodoItem[];
 	path?: string;
 	position: "beginning" | "end" | "before" | "after";
 	reference_todo_text?: string;
 };
 
-export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
+export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 	specification: schema,
 	icon: "list-plus",
 	initialLabel: t('tools.add.label'),
-	execute: async (context: ToolExecutionContext<AddTodoToolInput>): Promise<void> => {
+	execute: async (context: ToolExecutionContext<TaskAddToolInput>): Promise<void> => {
 		const { plugin, params } = context;
 		const { todos, path, position, reference_todo_text } = params;
 

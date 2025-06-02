@@ -12,7 +12,7 @@ import { t } from "../i18n";
 
 
 const schema = {
-  name: "check_todo",
+  name: "task_check",
   description: "Marks one or more to-do items as completed in the specified file (defaults to today's daily note)",
   input_schema: {
     type: "object",
@@ -48,7 +48,7 @@ const schema = {
   }
 };
 
-type CheckTodoToolInput = {
+type TaskCheckToolInput = {
   todos: Array<{
     todo_text: string;
     comment?: string;
@@ -57,11 +57,11 @@ type CheckTodoToolInput = {
   time?: string;
 }
 
-export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
+export const taskCheckTool: ObsidianTool<TaskCheckToolInput> = {
   specification: schema,
   icon: "check-circle",
   initialLabel: t('tools.check.label'),
-  execute: async (context: ToolExecutionContext<CheckTodoToolInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<TaskCheckToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos, time } = params;
     

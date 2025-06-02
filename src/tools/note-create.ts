@@ -6,7 +6,7 @@ import { ToolExecutionContext } from "../utils/chat/types";
 import { t } from "../i18n";
 
 const schema = {
-  name: "create_document",
+  name: "note_create",
   description: "Creates a new document in the vault at the specified path with the provided content. Will throw an error if a document already exists at the specified path.",
   input_schema: {
     type: "object",
@@ -24,16 +24,16 @@ const schema = {
   }
 };
 
-type CreateDocumentToolInput = {
+type NoteCreateToolInput = {
   path: string,
   content: string
 }
 
-export const createDocumentTool: ObsidianTool<CreateDocumentToolInput> = {
+export const noteCreateTool: ObsidianTool<NoteCreateToolInput> = {
   specification: schema,
   icon: "file-plus",
   initialLabel: t('tools.actions.createDocument.default', { path: '' }),
-  execute: async (context: ToolExecutionContext<CreateDocumentToolInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<NoteCreateToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { path, content } = params;
     const documentContent = content || ''; // Default to empty string if content is undefined

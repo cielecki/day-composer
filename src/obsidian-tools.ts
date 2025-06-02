@@ -1,19 +1,19 @@
 import type { LifeNavigatorPlugin } from './LifeNavigatorPlugin';
-import { createDocumentTool } from "./tools/create-document";
-import { searchVaultTool } from "./tools/search-vault";
-import { readDocumentTool } from "./tools/read-document";
-import { appendToDocumentTool } from "./tools/append-to-document";
-import { checkTodoTool } from "./tools/check-todo";
-import { addTodoTool } from "./tools/add-todo";
-import { uncheckTodoTool } from "./tools/uncheck-todo";
-import { moveTodoTool } from "./tools/move-todo";
-import { abandonTodoTool } from "./tools/abandon-todo";
-import { createCompletedTodoTool } from "./tools/create-completed-todo";
-import { handoverModeTool } from "./tools/handover-mode";
-import { editTodoTool } from "./tools/edit-todo";
-import { removeTodoTool } from "./tools/remove-todo";
-import { listDirectoryTool } from "./tools/list-directory";
-import { findFilesByTagTool } from "./tools/find-files-by-tag";
+import { noteCreateTool } from "./tools/note-create";
+import { vaultSearchTool } from "./tools/vault-search";
+import { noteReadTool } from "./tools/note-read";
+import { noteAppendToTool } from "./tools/note-append-to";
+import { taskCheckTool } from "./tools/task-check";
+import { taskAddTool } from "./tools/task-add";
+import { taskUncheckTool } from "./tools/task-uncheck";
+import { taskMoveTool } from "./tools/task-move";
+import { taskAbandonTool } from "./tools/task-abandon";
+import { taskCreateCompletedTool } from "./tools/task-create-completed";
+import { modeHandoverTool } from "./tools/mode-handover";
+import { taskEditTool } from "./tools/task-edit";
+import { taskRemoveTool } from "./tools/task-remove";
+import { vaultListDirectoryTool } from "./tools/vault-list-directory";
+import { vaultFindFilesByTagTool } from "./tools/vault-find-files-by-tag";
 import { ToolExecutionError } from "./utils/tools/tool-execution-error";
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tool-filter";
@@ -69,22 +69,21 @@ export class ObsidianTools {
 	private plugin: LifeNavigatorPlugin;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private tools: ObsidianTool<any>[] = [
-		createDocumentTool,
-		searchVaultTool,
-		listDirectoryTool,
-		findFilesByTagTool,
-		readDocumentTool,
-		appendToDocumentTool,
-		checkTodoTool,
-		addTodoTool,
-		uncheckTodoTool,
-		moveTodoTool,
-		abandonTodoTool,
-		createCompletedTodoTool,
-		//Disabled for now: showTodosTool,
-		handoverModeTool,
-		editTodoTool,
-		removeTodoTool,
+		noteCreateTool,
+		vaultSearchTool,
+		vaultListDirectoryTool,
+		vaultFindFilesByTagTool,
+		noteReadTool,
+		noteAppendToTool,
+		taskCheckTool,
+		taskAddTool,
+		taskUncheckTool,
+		taskMoveTool,
+		taskAbandonTool,
+		taskCreateCompletedTool,
+		modeHandoverTool,
+		taskEditTool,
+		taskRemoveTool,
 	];
 
 	constructor(plugin: LifeNavigatorPlugin) {

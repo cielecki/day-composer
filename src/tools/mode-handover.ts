@@ -7,7 +7,7 @@ type HandoverModeToolInput = {
 	mode_id: string;
 };
 
-export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
+export const modeHandoverTool: ObsidianTool<HandoverModeToolInput> = {
 	get specification() {
 		// Dynamically generate specification with current available modes
 		let availableModes: string[] = [];
@@ -31,7 +31,7 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 		}
 
 		return {
-			name: "handover_mode",
+			name: "mode_handover",
 			description: "Hand over the conversation to a different AI mode that is better suited to handle the current task or context. Use this when you recognize that another mode's specialized capabilities, personality, or context would be more appropriate for the user's needs.",
 			input_schema: {
 				type: "object",

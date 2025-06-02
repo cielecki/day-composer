@@ -9,7 +9,7 @@ import { calculateLineNumberForNode, createNavigationTarget } from "../utils/too
 import { t } from "../i18n";
 
 const schema = {
-  name: "remove_todo",
+  name: "task_remove",
   description: "Removes one or more to-do items by converting them to comment blocks indicating they have been removed",
   input_schema: {
     type: "object",
@@ -41,16 +41,16 @@ type TodoItem = {
   todo_text: string;
 };
 
-type RemoveTodoToolInput = {
+type TaskRemoveToolInput = {
   todos: TodoItem[];
   file_path?: string;
 };
 
-export const removeTodoTool: ObsidianTool<RemoveTodoToolInput> = {
+export const taskRemoveTool: ObsidianTool<TaskRemoveToolInput> = {
   specification: schema,
   icon: "trash-2",
   initialLabel: t('tools.remove.label'),
-  execute: async (context: ToolExecutionContext<RemoveTodoToolInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<TaskRemoveToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos } = params;
     

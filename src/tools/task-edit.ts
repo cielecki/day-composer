@@ -9,7 +9,7 @@ import { createNavigationTargetsForTasks } from "../utils/tools/line-number-util
 import { t } from "../i18n";
 
 const schema = {
-  name: "edit_todo",
+  name: "task_edit",
   description: "Edits an existing to-do item by replacing it with updated information (text, status, comment)",
   input_schema: {
     type: "object",
@@ -40,7 +40,7 @@ const schema = {
   }
 };
 
-type EditTodoToolInput = {
+type TaskEditToolInput = {
   original_todo_text: string;
   replacement_todo_text: string;
   replacement_status?: "pending" | "completed" | "abandoned" | "moved";
@@ -48,11 +48,11 @@ type EditTodoToolInput = {
   file_path?: string;
 };
 
-export const editTodoTool: ObsidianTool<EditTodoToolInput> = {
+export const taskEditTool: ObsidianTool<TaskEditToolInput> = {
   specification: schema,
   icon: "edit",
   initialLabel: t('tools.edit.label'),
-  execute: async (context: ToolExecutionContext<EditTodoToolInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<TaskEditToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { original_todo_text } = params;
     

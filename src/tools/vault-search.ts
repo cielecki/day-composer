@@ -4,7 +4,7 @@ import { ToolExecutionContext } from "../utils/chat/types";
 import { t } from "../i18n";
 
 const schema = {
-  name: "search_vault",
+  name: "vault_search",
   description: "Searches for documents in the vault matching the provided fuzzy query",
   input_schema: {
     type: "object",
@@ -18,15 +18,15 @@ const schema = {
   }
 };
 
-type SearchVaultToolInput = {
+type VaultSearchToolInput = {
   query: string
 }
 
-export const searchVaultTool: ObsidianTool<SearchVaultToolInput> = {
+export const vaultSearchTool: ObsidianTool<VaultSearchToolInput> = {
   specification: schema,
   icon: "search",
   initialLabel: t('tools.search.label'),
-  execute: async (context: ToolExecutionContext<SearchVaultToolInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<VaultSearchToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { query } = params;
 
