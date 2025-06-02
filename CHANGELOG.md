@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Audio Pause/Resume and Caching**: Enhanced audio controls with true pause/resume functionality and intelligent caching. Audio can be paused and resumed from the exact same position, not just stopped and restarted. Generated audio is cached within components for instant playback on repeated requests, improving performance and reducing API calls. Separate play/pause and stop buttons provide better control over audio playback. Cache uses legacy TTS for reliable audio generation and consistent results. Stop button remains active when audio is paused and resets everything back to the initial state (speaker icon ready to start from beginning). Fixed race condition where stopping audio generation would still play audio when generation completed in background. Main input area properly shows stop button when audio is paused instead of send button.
+
 ### Fixed
 - **Mobile Highlighting & Scroll Positioning**: Enhanced text highlighting system for mobile devices, especially iOS. Replaced unreliable selection-based highlighting with robust CodeMirror decorations, added mobile-specific CSS with hardware acceleration, implemented iOS-specific focus handling, added visual pulse animation for better visibility on touch devices, and **fixed scroll positioning to ensure highlighted text appears properly on screen**. The system now uses proper `EditorView.scrollIntoView()` with device-optimized positioning (top positioning on mobile, center on desktop) and includes fallback visibility checks.
 - **Polish Translation Completeness**: Fixed missing Polish translations for task unchecking and other tool actions. All tool action text (create completed todo, handover mode, read document, abandon todo, add todo) now properly displays in Polish instead of showing English text when Polish is selected as the language.

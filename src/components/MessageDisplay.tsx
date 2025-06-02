@@ -44,7 +44,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   abort,
 }) => {
   const { editUserMessage, startEditingMessage } = useAIAgent();
-  const { speakText, isPlayingAudio, isGeneratingSpeech, stopAudio } = useTextToSpeech();
+  const { speakText, isPlayingAudio, isGeneratingSpeech, stopAudio, isPaused, pauseAudio, resumeAudio } = useTextToSpeech();
   const { isRecording } = useSpeechToText();
   const [copyIcon, setCopyIcon] = useState('copy');
 
@@ -76,7 +76,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
     }
   };
 
-  // Handle speak message
+  // Handle speak message with pause/resume functionality
   const handleSpeakMessage = () => {
     if (role === 'assistant') {
       // Don't allow TTS if recording is active
@@ -85,16 +85,31 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
         return;
       }
       
-      if (isPlayingAudio) {
-        // If audio is already playing, stop it
+      if (isPaused) {
+        // If audio is paused, resume it
+        resumeAudio();
+      } else if (isPlayingAudio) {
+        // If audio is playing, pause it
+        pauseAudio();
+      } else if (isGeneratingSpeech) {
+        // If speech is generating, stop it
         stopAudio();
       } else {
         // Otherwise start playing the text
         const textToSpeak = getPlainTextContent(contentBlocksToRender);
         if (textToSpeak) {
-          speakText(textToSpeak, new AbortController().signal, true);
+          // Pass a dummy abort signal since TTS context creates its own controller internally
+          const dummyController = new AbortController();
+          speakText(textToSpeak, dummyController.signal, true);
         }
       }
+    }
+  };
+
+  // Handle stop message (separate from pause)
+  const handleStopMessage = () => {
+    if (role === 'assistant') {
+      stopAudio();
     }
   };
 
@@ -253,28 +268,47 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
               {role === 'assistant' && (
                 <>
                   {hasTextContent && (
-                    <button 
-                      className={`clickable-icon ${isPlayingAudio ? 'playing' : isGeneratingSpeech ? 'generating' : ''} ${isRecording ? 'disabled' : ''}`}
-                      onClick={handleSpeakMessage}
-                      disabled={isRecording}
-                      aria-label={
-                        isRecording
-                          ? t('ui.message.recordingInProgress')
-                          : isPlayingAudio 
-                            ? t('ui.message.stopSpeech') 
-                            : isGeneratingSpeech 
-                              ? t('ui.message.generatingSpeech') 
-                              : t('ui.message.speak')
-                      }
-                    >
-                      {isPlayingAudio ? (
-                        <LucideIcon name="circle-stop" size={18} />
-                      ) : isGeneratingSpeech ? (
-                        <LucideIcon name="loader" size={18} />
-                      ) : (
-                        <LucideIcon name="volume-2" size={18} />
+                    <>
+                      {/* Play/Pause button */}
+                      <button 
+                        className={`clickable-icon ${isPaused ? 'paused' : isPlayingAudio ? 'playing' : isGeneratingSpeech ? 'generating' : ''} ${isRecording ? 'disabled' : ''}`}
+                        onClick={handleSpeakMessage}
+                        disabled={isRecording}
+                        aria-label={
+                          isRecording
+                            ? t('ui.message.recordingInProgress')
+                            : isPaused
+                              ? t('ui.message.resumeAudio')
+                              : isPlayingAudio 
+                                ? t('ui.message.pauseAudio') 
+                                : isGeneratingSpeech 
+                                  ? t('ui.message.generatingSpeech') 
+                                  : t('ui.message.speak')
+                        }
+                      >
+                        {isGeneratingSpeech ? (
+                          <LucideIcon name="loader" size={18} />
+                        ) : isPaused ? (
+                          <LucideIcon name="play" size={18} />
+                        ) : isPlayingAudio ? (
+                          <LucideIcon name="pause" size={18} />
+                        ) : (
+                          <LucideIcon name="volume-2" size={18} />
+                        )}
+                      </button>
+                      
+                      {/* Stop button - only show when audio is playing, paused, or generating */}
+                      {(isPlayingAudio || isPaused || isGeneratingSpeech) && (
+                        <button 
+                          className="clickable-icon stop-button"
+                          onClick={handleStopMessage}
+                          disabled={isRecording}
+                          aria-label={t('ui.message.stopAudio')}
+                        >
+                          <LucideIcon name="square" size={18} />
+                        </button>
                       )}
-                    </button>
+                    </>
                   )}
                   {hasTextContent && (
                     <button 

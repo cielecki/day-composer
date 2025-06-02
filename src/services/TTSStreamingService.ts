@@ -132,6 +132,21 @@ export class TTSStreamingService {
         this.reset();
     }
 
+    pauseStreaming(): void {
+        if (this.currentAudio && !this.currentAudio.paused) {
+            this.currentAudio.pause();
+            // Keep isStreaming true so we can resume
+        }
+    }
+
+    resumeStreaming(): void {
+        if (this.currentAudio && this.currentAudio.paused) {
+            this.currentAudio.play().catch(error => {
+                this.onError?.(`Resume playback failed: ${error.message}`);
+            });
+        }
+    }
+
     private reset(): void {
         this.chunks = [];
         this.audioQueue = [];

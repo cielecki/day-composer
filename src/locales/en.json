@@ -13,7 +13,6 @@
   },
   "errors": {
     "audio": {
-      "noData": "No audio stream received from API.",
       "playbackError": "Error playing audio: {{error}}"
     },
     "chat": {
@@ -393,9 +392,11 @@
       "edit": "Edit message",
       "editing": "Editing message",
       "generatingSpeech": "Generating speech",
+      "pauseAudio": "Pause audio",
       "recordingInProgress": "Recording in progress",
+      "resumeAudio": "Resume audio",
       "speak": "Read aloud",
-      "stopSpeech": "Stop speech"
+      "stopAudio": "Stop audio"
     },
     "modal": {
       "copied": "Copied!",

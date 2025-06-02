@@ -29,7 +29,7 @@ export const UnifiedInputArea: React.FC<{
     finalizeRecording,
     cancelTranscription,
   } = useSpeechToText();
-  const { isPlayingAudio, isGeneratingSpeech, stopAudio } = useTextToSpeech();
+  const { isPlayingAudio, isGeneratingSpeech, stopAudio, isPaused } = useTextToSpeech();
 
   // Input state
   const [message, setMessage] = useState("");
@@ -776,7 +776,7 @@ export const UnifiedInputArea: React.FC<{
               )}
 
               {/* Stop button - visible for generation, audio playback, and transcription (but NOT basic recording) */}
-              {(isGeneratingResponse || isPlayingAudio || isGeneratingSpeech) && !isRecording && (
+              {(isGeneratingResponse || isPlayingAudio || isGeneratingSpeech || isPaused) && !isRecording && (
                 <button
                   className="input-control-button stop-button"
                   onClick={handleStopAll}
@@ -796,7 +796,7 @@ export const UnifiedInputArea: React.FC<{
               )}
 
               {/* Send button - visible when not recording, AND nothing is being generated */}
-              {!isTranscribing && !isRecording && !(isGeneratingResponse || isPlayingAudio || isGeneratingSpeech) && (
+              {!isTranscribing && !isRecording && !(isGeneratingResponse || isPlayingAudio || isGeneratingSpeech || isPaused) && (
                 <button
                   className="input-control-button send-button"
                   onClick={handleSendMessage}

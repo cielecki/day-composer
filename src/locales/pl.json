@@ -13,7 +13,6 @@
   },
   "errors": {
     "audio": {
-      "noData": "Nie otrzymano danych audio. Spróbuj ponownie.",
       "playbackError": "Błąd odtwarzania audio: {{error}}"
     },
     "chat": {
@@ -391,11 +390,13 @@
       "attachedImage": "Załączony obraz",
       "copy": "Kopiuj wiadomość",
       "edit": "Edytuj wiadomość",
-      "editing": "Edytowanie wiadomości",
+      "editing": "Edycja wiadomości",
       "generatingSpeech": "Generowanie mowy",
+      "pauseAudio": "Zatrzymaj audio",
       "recordingInProgress": "Nagrywanie w toku",
+      "resumeAudio": "Wznów audio",
       "speak": "Przeczytaj na głos",
-      "stopSpeech": "Zatrzymaj odtwarzanie"
+      "stopAudio": "Zatrzymaj audio"
     },
     "modal": {
       "copied": "Skopiowano!",
