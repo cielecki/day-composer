@@ -1,14 +1,14 @@
-import MyPlugin from '../main';
-import { App, PluginSettingTab, Setting, Notice, Modal } from 'obsidian';
-import { getPluginSettings } from "./PluginSettings";
+import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
+import { App, PluginSettingTab, Setting, Notice, Modal, getIcon } from 'obsidian';
+import { getPluginSettings } from "./LifeNavigatorSettings";
 import { t } from '../i18n';
 
-export class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+export class LifeNavigatorSettingTab extends PluginSettingTab {
+	plugin: LifeNavigatorPlugin;
 	userToolsContainer: HTMLElement;
 	secretsContainer: HTMLElement;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: LifeNavigatorPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -68,7 +68,7 @@ export class SampleSettingTab extends PluginSettingTab {
 				.setButtonText(t('settings.actions.createStarterKit.button'))
 				.onClick(async () => {
 					// Get current plugin instance
-					const plugin = (this.app as any).plugins.plugins['life-navigator'] as MyPlugin;
+					const plugin = (this.app as any).plugins.plugins['life-navigator'] as LifeNavigatorPlugin;
 					if (plugin) {
 						button.setDisabled(true);
 						button.setButtonText(t('ui.setup.saving'));
@@ -258,30 +258,107 @@ export class SampleSettingTab extends PluginSettingTab {
 				const confirmed = confirm(t('settings.secrets.list.confirmDelete', { key }));
 				if (confirmed) {
 					settings.removeSecret(key);
+					
+					// Reset tutorial state if relevant API keys are deleted
+					if (key === 'OPENAI_API_KEY') {
+						settings.tutorial.openaiKeyConfigured = false;
+					}
+					// If Anthropic key is deleted and OpenAI key doesn't exist,
+					// reset OpenAI configured state too
+					if (key === 'ANTHROPIC_API_KEY') {
+						const hasOpenAIKey = Boolean(settings.getSecret('OPENAI_API_KEY') && settings.getSecret('OPENAI_API_KEY')!.trim().length > 0);
+						if (!hasOpenAIKey) {
+							settings.tutorial.openaiKeyConfigured = false;
+						}
+					}
+					
 					await settings.saveSettings();
 					await this.refreshSecretsDisplay();
 					new Notice(t('settings.secrets.list.deleted', { key }));
+					
+					// Dispatch event to notify setup flow of tutorial state change
+					window.dispatchEvent(new CustomEvent('life-navigator-tutorial-state-changed'));
 				}
 			});
 		}
 	}
 
 	showAddSecretDialog(): void {
-		const modal = new AddSecretModal(this.app, (key, value) => {
+		const modal = new AddSecretModal(this.app, async (key, value) => {
 			const settings = getPluginSettings();
 			settings.setSecret(key, value);
-			settings.saveSettings();
-			this.refreshSecretsDisplay();
+			
+			// Update tutorial state if relevant API keys are configured
+			if (key === 'OPENAI_API_KEY') {
+				if (value.trim().length > 0) {
+					settings.tutorial.openaiKeyConfigured = true;
+				} else {
+					settings.tutorial.openaiKeyConfigured = false;
+				}
+			}
+			if (key === 'ANTHROPIC_API_KEY') {
+				if (value.trim().length > 0) {
+					// If Anthropic key is set and we don't have OpenAI key, 
+					// we should proceed past the OpenAI step
+					const hasOpenAIKey = Boolean(settings.getSecret('OPENAI_API_KEY') && settings.getSecret('OPENAI_API_KEY')!.trim().length > 0);
+					if (!hasOpenAIKey) {
+						settings.tutorial.openaiKeyConfigured = true;
+					}
+				} else {
+					// If Anthropic key is empty and OpenAI key doesn't exist,
+					// reset OpenAI configured state too
+					const hasOpenAIKey = Boolean(settings.getSecret('OPENAI_API_KEY') && settings.getSecret('OPENAI_API_KEY')!.trim().length > 0);
+					if (!hasOpenAIKey) {
+						settings.tutorial.openaiKeyConfigured = false;
+					}
+				}
+			}
+			
+			await settings.saveSettings();
+			await this.refreshSecretsDisplay();
+			
+			// Dispatch event to notify setup flow of tutorial state change
+			window.dispatchEvent(new CustomEvent('life-navigator-tutorial-state-changed'));
 		});
 		modal.open();
 	}
 
 	showEditSecretDialog(key: string, currentValue: string): void {
-		const modal = new EditSecretModal(this.app, key, currentValue, (value) => {
+		const modal = new EditSecretModal(this.app, key, currentValue, async (value) => {
 			const settings = getPluginSettings();
 			settings.setSecret(key, value);
-			settings.saveSettings();
-			this.refreshSecretsDisplay();
+			
+			// Update tutorial state if relevant API keys are configured
+			if (key === 'OPENAI_API_KEY') {
+				if (value.trim().length > 0) {
+					settings.tutorial.openaiKeyConfigured = true;
+				} else {
+					settings.tutorial.openaiKeyConfigured = false;
+				}
+			}
+			if (key === 'ANTHROPIC_API_KEY') {
+				if (value.trim().length > 0) {
+					// If Anthropic key is set and we don't have OpenAI key, 
+					// we should proceed past the OpenAI step
+					const hasOpenAIKey = Boolean(settings.getSecret('OPENAI_API_KEY') && settings.getSecret('OPENAI_API_KEY')!.trim().length > 0);
+					if (!hasOpenAIKey) {
+						settings.tutorial.openaiKeyConfigured = true;
+					}
+				} else {
+					// If Anthropic key is cleared and OpenAI key doesn't exist,
+					// reset OpenAI configured state too
+					const hasOpenAIKey = Boolean(settings.getSecret('OPENAI_API_KEY') && settings.getSecret('OPENAI_API_KEY')!.trim().length > 0);
+					if (!hasOpenAIKey) {
+						settings.tutorial.openaiKeyConfigured = false;
+					}
+				}
+			}
+			
+			await settings.saveSettings();
+			await this.refreshSecretsDisplay();
+			
+			// Dispatch event to notify setup flow of tutorial state change
+			window.dispatchEvent(new CustomEvent('life-navigator-tutorial-state-changed'));
 		});
 		modal.open();
 	}
@@ -325,49 +402,58 @@ export class SampleSettingTab extends PluginSettingTab {
 
 			// Tool header with icon and name
 			const toolHeader = toolContainer.createEl('div', {
-				attr: { style: 'display: flex; flex-grow: 1; align-items: center; justify-content: space-between; margin-bottom: 8px;' }
+				attr: { style: 'display: flex; flex-grow: 1; align-items: center; justify-content: space-between;' }
 			});
 
 			const toolInfo = toolHeader.createEl('div', {
+				attr: { 
+					style: 'display: flex; flex-direction: column; gap: 4px; cursor: pointer; width: 100%;', 
+					title: t('settings.userTools.list.tooltips.clickToOpen') 
+				}
+			});
+
+			// First row: icon + tool name
+			const titleRowEl = toolInfo.createEl('div', {
 				attr: { style: 'display: flex; align-items: center; gap: 8px;' }
 			});
 
-			// Tool icon (using CSS icons or emoji fallback)
-			const iconEl = toolInfo.createEl('span', {
-				text: '🔧', // fallback
+			// Tool icon (using Obsidian's getIcon function)
+			const iconEl = titleRowEl.createEl('span', {
 				attr: { 
-					style: `font-size: 16px; ${tool.iconColor ? `color: ${tool.iconColor};` : ''}`,
+					style: `display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; flex-shrink: 0;`,
 					title: `Icon: ${tool.icon}`
 				}
 			});
 
-			// Try to use Lucide icon if available
-			if (tool.icon && tool.icon !== 'gear') {
-				iconEl.textContent = '';
-				iconEl.addClass(`lucide-${tool.icon}`);
+			// Use Obsidian's getIcon function for proper icon rendering
+			if (tool.icon) {
+				const iconSvg = getIcon(tool.icon);
+				if (iconSvg) {
+					iconEl.appendChild(iconSvg);
+				} else {
+					// Fallback to emoji if icon not found
+					iconEl.textContent = '🔧';
+				}
+			} else {
+				iconEl.textContent = '🔧';
 			}
 
-			// Tool name and description (clickable to open file)
-			const nameEl = toolInfo.createEl('div', {
-				attr: { 
-					style: 'cursor: pointer;',
-					title: t('settings.userTools.list.tooltips.clickToOpen')
-				}
-			});
-			nameEl.createEl('strong', { 
+			// Tool name
+			titleRowEl.createEl('strong', { 
 				text: tool.name,
-				attr: { style: 'color: var(--interactive-accent);' }
 			});
+
+			// Tool description (separate row, aligned with icon)
 			if (tool.description) {
-				nameEl.createEl('div', { 
+				toolInfo.createEl('div', { 
 					text: tool.description,
 					cls: 'setting-item-description',
 					attr: { style: 'color: var(--text-muted);' }
 				});
 			}
 
-			// Make name/description clickable to open file
-			nameEl.addEventListener('click', async () => {
+			// Make entire tool info section clickable to open file
+			toolInfo.addEventListener('click', async () => {
 				try {
 					// Close the settings modal first
 					const settingsModal = document.querySelector('.modal-container');
@@ -408,7 +494,7 @@ export class SampleSettingTab extends PluginSettingTab {
 				attr: { 
 					style: `padding: 4px 8px; font-size: 12px; ${
 						status.approved && !status.codeChanged ? 
-						'background: var(--color-red); color: white;' : 
+						'background: var(--background-secondary); color: var(--text-normal);' : 
 						'background: var(--interactive-accent); color: white;'
 					}`
 				}
@@ -436,9 +522,9 @@ export class SampleSettingTab extends PluginSettingTab {
 }
 
 class AddSecretModal extends Modal {
-	private onResult: (key: string, value: string) => void;
+	private onResult: (key: string, value: string) => Promise<void>;
 
-	constructor(app: App, onResult: (key: string, value: string) => void) {
+	constructor(app: App, onResult: (key: string, value: string) => Promise<void>) {
 		super(app);
 		this.onResult = onResult;
 	}
@@ -491,8 +577,13 @@ class AddSecretModal extends Modal {
 				if (!confirmed) return;
 			}
 
-			this.onResult(key, value);
-			this.close();
+			try {
+				await this.onResult(key, value);
+				this.close();
+			} catch (error) {
+				console.error('Error saving secret:', error);
+				new Notice('Error saving secret');
+			}
 		};
 
 		// Focus the first input
@@ -517,9 +608,9 @@ class AddSecretModal extends Modal {
 class EditSecretModal extends Modal {
 	private key: string;
 	private currentValue: string;
-	private onResult: (value: string) => void;
+	private onResult: (value: string) => Promise<void>;
 
-	constructor(app: App, key: string, currentValue: string, onResult: (value: string) => void) {
+	constructor(app: App, key: string, currentValue: string, onResult: (value: string) => Promise<void>) {
 		super(app);
 		this.key = key;
 		this.currentValue = currentValue;
@@ -553,8 +644,13 @@ class EditSecretModal extends Modal {
 		const saveBtn = buttonsEl.createEl('button', { text: t('settings.secrets.dialog.save') });
 		saveBtn.className = 'mod-cta';
 		saveBtn.onclick = async () => {
-			this.onResult(valueInput.value);
-			this.close();
+			try {
+				await this.onResult(valueInput.value);
+				this.close();
+			} catch (error) {
+				console.error('Error saving secret:', error);
+				new Notice('Error saving secret');
+			}
 		};
 
 		// Focus and select the input

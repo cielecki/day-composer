@@ -1,5 +1,4 @@
-import MyPlugin from "../../main";
-import { App, TFile } from "obsidian";
+import { LifeNavigatorPlugin } from '../../LifeNavigatorPlugin';
 import { fileExists } from "../fs/file-exists";
 import { getFile } from "../fs/get-file";
 import { modifyFile } from "../fs/modify-file";
@@ -88,7 +87,7 @@ export async function readNote({
 	plugin,
 	filePath,
 }: {
-	plugin: MyPlugin;
+	plugin: LifeNavigatorPlugin;
 	filePath: string;
 }): Promise<Note> {
 	const exists = await fileExists(filePath, plugin.app);
@@ -124,7 +123,7 @@ export async function updateNote({
 	filePath,
 	updatedNote,
 }: {
-	plugin: MyPlugin;
+	plugin: LifeNavigatorPlugin;
 	filePath: string;
 	updatedNote: Note;
 }) {

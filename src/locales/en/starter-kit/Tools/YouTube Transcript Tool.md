@@ -1,10 +1,8 @@
 ---
 tags: ["ln-tool"]
-ln-tool-name: "YouTube Transcript Download"
-ln-tool-description: "Downloads transcript from YouTube videos without using npm packages"
+ln-tool-description: "Download transcripts from YouTube videos"
 ln-tool-version: "1.0.0"
 ln-tool-icon: "youtube"
-ln-tool-icon-color: "#ff0000"
 ln-tool-enabled: true
 ---
 

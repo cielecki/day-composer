@@ -1,190 +1,166 @@
 ---
 tags: ["ln-tool"]
-ln-tool-name: "Template Tool"
 ln-tool-description: "A basic template for creating your own custom tools"
 ln-tool-version: "1.0.0"
 ln-tool-icon: "wrench"
-ln-tool-icon-color: "#6B7280"
 ln-tool-enabled: true
 ---
 
 # Template Tool
 
-This is a basic template for creating user-defined tools. Copy this file and modify it to create your own custom tools!
+This is a basic template for creating user-defined tools. Copy this file and modify it to create your own custom tools for Life Navigator.
 
-## Schema
+## How to Use This Template
+
+### 1. Copy and Rename
+- Copy this file to create a new tool
+- Give it a descriptive name that reflects its purpose
+- Place it anywhere in your vault (it will be automatically discovered)
+
+### 2. Update the Frontmatter
+Required fields in the YAML frontmatter:
+- **`tags`**: Must include `["ln-tool"]` for the tool to be discovered
+- **`ln-tool-name`**: The display name for your tool
+- **`ln-tool-description`**: Brief description of what the tool does  
+- **`ln-tool-version`**: Version number (increment when making changes)
+- **`ln-tool-enabled`**: Set to `true` to enable the tool
+
+Optional customization:
+- **`ln-tool-icon`**: Choose from [Lucide icons](https://lucide.dev/)
+
+### 2. Modify the Schema
+- **Add parameters**: Define what inputs your tool needs
+- **Set types**: `string`, `number`, `boolean`, `array`, `object`
+- **Add descriptions**: Help the AI understand when and how to use each parameter
+- **Set required fields**: Mark which parameters are mandatory
+
+### 3. Write the JavaScript Code  
+- **Use the `execute` function**: This is called when the tool runs
+- **Access inputs via `input`**: Get the parameters passed by the AI
+- **Use `progress()` for updates**: Show progress messages in the chat
+- **Use `setLabel()` for status**: Update the tool's display text
+- **Use `addNavigationTarget()` for links**: Create clickable links in the chat
+- **Access Obsidian APIs via `plugin.app`**: Full access to vault, files, etc.
+
+### 4. Test Your Tool
+1. Save the file
+2. Go to Life Navigator settings
+3. Find your tool in the User-Defined Tools section  
+4. Click "Approve" to enable it
+5. Test it in conversation with your AI assistant
+
+## Tool Template Schema
 
 ```json
 {
   "name": "template_tool",
-  "description": "A basic template for a user-defined tool",
+  "description": "A template tool that demonstrates basic functionality",
   "input_schema": {
     "type": "object",
     "properties": {
-      "title": {
-        "type": "string",
-        "description": "Title for the created note"
-      },
-      "content": {
+      "message": {
         "type": "string", 
-        "description": "Content to include in the note"
+        "description": "A message to display"
       },
-      "tags": {
-        "type": "array",
-        "description": "Optional tags to add to the note",
-        "items": {
-          "type": "string"
-        }
+      "count": {
+        "type": "number",
+        "description": "Number of times to repeat the message"
       }
     },
-    "required": ["title"]
+    "required": ["message"]
   }
 }
 ```
 
-## Implementation
+## Tool Implementation
 
 ```javascript
-async function execute(context) {
-  const { params, plugin, progress, addNavigationTarget, setLabel } = context;
-  
-  // Helper function for Unicode normalization (reusable across tools)
-  function normalizeUnicode(text) {
-    return text
-      .normalize('NFKD') // Decompose characters into base + diacritics
-      .replace(/[\u0300-\u036f]/g, ''); // Remove combining diacritical marks
-  }
-  
+async function execute(input, { progress, setLabel, addNavigationTarget, plugin }) {
   try {
-    // Set initial status
-    setLabel("Starting template tool...");
-    progress("Processing your request...");
+    // Update the tool label to show it's running
+    setLabel("Running template tool...");
     
-    // Extract parameters
-    const { title, content = "", tags = [] } = params;
+    // Show initial progress
+    progress("Starting template tool execution");
     
-    // Validate required parameters
-    if (!title || title.trim() === "") {
-      throw new Error('Title is required');
+    // Get input parameters with defaults
+    const message = input.message || "Hello from template tool!";
+    const count = input.count || 1;
+    
+    // Simulate some work with progress updates
+    for (let i = 1; i <= count; i++) {
+      progress(`Processing iteration ${i} of ${count}`);
+      
+      // Create a simple note with the message
+      const fileName = `Template Output ${i} - ${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.md`;
+      const content = `# Template Tool Output\n\nMessage: ${message}\nIteration: ${i}\nGenerated: ${new Date().toLocaleString()}`;
+      
+      // Create the file
+      await plugin.app.vault.create(fileName, content);
+      
+      // Add navigation target so user can click to open the file
+      addNavigationTarget({
+        type: 'file',
+        path: fileName,
+        label: `Open ${fileName}`
+      });
+      
+      // Small delay to show progress
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
     
-    setLabel("Creating note...");
-    progress(`Creating note: ${title}`);
-    
-    // Build note content
-    let noteContent = `# ${title}\n\n`;
-    
-    // Add creation timestamp
-    noteContent += `**Created:** ${new Date().toLocaleString()}\n`;
-    
-    // Add tags if provided
-    if (tags.length > 0) {
-      noteContent += `**Tags:** ${tags.map(tag => `#${tag}`).join(' ')}\n`;
-    }
-    
-    noteContent += `\n---\n\n`;
-    
-    // Add main content
-    if (content) {
-      noteContent += `${content}\n\n`;
-    } else {
-      noteContent += `*Add your content here...*\n\n`;
-    }
-    
-    // Add footer
-    noteContent += `---\n*Generated by Template Tool*`;
-    
-    // Generate filename using proper Unicode normalization
-    const sanitizedTitle = normalizeUnicode(title).replace(/[^a-zA-Z0-9 ]/g, '').trim();
-    const timestamp = new Date().toISOString().split('T')[0];
-    const filename = `${sanitizedTitle} - ${timestamp}.md`;
-    
-    // Create the file
-    await plugin.app.vault.create(filename, noteContent);
-    
-    // Add navigation target to open the created file
-    addNavigationTarget({
-      filePath: filename,
-      description: `Open created note: ${title}`
-    });
-    
-    // Success status
-    setLabel("Template tool completed");
-    progress(`Successfully created note: ${filename}`);
+    // Update final status
+    setLabel(`Template tool completed (${count} files created)`);
+    progress(`✅ Template tool finished successfully! Created ${count} file(s).`);
     
   } catch (error) {
+    progress(`❌ Error: ${error.message}`);
     setLabel("Template tool failed");
-    progress(`Error: ${error.message}`);
     throw error;
   }
 }
 ```
 
-## How to Customize This Template
+## Key Concepts
 
-### 1. Change the Frontmatter
-- **`ln-tool-name`**: Your tool's display name
-- **`ln-tool-description`**: What your tool does
-- **`ln-tool-icon`**: Choose from [Lucide icons](https://lucide.dev/)
-- **`ln-tool-icon-color`**: Any hex color code
+### Tool Discovery
+Tools are automatically discovered by scanning for files with the `ln-tool` tag in their frontmatter. No manual registration required.
 
-### 2. Modify the Schema
-- **Add parameters**: Define what inputs your tool needs
-- **Set types**: `string`, `number`, `boolean`, `array`, `object`
-- **Add validation**: `required`, `minLength`, `enum`, etc.
-- **Write descriptions**: Help the AI understand each parameter
+### Security Model
+All tools must be explicitly approved before they can execute. This prevents malicious code from running automatically.
 
-### 3. Update the Implementation
-- **Change the logic**: Replace the note creation with your functionality
-- **Add API calls**: Use `fetch()` for external services
-- **File operations**: Create, read, modify files in your vault
-- **Error handling**: Add try/catch blocks for robust execution
+### Parameter Validation
+The JSON schema automatically validates inputs from the AI, ensuring your tool receives the expected data types.
 
-## Common Tool Patterns
+### Progress Reporting
+Use `progress()` to provide real-time updates that appear in the chat, helping users understand what the tool is doing.
 
-### File Creator Tools
-```javascript
-// Create different types of files
-await plugin.app.vault.create(filename, content);
-```
+### Navigation Integration
+Use `addNavigationTarget()` to create clickable links that can open files, navigate to specific locations, or trigger other actions.
 
-### Data Processing Tools
-```javascript
-// Read and process existing files
-const file = plugin.app.vault.getAbstractFileByPath(path);
-const content = await plugin.app.vault.read(file);
-```
+### Error Handling
+Always wrap your code in try-catch blocks and provide meaningful error messages to help with debugging.
 
-### API Integration Tools
-```javascript
-// Call external APIs
-const response = await fetch(apiUrl, options);
-const data = await response.json();
-```
+## Best Practices
 
-### Vault Search Tools
-```javascript
-// Search through your vault
-const files = plugin.app.vault.getMarkdownFiles();
-const results = files.filter(file => /* your criteria */);
-```
+1. **Start Simple**: Begin with basic functionality and add complexity gradually
+2. **Validate Inputs**: Check that required parameters are present and valid
+3. **Provide Feedback**: Use progress updates to keep users informed
+4. **Handle Errors**: Always include error handling and recovery
+5. **Test Thoroughly**: Test with various inputs and edge cases
+6. **Document Well**: Include clear descriptions in your schema and comments in your code
+7. **Version Control**: Increment the version number when making changes
 
-## Tips for Tool Development
+## Examples
 
-1. **Start Simple**: Begin with basic functionality and add features gradually
-2. **Test Frequently**: Use the debug command to test your tools
-3. **Handle Errors**: Always include try/catch blocks
-4. **Provide Feedback**: Use `progress()` and `setLabel()` to keep users informed
-5. **Add Navigation**: Use `addNavigationTarget()` to help users find results
-6. **Validate Inputs**: Check parameters before processing
-7. **Document Well**: Include clear descriptions and examples
+For more examples and inspiration, check out the other tools included in the starter kit:
+- Weather Tool: API integration example
+- Image Generation Tool: File creation and external API usage  
+- YouTube Transcript Tool: Data processing and file manipulation
 
-## Next Steps
+## Getting Help
 
-1. **Copy this file** to create your own tool
-2. **Rename it** to describe your tool's purpose
-3. **Modify the schema** to define your parameters
-4. **Update the implementation** with your logic
-5. **Test it** with the AI assistant
-
-Happy tool building! 🔧✨ 
+If you need help creating tools:
+1. Check the other tool examples in the starter kit
+2. Use the Tool Creator mode for assistance
+3. Visit the [project documentation](https://github.com/cielecki/life-navigator) for more resources 

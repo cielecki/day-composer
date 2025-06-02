@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import { t } from '../../i18n';
-import { getPluginSettings } from '../../settings/PluginSettings';
+import { getPluginSettings } from '../../settings/LifeNavigatorSettings';
 import { LucideIcon } from '../LucideIcon';
 
 interface AnthropicKeyScreenProps {
 	onKeyConfigured: () => void;
-	onOpenSettings: () => void;
 }
 
 export const AnthropicKeyScreen: React.FC<AnthropicKeyScreenProps> = ({
-	onKeyConfigured,
-	onOpenSettings
+	onKeyConfigured
 }) => {
 	const [apiKey, setApiKey] = useState('');
 	const [isConfiguring, setIsConfiguring] = useState(false);
@@ -31,57 +29,37 @@ export const AnthropicKeyScreen: React.FC<AnthropicKeyScreenProps> = ({
 		}
 	};
 
-	const handleSkip = () => {
-		onOpenSettings();
-	};
-
 	return (
-		<div className="setup-screen">
-			<div className="setup-content">
+		<div className="setup-screen-focused">
+			<div className="setup-content-focused">
 				<div className="setup-icon">
-					<LucideIcon name="key" size={64} color="var(--interactive-accent)" />
+					<LucideIcon name="key" size={48} color="var(--interactive-accent)" />
 				</div>
 				
-				<h2 className="setup-title">
+				<h2 className="setup-title-focused">
 					{t('ui.setup.anthropicKey.title')}
 				</h2>
 				
-				<p className="setup-description">
+				<p className="setup-description-focused">
 					{t('ui.setup.anthropicKey.description')}
 				</p>
 				
-				<div className="setup-steps">
-					<div className="setup-step">
-						<span className="setup-step-number">1</span>
-						<div className="setup-step-content">
-							<span>{t('ui.setup.anthropicKey.steps.visit')}</span>
-							<a 
-								href="https://console.anthropic.com/settings/keys" 
-								target="_blank" 
-								rel="noopener noreferrer"
-								className="setup-step-link"
-							>
-								{t('ui.setup.anthropicKey.getKey')} →
-							</a>
-						</div>
-					</div>
-					<div className="setup-step">
-						<span className="setup-step-number">2</span>
-						<span>{t('ui.setup.anthropicKey.steps.create')}</span>
-					</div>
-					<div className="setup-step">
-						<span className="setup-step-number">3</span>
-						<span>{t('ui.setup.anthropicKey.steps.paste')}</span>
-					</div>
+				<div className="setup-key-link">
+					<a 
+						href="https://console.anthropic.com/settings/keys" 
+						target="_blank" 
+						rel="noopener noreferrer"
+						className="setup-get-key-link"
+					>
+						<LucideIcon name="external-link" size={16} />
+						{t('ui.setup.anthropicKey.getKey')} →
+					</a>
 				</div>
 
-				<div className="setup-input-group">
-					<div className="setup-input-label">
-						{t('ui.setup.anthropicKey.inputLabel')}
-					</div>
+				<div className="setup-input-focused">
 					<input
 						type="password"
-						className="setup-input"
+						className="setup-input-large"
 						placeholder={t('ui.setup.anthropicKey.placeholder')}
 						value={apiKey}
 						onChange={(e) => setApiKey(e.target.value)}
@@ -90,30 +68,18 @@ export const AnthropicKeyScreen: React.FC<AnthropicKeyScreenProps> = ({
 								handleSaveKey();
 							}
 						}}
+						autoFocus
 					/>
 				</div>
 
-				<div className="setup-buttons">
+				<div className="setup-actions-focused">
 					<button 
-						className="mod-cta setup-button"
+						className="setup-button-primary"
 						onClick={handleSaveKey}
 						disabled={!apiKey.trim() || isConfiguring}
 					>
 						{isConfiguring ? t('ui.setup.saving') : t('ui.setup.anthropicKey.saveButton')}
 					</button>
-				</div>
-
-				<div className="setup-help">
-					<a 
-						href="#" 
-						onClick={(e) => {
-							e.preventDefault();
-							handleSkip();
-						}}
-						className="setup-link"
-					>
-						{t('ui.setup.openSettings')}
-					</a>
 				</div>
 			</div>
 		</div>

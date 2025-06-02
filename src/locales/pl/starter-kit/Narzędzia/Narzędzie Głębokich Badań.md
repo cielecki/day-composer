@@ -1,10 +1,8 @@
 ---
 tags: ["ln-tool"]
-ln-tool-name: "Głębokie Badania"
 ln-tool-description: "Przeprowadza kompleksowe badania internetowe używając API Firecrawl i zapisuje szczegółowe raporty z cytatami"
 ln-tool-version: "1.0.0"
 ln-tool-icon: "search"
-ln-tool-icon-color: "#FF6B35"
 ln-tool-enabled: true
 ---
 

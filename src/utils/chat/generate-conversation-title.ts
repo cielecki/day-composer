@@ -1,4 +1,4 @@
-import { getPluginSettings } from "../../settings/PluginSettings";
+import { getPluginSettings } from "../../settings/LifeNavigatorSettings";
 import { Message } from "./types";
 import { LNMode } from '../mode/LNMode';
 import { getFirstUserMessage } from "./get-first-user-message";

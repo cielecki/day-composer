@@ -8,7 +8,7 @@ import React, {
 	useEffect,
 } from "react";
 import { Notice } from "obsidian";
-import type MyPlugin from "../main";
+import type { LifeNavigatorPlugin } from 'src/LifeNavigatorPlugin';
 import { useTextToSpeech } from "./TextToSpeechContext";
 import { useSpeechToText } from "./SpeechToTextContext";
 import { Message } from "../utils/chat/types";
@@ -61,7 +61,7 @@ const AIAgentContext = createContext<AIAgentContextType | undefined>(undefined);
 export const AIAgentProvider: React.FC<{
 	children?: ReactNode;
 	conversationDatabase: ConversationDatabase;
-	plugin: MyPlugin;
+	plugin: LifeNavigatorPlugin;
 }> = ({ children, plugin, conversationDatabase }) => {
 	const [_, setForceUpdate] = useState(0);
 	const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);

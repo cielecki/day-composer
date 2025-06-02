@@ -1,9 +1,7 @@
-import MyPlugin from "../main";
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
 import { findTaskByDescription, readNote, updateNote, NoteNode } from "../utils/tools/note-utils";
 import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
-import { getCurrentTime } from "../utils/time/get-current-time";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { validateTasks } from "../utils/task/task-validation";
 import { removeTaskFromDocument, insertTaskAtPosition, appendComment, Task } from "../utils/task/task-utils";

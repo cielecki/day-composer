@@ -1,10 +1,8 @@
 ---
 tags: ["ln-tool"]
-ln-tool-name: "Get Weather"
 ln-tool-description: "Fetches current weather information for a specified location"
 ln-tool-version: "1.0.0"
 ln-tool-icon: "cloud"
-ln-tool-icon-color: "#87CEEB"
 ln-tool-enabled: true
 ---
 

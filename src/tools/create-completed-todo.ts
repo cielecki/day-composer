@@ -1,11 +1,10 @@
-import MyPlugin from "../main";
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { getCurrentTime } from "../utils/time/get-current-time";
-import { appendComment, insertTaskAtPosition, Task } from "../utils/task/task-utils";
+import { insertTaskAtPosition, Task } from "../utils/task/task-utils";
 
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { ObsidianTool, NavigationTarget } from "../obsidian-tools";
+import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
 import { findCurrentSpot, readNote, updateNote } from "../utils/tools/note-utils";
 import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";

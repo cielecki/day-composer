@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { Notice, App } from 'obsidian';
 import OpenAI from 'openai';
-import { getPluginSettings, TTSVoice } from "../settings/PluginSettings";
-import { TTS_VOICES } from "../settings/PluginSettings";
+import { getPluginSettings, TTSVoice } from "../settings/LifeNavigatorSettings";
+import { TTS_VOICES } from "../settings/LifeNavigatorSettings";
 import { t } from '../i18n';
 import { DEFAULT_VOICE_INSTRUCTIONS } from "../utils/mode/ln-mode-defaults";
 import { useLNMode } from './LNModeContext';

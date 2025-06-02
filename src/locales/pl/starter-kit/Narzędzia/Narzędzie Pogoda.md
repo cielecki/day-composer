@@ -1,10 +1,8 @@
 ---
 tags: ["ln-tool"]
-ln-tool-name: "Sprawdź Pogodę"
 ln-tool-description: "Pobiera aktualne informacje o pogodzie dla określonej lokalizacji"
 ln-tool-version: "1.0.0"
 ln-tool-icon: "cloud"
-ln-tool-icon-color: "#87CEEB"
 ln-tool-enabled: true
 ---
 

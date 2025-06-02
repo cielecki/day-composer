@@ -1,5 +1,4 @@
 import { TFile, TFolder, normalizePath } from "obsidian";
-import MyPlugin from "../main";
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";

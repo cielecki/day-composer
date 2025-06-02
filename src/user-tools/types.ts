@@ -7,7 +7,6 @@ export interface UserDefinedTool {
   
   // UI customization  
   icon: string;
-  iconColor?: string;
   
   // Execution
   executeCode: string;

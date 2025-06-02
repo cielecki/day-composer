@@ -1,5 +1,4 @@
-import { Notice } from 'obsidian';
-import MyPlugin from '../main';
+import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { UserDefinedTool } from './types';
 import { UserDefinedToolScanner } from './UserDefinedToolScanner';
 import { UserToolApprovalManager } from './ToolApprovalManager';
@@ -12,13 +11,13 @@ import { sanitizeToolName } from '../utils/text/string-sanitizer';
 import { TFile } from 'obsidian';
 
 export class UserDefinedToolManager {
-  private plugin: MyPlugin;
+  private plugin: LifeNavigatorPlugin;
   private tools: Map<string, UserDefinedTool> = new Map();
   private approvalManager: UserToolApprovalManager;
   private scanner: UserDefinedToolScanner;
   private secureContext: SecureExecutionContext;
 
-  constructor(plugin: MyPlugin) {
+  constructor(plugin: LifeNavigatorPlugin) {
     this.plugin = plugin;
     this.approvalManager = new UserToolApprovalManager(plugin);
     this.scanner = new UserDefinedToolScanner(plugin.app);

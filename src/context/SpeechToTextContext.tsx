@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback, useRef } from 'react';
 import { Notice, moment } from 'obsidian';
-import { getPluginSettings } from '../settings/PluginSettings';
+import { getPluginSettings } from '../settings/LifeNavigatorSettings';
 import OpenAI from 'openai';
 import { t } from '../i18n';
 import { expandLinks } from '../utils/links/expand-links';

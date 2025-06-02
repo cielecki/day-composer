@@ -173,8 +173,6 @@ export const UnifiedInputArea: React.FC<{
     } else {
       // Clean up when recording stops
       cleanup();
-      // Also clear the waveform data to ensure clean state
-      setWaveformData(Array(WAVEFORM_HISTORY_LENGTH).fill(0));
     }
 
     return () => cleanup();
@@ -525,6 +523,14 @@ export const UnifiedInputArea: React.FC<{
     return () => clearTimeout(timer);
   }, [volumeLevel, isRecording]);
 
+  // Clear waveform data when transcription completes
+  useEffect(() => {
+    // Detect when transcription completes (transition from true to false)
+    if (!isTranscribing) {
+      setWaveformData(Array(WAVEFORM_HISTORY_LENGTH).fill(0));
+    }
+  }, [isTranscribing]);
+
   return (
     <div className="unified-input-container">
       {/* Hidden file input for image selection */}
@@ -612,7 +618,7 @@ export const UnifiedInputArea: React.FC<{
           />
 
           {/* Waveform visualization */}
-          {isRecording && (
+          {(isRecording || isTranscribing) && (
             <div className="waveform-container">
               <div className="waveform">
                 {waveformData.map((level, index) => (

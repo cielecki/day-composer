@@ -1,5 +1,3 @@
-import MyPlugin from "../main";
-import { modifyFile } from "../utils/fs/modify-file";
 import { readFile } from "../utils/fs/read-file";
 import { getFile } from "../utils/fs/get-file";
 import { ObsidianTool } from "../obsidian-tools";

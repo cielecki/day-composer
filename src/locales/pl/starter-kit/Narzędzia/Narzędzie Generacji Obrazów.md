@@ -1,10 +1,8 @@
 ---
 tags: ["ln-tool"]
-ln-tool-name: "Generuj Obraz"
 ln-tool-description: "Generuje obrazy używając modelu GPT-4o OpenAI i zapisuje je w sejfie"
 ln-tool-version: "1.0.0"
 ln-tool-icon: "image"
-ln-tool-icon-color: "#4CAF50"
 ln-tool-enabled: true
 ---
 

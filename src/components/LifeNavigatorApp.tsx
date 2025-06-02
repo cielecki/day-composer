@@ -427,24 +427,14 @@ export const LifeNavigatorApp: React.FC = () => {
 		setForceUpdate((prev: number) => prev + 1);
 	}, []);
 
-	const handleOpenSettings = useCallback(() => {
-		// Open Obsidian settings - simplified approach
-		if (window.app) {
-			try {
-				// @ts-ignore - Access Obsidian's settings API
-				window.app.setting?.open();
-				// @ts-ignore - Navigate to plugin settings if available
-				window.app.setting?.openTabById?.('community-plugins');
-			} catch (error) {
-				console.log('Please open Obsidian Settings > Community Plugins > Life Navigator to configure API keys');
-			}
-		}
-	}, []);
-
 	// Refresh setup state check when component becomes visible or mounts
 	useEffect(() => {
 		const checkSetupState = () => {
 			setForceUpdate((prev: number) => prev + 1);
+		};
+
+		const handleTutorialStateChange = () => {
+			checkSetupState();
 		};
 
 		// Check immediately when component mounts
@@ -453,8 +443,12 @@ export const LifeNavigatorApp: React.FC = () => {
 		// Also check when window gains focus (user returns to Obsidian)
 		window.addEventListener('focus', checkSetupState);
 		
+		// Listen for tutorial state changes from settings
+		window.addEventListener('life-navigator-tutorial-state-changed', handleTutorialStateChange);
+		
 		return () => {
 			window.removeEventListener('focus', checkSetupState);
+			window.removeEventListener('life-navigator-tutorial-state-changed', handleTutorialStateChange);
 		};
 	}, []);
 
@@ -463,7 +457,6 @@ export const LifeNavigatorApp: React.FC = () => {
 		return (
 			<SetupFlow 
 				onSetupComplete={handleSetupComplete}
-				onOpenSettings={handleOpenSettings}
 			/>
 		);
 	}

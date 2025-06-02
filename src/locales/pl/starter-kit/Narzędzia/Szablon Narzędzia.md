@@ -1,10 +1,8 @@
 ---
 tags: ["ln-tool"]
-ln-tool-name: "Szablon Narzędzia"
 ln-tool-description: "Podstawowy szablon do tworzenia własnych niestandardowych narzędzi"
 ln-tool-version: "1.0.0"
 ln-tool-icon: "wrench"
-ln-tool-icon-color: "#6B7280"
 ln-tool-enabled: true
 ---
 
@@ -126,7 +124,6 @@ async function execute(context) {
 - **`ln-tool-name`**: Nazwa wyświetlana twojego narzędzia
 - **`ln-tool-description`**: Co robi twoje narzędzie
 - **`ln-tool-icon`**: Wybierz z [ikon Lucide](https://lucide.dev/)
-- **`ln-tool-icon-color`**: Dowolny kod koloru hex
 
 ### 2. Zmodyfikuj Schemat
 - **Dodaj parametry**: Zdefiniuj jakie wejścia potrzebuje twoje narzędzie

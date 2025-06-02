@@ -4,14 +4,14 @@ import { LifeNavigatorApp } from "./components/LifeNavigatorApp";
 import { Message } from "./utils/chat/types";
 import { AIAgentProvider } from "./context/AIAgentContext";
 import { SpeechToTextProvider } from "./context/SpeechToTextContext";
-import MyPlugin from "./main";
+import { LifeNavigatorPlugin } from './LifeNavigatorPlugin';
 import { TextToSpeechProvider } from "./context/TextToSpeechContext";
 import { LNModeProvider } from "./context/LNModeContext";
 import { t } from './i18n';
 import { ConversationDatabase } from "./services/conversation-database";
 
 export interface LifeNavigatorViewProps {
-	plugin: MyPlugin;
+	plugin: LifeNavigatorPlugin;
 	initialMessages?: Message[];
 }
 

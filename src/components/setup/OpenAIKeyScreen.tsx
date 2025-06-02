@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { t } from '../../i18n';
-import { getPluginSettings } from '../../settings/PluginSettings';
+import { getPluginSettings } from '../../settings/LifeNavigatorSettings';
 import { LucideIcon } from '../LucideIcon';
 
 interface OpenAIKeyScreenProps {
 	onKeyConfigured: () => void;
-	onOpenSettings: () => void;
 	onSkip: () => void;
 }
 
 export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 	onKeyConfigured,
-	onOpenSettings,
 	onSkip
 }) => {
 	const [apiKey, setApiKey] = useState('');
@@ -54,57 +52,37 @@ export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 		}
 	};
 
-	const handleOpenSettings = () => {
-		onOpenSettings();
-	};
-
 	return (
-		<div className="setup-screen">
-			<div className="setup-content">
+		<div className="setup-screen-focused">
+			<div className="setup-content-focused">
 				<div className="setup-icon">
-					<LucideIcon name="mic" size={64} color="var(--interactive-accent)" />
+					<LucideIcon name="mic" size={48} color="var(--interactive-accent)" />
 				</div>
 				
-				<h2 className="setup-title">
+				<h2 className="setup-title-focused">
 					{t('ui.setup.openaiKey.title')}
 				</h2>
 				
-				<p className="setup-description">
+				<p className="setup-description-focused">
 					{t('ui.setup.openaiKey.description')}
 				</p>
 				
-				<div className="setup-steps">
-					<div className="setup-step">
-						<span className="setup-step-number">1</span>
-						<div className="setup-step-content">
-							<span>{t('ui.setup.openaiKey.steps.visit')}</span>
-							<a 
-								href="https://platform.openai.com/api-keys" 
-								target="_blank" 
-								rel="noopener noreferrer"
-								className="setup-step-link"
-							>
-								{t('ui.setup.openaiKey.getKey')} →
-							</a>
-						</div>
-					</div>
-					<div className="setup-step">
-						<span className="setup-step-number">2</span>
-						<span>{t('ui.setup.openaiKey.steps.create')}</span>
-					</div>
-					<div className="setup-step">
-						<span className="setup-step-number">3</span>
-						<span>{t('ui.setup.openaiKey.steps.paste')}</span>
-					</div>
+				<div className="setup-key-link">
+					<a 
+						href="https://platform.openai.com/api-keys" 
+						target="_blank" 
+						rel="noopener noreferrer"
+						className="setup-get-key-link"
+					>
+						<LucideIcon name="external-link" size={16} />
+						{t('ui.setup.openaiKey.getKey')} →
+					</a>
 				</div>
 
-				<div className="setup-input-group">
-					<div className="setup-input-label">
-						{t('ui.setup.openaiKey.inputLabel')}
-					</div>
+				<div className="setup-input-focused">
 					<input
 						type="password"
-						className="setup-input"
+						className="setup-input-large"
 						placeholder={t('ui.setup.openaiKey.placeholder')}
 						value={apiKey}
 						onChange={(e) => setApiKey(e.target.value)}
@@ -113,12 +91,13 @@ export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 								handleSaveKey();
 							}
 						}}
+						autoFocus
 					/>
 				</div>
 
-				<div className="setup-buttons">
+				<div className="setup-actions-focused">
 					<button 
-						className="mod-cta setup-button"
+						className="setup-button-primary"
 						onClick={handleSaveKey}
 						disabled={!apiKey.trim() || isConfiguring}
 					>
@@ -131,23 +110,6 @@ export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 					>
 						{isSkipping ? t('ui.setup.saving') : t('ui.setup.openaiKey.skipButton')}
 					</button>
-				</div>
-
-				<div className="setup-help">
-					<a 
-						href="#" 
-						onClick={(e) => {
-							e.preventDefault();
-							handleOpenSettings();
-						}}
-						className="setup-link"
-					>
-						{t('ui.setup.openSettings')}
-					</a>
-				</div>
-
-				<div className="setup-note">
-					<p>{t('ui.setup.openaiKey.note')}</p>
 				</div>
 			</div>
 		</div>

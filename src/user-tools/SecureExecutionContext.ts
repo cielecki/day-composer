@@ -2,7 +2,7 @@ import { ToolExecutionError } from '../utils/tools/tool-execution-error';
 import { UserToolExecutionContext } from './types';
 import { createHash } from 'crypto';
 import { requestUrl } from 'obsidian';
-import { getPluginSettings } from '../settings/PluginSettings';
+import { getPluginSettings } from '../settings/LifeNavigatorSettings';
 
 export class SecureExecutionContext {
   private allowedAPIs: Set<string>;

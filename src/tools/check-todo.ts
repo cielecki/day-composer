@@ -1,4 +1,3 @@
-import MyPlugin from "../main";
 import { getCurrentTime } from "../utils/time/get-current-time";
 import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
 import { appendComment, Task } from "../utils/task/task-utils";

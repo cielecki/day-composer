@@ -1,14 +1,13 @@
-import { App } from 'obsidian';
 import { UserDefinedTool, ToolApproval } from './types';
-import MyPlugin from '../main';
+import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { ToolApprovalModal } from '../components/ToolApprovalModal';
 
 export class UserToolApprovalManager {
-  private plugin: MyPlugin;
+  private plugin: LifeNavigatorPlugin;
   private approvals: Map<string, ToolApproval> = new Map();
   private storageKey = 'user-tool-approvals';
 
-  constructor(plugin: MyPlugin) {
+  constructor(plugin: LifeNavigatorPlugin) {
     this.plugin = plugin;
     this.loadApprovals();
   }

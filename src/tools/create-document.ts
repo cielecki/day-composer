@@ -1,4 +1,3 @@
-import MyPlugin from "../main";
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { ObsidianTool } from "../obsidian-tools";

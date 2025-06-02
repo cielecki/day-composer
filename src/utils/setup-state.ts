@@ -1,4 +1,4 @@
-import { getPluginSettings } from "../settings/PluginSettings";
+import { getPluginSettings } from "../settings/LifeNavigatorSettings";
 
 export enum SetupStep {
 	CONFIGURE_LANGUAGE = "configure_language",

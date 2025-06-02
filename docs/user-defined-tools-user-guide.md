@@ -41,14 +41,14 @@ A user-defined tool is an Obsidian note with three main sections:
 ```yaml
 ---
 tags: ["ln-tool"]
-ln-tool-name: "My Custom Tool"
-ln-tool-description: "What this tool does"
+ln-tool-description: "A simple example tool"
 ln-tool-version: "1.0.0"
 ln-tool-icon: "gear"  # Lucide icon name
-ln-tool-icon-color: "#4caf50"  # Hex color code
 ln-tool-enabled: true
 ---
 ```
+
+**Note:** The tool name is automatically taken from the filename (just like modes).
 
 ### 2. JSON Schema Definition
 ```json
@@ -164,7 +164,6 @@ const data = await response.json();
 ```markdown
 ---
 tags: ["ln-tool"]
-ln-tool-name: "Smart Note Creator"
 ln-tool-description: "Creates a note with template and metadata"
 ln-tool-icon: "file-plus"
 ln-tool-enabled: true

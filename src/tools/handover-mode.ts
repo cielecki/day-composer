@@ -1,7 +1,5 @@
-import MyPlugin from "../main";
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
-import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { modeManagerService } from "../services/ModeManagerService";
 import { t } from "../i18n";
 

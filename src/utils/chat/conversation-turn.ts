@@ -7,7 +7,7 @@ import { processAnthropicStream, StreamProcessorCallbacks } from "./stream-proce
 import { processToolUseBlocks } from "./tool-processing";
 import { getToolUseBlocks, hasIncompleteToolCalls, hasIncompleteThinking, clearThinkingInProgress } from "./content-blocks";
 import { cleanupLastMessage } from "./message-validation";
-import { getPluginSettings } from "../../settings/PluginSettings";
+import { getPluginSettings } from "../../settings/LifeNavigatorSettings";
 import { getDefaultLNMode, resolveAutoModel } from "../mode/ln-mode-defaults";
 import { t } from '../../i18n';
 import type { ObsidianTool } from "../../obsidian-tools";

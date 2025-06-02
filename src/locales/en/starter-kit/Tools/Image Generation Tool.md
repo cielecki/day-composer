@@ -1,10 +1,8 @@
 ---
 tags: ["ln-tool"]
-ln-tool-name: "Generate Image"
 ln-tool-description: "Generates images using OpenAI's GPT-4o image generation model and saves them to the vault"
 ln-tool-version: "1.0.0"
 ln-tool-icon: "image"
-ln-tool-icon-color: "#4CAF50"
 ln-tool-enabled: true
 ---
 

@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **API Key Storage**: Migrated from specific API key fields (openAIApiKey, anthropicApiKey, firecrawlApiKey) to generic secrets system with backward compatibility.
+- **Setup Screen Overhaul**: Simplified setup screen CSS by removing excessive animations, transforms, and over-styled elements. Replaced 90s-era web design patterns with clean, modern styling that follows Obsidian's design principles. Reduced CSS from ~320 lines to ~90 lines while maintaining functionality and improving visual appeal. Improved language selection interface in setup flow with better visual hierarchy, cleaner current language indicator using a checkmark icon instead of text, and enhanced button styling with proper selected states.
+- **User-Defined Tool Naming**: Tool names now come from filenames (like modes) instead of frontmatter `ln-tool-name` field. This makes tool creation simpler and more consistent with how modes work. Tool files can be renamed to change the tool name, and no frontmatter field is required for naming.
+- **Secrets**: Fixed issue where secrets edited in settings would not persist after app reload due to legacy loading overwriting the secrets object and improper async handling in the settings UI. The loading process now properly handles migration without overwriting new secrets, and all save operations are properly awaited. Additionally, the saveSettings() method now explicitly excludes legacy API keys from saved data, ensuring complete removal of old properties from data.json after migration.
+
+### Fixed
+- **Waveform Visibility During Transcription**: Fixed waveform visualization to remain visible during transcription instead of disappearing. The waveform now stays static during transcription (showing the last recorded pattern) and is cleared after transcription completes. This provides better visual feedback by maintaining the visual indication during processing while stopping the distracting animation.
 
 ### Removed
 - **Built-in YouTube Transcript Tool**: Removed the built-in `download_youtube_transcript` tool in favor of the user-defined YouTube transcript tool available in the starter kit. This simplifies the codebase while maintaining functionality through the more flexible user-defined tool system.

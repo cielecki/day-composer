@@ -100,9 +100,7 @@
     },
     "secrets": {
       "addNew": {
-        "button": "Add Secret",
-        "desc": "Add a new API key or secret",
-        "name": "Add New Secret"
+        "button": "Add Secret"
       },
       "description": "Manage API keys and secrets for user-defined tools. These are stored as key-value pairs for flexible use.",
       "dialog": {
@@ -116,8 +114,6 @@
         "keyLabel": "Secret Name",
         "keyPlaceholder": "e.g., OPENAI_API_KEY, ANTHROPIC_API_KEY, FIRECRAWL_API_KEY",
         "save": "Save",
-        "saved": "Secret '{{key}}' has been saved.",
-        "updated": "Secret '{{key}}' has been updated.",
         "valueLabel": "Secret Value",
         "valuePlaceholder": "Enter the API key or secret value"
       },
@@ -126,7 +122,6 @@
         "delete": "Delete",
         "deleted": "Secret '{{key}}' has been deleted.",
         "edit": "Edit",
-        "empty": "(empty)",
         "noSecrets": "No secrets configured. Add API keys and secrets using the button above."
       },
       "securityNote": "Important: Your secrets are stored in your Obsidian config folder in plain text. Do not share your vault or config folder with others if you store sensitive API keys here.",
@@ -136,16 +131,11 @@
       "title": "Security Notice"
     },
     "userTools": {
-      "enabled": {
-        "desc": "Allow execution of user-defined tools from Obsidian notes.",
-        "name": "Enable User-Defined Tools"
-      },
       "list": {
         "controls": {
           "approve": "Approve Tool",
           "revoke": "Revoke Approval"
         },
-        "disabled": "User-defined tools are disabled. Enable the feature above to see discovered tools.",
         "noManager": "User tools manager not initialized. Try restarting Obsidian.",
         "noTools": "No user-defined tools found. Use Tool Creator mode to create custom tools through chat.",
         "tooltips": {
@@ -156,7 +146,6 @@
         "title": "Security Notice",
         "warning": "User-defined tools execute JavaScript code with full access to your vault, file system, and network requests. Each tool requires individual approval before execution. Always review tool code carefully before approving, and only approve tools from trusted sources."
       },
-      "securityWarning": "⚠️ SECURITY WARNING ⚠️\n\nUser-defined tools execute JavaScript code with full access to:\n• Your entire Obsidian vault\n• Local file system\n• Network requests\n• System resources\n\nThis can be dangerous if you run untrusted code.\n\nOnly enable this if you:\n• Understand JavaScript security risks\n• Will only run tools you trust\n• Review all tool code before approval\n\nDo you want to enable user-defined tools?",
       "title": "User-Defined Tools"
     }
   },
@@ -164,6 +153,37 @@
     "format": {
       "abandonedAt": " (abandoned at {{time}})",
       "completedAt": " (completed at {{time}})"
+    }
+  },
+  "toolApproval": {
+    "buttons": {
+      "approve": "Approve Tool",
+      "cancel": "Cancel"
+    },
+    "code": {
+      "title": "Tool Code"
+    },
+    "header": {
+      "title": "Tool Approval Required"
+    },
+    "info": {
+      "description": "Description",
+      "file": "File",
+      "tool": "Tool"
+    },
+    "schema": {
+      "title": "Tool Schema"
+    },
+    "security": {
+      "description": "This tool will execute JavaScript code that can access your vault, file system, and make network requests.",
+      "risks": {
+        "files": "Access to your file system",
+        "network": "Make network requests",
+        "system": "Execute system commands",
+        "vault": "Access to your Obsidian vault"
+      },
+      "title": "Security Warning",
+      "warning": "Only approve tools from trusted sources. Always review the code carefully before approval."
     }
   },
   "tools": {
@@ -375,39 +395,24 @@
       "anthropicKey": {
         "description": "Anthropic Claude powers the main AI functionality. You'll need an API key to continue.",
         "getKey": "Get your Anthropic API key",
-        "inputLabel": "Paste your API key here:",
         "placeholder": "Paste your Anthropic API key here",
         "saveButton": "Save and Continue",
-        "steps": {
-          "create": "Create a new API key",
-          "paste": "Paste it here",
-          "visit": "Visit console.anthropic.com/settings/keys"
-        },
         "title": "Configure Anthropic API Key"
       },
       "language": {
-        "current": "Current",
         "currentLanguage": "Current Obsidian language:",
-        "description": "Life Navigator works best when your Obsidian interface language matches the language you write your notes in. Select your preferred language below - if it's different from your current setting, Obsidian will restart automatically to apply the change. Voice features (speech-to-text and text-to-speech) will automatically use your selected language.",
+        "description": "Choose your preferred language. Life Navigator will work best when your language matches how you write your notes.",
         "manualRestart": "Please restart Obsidian to apply the language changes.",
-        "note": "If you select a different language than currently configured, Obsidian will automatically restart to apply the changes. All Life Navigator content, AI interactions, and starter kit files will then be in your selected language. Voice features will automatically work in your chosen language.",
+        "note": "If you change languages, Obsidian will restart automatically to apply the changes.",
         "supportedLanguages": "Available Language Options",
         "title": "Configure Language"
       },
-      "openSettings": "Open Settings",
       "openaiKey": {
         "description": "OpenAI powers voice features like text-to-speech. This is optional but recommended.",
         "getKey": "Get your OpenAI API key",
-        "inputLabel": "Paste your API key here:",
-        "note": "You can always add this later in settings to enable voice features.",
         "placeholder": "Paste your OpenAI API key here",
         "saveButton": "Save and Continue",
         "skipButton": "Skip for now",
-        "steps": {
-          "create": "Create a new API key",
-          "paste": "Paste it here",
-          "visit": "Visit platform.openai.com/api-keys"
-        },
         "title": "Configure OpenAI API Key"
       },
       "saving": "Saving...",

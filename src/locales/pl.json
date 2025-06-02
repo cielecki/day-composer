@@ -100,9 +100,7 @@
     },
     "secrets": {
       "addNew": {
-        "button": "Dodaj Sekret",
-        "desc": "Dodaj nowy klucz API lub sekret",
-        "name": "Dodaj Nowy Sekret"
+        "button": "Dodaj Sekret"
       },
       "description": "Zarządzaj kluczami API i sekretami dla narzędzi zdefiniowanych przez użytkownika. Są przechowywane jako pary klucz-wartość dla elastycznego użycia.",
       "dialog": {
@@ -116,8 +114,6 @@
         "keyLabel": "Nazwa Sekretu",
         "keyPlaceholder": "np. OPENAI_API_KEY, ANTHROPIC_API_KEY, FIRECRAWL_API_KEY",
         "save": "Zapisz",
-        "saved": "Sekret '{{key}}' został zapisany.",
-        "updated": "Sekret '{{key}}' został zaktualizowany.",
         "valueLabel": "Wartość Sekretu",
         "valuePlaceholder": "Wprowadź klucz API lub wartość sekretu"
       },
@@ -126,27 +122,20 @@
         "delete": "Usuń",
         "deleted": "Sekret '{{key}}' został usunięty.",
         "edit": "Edytuj",
-        "empty": "(pusty)",
         "noSecrets": "Brak skonfigurowanych sekretów. Dodaj klucze API i sekrety używając przycisku powyżej."
       },
       "securityNote": "Ważne: Twoje sekrety są przechowywane w folderze konfiguracyjnym Obsidian w postaci zwykłego tekstu. Nie udostępniaj swojego vault'a ani folderu konfiguracyjnego innym, jeśli przechowujesz tutaj wrażliwe klucze API.",
       "title": "Klucze API i Sekrety"
     },
     "security": {
-      "title": "Informacja o Bezpieczeństwie",
-      "warning": "Narzędzia zdefiniowane przez użytkownika wykonują kod JavaScript który może uzyskać dostęp do twojego vault'a, systemu plików i wykonywać żądania sieciowe. Każde narzędzie wymaga indywidualnego zatwierdzenia przed wykonaniem. Zawsze dokładnie sprawdzaj kod narzędzia przed zatwierdzeniem i zatwierdź tylko narzędzia z zaufanych źródeł."
+      "title": "Informacja o Bezpieczeństwie"
     },
     "userTools": {
-      "enabled": {
-        "desc": "Zezwalaj na wykonywanie narzędzi zdefiniowanych przez użytkownika z notatek Obsidian.",
-        "name": "Włącz Narzędzia Zdefiniowane przez Użytkownika"
-      },
       "list": {
         "controls": {
           "approve": "Zatwierdź Narzędzie",
           "revoke": "Cofnij Zatwierdzenie"
         },
-        "disabled": "Narzędzia zdefiniowane przez użytkownika są wyłączone. Włącz funkcję powyżej, aby zobaczyć odkryte narzędzia.",
         "noManager": "Menedżer narzędzi użytkownika nie został zainicjowany. Spróbuj uruchomić ponownie Obsidian.",
         "noTools": "Nie znaleziono narzędzi zdefiniowanych przez użytkownika. Użyj trybu Tool Creator, aby tworzyć niestandardowe narzędzia poprzez rozmowę.",
         "tooltips": {
@@ -157,7 +146,6 @@
         "title": "Ostrzeżenie Bezpieczeństwa",
         "warning": "Narzędzia zdefiniowane przez użytkownika wykonują kod JavaScript który może uzyskać dostęp do twojego vault'a, systemu plików i wykonywać żądania sieciowe. Każde narzędzie wymaga indywidualnego zatwierdzenia przed wykonaniem. Zawsze dokładnie sprawdzaj kod narzędzia przed zatwierdzeniem i zatwierdź tylko narzędzia z zaufanych źródeł."
       },
-      "securityWarning": "⚠️ OSTRZEŻENIE BEZPIECZEŃSTWA ⚠️\n\nNarzędzia zdefiniowane przez użytkownika wykonują kod JavaScript z pełnym dostępem do:\n• Całego twojego vault'a Obsidian\n• Lokalnego systemu plików\n• Żądań sieciowych\n• Zasobów systemowych\n\nMoże to być niebezpieczne jeśli uruchomisz niezaufany kod.\n\nWłączaj to tylko jeśli:\n• Rozumiesz zagrożenia bezpieczeństwa JavaScript\n• Będziesz uruchamiać tylko zaufane narzędzia\n• Przejrzysz cały kod narzędzi przed zatwierdzeniem\n\nCzy chcesz włączyć narzędzia zdefiniowane przez użytkownika?",
       "title": "Narzędzia Zdefiniowane przez Użytkownika"
     }
   },
@@ -165,6 +153,37 @@
     "format": {
       "abandonedAt": " (porzucone o {{time}})",
       "completedAt": " (zakończone o {{time}})"
+    }
+  },
+  "toolApproval": {
+    "buttons": {
+      "approve": "Zatwierdź narzędzie",
+      "cancel": "Anuluj"
+    },
+    "code": {
+      "title": "Kod narzędzia"
+    },
+    "header": {
+      "title": "Wymagane zatwierdzenie narzędzia"
+    },
+    "info": {
+      "description": "Opis",
+      "file": "Plik",
+      "tool": "Narzędzie"
+    },
+    "schema": {
+      "title": "Schemat narzędzia"
+    },
+    "security": {
+      "description": "To narzędzie wykona kod JavaScript, który może uzyskać dostęp do twojego vault'a, systemu plików i wykonywać żądania sieciowe.",
+      "risks": {
+        "files": "Dostęp do systemu plików",
+        "network": "Wykonywanie żądań sieciowych",
+        "system": "Wykonywanie poleceń systemowych",
+        "vault": "Dostęp do twojego vault'a Obsidian"
+      },
+      "title": "Ostrzeżenie bezpieczeństwa",
+      "warning": "Zatwierdzaj tylko narzędzia z zaufanych źródeł. Zawsze dokładnie sprawdzaj kod przed zatwierdzeniem."
     }
   },
   "tools": {
@@ -376,39 +395,24 @@
       "anthropicKey": {
         "description": "Anthropic Claude zasila główną funkcjonalność AI. Potrzebujesz klucza API, aby kontynuować.",
         "getKey": "Pobierz swój klucz API Anthropic",
-        "inputLabel": "Wklej tutaj swój klucz API:",
         "placeholder": "Wklej tutaj swój klucz API Anthropic",
         "saveButton": "Zapisz i kontynuuj",
-        "steps": {
-          "create": "Utwórz nowy klucz API",
-          "paste": "Wklej go tutaj",
-          "visit": "Odwiedź console.anthropic.com/settings/keys"
-        },
         "title": "Skonfiguruj klucz API Anthropic"
       },
       "language": {
-        "current": "Aktualny",
         "currentLanguage": "Aktualny język Obsidiana:",
-        "description": "Life Navigator działa najlepiej, gdy język interfejsu Obsidiana pasuje do języka, w którym piszesz notatki. Wybierz preferowany język poniżej - jeśli różni się od aktualnego ustawienia, Obsidian automatycznie się zrestartuje, aby zastosować zmianę. Funkcje głosowe (mowa na tekst i tekst na mowę) automatycznie użyją wybranego języka.",
+        "description": "Wybierz preferowany język. Life Navigator będzie działać najlepiej, gdy język będzie pasować do tego, jak piszesz swoje notatki.",
         "manualRestart": "Proszę zrestartować Obsidiana, aby zastosować zmiany języka.",
-        "note": "Jeśli wybierzesz inny język niż aktualnie skonfigurowany, Obsidian automatycznie się zrestartuje, aby zastosować zmiany. Cała zawartość Life Navigator, interakcje z AI i pliki pakietu startowego będą wtedy w wybranym języku. Funkcje głosowe automatycznie będą działać w wybranym języku.",
+        "note": "Jeśli zmienisz język, Obsidian automatycznie się zrestartuje, aby zastosować zmiany.",
         "supportedLanguages": "Dostępne opcje językowe",
         "title": "Konfiguracja języka"
       },
-      "openSettings": "Otwórz ustawienia",
       "openaiKey": {
         "description": "OpenAI zasila funkcje głosowe takie jak synteza mowy. To jest opcjonalne, ale zalecane.",
         "getKey": "Pobierz swój klucz API OpenAI",
-        "inputLabel": "Wklej tutaj swój klucz API:",
-        "note": "Możesz zawsze dodać to później w ustawieniach, aby włączyć funkcje głosowe.",
         "placeholder": "Wklej tutaj swój klucz API OpenAI",
         "saveButton": "Zapisz i kontynuuj",
         "skipButton": "Pomiń na razie",
-        "steps": {
-          "create": "Utwórz nowy klucz API",
-          "paste": "Wklej go tutaj",
-          "visit": "Odwiedź platform.openai.com/api-keys"
-        },
         "title": "Skonfiguruj klucz API OpenAI"
       },
       "saving": "Zapisywanie...",

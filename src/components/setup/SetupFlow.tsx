@@ -8,12 +8,10 @@ import { useLNMode } from '../../context/LNModeContext';
 
 interface SetupFlowProps {
 	onSetupComplete: () => void;
-	onOpenSettings: () => void;
 }
 
 export const SetupFlow: React.FC<SetupFlowProps> = ({
-	onSetupComplete,
-	onOpenSettings
+	onSetupComplete
 }) => {
 	const { lnModesRef } = useLNMode();
 	const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -51,7 +49,10 @@ export const SetupFlow: React.FC<SetupFlowProps> = ({
 		};
 
 		window.addEventListener('focus', handleFocus);
-		return () => window.removeEventListener('focus', handleFocus);
+		
+		return () => {
+			window.removeEventListener('focus', handleFocus);
+		};
 	}, [refreshSetupState]);
 
 	const handleLanguageConfigured = useCallback(() => {
@@ -102,7 +103,6 @@ export const SetupFlow: React.FC<SetupFlowProps> = ({
 			return (
 				<AnthropicKeyScreen 
 					onKeyConfigured={handleAnthropicKeyConfigured}
-					onOpenSettings={onOpenSettings}
 				/>
 			);
 
@@ -110,7 +110,6 @@ export const SetupFlow: React.FC<SetupFlowProps> = ({
 			return (
 				<OpenAIKeyScreen 
 					onKeyConfigured={handleOpenAIKeyConfigured}
-					onOpenSettings={onOpenSettings}
 					onSkip={handleOpenAIKeySkipped}
 				/>
 			);

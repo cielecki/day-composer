@@ -1,5 +1,4 @@
-import MyPlugin from "../main";
-import { ObsidianTool, NavigationTarget } from "../obsidian-tools";
+import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
 import { findTaskByDescription, updateNote, readNote, NoteNode, TextBlock } from '../utils/tools/note-utils';
 import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";

@@ -1,18 +1,17 @@
 # TODO
 
-- [ ] In the setup the input to paste into for antropic and openai keys IS VERY SMALL compared to other things that draw attention, can you redesign those screens to be simpler and more to the point, centered around the input that you are pasting into? Remove old css after you are done modifying this.
-- [ ] In the initial setup screen the language text is waaay too long
+- [x] In the setup the input to paste into for antropic and openai keys IS VERY SMALL compared to other things that draw attention, can you redesign those screens to be simpler and more to the point, centered around the input that you are pasting into? Remove old css after you are done modifying this.
+- [x] In the initial setup screen the language text is waaay too long
 - [ ] Jak robiłem kolejną transkrypcje podczas generacji coś się walneło, chyba ostatnie zmiany popsuły w tym zakresie coś.
 - [ ] Wrap up and prepare the user tools feature for release
 - [ ] **AI-Assisted Knowledge Base Editing:** Explore functionality for the AI to directly suggest or make additions/modifications to the user's core knowledge files (e.g., `About Me.md`, `Relationships.md`) based on conversations or insights. The user need is to streamline the process of updating personal context, allowing the AI to help maintain and expand the knowledge base it uses.
 - [ ] **Interactive Creator Mode:** How to create guidance for users when creating their materials? Some nice mode? or docs? Maybe a tutorial agent? Create a creator mode that generates sections/files based on dialogue with the user instead of using standard starter kits. This would provide a more personalized and interactive setup experience. Maybe this should allow for downloading files from github based on needs of the user.
-- [ ] Less invasive onboarding materials
+- [ ] Less invasive startup kit materials
 - [ ] Encrypted secrets storage?
+- [ ] ln-tool vs ln_description in mode, would be good to create a coherent naming scheme for those attributes
 
 
 > ### Required
-> [[1](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/settings/SettingsTab.ts#L6-L73)][[2](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/main.ts#L213-L420)]:Remember to rename the sample classes to something that makes sense to your plugin. If there are any errors, Obsidian will spit out this class name, so this will be important for users to debug if they need to.
-> 
 > [[1](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/settings/SettingsTab.ts#L32)][[2](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/settings/SettingsTab.ts#L46)][[3](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/settings/SettingsTab.ts#L63)][[4](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/settings/SettingsTab.ts#L70)][[5](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L405)][[6](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L439)][[7](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L444)][[8](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L449)][[9](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/LucideIcon.tsx#L29)]:Using `innerHTML`, `outerHTML` or similar API's is a security risk. Instead, use the DOM API or the Obsidian helper functions: https://docs.obsidian.md/Plugins/User+interface/HTML+elements
 > 
 > [[1](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/tools/utils/getDailyNotesSettings.ts#L14)]:Obsidian's configuration directory isn't necessarily `.obsidian`, it can be configured by the user. You can access the configured value from `Vault#configDir`

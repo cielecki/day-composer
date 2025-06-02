@@ -1,6 +1,3 @@
-import MyPlugin from "../main";
-import { readFile } from "../utils/fs/read-file";
-import { getFile } from "../utils/fs/get-file";
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
 import { t } from "../i18n";

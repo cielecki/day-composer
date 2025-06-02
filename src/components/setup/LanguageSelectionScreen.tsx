@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { t } from '../../i18n';
-import { getPluginSettings } from '../../settings/PluginSettings';
+import { getPluginSettings } from '../../settings/LifeNavigatorSettings';
 import { LucideIcon } from '../LucideIcon';
 
 interface LanguageSelectionScreenProps {
@@ -78,17 +78,17 @@ export const LanguageSelectionScreen: React.FC<LanguageSelectionScreenProps> = (
 	};
 
 	return (
-		<div className="setup-screen">
-			<div className="setup-content">
+		<div className="setup-screen-focused">
+			<div className="setup-content-focused">
 				<div className="setup-icon">
 					<LucideIcon name="languages" size={64} color="var(--interactive-accent)" />
 				</div>
 				
-				<h2 className="setup-title">
+				<h2 className="setup-title-focused">
 					{t('ui.setup.language.title')}
 				</h2>
 				
-				<p className="setup-description">
+				<p className="setup-description-focused">
 					{t('ui.setup.language.description')}
 				</p>
 
@@ -106,16 +106,20 @@ export const LanguageSelectionScreen: React.FC<LanguageSelectionScreenProps> = (
 						{getAvailableLanguages().map((lang) => (
 							<button
 								key={lang.code}
-								className={`setup-language-button`}
+								className={`setup-language-button ${currentLanguage === lang.code ? 'current' : ''}`}
 								onClick={() => handleLanguageChange(lang.code)}
 								disabled={isConfiguring}
 							>
-								<span className="language-name">
-									{lang.nativeName}
+								<div className="language-button-content">
+									<span className="language-name">
+										{lang.nativeName}
+									</span>
 									{currentLanguage === lang.code && (
-										<span className="language-current"> ✓ {t('ui.setup.language.current')}</span>
+										<span className="language-current-indicator">
+											<LucideIcon name="check" size={16} color="var(--interactive-accent)" />
+										</span>
 									)}
-								</span>
+								</div>
 							</button>
 						))}
 					</div>

@@ -18,16 +18,20 @@ export class ToolApprovalModal extends Modal {
     const { contentEl } = this;
     contentEl.empty();
     
-    // Add modal styling
+    // Add modal styling - set up the container structure
     contentEl.addClass('tool-approval-modal');
     contentEl.style.maxWidth = '600px';
     contentEl.style.maxHeight = '80vh';
-    contentEl.style.overflow = 'auto';
+    contentEl.style.overflow = 'hidden'; // Prevent the whole modal from scrolling
+    contentEl.style.display = 'flex';
+    contentEl.style.flexDirection = 'column';
 
-    // Header with warning icon
+    // Fixed Header with warning icon
     const headerEl = contentEl.createEl('div', { 
       cls: 'tool-approval-header',
-      attr: { style: 'display: flex; align-items: center; gap: 8px; margin-bottom: 16px;' }
+      attr: { 
+        style: 'display: flex; align-items: center; gap: 8px; padding: 16px; border-bottom: 1px solid var(--background-modifier-border); flex-shrink: 0;' 
+      }
     });
     
     const warningIcon = headerEl.createEl('span', {
@@ -36,98 +40,101 @@ export class ToolApprovalModal extends Modal {
     warningIcon.textContent = '⚠️';
     
     headerEl.createEl('h2', { 
-      text: 'Security Warning: User-Defined Tool',
+      text: t('toolApproval.header.title'),
       attr: { style: 'margin: 0; color: var(--color-red);' }
     });
 
-    // Tool information section
-    const infoSection = contentEl.createEl('div', { 
-      attr: { style: 'margin-bottom: 16px;' }
+    // Scrollable content container
+    const scrollableContent = contentEl.createEl('div', {
+      attr: { 
+        style: 'flex: 1; overflow-y: auto; padding: 16px;' 
+      }
     });
-    
-    const toolInfoEl = infoSection.createEl('div', {
+
+    // Tool information section
+    const toolInfoEl = scrollableContent.createEl('div', {
       attr: { style: 'background: var(--background-secondary); padding: 12px; border-radius: 6px; margin-bottom: 16px;' }
     });
     
-    toolInfoEl.createEl('p').innerHTML = `<strong>Tool:</strong> ${this.escapeHtml(this.tool.name)}`;
-    toolInfoEl.createEl('p').innerHTML = `<strong>Description:</strong> ${this.escapeHtml(this.tool.description)}`;
-    toolInfoEl.createEl('p').innerHTML = `<strong>File:</strong> ${this.escapeHtml(this.tool.filePath)}`;
+    toolInfoEl.createEl('p').innerHTML = `<strong>${t('toolApproval.info.tool')}:</strong> ${this.escapeHtml(this.tool.name)}`;
+    toolInfoEl.createEl('p').innerHTML = `<strong>${t('toolApproval.info.description')}:</strong> ${this.escapeHtml(this.tool.description)}`;
+    toolInfoEl.createEl('p').innerHTML = `<strong>${t('toolApproval.info.file')}:</strong> ${this.escapeHtml(this.tool.filePath)}`;
 
-    // Security warning section
-    const warningSection = contentEl.createEl('div', {
+    // Security warning section - fix the red-on-red text issue
+    const warningSection = scrollableContent.createEl('div', {
       attr: { 
-        style: 'background: var(--background-modifier-error); border: 1px solid var(--color-red); padding: 16px; border-radius: 6px; margin-bottom: 16px;'
+        style: 'background: var(--background-secondary); border-left: 4px solid var(--color-red); padding: 16px; border-radius: 6px; margin-bottom: 16px; border: 1px solid var(--background-modifier-border);'
       }
     });
 
     warningSection.createEl('h3', { 
-      text: '🔴 IMPORTANT SECURITY NOTICE',
+      text: t('toolApproval.security.title'),
       attr: { style: 'margin: 0 0 8px 0; color: var(--color-red);' }
     });
     
     warningSection.createEl('p', { 
-      text: 'This tool will execute JavaScript code that can:',
-      attr: { style: 'margin: 8px 0;' }
+      text: t('toolApproval.security.description'),
+      attr: { style: 'margin: 8px 0; color: var(--text-normal);' }
     });
     
     const risksList = warningSection.createEl('ul', {
-      attr: { style: 'margin: 8px 0; padding-left: 20px;' }
+      attr: { style: 'margin: 8px 0; padding-left: 20px; color: var(--text-normal);' }
     });
     
-    risksList.createEl('li', { text: 'Access your entire Obsidian vault' });
-    risksList.createEl('li', { text: 'Read, create, modify, or delete files' });
-    risksList.createEl('li', { text: 'Make network requests' });
-    risksList.createEl('li', { text: 'Potentially access system resources' });
+    risksList.createEl('li', { text: t('toolApproval.security.risks.vault') });
+    risksList.createEl('li', { text: t('toolApproval.security.risks.files') });
+    risksList.createEl('li', { text: t('toolApproval.security.risks.network') });
+    risksList.createEl('li', { text: t('toolApproval.security.risks.system') });
     
     warningSection.createEl('p', { 
-      text: 'Only approve tools from trusted sources that you understand!',
+      text: t('toolApproval.security.warning'),
       attr: { style: 'font-weight: bold; margin: 8px 0 0 0; color: var(--color-red);' }
     });
 
     // Tool schema section
-    const schemaSection = contentEl.createEl('div', {
+    const schemaSection = scrollableContent.createEl('div', {
       attr: { style: 'margin-bottom: 16px;' }
     });
     
     schemaSection.createEl('h3', { 
-      text: 'Tool Schema:',
+      text: t('toolApproval.schema.title'),
       attr: { style: 'margin: 0 0 8px 0;' }
     });
     
     const schemaEl = schemaSection.createEl('pre', {
       attr: { 
-        style: 'background: var(--background-secondary); padding: 12px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; font-family: var(--font-monospace); font-size: 12px;'
+        style: 'background: var(--background-secondary); padding: 12px; border-radius: 6px; white-space: pre-wrap; font-family: var(--font-monospace); font-size: 12px; word-wrap: break-word;'
       }
     });
     schemaEl.textContent = JSON.stringify(this.tool.schema, null, 2);
 
-    // Tool code section
-    const codeSection = contentEl.createEl('div', {
+    // Tool code section - remove individual scrolling
+    const codeSection = scrollableContent.createEl('div', {
       attr: { style: 'margin-bottom: 20px;' }
     });
     
     codeSection.createEl('h3', { 
-      text: 'Tool Code:',
+      text: t('toolApproval.code.title'),
       attr: { style: 'margin: 0 0 8px 0;' }
     });
     
     const codeEl = codeSection.createEl('pre', {
       attr: { 
-        style: 'background: var(--background-secondary); padding: 12px; border-radius: 6px; overflow-x: auto; max-height: 200px; white-space: pre-wrap; font-family: var(--font-monospace); font-size: 12px;'
+        style: 'background: var(--background-secondary); padding: 12px; border-radius: 6px; white-space: pre-wrap; font-family: var(--font-monospace); font-size: 12px; word-wrap: break-word;'
       }
     });
     codeEl.textContent = this.tool.executeCode;
 
-    // Buttons
+    // Fixed buttons at the bottom
     const buttonsEl = contentEl.createEl('div', {
       attr: { 
-        style: 'display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;'
+        style: 'display: flex; gap: 10px; justify-content: flex-end; padding: 16px; border-top: 1px solid var(--background-modifier-border); flex-shrink: 0;'
       }
     });
 
     // Cancel button
     const cancelBtn = buttonsEl.createEl('button', {
-      text: 'Cancel',
+      text: t('toolApproval.buttons.cancel'),
       attr: { 
         style: 'padding: 8px 16px; border: 1px solid var(--background-modifier-border); background: var(--background-primary); color: var(--text-normal); border-radius: 4px; cursor: pointer;'
       }
@@ -140,7 +147,7 @@ export class ToolApprovalModal extends Modal {
 
     // Approve button
     const approveBtn = buttonsEl.createEl('button', {
-      text: 'I understand the risks - Approve',
+      text: t('toolApproval.buttons.approve'),
       attr: { 
         style: 'padding: 8px 16px; background: var(--interactive-accent); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;'
       }
@@ -150,6 +157,11 @@ export class ToolApprovalModal extends Modal {
       this.onResult(true);
       this.close();
     });
+
+    // Focus the approve button as the primary action after user has had time to read
+    setTimeout(() => {
+      approveBtn.focus();
+    }, 100);
 
     // Hover effects
     cancelBtn.addEventListener('mouseenter', () => {

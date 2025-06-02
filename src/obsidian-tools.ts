@@ -1,4 +1,4 @@
-import type MyPlugin from "./main";
+import type { LifeNavigatorPlugin } from './LifeNavigatorPlugin';
 import { createDocumentTool } from "./tools/create-document";
 import { searchVaultTool } from "./tools/search-vault";
 import { readDocumentTool } from "./tools/read-document";
@@ -19,7 +19,6 @@ import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tool-filter";
 import { LNMode } from './utils/mode/LNMode';
 import { ToolExecutionContext } from './utils/chat/types';
-import { getPluginSettings } from './settings/PluginSettings';
 
 // Import React
 import React from "react";
@@ -67,7 +66,7 @@ export interface ObsidianTool<TInput> {
  * Class that handles all Obsidian-specific tool operations
  */
 export class ObsidianTools {
-	private plugin: MyPlugin;
+	private plugin: LifeNavigatorPlugin;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private tools: ObsidianTool<any>[] = [
 		createDocumentTool,
@@ -88,7 +87,7 @@ export class ObsidianTools {
 		removeTodoTool,
 	];
 
-	constructor(plugin: MyPlugin) {
+	constructor(plugin: LifeNavigatorPlugin) {
 		this.plugin = plugin;
 	}
 
@@ -246,7 +245,7 @@ export class ObsidianTools {
 // Module-level instance management
 let instance: ObsidianTools | null = null;
 
-export function getObsidianTools(plugin: MyPlugin): ObsidianTools {
+export function getObsidianTools(plugin: LifeNavigatorPlugin): ObsidianTools {
 	// If instance exists, return it
 	if (instance) {
 		return instance;

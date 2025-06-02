@@ -1,4 +1,3 @@
-import MyPlugin from "../main";
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { Task } from "../utils/task/task-utils";
@@ -6,12 +5,8 @@ import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
 import {
-	findCurrentSpot,
 	readNote,
 	updateNote,
-	Note,
-	NoteNode,
-	TextBlock,
 	determineInsertionPosition
 } from "../utils/tools/note-utils";
 import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";

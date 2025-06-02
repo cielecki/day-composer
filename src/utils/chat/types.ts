@@ -1,5 +1,5 @@
 import { NavigationTarget } from '../../obsidian-tools';
-import MyPlugin from '../../main';
+import { LifeNavigatorPlugin } from '../../LifeNavigatorPlugin';
 
 export interface Message {
 	role: "user" | "assistant";
@@ -21,7 +21,7 @@ export interface MessageWithToolResults {
 // Tool Execution Context for the new context-based tool system
 export interface ToolExecutionContext<TInput = any> {
 	// Execution environment
-	plugin: MyPlugin;
+	plugin: LifeNavigatorPlugin;
 	params: TInput;
 	signal: AbortSignal;
 	

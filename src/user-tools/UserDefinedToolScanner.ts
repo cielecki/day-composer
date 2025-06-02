@@ -67,13 +67,12 @@ export class UserDefinedToolScanner {
       throw new Error(`Tool version is required. Please add 'ln-tool-version: "1.0.0"' to the frontmatter of ${file.path}`);
     }
     
-    return {
-      filePath: file.path,
-      name: metadata?.frontmatter?.['ln-tool-name'] || file.basename,
+    const tool: UserDefinedTool = {
+      name: file.basename,
       description: metadata?.frontmatter?.['ln-tool-description'] || '',
+      icon: metadata?.frontmatter?.['ln-tool-icon'] || 'wrench',
+      filePath: file.path,
       version: version.trim(),
-      icon: metadata?.frontmatter?.['ln-tool-icon'] || 'gear',
-      iconColor: metadata?.frontmatter?.['ln-tool-icon-color'],
       executeCode,
       schema,
       enabled: metadata?.frontmatter?.['ln-tool-enabled'] !== false,
@@ -82,6 +81,8 @@ export class UserDefinedToolScanner {
       schemaHash: this.calculateHash(JSON.stringify(schema)),
       lastModified: file.stat.mtime
     };
+    
+    return tool;
   }
   
   private extractJSONBlocks(content: string): string[] {

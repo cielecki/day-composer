@@ -1,5 +1,4 @@
 import { prepareFuzzySearch } from "obsidian";
-import MyPlugin from "../main";
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
 import { t } from "../i18n";

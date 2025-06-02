@@ -1,4 +1,4 @@
-import type MyPlugin from '../main';
+import type { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 
 export type TTSVoice = "alloy" | "ash" | "coral" | "echo" | "fable" | "onyx" | "nova" | "sage" | "shimmer";
 export const TTS_VOICES: TTSVoice[] = ['alloy', 'ash', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer'];
@@ -9,7 +9,7 @@ export interface TutorialSettings {
 	// Future tutorial/setup related settings can be added here
 }
 
-export class PluginSettings {
+export class LifeNavigatorSettings {
 	// Generic secrets system - allows any string -> string mapping
 	secrets: Record<string, string> = {};
 	speechToTextPrompt: string = '';
@@ -18,15 +18,26 @@ export class PluginSettings {
 		obsidianLanguageConfigured: false,
 		openaiKeyConfigured: false
 	};
-	private plugin: MyPlugin | undefined;
+	private plugin: LifeNavigatorPlugin | undefined;
 
-	public init(plugin: MyPlugin) {
+	public init(plugin: LifeNavigatorPlugin) {
 		this.plugin = plugin;
 	}
 
 	async saveSettings(): Promise<void> {
 		if (this.plugin) {
-			await this.plugin.saveData(this);
+			// Create a copy of the current object and remove legacy properties
+			const dataToSave = { ...this };
+			
+			// Remove legacy API key properties
+			delete (dataToSave as any).openAIApiKey;
+			delete (dataToSave as any).anthropicApiKey;
+			delete (dataToSave as any).firecrawlApiKey;
+			
+			// Remove the plugin reference as it shouldn't be serialized
+			delete (dataToSave as any).plugin;
+			
+			await this.plugin.saveData(dataToSave);
 		}
 	}
 
@@ -80,10 +91,10 @@ export class PluginSettings {
 	}
 }
 
-let pluginInstance: PluginSettings;
+let pluginInstance: LifeNavigatorSettings;
 
-export function createPluginSettings(plugin: MyPlugin): PluginSettings {
-	const settings = new PluginSettings();
+export function createPluginSettings(plugin: LifeNavigatorPlugin): LifeNavigatorSettings {
+	const settings = new LifeNavigatorSettings();
 	settings.init(plugin);
 
 	// Load existing settings - this will be called asynchronously in main.ts
@@ -92,38 +103,48 @@ export function createPluginSettings(plugin: MyPlugin): PluginSettings {
 	return settings;
 }
 
-export async function loadPluginSettings(plugin: MyPlugin): Promise<PluginSettings> {
+export async function loadPluginSettings(plugin: LifeNavigatorPlugin): Promise<LifeNavigatorSettings> {
 	const settings = getPluginSettings();
 	
 	// Load existing settings
 	const data = await plugin.loadData() || {};
-	Object.assign(settings, data);
+	
+	// First, safely copy non-conflicting properties
+	const { openAIApiKey, anthropicApiKey, firecrawlApiKey, ...safeData } = data as any;
+	Object.assign(settings, safeData);
+
+	// Ensure secrets object exists
+	if (!settings.secrets) {
+		settings.secrets = {};
+	}
+
+	let migrationOccurred = false;
 
 	// Migration: move old API keys to new secrets system with standard naming
-	if ((data as any).openAIApiKey) {
-		settings.setSecret('OPENAI_API_KEY', (data as any).openAIApiKey);
-		// Don't delete old key yet to ensure backwards compatibility
+	if (openAIApiKey) {
+		settings.setSecret('OPENAI_API_KEY', openAIApiKey);
+		migrationOccurred = true;
 	}
 	
-	if ((data as any).anthropicApiKey) {
-		settings.setSecret('ANTHROPIC_API_KEY', (data as any).anthropicApiKey);
-		// Don't delete old key yet to ensure backwards compatibility
+	if (anthropicApiKey) {
+		settings.setSecret('ANTHROPIC_API_KEY', anthropicApiKey);
+		migrationOccurred = true;
 	}
 	
-	if ((data as any).firecrawlApiKey) {
-		settings.setSecret('FIRECRAWL_API_KEY', (data as any).firecrawlApiKey);
-		// Don't delete old key yet to ensure backwards compatibility
+	if (firecrawlApiKey) {
+		settings.setSecret('FIRECRAWL_API_KEY', firecrawlApiKey);
+		migrationOccurred = true;
 	}
 
-	// Save settings if migration occurred
-	if ((data as any).openAIApiKey || (data as any).anthropicApiKey || (data as any).firecrawlApiKey) {
+	// Save settings if migration occurred to persist the new format and remove old keys
+	if (migrationOccurred) {
 		await settings.saveSettings();
 	}
 
 	return settings;
 }
 
-export function getPluginSettings(): PluginSettings {
+export function getPluginSettings(): LifeNavigatorSettings {
 	if (!pluginInstance) {
 		throw new Error('Plugin settings not initialized. Call createPluginSettings first.');
 	}

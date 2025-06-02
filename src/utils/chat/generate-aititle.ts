@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { getPluginSettings } from "../../settings/PluginSettings";
+import { getPluginSettings } from "../../settings/LifeNavigatorSettings";
 import { LNMode } from '../mode/LNMode';
 
 

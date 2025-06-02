@@ -15,7 +15,7 @@ import {
 } from "../utils/mode/ln-mode-defaults";
 import * as yaml from "js-yaml";
 import { t } from '../i18n';
-import { getPluginSettings } from "../settings/PluginSettings";
+import { getPluginSettings } from "../settings/LifeNavigatorSettings";
 import { modeManagerService } from "../services/ModeManagerService";
 import { DEFAULT_VOICE_INSTRUCTIONS } from "../utils/mode/ln-mode-defaults";
 
