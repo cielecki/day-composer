@@ -3,7 +3,6 @@ import { ConfirmReloadModal } from './components/ConfirmReloadModal';
 import { initI18n, t } from './i18n';
 import { LifeNavigatorView, LIFE_NAVIGATOR_VIEW_TYPE } from './life-navigator-view';
 import { checkForAvailableUpdate, checkForUpdatesOnStartup } from './auto-update';
-import { createNewMode } from './utils/mode/create-new-mode';
 import { getObsidianTools, resetObsidianTools } from './obsidian-tools';
 import { LifeNavigatorSettingTab } from './settings/LifeNavigatorSettingTab';
 import { createPluginSettings, loadPluginSettings, getPluginSettings } from './settings/LifeNavigatorSettings';
@@ -43,16 +42,6 @@ export class LifeNavigatorPlugin extends Plugin {
 
 			return this.view;
 
-		});
-
-		// Add command to create a new mode
-		this.addCommand({
-			id: "create-new-mode",
-			name: t("tools.createNewMode"),
-			callback: async () => {
-				new Notice("Creating a new mode...");
-				await createNewMode(this.app);
-			},
 		});
 
 		// Add command to reset tutorial

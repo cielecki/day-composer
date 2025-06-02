@@ -695,33 +695,6 @@ export const LifeNavigatorApp: React.FC = () => {
 									
 								</>
 							)}
-
-							
-							<div
-								style={{
-									padding: "8px 12px",
-									cursor: "pointer",
-									display: "flex",
-									alignItems: "center",
-									gap: "8px",
-									fontSize: "14px",
-									color: "var(--text-normal)",
-									whiteSpace: "normal",
-									wordBreak: "break-word",
-								}}
-								onClick={() => {
-									if (window.app) {
-										// @ts-ignore - Using the Obsidian command API
-										window.app.commands.executeCommandById("life-navigator:create-new-mode");
-									}
-									setDropdownOpen(false);
-								}}
-								onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
-								onMouseOut={e => (e.currentTarget.style.backgroundColor = "transparent")}
-							>
-								<LucideIcon name="plus" size={16} color="var(--text-normal)" />
-								{t('ui.mode.newMode')}
-							</div>
 						</div>
 					)}
 				</div>

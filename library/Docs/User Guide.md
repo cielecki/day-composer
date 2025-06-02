@@ -166,10 +166,13 @@ Each mode can be extensively customized:
 
 ### Creating New Modes
 
-1. Create a new markdown file in the Modes directory
-2. Copy the structure from an existing mode
-3. Customize the system prompt, voice, and appearance settings
+To create a new mode, ask the AI assistant to help you. The AI can:
+1. Guide you through the process of creating a mode file
+2. Help you customize the system prompt, voice, and appearance settings
+3. Ensure the mode is properly configured and saved in the correct location
 4. The new mode will automatically appear in the Life Navigator panel
+
+Simply ask something like "Help me create a new mode for [your purpose]" and the AI will walk you through the process.
 
 ### Adding Information Files
 

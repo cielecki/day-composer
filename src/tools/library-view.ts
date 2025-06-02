@@ -41,12 +41,12 @@ const LIBRARY_PATH = 'library';
 export const libraryViewTool: ObsidianTool<LibraryViewInput> = {
   specification: schema,
   icon: "eye",
-  initialLabel: 'View library content',
+  initialLabel: t('tools.library.view.label'),
   execute: async (context: ToolExecutionContext<LibraryViewInput>): Promise<void> => {
     const { params } = context;
     const { path, save_to_vault = false, filename } = params;
 
-    context.setLabel('Downloading library content...');
+    context.setLabel(t('tools.library.view.inProgress'));
 
     try {
       // Clean up the path
@@ -70,7 +70,7 @@ export const libraryViewTool: ObsidianTool<LibraryViewInput> = {
 
       // Check if request was successful
       if (response.status !== 200) {
-        context.setLabel('Download failed');
+        context.setLabel(t('tools.library.view.failed'));
         throw new ToolExecutionError(`Failed to download ${cleanPath}. Status: ${response.status} (file may not exist)`);
       }
 
@@ -107,11 +107,11 @@ export const libraryViewTool: ObsidianTool<LibraryViewInput> = {
       formattedContent += content;
 
       // Display the formatted content
-      context.setLabel('Library content viewed');
+      context.setLabel(t('tools.library.view.completed'));
       context.progress(formattedContent);
 
     } catch (error) {
-      context.setLabel('Failed to view content');
+      context.setLabel(t('tools.library.view.failed'));
       if (error instanceof ToolExecutionError) {
         throw error;
       }

@@ -22,15 +22,15 @@ const INDEX_PATH = 'library/index.md';
 export const libraryListTool: ObsidianTool<LibraryListInput> = {
 	specification: schema,
 	icon: "library",
-	initialLabel: 'Browse Life Navigator library',
+	initialLabel: t('tools.library.list.label'),
 	execute: async (context: ToolExecutionContext<LibraryListInput>): Promise<void> => {
 		try {
-			context.setLabel('Browsing Life Navigator library...');
+			context.setLabel(t('tools.library.list.inProgress'));
 
 			const [owner, repo] = LIFE_NAVIGATOR_REPO.split('/');
 
 			// Fetch the index.md file directly
-			const indexUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${INDEX_PATH}`;
+			const indexUrl = `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/${INDEX_PATH}`;
 			const response = await fetch(indexUrl);
 
 			if (!response.ok) {
@@ -42,7 +42,7 @@ export const libraryListTool: ObsidianTool<LibraryListInput> = {
 			context.progress(indexContent);
 
 		} catch (error) {
-			context.setLabel('Failed to browse library');
+			context.setLabel(t('tools.library.list.failed'));
 			const errorMessage = error instanceof Error ? error.message : String(error);
 			context.progress(`❌ Error: ${errorMessage}`);
 			throw error instanceof ToolExecutionError ? error : new ToolExecutionError(errorMessage);

@@ -84,6 +84,34 @@ This index catalogs all files in the Life Navigator library with descriptions an
 - **Description**: Motivational workout buddy/coach mode with direct, energetic communication style focused on action-oriented advice and identifying next optimal tasks
 - **Use When**: User needs motivation, wants direct action-focused advice, requires energy boost, or prefers masculine, no-nonsense interaction style
 
+## Docs - Documentation
+
+### Getting Started & Setup
+- **Path**: `Docs/Installation.md`
+- **Description**: Step-by-step installation guide covering Obsidian setup, vault creation, plugin installation (both community browser and manual methods), mobile configuration, and troubleshooting common setup issues
+- **Use When**: User is setting up Life Navigator for the first time, needs help with installation issues, wants to configure mobile sync, or troubleshooting plugin visibility problems
+
+- **Path**: `Docs/User Guide.md`
+- **Description**: Comprehensive user guide covering core concepts, daily workflows, customization options, mobile usage, and best practices for getting the most out of Life Navigator with detailed examples and troubleshooting tips
+- **Use When**: User needs help understanding how Life Navigator works, wants to learn about features, needs guidance on daily workflows, customizing modes, or general usage questions
+
+### Technical Documentation
+- **Path**: `Docs/Link Expansion.md`
+- **Description**: Technical documentation explaining the link expansion system including special link formats (daily notes, date/time, current file), usage of the magnifying glass emoji (🔎), and HTML comment filtering during expansion
+- **Use When**: User wants to understand how link expansion works, needs help with dynamic links, troubleshooting link issues, or building complex context structures with nested links
+
+- **Path**: `Docs/Tools.md`
+- **Description**: Complete reference for all built-in Life Navigator tools including document management, vault exploration, task management, system tools, deep research capabilities, and tool filtering configuration
+- **Use When**: User needs information about available tools, wants to understand tool capabilities, needs examples of tool usage, or configuring tool access in different modes
+
+- **Path**: `Docs/User Defined Tools.md`
+- **Description**: Comprehensive guide for creating custom JavaScript tools including security warnings, tool structure (frontmatter, JSON schema, JavaScript implementation), execution context, available APIs, examples, and troubleshooting
+- **Use When**: User wants to create custom tools, needs help with tool development, debugging user-defined tools, understanding security implications, or learning about the tool approval process
+
+- **Path**: `Docs/Validation Tools.md`
+- **Description**: Documentation for built-in validation tools (Mode Validator and Tool Validator) that check configuration completeness, YAML/JSON syntax, link expansion, and provide detailed error/warning reports
+- **Use When**: User is troubleshooting mode or tool issues, wants to validate configurations before sharing, needs to debug problems, or ensure quality in their Life Navigator setup
+
 ## File Selection Guidelines
 
 ### High Priority (Download First)
@@ -95,16 +123,23 @@ This index catalogs all files in the Life Navigator library with descriptions an
 ### Context-Dependent
 - **Planning Sessions**: `Modes/Planner.md` + `Info/About Me/Day Structure.md` + `Info/Backlog.md` + day notes
 - **Personal Discussions**: `Info/About Me/` directory + `Modes/Reflection.md`
-- **Technical Help**: `Modes/Tool Creator.md` + `Tools/Template Tool.md`
+- **Technical Help**: `Modes/Tool Creator.md` + `Tools/Template Tool.md` + `Docs/User Defined Tools.md`
 - **Research Requests**: `Tools/Deep Research Tool.md` or `Tools/YouTube Transcript Tool.md`
 - **Creative Projects**: `Modes/Songwriter.md` + `Tools/Image Generation Tool.md`
+- **Setup & Installation**: `Docs/Installation.md` + `Docs/User Guide.md`
+- **Understanding Features**: `Docs/User Guide.md` + `Docs/Tools.md` + `Docs/Link Expansion.md`
+- **Troubleshooting**: `Docs/Validation Tools.md` + relevant documentation based on issue
 
 ### Situational
 - Weather-related queries: `Tools/Weather Tool.md`
-- Tool development: `Tools/Template Tool.md` + `Modes/Tool Creator.md`
+- Tool development: `Tools/Template Tool.md` + `Modes/Tool Creator.md` + `Docs/User Defined Tools.md`
 - Casual conversation: `Modes/Bro.md`
 - Goal setting: `Info/Backlog.md` + `Info/About Me/Role Models.md`
 - Daily routine questions: `Info/About Me/Day Structure.md`
+- Link expansion questions: `Docs/Link Expansion.md`
+- Tool usage questions: `Docs/Tools.md`
+- Mode/tool validation: `Docs/Validation Tools.md`
+- First-time setup: `Docs/Installation.md` + `Docs/User Guide.md`
 
 ## Usage Patterns
 
@@ -112,7 +147,9 @@ This index catalogs all files in the Life Navigator library with descriptions an
 **Personal Advice**: Include `Info/About Me.md` and relevant relationship/role model files
 **Daily Planning**: Combine `Modes/Planner.md` with `Info/About Me/Day Structure.md` and day notes
 **Creative Work**: Use specialized modes (`Modes/Songwriter.md`) with appropriate tools
-**Technical Support**: Load `Modes/Tool Creator.md` for development assistance
+**Technical Support**: Load `Modes/Tool Creator.md` and `Docs/User Defined Tools.md` for development assistance
 **Reflection Sessions**: Use `Modes/Reflection.md` with personal info and recent day notes
+**Learning Life Navigator**: Start with `Docs/User Guide.md` and explore specific documentation as needed
+**Debugging Issues**: Use `Docs/Validation Tools.md` with relevant mode/tool files
 
 This index enables AI to make informed decisions about which files to download based on user context, ensuring relevant information is always available while avoiding unnecessary file loading.
