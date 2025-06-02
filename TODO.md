@@ -1,8 +1,38 @@
 # TODO
 
-- [x] 📱 Poprawić highlight na mobilce w Life Navigatorze
-- [ ] 💡 Zrobić kreator narzędzi w Obsidianie (nie przez MCP, tylko bezpośrednio tworzone)
-- [ ] ▶️ Dodać możliwość pauzowania i odpauzowywania audio w Life Navigatorze
+- [ ] Generate image should be a user tool
+- [ ] user tools should have a version attribute
+- [ ] Proper mature user defined calendar tool 
+- [ ] Deep research should be a user tool
+- [ ] Any other tools should be user tools?
+- [ ] Wrap up and prepare the user tools feature for release
+- [ ] **AI-Assisted Knowledge Base Editing:** Explore functionality for the AI to directly suggest or make additions/modifications to the user's core knowledge files (e.g., `About Me.md`, `Relationships.md`) based on conversations or insights. The user need is to streamline the process of updating personal context, allowing the AI to help maintain and expand the knowledge base it uses.
+- [ ] **Interactive Creator Mode:** How to create guidance for users when creating their materials? Some nice mode? or docs? Maybe a tutorial agent? Create a creator mode that generates sections/files based on dialogue with the user instead of using standard starter kits. This would provide a more personalized and interactive setup experience. Maybe this should allow for downloading files from github based on needs of the user.
+- [ ] **Asset repository:** Create a repository of assets that can be used in the plugin and can be downloaded by the creation agent.
+
+There should be an assets.json file in the repository that the plugin downloads, the structure of assets.json:
+
+{
+    "assets": [
+        {
+            "name": "asset1",
+            "type": "tool | mode | note",
+            "hash": "1234567890"
+            "url": "https://example.com/asset1.md"
+            
+        },
+        {
+            "name": "Example Asset",
+            "type": "note",
+            "hash": "1234567890"
+            "url": "https://example.com/example.md"
+        }
+    ]
+}
+
+The main Life Navigator mode should have tools to search this assets repository and download assets - and get them as a result of the tool call. Those assets should be strictly english and the agent should be repsonsible for translating them to the language of the user and adjusting them for user's needs before saving them to the user's vault. It's also possible that the agent will download few sample modes or toools and then create a completly new asset based on them.
+
+Maybe this does not have to be json as it will be interpreted by AI anyway. it could be a markdown doc.
 
 # Stages
 - [ ] Onboard 5 people to the plugin
@@ -16,7 +46,9 @@
 - [ ] Article about wiki paradigm as markdown database (creating/using input output not chats and rag, AI helping with this)
 
 ## Nice to haves
+- [ ] Introduce support for weekly and monthly summaries via ln-monthly-note and ln-weekly-note.
 - [ ] Creator prototype
+- [ ] Change the link emoji to 🧭?
 - [ ] Can I have more granular styles.css?
 - [ ] Proper management of available tools for modes.
 - [ ] System prompt injection into TTS prompt via current chat expansion? also refactor the way current chat information is gathered.
