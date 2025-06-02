@@ -575,8 +575,8 @@ export const LifeNavigatorApp: React.FC = () => {
 								onClick={() => {
 									if (window.app && activeMode.ln_path) {
 										const file = window.app.vault.getAbstractFileByPath(activeMode.ln_path);
-										if (file) {
-											window.app.workspace.getLeaf().openFile(file as TFile);
+										if (file instanceof TFile) {
+											window.app.workspace.getLeaf().openFile(file);
 										}
 									}
 									setDropdownOpen(false);

@@ -11,7 +11,7 @@ export async function getDailyNotesSettings(app: App): Promise<DailyNotesSetting
   let settings: DailyNotesSettings = { folder: '', format: 'YYYY-MM-DD' };
 
   try {
-    const dailyNotesConfigPath = '.obsidian/daily-notes.json';
+    const dailyNotesConfigPath = `${app.vault.configDir}/daily-notes.json`;
     if (await app.vault.adapter.exists(dailyNotesConfigPath)) {
       const configContent = await app.vault.adapter.read(dailyNotesConfigPath);
       const config = JSON.parse(configContent);
