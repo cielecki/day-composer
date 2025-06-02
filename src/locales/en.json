@@ -236,12 +236,6 @@
     "add": {
       "label": "Add Todo"
     },
-    "append": {
-      "completed": "Appended to {{path}}",
-      "failed": "Failed to append to {{path}}",
-      "inProgress": "Appending to {{path}}...",
-      "label": "Append to Document"
-    },
     "check": {
       "label": "Check Todo"
     },
@@ -254,13 +248,22 @@
     },
     "createDocument": {
       "progress": {
-        "success": "Successfully created document in {{path}}"
+        "success": "Successfully created document in {{path}}",
+        "versionedPath": "File already exists. Creating versioned file: {{originalPath}} → {{versionedPath}}"
       }
     },
     "createNewMode": "Create New Mode",
     "createStarterKit": "Create Starter Kit",
     "edit": {
       "label": "Edit Todo"
+    },
+    "find": {
+      "completed": "Found content in {{path}}",
+      "empty": "Directory {{path}} is empty",
+      "failed": "Failed to find content in {{path}}",
+      "header": "Contents of {{path}} ({{count}} items):",
+      "inProgress": "Finding content in {{path}}...",
+      "label": "Find Files"
     },
     "findFilesByTag": {
       "completed": "Found {{count}} files with tag {{tag}}",
@@ -277,14 +280,6 @@
       "label": "Handover Mode",
       "noReason": "Switching to {{mode}} mode"
     },
-    "listDirectory": {
-      "completed": "Listed directory {{path}}",
-      "empty": "Directory {{path}} is empty",
-      "failed": "Failed to list directory {{path}}",
-      "header": "Contents of {{path}} ({{count}} items):",
-      "inProgress": "Listing directory {{path}}...",
-      "label": "List Directory"
-    },
     "move": {
       "label": "Move Todo"
     },
@@ -292,16 +287,17 @@
       "navigateToCompletedTodo": "Navigate to completed todo",
       "navigateToEditedTodo": "Navigate to edited todo",
       "navigateToUncheckedTodo": "Navigate to unchecked todo",
-      "openAppendedDocument": "Open appended document",
       "openCreatedDocument": "Open created document",
-      "openDocument": "Open document"
+      "openEditedDocument": "Open edited document",
+      "openNote": "Open document"
+    },
+    "noteEdit": {
+      "completed": "Edited document {{path}}",
+      "failed": "Failed to edit document {{path}}",
+      "inProgress": "Editing document {{path}}...",
+      "label": "Edit Document"
     },
     "openLifeNavigator": "Open Life Navigator",
-    "progress": {
-      "appendToDocument": {
-        "success": "Content appended to {{path}}"
-      }
-    },
     "read": {
       "completed": "Read document {{path}}",
       "failed": "Failed to read document {{path}}",
@@ -333,6 +329,12 @@
     },
     "uncheck": {
       "label": "Uncheck Todo"
+    },
+    "urlDownload": {
+      "completed": "Downloaded content from {{url}}",
+      "failed": "Failed to download from {{url}}",
+      "inProgress": "Downloading from {{url}}...",
+      "label": "Download URL"
     }
   },
   "ui": {

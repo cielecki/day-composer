@@ -236,12 +236,6 @@
     "add": {
       "label": "Dodaj Todo"
     },
-    "append": {
-      "completed": "Dołączono do {{path}}",
-      "failed": "Nie udało się dołączyć do {{path}}",
-      "inProgress": "Dołączanie do {{path}}...",
-      "label": "Dołącz do Dokumentu"
-    },
     "check": {
       "label": "Zaznacz Todo"
     },
@@ -254,13 +248,22 @@
     },
     "createDocument": {
       "progress": {
-        "success": "Pomyślnie utworzono dokument w {{path}}"
+        "success": "Pomyślnie utworzono dokument w {{path}}",
+        "versionedPath": "Plik już istnieje. Tworzenie wersjonowanego pliku: {{originalPath}} → {{versionedPath}}"
       }
     },
     "createNewMode": "Utwórz nowy tryb",
     "createStarterKit": "Utwórz pakiet startowy",
     "edit": {
       "label": "Edytuj Todo"
+    },
+    "find": {
+      "completed": "Znaleziono zawartość w {{path}}",
+      "empty": "Katalog {{path}} jest pusty",
+      "failed": "Nie udało się znaleźć zawartości w {{path}}",
+      "header": "Zawartość {{path}} ({{count}} elementów):",
+      "inProgress": "Wyszukiwanie zawartości w {{path}}...",
+      "label": "Znajdź Pliki"
     },
     "findFilesByTag": {
       "completed": "Znaleziono {{count}} plików z tagiem {{tag}}",
@@ -277,14 +280,6 @@
       "label": "Przekaż Tryb",
       "noReason": "Przełączanie na tryb {{mode}}"
     },
-    "listDirectory": {
-      "completed": "Wyświetlono katalog {{path}}",
-      "empty": "Katalog {{path}} jest pusty",
-      "failed": "Nie udało się wyświetlić katalogu {{path}}",
-      "header": "Zawartość {{path}} ({{count}} elementów):",
-      "inProgress": "Wyświetlanie katalogu {{path}}...",
-      "label": "Wyświetl Katalog"
-    },
     "move": {
       "label": "Przenieś Todo"
     },
@@ -292,16 +287,17 @@
       "navigateToCompletedTodo": "Przejdź do ukończonego todo",
       "navigateToEditedTodo": "Przejdź do edytowanego todo",
       "navigateToUncheckedTodo": "Przejdź do odznaczonego todo",
-      "openAppendedDocument": "Otwórz dołączony dokument",
       "openCreatedDocument": "Otwórz utworzony dokument",
-      "openDocument": "Otwórz dokument"
+      "openEditedDocument": "Otwórz edytowany dokument",
+      "openNote": "Otwórz dokument"
+    },
+    "noteEdit": {
+      "completed": "Edytowano dokument {{path}}",
+      "failed": "Nie udało się edytować dokumentu {{path}}",
+      "inProgress": "Edytowanie dokumentu {{path}}...",
+      "label": "Edytuj Dokument"
     },
     "openLifeNavigator": "Otwórz Life Navigator",
-    "progress": {
-      "appendToDocument": {
-        "success": "Dołączono zawartość do {{path}}"
-      }
-    },
     "read": {
       "completed": "Odczytano dokument {{path}}",
       "failed": "Nie udało się odczytać dokumentu {{path}}",
@@ -333,6 +329,12 @@
     },
     "uncheck": {
       "label": "Odznacz Todo"
+    },
+    "urlDownload": {
+      "completed": "Pobrano zawartość z {{url}}",
+      "failed": "Nie udało się pobrać z {{url}}",
+      "inProgress": "Pobieranie z {{url}}...",
+      "label": "Pobierz URL"
     }
   },
   "ui": {

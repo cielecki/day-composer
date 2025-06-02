@@ -6,13 +6,13 @@ import { TFile } from "obsidian";
 
 const schema = {
   name: "note_read",
-  description: "Reads the content of a document from the vault",
+  description: "Reads the content of a note from the vault",
   input_schema: {
     type: "object",
     properties: {
       path: {
         type: "string",
-        description: "The path of the document to read (including .md extension)",
+        description: "The path of the note to read (including .md extension)",
       }
     },
     required: ["path"]
@@ -52,7 +52,7 @@ export const noteReadTool: ObsidianTool<NoteReadToolInput> = {
       // Add navigation target
       context.addNavigationTarget({
         filePath: path,
-        description: t("tools.navigation.openDocument")
+        description: t("tools.navigation.openNote")
       });
 
       context.setLabel(t('tools.read.completed', { path }));

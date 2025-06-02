@@ -8,6 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Mode and Tool Validation Tools**: Added two new built-in validation tools for quality assurance and debugging:
+  - **Mode Validator Tool**: Validates Life Navigator mode files for completeness, correctness, and functionality. Checks frontmatter structure, required attributes, link expansion, system prompt rendering, and ensures all mode settings are valid.
+  - **Tool Validator Tool**: Validates user-defined tool files for proper structure, schema validity, JavaScript code syntax, and integration with the tool system. Helps identify issues before tools are executed.
+  - Both tools provide comprehensive reports with errors, warnings, and informational messages, and include navigation targets to open the validated files for editing.
+- **URL Download Tool**: Simple tool for downloading content from any URL and displaying it directly in the chat:
+  - **URL Validation**: Ensures proper URL format before attempting download
+  - **Content Display**: Shows downloaded content with metadata (content type, length, status)
+  - **Error Handling**: Clear error messages for invalid URLs or failed requests
+  - **User Agent**: Properly identifies as Life Navigator for web requests
+- **Comprehensive Note Editing Tool**: Replaced simple append-to functionality with advanced `note_edit` tool supporting multiple edit operations in sequence:
+  - **Replace**: Replace first occurrence of text (supports multiline)
+  - **Insert**: Insert content at various positions (after/before text, after/before line numbers, append to end, prepend to start)
+  - **Sequential Processing**: Apply multiple edits in one operation with detailed feedback for each step
+  - **Enhanced Error Handling**: Descriptive error messages when search text isn't found or line numbers are out of bounds
+- **Enhanced Note Creation**: Extended `note_create` tool with auto-versioning capability:
+  - **Auto-versioning**: Automatically create versioned filenames when file exists (e.g., 'note.md' becomes 'note 2.md')
+  - **Intelligent Naming**: Sequential versioning with proper extension handling
+  - **Backward Compatibility**: Optional feature that maintains existing behavior when disabled
 - **User-Defined Tools**: Introduced comprehensive system for creating custom tools from Obsidian notes. Users can create tools by adding `ln-tool` tag to note frontmatter with JSON schema and JavaScript implementation. Includes security approval system, sandboxed execution, and example tools for YouTube transcript downloads and weather reports. Feature is disabled by default with clear security warnings. Converted deep research functionality to user-defined tool using direct Firecrawl API requests instead of external dependencies. Converted image generation functionality to user-defined tool using direct OpenAI API requests instead of external dependencies.
 - **Generic Secrets Management**: Replaced specific API key fields with flexible secrets system allowing any key-value pairs. Includes UI for adding/editing/deleting secrets with automatic migration from old API keys. Updated to use industry-standard environment variable naming conventions (OPENAI_API_KEY, ANTHROPIC_API_KEY, FIRECRAWL_API_KEY) for better compatibility with other tools and development environments. Added global `getSecret()` function available to all user-defined tools for secure access to API keys and secrets.
 - **Security Approval System**: Added security approval system for user-defined tools with code verification and persistent approvals.
@@ -21,6 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Setup Screen Overhaul**: Simplified setup screen CSS by removing excessive animations, transforms, and over-styled elements. Replaced 90s-era web design patterns with clean, modern styling that follows Obsidian's design principles. Reduced CSS from ~320 lines to ~90 lines while maintaining functionality and improving visual appeal. Improved language selection interface in setup flow with better visual hierarchy, cleaner current language indicator using a checkmark icon instead of text, and enhanced button styling with proper selected states.
 - **User-Defined Tool Naming**: Tool names now come from filenames (like modes) instead of frontmatter `ln-tool-name` field. This makes tool creation simpler and more consistent with how modes work. Tool files can be renamed to change the tool name, and no frontmatter field is required for naming.
 - **Secrets**: Fixed issue where secrets edited in settings would not persist after app reload due to legacy loading overwriting the secrets object and improper async handling in the settings UI. The loading process now properly handles migration without overwriting new secrets, and all save operations are properly awaited. Additionally, the saveSettings() method now explicitly excludes legacy API keys from saved data, ensuring complete removal of old properties from data.json after migration.
+- **Vault Search Tool**: Improved vault search functionality to use Obsidian's built-in fuzzy search API (`prepareFuzzySearch`) instead of simple string matching. This provides more accurate search results with proper scoring, better relevance ranking, and fuzzy matching capabilities that match Obsidian's native search behavior. Search now covers both file paths and content with intelligent result prioritization.
+- **Vault Find Tool**: Renamed `vault_list_directory` tool to `vault_find` to better reflect its search capabilities similar to the Linux `find` command. Updated tool description, translations, and changed icon from folder to search to emphasize its find/search functionality rather than simple directory listing.
 
 ### Fixed
 - **Waveform Visibility During Transcription**: Fixed waveform visualization to remain visible during transcription instead of disappearing. The waveform now stays static during transcription (showing the last recorded pattern) and is cleared after transcription completes. This provides better visual feedback by maintaining the visual indication during processing while stopping the distracting animation.

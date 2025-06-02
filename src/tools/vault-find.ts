@@ -5,8 +5,8 @@ import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { t } from "../i18n";
 
 const schema = {
-  name: "vault_list_directory",
-  description: "Lists files and directories in a given vault path. Can list recursively to show the complete directory structure.",
+  name: "vault_find",
+  description: "Find files and directories in the vault using various search criteria. Similar to the Linux 'find' command, it can search recursively and filter by file types.",
   input_schema: {
     type: "object",
     properties: {
@@ -42,7 +42,7 @@ const schema = {
   }
 };
 
-type VaultListDirectoryToolInput = {
+type VaultFindToolInput = {
   directory_path?: string;
   recursive?: boolean;
   include_files?: boolean;
@@ -59,15 +59,15 @@ interface DirectoryItem {
   children?: DirectoryItem[];
 }
 
-export const vaultListDirectoryTool: ObsidianTool<VaultListDirectoryToolInput> = {
+export const vaultFindTool: ObsidianTool<VaultFindToolInput> = {
   specification: schema,
-  icon: "folder",
-  initialLabel: t('tools.listDirectory.label'),
-  execute: async (context: ToolExecutionContext<VaultListDirectoryToolInput>): Promise<void> => {
+  icon: "search",
+  initialLabel: t('tools.find.label'),
+  execute: async (context: ToolExecutionContext<VaultFindToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { directory_path = "", recursive = false, include_files = true, include_folders = true, file_types = [] } = params;
     
-    context.setLabel(t('tools.listDirectory.inProgress', { path: directory_path || 'root' }));
+    context.setLabel(t('tools.find.inProgress', { path: directory_path || 'root' }));
 
     try {
       // Normalize the path
@@ -77,12 +77,12 @@ export const vaultListDirectoryTool: ObsidianTool<VaultListDirectoryToolInput> =
       const folder = targetPath === "" ? plugin.app.vault.getRoot() : plugin.app.vault.getAbstractFileByPath(targetPath);
       
       if (!folder) {
-        context.setLabel(t('tools.listDirectory.failed', { path: targetPath }));
+        context.setLabel(t('tools.find.failed', { path: targetPath }));
         throw new ToolExecutionError(`Directory not found: ${targetPath}`);
       }
       
       if (!(folder instanceof TFolder)) {
-        context.setLabel(t('tools.listDirectory.failed', { path: targetPath }));
+        context.setLabel(t('tools.find.failed', { path: targetPath }));
         throw new ToolExecutionError(`Path is not a directory: ${targetPath}`);
       }
       
@@ -90,8 +90,8 @@ export const vaultListDirectoryTool: ObsidianTool<VaultListDirectoryToolInput> =
       const children = folder.children;
       
       if (children.length === 0) {
-        const emptyMessage = t('tools.listDirectory.empty', { path: targetPath || 'root' });
-        context.setLabel(t('tools.listDirectory.completed', { path: targetPath || 'root' }));
+        const emptyMessage = t('tools.find.empty', { path: targetPath || 'root' });
+        context.setLabel(t('tools.find.completed', { path: targetPath || 'root' }));
         context.progress(emptyMessage);
         return;
       }
@@ -105,7 +105,7 @@ export const vaultListDirectoryTool: ObsidianTool<VaultListDirectoryToolInput> =
       
       // Build the result
       const result: string[] = [];
-      result.push(t('tools.listDirectory.header', { 
+      result.push(t('tools.find.header', { 
         path: targetPath || 'root',
         count: children.length
       }));
@@ -132,10 +132,10 @@ export const vaultListDirectoryTool: ObsidianTool<VaultListDirectoryToolInput> =
       
       const resultText = result.join('\n');
       
-      context.setLabel(t('tools.listDirectory.completed', { path: targetPath || 'root' }));
+      context.setLabel(t('tools.find.completed', { path: targetPath || 'root' }));
       context.progress(resultText);
     } catch (error) {
-      context.setLabel(t('tools.listDirectory.failed', { path: directory_path || 'root' }));
+      context.setLabel(t('tools.find.failed', { path: directory_path || 'root' }));
       throw error;
     }
   }

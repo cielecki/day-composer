@@ -4,7 +4,7 @@ This document outlines potential future features and improvements for the Life N
 
 ## Accepted/Implemented Ideas
 
-See [TODO.md](TODO.md) for accepted ideas.
+See [TODO.md](../TODO.md) for accepted ideas.
 
 ## Floating Ideas
 

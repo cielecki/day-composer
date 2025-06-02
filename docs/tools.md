@@ -5,22 +5,98 @@ Life Navigator provides AI assistants with a comprehensive set of tools to help 
 ## Document Management Tools
 
 ### Create Document
-**Tool:** `create_document`
+**Tool:** `note_create`
 - Creates new markdown files in your vault
 - Automatically handles file path creation and content formatting
+- **Auto-versioning**: Optional feature to create versioned filenames when file already exists
 - Useful for creating new notes, templates, or structured documents
 
+**Auto-versioning Feature:**
+When `auto_version` parameter is set to `true`, the tool automatically creates versioned filenames if the target file already exists:
+- `note.md` → `note 2.md`
+- `research.md` → `research 2.md` → `research 3.md`
+- Preserves file extensions and maintains sequential numbering
+
 ### Read Document
-**Tool:** `read_document`
+**Tool:** `note_read`
 - Reads the content of existing files in your vault
-- Allows the AI to access and reference information from your notes
+- Allows the AI to access and reference information from your existing content
 - Essential for providing contextual assistance based on your existing content
 
-### Append to Document
-**Tool:** `append_to_document`
-- Adds content to the end of existing files
-- Perfect for adding new entries to journals, logs, or ongoing notes
-- Maintains existing content while extending it
+### Edit Document
+**Tool:** `note_edit`
+- **Comprehensive editing capabilities** for existing documents with multiple operation types
+- **Sequential processing**: Apply multiple edits in one operation with detailed feedback
+- **Enhanced error handling**: Descriptive messages when search text isn't found or line numbers are invalid
+
+**Supported Edit Operations:**
+
+**Replace Operations:**
+- `replace`: Replace first occurrence of text (supports multiline text)
+- Requires `search_text` and `replacement_text` parameters
+- Example: Replace outdated information with current data
+
+**Insert Operations:**
+- `insert_after`: Insert content immediately after specified text
+- `insert_before`: Insert content immediately before specified text  
+- `insert_after_line`: Insert content after a specific line number (1-based)
+- `insert_before_line`: Insert content before a specific line number (1-based)
+- `append`: Add content to the end of the document
+- `prepend`: Add content to the beginning of the document
+
+**Usage Examples:**
+```json
+{
+  "path": "My Notes.md",
+  "edits": [
+    {
+      "type": "replace",
+      "search_text": "Old heading",
+      "replacement_text": "New improved heading"
+    },
+    {
+      "type": "insert_after",
+      "search_text": "## Research Notes",
+      "content": "\n\n### Key Findings\n- Important discovery"
+    },
+    {
+      "type": "append",
+      "content": "\n\n## Conclusion\nSummary of findings"
+    }
+  ]
+}
+```
+
+**Error Handling:**
+- Clear feedback for each edit operation
+- Specific error messages when search text isn't found
+- Line number validation for line-based operations
+- Detailed success messages showing what was changed
+
+### Download URL
+**Tool:** `url_download`
+- Downloads content from any URL and displays it in the progress output
+- Useful for quickly fetching web content, APIs, or any accessible URL
+- Automatically validates URL format and handles errors gracefully
+- Displays content with metadata including content type and length
+
+**Features:**
+- **URL Validation**: Ensures proper URL format before attempting download
+- **Content Metadata**: Shows content type, length, and HTTP status
+- **Error Handling**: Clear error messages for invalid URLs or failed requests
+- **User Agent**: Identifies as Life Navigator for proper web etiquette
+
+**Usage Examples:**
+- Fetch API responses for research
+- Download web pages for analysis
+- Access public data sources
+- Retrieve documentation or articles
+
+**Example Usage:**
+```
+Download content from: url="https://api.github.com/repos/user/repo"
+Fetch webpage: url="https://example.com/article"
+```
 
 ## Vault Exploration Tools
 

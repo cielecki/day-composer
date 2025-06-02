@@ -34,22 +34,62 @@ export const vaultSearchTool: ObsidianTool<VaultSearchToolInput> = {
 
     try {
       const files = plugin.app.vault.getMarkdownFiles();
-      const results: { file: string; relevance: number; content: string }[] = [];
+      const results: { file: string; relevance: number; content: string; matches: any }[] = [];
+
+      // Prepare the fuzzy search callback using Obsidian's API
+      const fuzzySearchFn = prepareFuzzySearch(query);
 
       for (const file of files) {
         const content = await plugin.app.vault.read(file);
         
-        // Simple search - check if query appears in content (case insensitive)
-        const lowerContent = content.toLowerCase();
-        const lowerQuery = query.toLowerCase();
+        // Search in file path using Obsidian's fuzzy search
+        const pathResult = fuzzySearchFn(file.path);
         
-        if (lowerContent.includes(lowerQuery)) {
-          // Simple relevance scoring based on number of matches
-          const matches = (lowerContent.match(new RegExp(lowerQuery, 'g')) || []).length;
+        // Search in file content using Obsidian's fuzzy search
+        const contentResult = fuzzySearchFn(content);
+        
+        let bestResult = null;
+        let searchLocation = '';
+        
+        // Determine the best match between path and content
+        if (pathResult && contentResult) {
+          if (pathResult.score >= contentResult.score) {
+            bestResult = pathResult;
+            searchLocation = 'filename';
+          } else {
+            bestResult = contentResult;
+            searchLocation = 'content';
+          }
+        } else if (pathResult) {
+          bestResult = pathResult;
+          searchLocation = 'filename';
+        } else if (contentResult) {
+          bestResult = contentResult;
+          searchLocation = 'content';
+        }
+        
+        if (bestResult) {
+          // Get a content preview
+          let preview = content;
+          if (bestResult.matches && bestResult.matches.length > 0 && searchLocation === 'content') {
+            // Find the first match and create a context around it
+            const firstMatchStart = bestResult.matches[0][0];
+            const contextStart = Math.max(0, firstMatchStart - 100);
+            const contextEnd = Math.min(content.length, firstMatchStart + 200);
+            preview = content.slice(contextStart, contextEnd);
+            if (contextStart > 0) preview = '...' + preview;
+            if (contextEnd < content.length) preview = preview + '...';
+          } else {
+            // Default preview - first 300 characters
+            preview = content.slice(0, 300);
+            if (content.length > 300) preview = preview + '...';
+          }
+          
           results.push({
             file: file.path,
-            relevance: matches,
-            content: content.slice(0, 500) // First 500 characters as preview
+            relevance: bestResult.score,
+            content: preview,
+            matches: bestResult.matches
           });
         }
       }
@@ -65,9 +105,11 @@ export const vaultSearchTool: ObsidianTool<VaultSearchToolInput> = {
       }
 
       // Create formatted result
-      const resultText = limitedResults.map((result, index) => 
-        `${index + 1}. **${result.file}** (${result.relevance} matches)\n   ${result.content.split('\n')[0]}...`
-      ).join('\n\n');
+      const resultText = limitedResults.map((result, index) => {
+        const scoreText = `(score: ${result.relevance.toFixed(2)})`;
+        const firstLine = result.content.split('\n')[0];
+        return `${index + 1}. **${result.file}** ${scoreText}\n   ${firstLine}...`;
+      }).join('\n\n');
 
       // Add navigation targets for each result
       limitedResults.forEach(result => {
