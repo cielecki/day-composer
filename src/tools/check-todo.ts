@@ -61,102 +61,97 @@ type CheckTodoToolInput = {
 export const checkTodoTool: ObsidianTool<CheckTodoToolInput> = {
   specification: schema,
   icon: "check-circle",
-  getActionText: (input: CheckTodoToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    if (!input || typeof input !== 'object' || !input.todos) {
-      return hasCompleted ? 'Checked todos' : 'Checking todos...';
-    }
-
-    const count = input.todos.length;
-    const todoText = count === 1 ? input.todos[0].todo_text : `${count} todos`;
-
-    if (hasError) {
-      return `Failed to check ${todoText}`;
-    } else if (hasCompleted) {
-      return `Checked ${todoText}`;
-    } else if (hasStarted) {
-      return `Checking ${todoText}...`;
-    } else {
-      return `Check ${todoText}`;
-    }
-  },
+  initialLabel: t('tools.check.label'),
   execute: async (context: ToolExecutionContext<CheckTodoToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos, time } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
+      context.setLabel("Failed to check todos");
       throw new ToolExecutionError("No to-do items provided");
     }
+
+    const count = todos.length;
+    const todoText = count === 1 ? todos[0].todo_text : `${count} todos`;
+    
+    context.setLabel(`Checking ${todoText}...`);
 
     // Format the current time if provided (common for all tasks)
     const currentTime = getCurrentTime(time);
     
     const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
     
-    const note = await readNote({plugin, filePath});
-    
-    // Use the validation utility to check all tasks upfront - will throw if validation fails
-    // Tasks must be in pending state to be checked off
-    validateTasks(
-      note, 
-      todos.map(todo => ({
-        todoText: todo.todo_text,
-        taskPredicate: (task) => task.status === 'pending'
-      }))
-    );
-    
-    // If we get here, all tasks were validated successfully
-    let updatedNote = JSON.parse(JSON.stringify(note));
-    const checkedTasks: string[] = [];
-    const movedTasks: Task[] = []; // Store references to the moved tasks
-    
-    // Process all tasks (we know they're all valid at this point)
-    for (const todo of todos) {
-      const { todo_text, comment } = todo;
+    try {
+      const note = await readNote({plugin, filePath});
       
-      // We already validated tasks, so we can directly find and process them
-      const task = findTaskByDescription(updatedNote, todo_text, (task) => task.status === 'pending');
+      // Use the validation utility to check all tasks upfront - will throw if validation fails
+      // Tasks must be in pending state to be checked off
+      validateTasks(
+        note, 
+        todos.map(todo => ({
+          todoText: todo.todo_text,
+          taskPredicate: (task) => task.status === 'pending'
+        }))
+      );
       
-      // Update status (common for all tasks)
-      task.status = 'completed';
+      // If we get here, all tasks were validated successfully
+      let updatedNote = JSON.parse(JSON.stringify(note));
+      const checkedTasks: string[] = [];
+      const movedTasks: Task[] = []; // Store references to the moved tasks
       
-      // Add completion time to the todo text if provided
-      if (currentTime) {
-        task.todoText = `${task.todoText}${t('tasks.format.completedAt', { time: currentTime })}`;
+      // Process all tasks (we know they're all valid at this point)
+      for (const todo of todos) {
+        const { todo_text, comment } = todo;
+        
+        // We already validated tasks, so we can directly find and process them
+        const task = findTaskByDescription(updatedNote, todo_text, (task) => task.status === 'pending');
+        
+        // Update status (common for all tasks)
+        task.status = 'completed';
+        
+        // Add completion time to the todo text if provided
+        if (currentTime) {
+          task.todoText = `${task.todoText}${t('tasks.format.completedAt', { time: currentTime })}`;
+        }
+        
+        // Add comment if provided
+        if (comment) {
+          appendComment(task, comment);
+        }
+        
+        // Move the completed task to the current position (unified logic with abandon-todo and move-todo)
+        updatedNote = moveTaskToPosition(updatedNote, task);
+        
+        // Store the task reference for finding its new position later
+        movedTasks.push(task);
+        checkedTasks.push(todo_text);
       }
       
-      // Add comment if provided
-      if (comment) {
-        appendComment(task, comment);
-      }
+      // Update the note with all completed tasks
+      await updateNote({plugin, filePath, updatedNote});
       
-      // Move the completed task to the current position (unified logic with abandon-todo and move-todo)
-      updatedNote = moveTaskToPosition(updatedNote, task);
-      
-      // Store the task reference for finding its new position later
-      movedTasks.push(task);
-      checkedTasks.push(todo_text);
+      // Create navigation targets for the moved tasks
+      const navigationTargets = createNavigationTargetsForTasks(
+        updatedNote,
+        movedTasks,
+        filePath,
+        `Navigate to checked todo{{count}}`
+      );
+
+      // Add navigation targets
+      navigationTargets.forEach(target => context.addNavigationTarget(target));
+
+      // Create result message
+      const resultMessage = checkedTasks.length === 1 
+        ? `✅ Checked off: "${checkedTasks[0]}"` 
+        : `✅ Checked off ${checkedTasks.length} todos:\n${checkedTasks.map(task => `• ${task}`).join('\n')}`;
+
+      context.setLabel(`Checked ${todoText}`);
+      context.progress(resultMessage);
+    } catch (error) {
+      context.setLabel(`Failed to check ${todoText}`);
+      throw error;
     }
-    
-    // Update the note with all completed tasks
-    await updateNote({plugin, filePath, updatedNote});
-    
-    // Create navigation targets for the moved tasks
-    const navigationTargets = createNavigationTargetsForTasks(
-      updatedNote,
-      movedTasks,
-      filePath,
-      `Navigate to checked todo{{count}}`
-    );
-
-    // Add navigation targets
-    navigationTargets.forEach(target => context.addNavigationTarget(target));
-
-    // Create result message
-    const resultMessage = checkedTasks.length === 1 
-      ? `✅ Checked off: "${checkedTasks[0]}"` 
-      : `✅ Checked off ${checkedTasks.length} todos:\n${checkedTasks.map(task => `• ${task}`).join('\n')}`;
-
-    context.progress(resultMessage);
   }
 };
 

@@ -234,7 +234,7 @@ const handleStreamAbortCleanup = (context: ConversationTurnContext): void => {
 					content: "❌ Operation aborted by user",
 					is_error: true,
 					is_complete: true,
-					navigationTargets: []
+					navigation_targets: []
 				};
 				context.updateLiveToolResult(toolId, abortedResult);
 			}

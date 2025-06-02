@@ -42,65 +42,60 @@ type UncheckTodoToolInput = {
 export const uncheckTodoTool: ObsidianTool<UncheckTodoToolInput> = {
   specification: schema,
   icon: "square",
-  getActionText: (input: UncheckTodoToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    let actionText = '';
-    if (!input || typeof input !== 'object') return '';
-    if (input.todo_text) actionText = `"${input.todo_text}"`;
-    
-    if (hasError) {
-      return t('tools.actions.uncheck.failed').replace('{{task}}', actionText);
-    } else if (hasCompleted) {
-      return t('tools.actions.uncheck.success').replace('{{task}}', actionText);
-    } else if (hasStarted) {
-      return t('tools.actions.uncheck.inProgress').replace('{{task}}', actionText);
-    } else {
-      return `Uncheck ${actionText}`;
-    }
-  },
+  initialLabel: t('tools.uncheck.label'),
   execute: async (context: ToolExecutionContext<UncheckTodoToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const todoDescription = params.todo_text;
     const comment = params.comment;
-    const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
-
-    const note = await readNote({plugin, filePath})
-
-    // Find the task
-    const task = findTaskByDescription(note, todoDescription, (task) => task.status !== 'pending');
     
-    // Check if task was found
-    if (!task) {
-      throw new ToolExecutionError(t('errors.tasks.notFound', {
+    context.setLabel(t('tools.actions.uncheck.inProgress', { task: todoDescription }));
+    
+    try {
+      const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
+      const note = await readNote({plugin, filePath})
+
+      // Find the task
+      const task = findTaskByDescription(note, todoDescription, (task) => task.status !== 'pending');
+      
+      // Check if task was found
+      if (!task) {
+        context.setLabel(t('tools.actions.uncheck.failed', { task: todoDescription }));
+        throw new ToolExecutionError(t('errors.tasks.notFound', {
+          task: todoDescription,
+          path: filePath
+        }));
+      }
+
+      // Update status directly on the task (it's already part of the note structure)
+      task.status = 'pending';
+
+      // Add comment if provided
+      if (comment) {
+        task.comment = task.comment ? task.comment + "\n    " + comment : "    " + comment;
+      }
+
+      // Update the note with the modified task
+      await updateNote({plugin, filePath, updatedNote: note})
+
+      // Create navigation targets for the unchecked task
+      const navigationTargets = createNavigationTargetsForTasks(
+        note,
+        [task],
+        filePath,
+        t('tools.navigation.navigateToUncheckedTodo')
+      );
+
+      // Add navigation targets
+      navigationTargets.forEach(target => context.addNavigationTarget(target));
+
+      context.setLabel(t('tools.actions.uncheck.success', { task: todoDescription }));
+      context.progress(t('tools.success.uncheck', {
         task: todoDescription,
         path: filePath
       }));
+    } catch (error) {
+      context.setLabel(t('tools.actions.uncheck.failed', { task: todoDescription }));
+      throw error;
     }
-
-    // Update status directly on the task (it's already part of the note structure)
-    task.status = 'pending';
-
-    // Add comment if provided
-    if (comment) {
-      task.comment = task.comment ? task.comment + "\n    " + comment : "    " + comment;
-    }
-
-    // Update the note with the modified task
-    await updateNote({plugin, filePath, updatedNote: note})
-
-    // Create navigation targets for the unchecked task
-    const navigationTargets = createNavigationTargetsForTasks(
-      note,
-      [task],
-      filePath,
-      t('tools.navigation.navigateToUncheckedTodo')
-    );
-
-    // Add navigation targets
-    navigationTargets.forEach(target => context.addNavigationTarget(target));
-
-    context.progress(t('tools.success.uncheck', {
-      task: todoDescription,
-      path: filePath
-    }));
   }
 };

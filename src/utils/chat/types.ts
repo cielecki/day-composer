@@ -30,6 +30,9 @@ export interface ToolExecutionContext<TInput = any> {
 	
 	// Navigation targets (can be called multiple times during execution)
 	addNavigationTarget(target: NavigationTarget): void;
+	
+	// Action text/label management (updates the tool's display text in chat)
+	setLabel(text: string): void;
 }
 
 // New block types based on Anthropic API for extended thinking
@@ -72,7 +75,8 @@ export interface ToolResultBlock {
 	content: string;
 	is_error?: boolean;
 	is_complete?: boolean; // Flag to track if tool execution is finished
-	navigationTargets?: NavigationTarget[];
+	navigation_targets?: NavigationTarget[];
+	current_label?: string; // Current label set by setLabel() during execution
 }
 
 // Union type for all possible content blocks

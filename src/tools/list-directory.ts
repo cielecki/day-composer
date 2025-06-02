@@ -1,7 +1,8 @@
-import { TFile, TFolder } from "obsidian";
+import { TFile, TFolder, normalizePath } from "obsidian";
 import MyPlugin from "../main";
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
+import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { t } from "../i18n";
 
 const schema = {
@@ -62,137 +63,81 @@ interface DirectoryItem {
 export const listDirectoryTool: ObsidianTool<ListDirectoryToolInput> = {
   specification: schema,
   icon: "folder",
-  getActionText: (input: ListDirectoryToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    const path = input?.directory_path || "vault root";
-    const recursive = input?.recursive ? " (recursive)" : "";
-    
-    if (hasError) {
-      return t('tools.actions.listDirectory.failed', { path: `${path}${recursive}` });
-    } else if (hasCompleted) {
-      return `Listed directory: ${path}${recursive}`;
-    } else if (hasStarted) {
-      return `Listing directory: ${path}${recursive}...`;
-    } else {
-      return `List directory: ${path}${recursive}`;
-    }
-  },
+  initialLabel: t('tools.listDirectory.label'),
   execute: async (context: ToolExecutionContext<ListDirectoryToolInput>): Promise<void> => {
+    const { plugin, params } = context;
+    const { directory_path = "", recursive = false, include_files = true, include_folders = true, file_types = [] } = params;
+    
+    context.setLabel(t('tools.listDirectory.inProgress', { path: directory_path || 'root' }));
+
     try {
-      const { plugin, params } = context;
-      const { 
-        directory_path = "", 
-        recursive = false, 
-        include_files = true, 
-        include_folders = true,
-        file_types = []
-      } = params;
-
-      // Normalize the directory path
-      const targetPath = directory_path?.trim() || "";
-      const normalizedPath = targetPath === "." || targetPath === "" ? "" : targetPath;
-
-      // Get the target folder
-      let targetFolder: TFolder;
-      if (normalizedPath === "") {
-        // Root of vault
-        targetFolder = plugin.app.vault.getRoot();
-      } else {
-        const abstractFile = plugin.app.vault.getAbstractFileByPath(normalizedPath);
-        if (!abstractFile) {
-          throw new Error(`Directory not found: ${normalizedPath}`);
-        }
-        if (!(abstractFile instanceof TFolder)) {
-          throw new Error(`Path is not a directory: ${normalizedPath}`);
-        }
-        targetFolder = abstractFile;
+      // Normalize the path
+      const targetPath = directory_path.trim() === "" ? "" : normalizePath(directory_path);
+      
+      // Get the folder (or root if path is empty)
+      const folder = targetPath === "" ? plugin.app.vault.getRoot() : plugin.app.vault.getAbstractFileByPath(targetPath);
+      
+      if (!folder) {
+        context.setLabel(t('tools.listDirectory.failed', { path: targetPath }));
+        throw new ToolExecutionError(`Directory not found: ${targetPath}`);
       }
-
-      // Build the directory listing
-      const listDirectory = (folder: TFolder, currentDepth: number = 0): DirectoryItem[] => {
-        const items: DirectoryItem[] = [];
-        
-        // Process folders first
-        if (include_folders) {
-          for (const childFolder of folder.children.filter(child => child instanceof TFolder)) {
-            const folderItem: DirectoryItem = {
-              name: childFolder.name,
-              path: childFolder.path,
-              type: 'folder'
-            };
-            
-            // Add children if recursive
-            if (recursive) {
-              folderItem.children = listDirectory(childFolder as TFolder, currentDepth + 1);
-            }
-            
-            items.push(folderItem);
-          }
+      
+      if (!(folder instanceof TFolder)) {
+        context.setLabel(t('tools.listDirectory.failed', { path: targetPath }));
+        throw new ToolExecutionError(`Path is not a directory: ${targetPath}`);
+      }
+      
+      // Get all children (files and folders)
+      const children = folder.children;
+      
+      if (children.length === 0) {
+        const emptyMessage = t('tools.listDirectory.empty', { path: targetPath || 'root' });
+        context.setLabel(t('tools.listDirectory.completed', { path: targetPath || 'root' }));
+        context.progress(emptyMessage);
+        return;
+      }
+      
+      // Sort children: folders first, then files, both alphabetically
+      const sortedChildren = children.sort((a, b) => {
+        if (a instanceof TFolder && b instanceof TFile) return -1;
+        if (a instanceof TFile && b instanceof TFolder) return 1;
+        return a.name.localeCompare(b.name);
+      });
+      
+      // Build the result
+      const result: string[] = [];
+      result.push(t('tools.listDirectory.header', { 
+        path: targetPath || 'root',
+        count: children.length
+      }));
+      result.push('');
+      
+      for (const child of sortedChildren) {
+        if (child instanceof TFolder) {
+          // It's a folder
+          const subItemCount = child.children.length;
+          result.push(`📁 **${child.name}/** (${subItemCount} items)`);
+        } else if (child instanceof TFile) {
+          // It's a file
+          const fileSize = (child.stat.size / 1024).toFixed(1);
+          result.push(`📄 **${child.name}** (${fileSize} KB)`);
+          
+          // Add navigation target for each file
+          context.addNavigationTarget({
+            filePath: child.path,
+            description: `Open: ${child.name}`
+          });
         }
-
-        // Process files
-        if (include_files) {
-          for (const childFile of folder.children.filter(child => child instanceof TFile)) {
-            const file = childFile as TFile;
-            
-            // Filter by file types if specified
-            if (file_types.length > 0 && !file_types.includes(file.extension)) {
-              continue;
-            }
-
-            const fileItem: DirectoryItem = {
-              name: file.name,
-              path: file.path,
-              type: 'file',
-              extension: file.extension,
-              size: file.stat.size
-            };
-            
-            items.push(fileItem);
-          }
-        }
-
-        return items;
-      };
-
-      const results = listDirectory(targetFolder);
-
-      // Format the results
-      const formatResults = (items: DirectoryItem[], depth: number = 0): string => {
-        let output = "";
-        const indent = "  ".repeat(depth);
-        
-        for (const item of items) {
-          if (item.type === 'folder') {
-            output += `${indent}📁 ${item.name}/\n`;
-            if (item.children && recursive) {
-              output += formatResults(item.children, depth + 1);
-            }
-          } else {
-            const sizeStr = item.size ? ` (${(item.size / 1024).toFixed(1)}KB)` : "";
-            const icon = item.extension === 'md' ? '📝' : '📄';
-            output += `${indent}${icon} ${item.name}${sizeStr}\n`;
-          }
-        }
-        
-        return output;
-      };
-
-      const formattedResults = formatResults(results);
-      const totalFiles = countItems(results, 'file');
-      const totalFolders = countItems(results, 'folder');
-
-      // Create summary
-      const pathDisplay = targetFolder.path || "vault root";
-      const recursiveNote = recursive ? " (recursive)" : "";
-      const summary = `Directory listing for: ${pathDisplay}${recursiveNote}\n\n` +
-                     `📊 Summary: ${totalFolders} folders, ${totalFiles} files\n\n` +
-                     formattedResults;
-
-      context.progress(summary);
-
+        result.push('');
+      }
+      
+      const resultText = result.join('\n');
+      
+      context.setLabel(t('tools.listDirectory.completed', { path: targetPath || 'root' }));
+      context.progress(resultText);
     } catch (error) {
-      console.error('Error listing directory:', error);
-      throw new Error(`Error listing directory: ${error.message || 'Unknown error'}`);
+      context.setLabel(t('tools.listDirectory.failed', { path: directory_path || 'root' }));
+      throw error;
     }
   }
 };

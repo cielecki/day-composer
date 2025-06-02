@@ -33,30 +33,19 @@ type CreateDocumentToolInput = {
 export const createDocumentTool: ObsidianTool<CreateDocumentToolInput> = {
   specification: schema,
   icon: "file-plus",
-  getActionText: (input: CreateDocumentToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    let actionText = '';
-    if (!input || typeof input !== 'object') return '';
-    if (input.path) actionText = `"${input.path}"`;
-    
-    if (hasError) {
-      return t('tools.actions.createDocument.failed', { path: actionText });
-    } else if (hasCompleted) {
-      return t('tools.actions.createDocument.completed', { path: actionText });
-    } else if (hasStarted) {
-      return t('tools.actions.createDocument.inProgress', { path: actionText });
-    } else {
-      return t('tools.actions.createDocument.default', { path: actionText });
-    }
-  },
+  initialLabel: t('tools.actions.createDocument.default', { path: '' }),
   execute: async (context: ToolExecutionContext<CreateDocumentToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { path, content } = params;
     const documentContent = content || ''; // Default to empty string if content is undefined
 
+    context.setLabel(t('tools.actions.createDocument.inProgress', { path: `"${path}"` }));
+
     // Check if the file already exists
     const exists = await fileExists(path, plugin.app);
 
     if (exists) {
+      context.setLabel(t('tools.actions.createDocument.failed', { path: `"${path}"` }));
       throw new ToolExecutionError(`File already exists at ${path}. Set overwrite to true to replace it.`);
     }
 
@@ -69,6 +58,7 @@ export const createDocumentTool: ObsidianTool<CreateDocumentToolInput> = {
       description: t("tools.navigation.openCreatedDocument")
     });
 
+    context.setLabel(t('tools.actions.createDocument.completed', { path: `"${path}"` }));
     context.progress(t('tools.createDocument.progress.success', { path }));
   }
 };

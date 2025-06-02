@@ -158,9 +158,11 @@ export const AIAgentProvider: React.FC<{
 			const systemPrompt = await getContext();
 			const obsidianTools = getObsidianTools(plugin);
 			const currentActiveMode = lnModesRef.current[activeModeIdRef.current];
+			
+			// Get tools asynchronously
 			const tools = currentActiveMode 
-				? obsidianTools.getToolsForMode(currentActiveMode) 
-				: obsidianTools.getTools();
+				? await obsidianTools.getToolsForMode(currentActiveMode)
+				: await obsidianTools.getTools();
 
 			// Set up conversation turn context
 			const turnContext: ConversationTurnContext = {

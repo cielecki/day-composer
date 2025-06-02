@@ -19,16 +19,11 @@
       "noContent": "Brak dostępnej zawartości czatu"
     },
     "conversationTurn": "Błąd podczas konwersacji: {{error}}",
-    "documents": {
-      "notFound": "Nie znaleziono pliku: {{path}}"
-    },
     "failedToUpdatePlugin": "Nie udało się zaktualizować wtyczki: {{error}}",
     "files": {
-      "createFailed": "Nie można utworzyć pliku docelowego w {{path}}: {{error}}",
       "formatFailed": "Nie udało się sformatować dokumentu po operacji na zadaniu",
       "getFailed": "Nie udało się pobrać pliku z {{path}}",
-      "notFound": "Nie znaleziono pliku w {{path}}",
-      "sourceNotFound": "Nie znaleziono pliku źródłowego w {{path}}"
+      "notFound": "Nie znaleziono pliku w {{path}}"
     },
     "linkExpansion": {
       "couldNotResolve": "Nie można znaleźć celu linku \"{{linkPath}}\""
@@ -40,9 +35,6 @@
       "multipleFound": "Znaleziono wiele zadań z opisem \"{{task}}\" w {{path}}. Proszę podać bardziej szczegółowy opis zadania.",
       "notFound": "Nie znaleziono zadania \"{{task}}\" w {{path}}. Jeśli zadanie znajduje się w innym pliku, określ go w parametrze file_path.",
       "removeNotFound": "Nie znaleziono zadania \"{{task}}\" w dokumencie"
-    },
-    "todos": {
-      "createError": "Błąd tworzenia zakończonego zadania: {{error}}"
     },
     "tools": {
       "execution": "Błąd wykonania narzędzia {{tool}}: {{error}}",
@@ -121,38 +113,57 @@
     },
     "security": {
       "title": "Informacja o bezpieczeństwie"
+    },
+    "userTools": {
+      "enabled": {
+        "desc": "Zezwalaj na wykonywanie narzędzi zdefiniowanych przez użytkownika z notatek Obsidian. Narzędzia tworzy się dodając tag 'ln-tool' do metadanych notatki z kodem JavaScript.",
+        "name": "Włącz Narzędzia Zdefiniowane przez Użytkownika"
+      },
+      "list": {
+        "controls": {
+          "approve": "Zatwierdź Narzędzie",
+          "revoke": "Cofnij Zatwierdzenie"
+        },
+        "disabled": "Narzędzia zdefiniowane przez użytkownika są wyłączone. Włącz funkcję powyżej, aby zobaczyć odkryte narzędzia.",
+        "noManager": "Menedżer narzędzi użytkownika nie został zainicjowany. Spróbuj uruchomić ponownie Obsidian.",
+        "noTools": "Nie znaleziono narzędzi zdefiniowanych przez użytkownika. Utwórz narzędzia dodając <code>tags: [\"ln-tool\"]</code> do metadanych notatki z blokami schemy JSON i kodu JavaScript.",
+        "tooltips": {
+          "clickToOpen": "Kliknij aby otworzyć plik narzędzia w edytorze"
+        }
+      },
+      "security": {
+        "title": "Ostrzeżenie Bezpieczeństwa",
+        "warning": "Narzędzia zdefiniowane przez użytkownika wykonują kod JavaScript który może uzyskać dostęp do twojego vault'a, systemu plików i wykonywać żądania sieciowe. Włączaj tę funkcję tylko jeśli rozumiesz implikacje bezpieczeństwa i ufasz wszystkim źródłom narzędzi."
+      },
+      "securityWarning": "⚠️ OSTRZEŻENIE BEZPIECZEŃSTWA ⚠️\n\nNarzędzia zdefiniowane przez użytkownika wykonują kod JavaScript z pełnym dostępem do:\n• Całego twojego vault'a Obsidian\n• Lokalnego systemu plików\n• Żądań sieciowych\n• Zasobów systemowych\n\nMoże to być niebezpieczne jeśli uruchomisz niezaufany kod.\n\nWłączaj to tylko jeśli:\n• Rozumiesz zagrożenia bezpieczeństwa JavaScript\n• Będziesz uruchamiać tylko zaufane narzędzia\n• Przejrzysz cały kod narzędzi przed zatwierdzeniem\n\nCzy chcesz włączyć narzędzia zdefiniowane przez użytkownika?",
+      "title": "Narzędzia Zdefiniowane przez Użytkownika"
     }
   },
   "tasks": {
     "format": {
       "abandonedAt": " (porzucone o {{time}})",
-      "completedAt": " (zakończone o {{time}})",
-      "movedFrom": " (z {{source}})",
-      "movedTo": " (→ {{target}})"
+      "completedAt": " (zakończone o {{time}})"
     }
   },
   "tools": {
+    "abandon": {
+      "label": "Porzuć Todo"
+    },
     "actions": {
       "abandon": {
-        "default": "Porzuć {{task}}",
         "failed": "Nie udało się porzucić zadania {{task}}",
         "inProgress": "Porzucanie zadania {{task}}...",
         "success": "Porzucono zadanie {{task}}"
       },
       "add": {
-        "default": "Dodaj {{task}}",
-        "failed": "Nie udało się dodać zadania {{task}}",
-        "inProgress": "Dodawanie zadania...",
+        "failed": "Nie udało się dodać todo {{task}}",
+        "inProgress": "Dodawanie todo...",
         "success": "Dodano {{task}}"
       },
-      "appendDocument": {
-        "failed": "Nie udało się dodać do {{path}}"
-      },
-      "createCompletedTodo": {
-        "default": "Utwórz zakończone zadanie {{task}}",
-        "failed": "Nie udało się utworzyć zakończonego zadania {{task}}",
-        "inProgress": "Tworzenie zakończonego zadania {{task}}...",
-        "success": "Utworzono zakończone zadanie {{task}}"
+      "createCompleted": {
+        "failed": "Nie udało się utworzyć ukończonego todo {{task}}",
+        "inProgress": "Tworzenie ukończonego todo {{task}}...",
+        "success": "Utworzono ukończone todo {{task}}"
       },
       "createDocument": {
         "completed": "Utworzono {{path}}",
@@ -160,55 +171,48 @@
         "failed": "Nie udało się utworzyć {{path}}",
         "inProgress": "Tworzenie {{path}}..."
       },
-      "downloadTranscript": {
-        "completed": "Pobrano {{actionText}}",
-        "inProgress": "Pobieranie {{actionText}}..."
-      },
       "editTodo": {
-        "failed": "Nie udało się edytować zadania {{task}}"
-      },
-      "findFilesByTag": {
-        "completed": "Znaleziono pliki z tagiem {{tag}}",
-        "failed": "Nie udało się znaleźć plików z tagiem {{tag}}",
-        "ready": "Znajdź pliki z tagiem {{tag}}",
-        "started": "Wyszukiwanie plików z tagiem {{tag}}..."
+        "completed": "Edytowano todo {{task}}",
+        "failed": "Nie udało się edytować todo {{task}}",
+        "inProgress": "Edytowanie todo {{task}}..."
       },
       "generateImage": {
-        "default": "Generuj obraz {{path}}",
         "failed": "Nie udało się wygenerować obrazu {{path}}"
       },
-      "handover": {
-        "default": "Przekaż sterowanie do {{modeName}}"
+      "move": {
+        "failed": "Nie udało się przenieść todo {{task}}",
+        "inProgress": "Przenoszenie todo {{task}}...",
+        "success": "Przeniesiono todo {{task}}"
       },
-      "listDirectory": {
-        "failed": "Nie udało się wyświetlić katalogu: {{path}}"
-      },
-      "readDocument": {
-        "default": "Odczytaj {{path}}",
-        "failed": "Nie udało się odczytać {{path}}",
-        "inProgress": "Odczytywanie {{path}}...",
-        "success": "Odczytano {{path}}"
-      },
-      "searchVault": {
-        "completed": "Wyszukano {{query}}",
-        "default": "Wyszukaj {{query}}",
-        "failed": "Nie udało się wyszukać {{query}}",
-        "inProgress": "Wyszukiwanie {{query}}..."
+      "remove": {
+        "failed": "Nie udało się usunąć todo {{task}}",
+        "inProgress": "Usuwanie todo {{task}}...",
+        "success": "Usunięto todo {{task}}"
       },
       "uncheck": {
-        "failed": "Nie udało się cofnąć oznaczenia zadania {{task}} jako zakończone",
-        "inProgress": "Cofanie oznaczenia zadania {{task}} jako zakończone...",
-        "success": "Cofnięto oznaczenie zadania {{task}} jako zakończone"
+        "failed": "Nie udało się odznaczyć todo {{task}}",
+        "inProgress": "Odznaczanie todo {{task}}...",
+        "success": "Odznaczono todo {{task}}"
       }
     },
-    "appendDocument": {
-      "progress": {
-        "success": "Zawartość dodana do {{path}}"
-      }
+    "add": {
+      "label": "Dodaj Todo"
+    },
+    "append": {
+      "completed": "Dołączono do {{path}}",
+      "failed": "Nie udało się dołączyć do {{path}}",
+      "inProgress": "Dołączanie do {{path}}...",
+      "label": "Dołącz do Dokumentu"
+    },
+    "check": {
+      "label": "Zaznacz Todo"
     },
     "checkForUpdates": "Sprawdź aktualizacje",
     "comments": {
       "removedTaskHeader": "USUNIĘTE ZADANIE"
+    },
+    "createCompleted": {
+      "label": "Utwórz Ukończone Todo"
     },
     "createDocument": {
       "progress": {
@@ -222,153 +226,142 @@
         "aborted": "Operacja badawcza została anulowana przez użytkownika",
         "emptyPath": "Ścieżka pliku nie może być pusta",
         "emptyQuery": "Zapytanie badawcze nie może być puste",
-        "general": "Błąd podczas prowadzenia głębokich badań: {{error}}",
+        "general": "Błąd podczas przeprowadzania głębokiego badania: {{error}}",
         "libraryLoad": "Nie udało się załadować biblioteki Firecrawl",
-        "noApiKey": "Nie ustawiono klucza API Firecrawl. Proszę skonfigurować go w ustawieniach dla funkcjonalności głębokich badań.",
+        "noApiKey": "Klucz API Firecrawl nie jest ustawiony. Skonfiguruj go w ustawieniach dla funkcji głębokiego badania.",
         "noResults": "Nie znaleziono odpowiednich informacji dla podanego zapytania.",
-        "quotaExceeded": "Przekroczono limit API Firecrawl. Proszę sprawdzić rozliczenia i limity użytkowania.",
-        "researchFailed": "Operacja badawcza nie powiodła się",
+        "quotaExceeded": "Przekroczono limit API Firecrawl. Sprawdź swoje limity rozliczeniowe i użycia.",
         "timeout": "Żądanie badawcze przekroczyło limit czasu. Spróbuj z bardziej konkretnym zapytaniem.",
-        "unknownError": "Wystąpił nieznany błąd podczas badań"
+        "unknownError": "Wystąpił nieznany błąd podczas badania"
       },
       "headers": {
         "analysis": "Analiza Badawcza",
-        "metadata": "Metadane Badań",
-        "results": "Wyniki Głębokich Badań",
+        "metadata": "Metadane Badania",
+        "results": "Wyniki Głębokiego Badania",
         "sources": "Źródła"
       },
+      "inProgress": "Badanie {{topic}}...",
+      "label": "Głębokie Badanie",
       "labels": {
-        "completed": "Zakończono",
+        "completed": "Ukończone",
         "maxDepth": "Maks. Głębokość",
-        "maxUrls": "Maks. URL-i",
+        "maxUrls": "Maks. URL-e",
         "query": "Zapytanie",
         "source": "Źródło",
         "sourcesFound": "Znalezione Źródła",
         "timeout": "Limit Czasu",
         "url": "URL"
       },
-      "preparing": "Badanie \"{{query}}\"",
-      "preparingGeneric": "Przygotowywanie badań...",
       "progress": {
         "loading": "Ładowanie biblioteki Firecrawl...",
-        "processing": "Przetwarzanie wyników badań...",
+        "processing": "Przetwarzanie wyników badania...",
         "saving": "Zapisywanie raportu badawczego...",
-        "starting": "Rozpoczynanie głębokich badań dla: \"{{query}}\"",
-        "validating": "Walidacja parametrów badawczych..."
+        "starting": "Rozpoczynanie głębokiego badania dla: \"{{query}}\"",
+        "validating": "Walidacja parametrów badania..."
       },
-      "researching": "Prowadzenie głębokich badań na temat \"{{query}}\"...",
-      "researchingGeneric": "Prowadzenie głębokich badań...",
       "result": {
-        "message": "Pomyślnie przeprowadzono głębokie badania na temat \"{{query}}\" i zapisano raport w {{path}}. Badania obejmowały {{sourceCount}} źródeł z {{maxDepth}} iteracjami głębokości.",
+        "message": "Pomyślnie przeprowadzono głębokie badanie na \"{{query}}\" i zapisano raport do {{path}}. Badanie obejmowało {{sourceCount}} źródeł z {{maxDepth}} iteracjami głębokości.",
         "navigationDescription": "Otwórz raport badawczy"
       },
-      "success": "Głębokie badania zakończone pomyślnie",
-      "successWithQuery": "Głębokie badania zakończone pomyślnie dla \"{{query}}\""
+      "success": "Głębokie badanie ukończone pomyślnie"
+    },
+    "edit": {
+      "label": "Edytuj Todo"
     },
     "findFilesByTag": {
-      "errors": {
-        "general": "Błąd podczas wyszukiwania plików według tagu: {{error}}",
-        "tagRequired": "Parametr tagu jest wymagany",
-        "unknown": "Wystąpił nieznany błąd"
-      },
-      "navigation": {
-        "description": "Przejdź do pliku {{index}}: {{name}}"
-      },
-      "results": {
-        "andMore": "i {{count}} więcej",
-        "content": "zawartość",
-        "contentExcluded": "Tagi w zawartości zostały wykluczone.",
-        "contentSnippet": "Zawartość",
-        "frontmatter": "frontmatter",
-        "frontmatterExcluded": "Tagi frontmatter zostały wykluczone.",
-        "header": "Znaleziono {{count}} plik{{plural}} z tagiem \"{{searchTag}}\":",
-        "headings": "Nagłówki",
-        "limitedResults": "Wyniki ograniczone do {{maxResults}} plików. Może być więcej plików z tym tagiem.",
-        "line": "linia",
-        "noFiles": "Nie znaleziono plików z tagiem \"{{searchTag}}\".",
-        "path": "Ścieżka",
-        "scopeLimited": "Uwaga: Zakres wyszukiwania był ograniczony.",
-        "tags": "Tagi"
-      }
+      "completed": "Znaleziono {{count}} plików z tagiem {{tag}}",
+      "failed": "Nie udało się znaleźć plików z tagiem {{tag}}",
+      "foundFiles": "Znaleziono {{count}} plików z tagiem {{tag}}",
+      "inProgress": "Wyszukiwanie plików z tagiem {{tag}}...",
+      "label": "Znajdź Pliki po Tagu",
+      "noResults": "Nie znaleziono plików z tagiem {{tag}}"
     },
     "generateImage": {
       "errors": {
         "aborted": "Generowanie obrazu zostało anulowane przez użytkownika",
         "emptyPath": "Ścieżka obrazu nie może być pusta",
         "emptyPrompt": "Prompt obrazu nie może być pusty",
-        "fileExists": "Plik już istnieje w {{path}}. Proszę wybrać inną ścieżkę lub usunąć istniejący plik.",
-        "general": "Błąd podczas generowania obrazu: {{error}}",
+        "fileExists": "Plik już istnieje w {{path}}. Wybierz inną ścieżkę lub usuń istniejący plik.",
+        "general": "Błąd generowania obrazu: {{error}}",
         "invalidRequest": "Nieprawidłowe żądanie do API OpenAI: {{error}}",
-        "noApiKey": "Nie ustawiono klucza API OpenAI. Proszę skonfigurować go w ustawieniach dla generowania obrazów.",
+        "noApiKey": "Klucz API OpenAI nie jest ustawiony. Skonfiguruj go w ustawieniach dla generowania obrazów.",
         "noBase64Data": "Nieprawidłowy format danych obrazu otrzymany z API OpenAI",
         "noImageData": "Nie otrzymano danych obrazu z API OpenAI",
-        "quotaExceeded": "Przekroczono limit API OpenAI. Proszę sprawdzić rozliczenia i limity użytkowania."
+        "quotaExceeded": "Przekroczono limit API OpenAI. Sprawdź swoje limity rozliczeniowe i użycia."
       },
       "generating": "Generowanie obrazu dla {{path}}...",
+      "label": "Generuj Obraz",
       "openImage": "Otwórz wygenerowany obraz",
       "progress": {
-        "generatingWithModel": "Generowanie obrazu za pomocą GPT-4o: \"{{prompt}}\"",
+        "generatingWithModel": "Generowanie obrazu z GPT-4o: \"{{prompt}}\"",
         "processing": "Przetwarzanie wygenerowanego obrazu...",
-        "saving": "Zapisywanie obrazu do sejfu..."
+        "saving": "Zapisywanie obrazu do vault'a..."
       },
       "success": "Pomyślnie utworzono obraz w {{path}}"
     },
     "handover": {
-      "alreadyInMode": "Już w trybie {{modeName}}. Zmiana nie jest potrzebna.",
-      "description": "Opis:",
-      "failedToSwitch": "Nie udało się przełączyć na {{modeName}}",
-      "handoverInstructions": "Przejąłeś kontrolę nad tą rozmową. Kontynuuj wykonywanie zadania użytkownika, używając swoich specjalistycznych możliwości i osobowości. Przejmij kontrolę i zapewnij odpowiednią pomoc zgodnie z celem swojego trybu.",
-      "invalidModeId": "ID trybu jest wymagane i musi być ciągiem znaków",
-      "modeNotFound": "Nie znaleziono trybu o ID \"{{modeId}}\".",
-      "newModeActive": "Teraz działasz jako tryb {{modeName}}.",
-      "noDescription": "Brak dostępnego opisu",
-      "noModes": "Brak dostępnych trybów do przełączenia.",
-      "successMessage": "Pomyślnie przełączono z trybu {{fromMode}} na {{toMode}}.",
-      "switchFailed": "Nie udało się przełączyć trybu: {{error}}",
-      "switched": "Przełączono na tryb {{modeName}}",
-      "switching": "Przełączanie na tryb {{modeName}}..."
+      "completed": "Przełączono na tryb {{mode}}",
+      "failed": "Nie udało się przełączyć na tryb {{mode}}",
+      "inProgress": "Przełączanie na tryb {{mode}}...",
+      "label": "Przekaż Tryb",
+      "noReason": "Przełączanie na tryb {{mode}}"
+    },
+    "listDirectory": {
+      "completed": "Wyświetlono katalog {{path}}",
+      "empty": "Katalog {{path}} jest pusty",
+      "failed": "Nie udało się wyświetlić katalogu {{path}}",
+      "header": "Zawartość {{path}} ({{count}} elementów):",
+      "inProgress": "Wyświetlanie katalogu {{path}}...",
+      "label": "Wyświetl Katalog"
+    },
+    "move": {
+      "label": "Przenieś Todo"
     },
     "navigation": {
-      "navigateToEditedTodo": "Przejdź do edytowanego zadania",
-      "navigateToUncheckedTodo": "Przejdź do odkręconego zadania",
-      "openAppendedDocument": "Otwórz zaktualizowany dokument",
+      "navigateToCompletedTodo": "Przejdź do ukończonego todo",
+      "navigateToEditedTodo": "Przejdź do edytowanego todo",
+      "navigateToUncheckedTodo": "Przejdź do odznaczonego todo",
+      "openAppendedDocument": "Otwórz dołączony dokument",
       "openCreatedDocument": "Otwórz utworzony dokument",
-      "openDownloadedTranscript": "Otwórz pobrany transkrypt",
-      "openReadDocument": "Otwórz przeczytany dokument"
+      "openDocument": "Otwórz dokument"
     },
     "openLifeNavigator": "Otwórz Life Navigator",
-    "position": {
-      "after": "po \"{{task}}\"",
-      "at": "w pozycji {{position}}",
-      "before": "przed \"{{task}}\""
-    },
     "progress": {
-      "downloadTranscript": {
-        "success": "Pomyślnie pobrano transkrypcję YouTube do {{path}}. Zawiera {{segments}} segmentów obejmujących około {{duration}} minut treści wideo."
-      },
-      "searchVault": {
-        "noResults": "Nie znaleziono wyników dla \"{{query}}\"",
-        "results": "Znaleziono {{count}} wynik{{plural}} dla \"{{query}}\""
+      "appendToDocument": {
+        "success": "Dołączono zawartość do {{path}}"
       }
     },
-    "resetTutorial": "Resetuj tutorial",
+    "read": {
+      "completed": "Odczytano dokument {{path}}",
+      "failed": "Nie udało się odczytać dokumentu {{path}}",
+      "inProgress": "Odczytywanie dokumentu {{path}}...",
+      "label": "Odczytaj Dokument"
+    },
+    "remove": {
+      "label": "Usuń Todo"
+    },
+    "resetTutorial": "Resetuj Tutorial",
+    "search": {
+      "completed": "Wyszukiwanie zakończone dla {{query}}",
+      "failed": "Nie udało się wyszukać {{query}}",
+      "inProgress": "Wyszukiwanie {{query}}...",
+      "label": "Przeszukaj Vault",
+      "noResults": "Nie znaleziono wyników dla {{query}}"
+    },
     "success": {
       "abandon": "✓ Oznaczono {{task}} jako porzucone w {{path}}",
       "add": "✓ Dodano {{task}} do {{path}}",
-      "complete": "✓ Dodano zakończone zadanie \"{{task}}\"{{time}} do {{path}}",
+      "complete": "✓ Dodano ukończone todo \"{{task}}\"{{time}} do {{path}}",
       "edit": "✓ Edytowano {{originalTask}} na {{newTask}} w {{path}}{{details}}",
       "move": "✓ Przeniesiono zadanie {{task}} z {{source}} do {{target}} {{position}}",
       "remove": "✓ Usunięto {{task}} z {{path}} (przekonwertowano na komentarz)",
-      "uncheck": "✓ Cofnięto oznaczenie \"{{task}}\" jako zakończone w {{path}}"
+      "uncheck": "✓ Odznaczono \"{{task}}\" w {{path}}"
     },
     "tasks": {
-      "count": {
-        "few": "{{count}} zadania",
-        "many": "{{count}} zadań",
-        "one": "{{count}} zadanie",
-        "zero": "brak zadań"
-      },
       "plural": "zadania"
+    },
+    "uncheck": {
+      "label": "Odznacz Todo"
     }
   },
   "ui": {

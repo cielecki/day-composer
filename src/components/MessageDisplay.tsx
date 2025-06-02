@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ContentBlock } from '../utils/chat/types';
 import { NavigationTarget } from '../obsidian-tools';
 import { ThinkingCollapsibleBlock, RedactedThinkingBlock as RedactedThinking, ToolBlock } from './CollapsibleBlock';
@@ -46,18 +46,44 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   const { editUserMessage, startEditingMessage } = useAIAgent();
   const { speakText, isPlayingAudio, isGeneratingSpeech, stopAudio, isPaused, pauseAudio, resumeAudio } = useTextToSpeech();
   const { isRecording } = useSpeechToText();
-  const [copyIcon, setCopyIcon] = useState('copy');
+  const [copyIcon, setCopyIcon] = useState<'copy' | 'check'>('copy');
+  const [toolsCache, setToolsCache] = useState<Map<string, any>>(new Map());
 
   const contentBlocksToRender = ensureContentBlocksForDisplay(content);
   const toolResultsMap = toolResults;
 
-  // Helper to extract plain text from content blocks
+  // Helper to get plain text content
   const getPlainTextContent = (blocks: ContentBlock[]): string => {
     return blocks
       .filter(block => block.type === 'text')
-      .map(block => (block as any).text || '')
-      .join('\n');
+      .map(block => (block as any).text)
+      .join(' ');
   };
+
+  // Load tools asynchronously when needed
+  useEffect(() => {
+    const loadToolsForBlocks = async () => {
+      const contentBlocks = ensureContentBlocksForDisplay(content);
+      const toolBlocks = contentBlocks.filter(block => block.type === 'tool_use');
+      const obsidianTools = getObsidianTools(undefined!);
+      
+      for (const block of toolBlocks) {
+        const toolName = (block as any).name;
+        if (toolName && !toolsCache.has(toolName)) {
+          try {
+            const tool = await obsidianTools.getToolByName(toolName);
+            if (tool) {
+              setToolsCache(prev => new Map(prev.set(toolName, tool)));
+            }
+          } catch (error) {
+            console.error(`Failed to load tool ${toolName}:`, error);
+          }
+        }
+      }
+    };
+    
+    loadToolsForBlocks();
+  }, [content, toolsCache]);
 
   // Handle copy message
   const handleCopyMessage = () => {
@@ -157,14 +183,14 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
         );
       case 'tool_use': {
         const resultData = toolResultsMap.get(block.id);
-        const tool = getObsidianTools(undefined!).getToolByName(block.name);
+        const tool = toolsCache.get(block.name);
         
         // Determine if we have any result content and if it's complete
         const hasContent = resultData && resultData.content && resultData.content.length > 0;
         const isComplete = resultData?.is_complete ?? false;
         const resultContent = resultData?.content || '';
         
-        const navigationTargets = resultData?.navigationTargets;
+        const navigationTargets = resultData?.navigation_targets;
         
         // Detect error based on result content starting with ❌
         const isErrorByContent = typeof resultContent === 'string' && resultContent.trim().startsWith('❌');
@@ -185,7 +211,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
             <div key={`block-${index}`} className={`tool-custom-renderer ${isError ? 'tool-error' : ''}`}>
               <div className="tool-custom-header">
                 <span className="tool-custom-title">
-                  {tool.getActionText(block.input, true, isComplete, !!isError)}
+                  {resultData?.current_label || tool?.initialLabel || block.name}
                 </span>
               </div>
               <div className="tool-custom-content">
@@ -204,6 +230,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
             result={resultContent}
             isError={!!isError}
             navigationTargets={navigationTargets}
+            currentLabel={resultData?.current_label}
             defaultOpen={false}
           />
         );

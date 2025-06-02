@@ -5,6 +5,8 @@ import { getFile } from "../utils/fs/get-file";
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
 import { t } from "../i18n";
+import { fileExists } from "../utils/fs/file-exists";
+import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 
 const schema = {
   name: "append_to_document",
@@ -32,54 +34,49 @@ type AppendToDocumentToolInput = {
 
 export const appendToDocumentTool: ObsidianTool<AppendToDocumentToolInput> = {
   specification: schema,
-  icon: "file-plus-2",
-  getActionText: (input: AppendToDocumentToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    let actionText = '';
-    if (!input || typeof input !== 'object') return '';
-    if (input.path) actionText = `"${input.path}"`;
-    
-    if (hasError) {
-      return t('tools.actions.appendDocument.failed', { path: actionText });
-    } else if (hasCompleted) {
-      return `Appended to ${actionText}`;
-    } else if (hasStarted) {
-      return `Appending to ${actionText}...`;
-    } else {
-      return `Append to ${actionText}`;
-    }
-  },
+  icon: "file-plus",
+  initialLabel: t('tools.append.label'),
   execute: async (context: ToolExecutionContext<AppendToDocumentToolInput>): Promise<void> => {
-    try {
-      const { plugin, params } = context;
-      const { path, content } = params;
-      const appendContent = content || ''; // Default to empty string if content is undefined
+    const { plugin, params } = context;
+    const { path, content } = params;
 
-      // Get the file
+    context.setLabel(t('tools.append.inProgress', { path }));
+
+    try {
+      // Check if the file exists
+      const exists = await fileExists(path, plugin.app);
+
+      if (!exists) {
+        context.setLabel(t('tools.append.failed', { path }));
+        throw new ToolExecutionError(`File not found: ${path}`);
+      }
+
+      // Read the existing file content
       const file = getFile(path, plugin.app);
-      
       if (!file) {
-        throw new Error(`File not found at ${path}`);
+        context.setLabel(t('tools.append.failed', { path }));
+        throw new ToolExecutionError(`File not found: ${path}`);
       }
       
-      // Read the current content
-      const currentContent = await readFile(file, plugin.app);
-      
+      const existingContent = await readFile(file, plugin.app);
+
       // Append the new content
-      const newContent = currentContent + appendContent;
-      
-      // Update the file
-      await modifyFile(file, newContent, plugin.app);
-      
+      const newContent = `${existingContent}\n${content}`;
+
+      // Write the updated content back to the file
+      await plugin.app.vault.modify(file, newContent);
+
       // Add navigation target
       context.addNavigationTarget({
         filePath: path,
         description: t("tools.navigation.openAppendedDocument")
       });
-      
-      context.progress(t('tools.appendDocument.progress.success', { path }));
+
+      context.setLabel(t('tools.append.completed', { path }));
+      context.progress(t('tools.progress.appendToDocument.success', { path }));
     } catch (error) {
-      console.error('Error appending to document:', error);
-      throw new Error(`Error appending to document: ${error.message || 'Unknown error'}`);
+      context.setLabel(t('tools.append.failed', { path }));
+      throw error;
     }
   }
 };

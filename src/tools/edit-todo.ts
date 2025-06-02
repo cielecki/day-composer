@@ -53,102 +53,98 @@ type EditTodoToolInput = {
 export const editTodoTool: ObsidianTool<EditTodoToolInput> = {
   specification: schema,
   icon: "edit",
-  getActionText: (input: EditTodoToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    let actionText = '';
-    if (!input || typeof input !== 'object') return '';
-    if (input.original_todo_text) actionText = input.original_todo_text;
-    
-    if (hasError) {
-      return t('tools.actions.editTodo.failed', { task: actionText });
-    } else if (hasCompleted) {
-      return `Edited todo ${actionText}`;
-    } else if (hasStarted) {
-      return `Editing todo ${actionText}...`;
-    } else {
-      return `Edit todo ${actionText}`;
-    }
-  },
+  initialLabel: t('tools.edit.label'),
   execute: async (context: ToolExecutionContext<EditTodoToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { original_todo_text } = params;
     
     if (!original_todo_text) {
+      context.setLabel(t('tools.actions.editTodo.failed', { task: '' }));
       throw new ToolExecutionError("Original todo text is required");
     }
     
     if (!params.replacement_todo_text) {
+      context.setLabel(t('tools.actions.editTodo.failed', { task: original_todo_text }));
       throw new ToolExecutionError("Replacement todo text is required");
     }
     
-    const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
-    const note = await readNote({plugin, filePath});
+    context.setLabel(t('tools.actions.editTodo.inProgress', { task: original_todo_text }));
     
-    // Validate that the original task exists
-    validateTasks(
-      note, 
-      [{ todoText: original_todo_text }]
-    );
-    
-    // Create a copy for modification
-    let updatedNote = JSON.parse(JSON.stringify(note));
-    
-    // Find the task in the updated note
-    const taskToUpdate = findTaskByDescription(updatedNote, original_todo_text, (task) => true);
-    
-    // Remember the original position for reinsertion
-    const originalPosition = updatedNote.content.findIndex((node: NoteNode) => 
-      node.type === 'task' && 
-      node.todoText === taskToUpdate.todoText && 
-      node.status === taskToUpdate.status
-    );
-    
-    // Remove the original task
-    updatedNote = removeTaskFromDocument(updatedNote, taskToUpdate);
-    
-    // Update task properties
-    taskToUpdate.todoText = params.replacement_todo_text;
-    
-    if (params.replacement_status) {
-      taskToUpdate.status = params.replacement_status;
-    }
-    
-    // Handle comment replacement/addition
-    if (params.replacement_comment !== undefined) {
-      if (params.replacement_comment === "") {
-        // Empty string means clear the comment
-        taskToUpdate.comment = "";
-      } else {
-        // Replace or add new comment
-        taskToUpdate.comment = "";
-        appendComment(taskToUpdate, params.replacement_comment);
+    try {
+      const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
+      const note = await readNote({plugin, filePath});
+      
+      // Validate that the original task exists
+      validateTasks(
+        note, 
+        [{ todoText: original_todo_text }]
+      );
+      
+      // Create a copy for modification
+      let updatedNote = JSON.parse(JSON.stringify(note));
+      
+      // Find the task in the updated note
+      const taskToUpdate = findTaskByDescription(updatedNote, original_todo_text, (task) => true);
+      
+      // Remember the original position for reinsertion
+      const originalPosition = updatedNote.content.findIndex((node: NoteNode) => 
+        node.type === 'task' && 
+        node.todoText === taskToUpdate.todoText && 
+        node.status === taskToUpdate.status
+      );
+      
+      // Remove the original task
+      updatedNote = removeTaskFromDocument(updatedNote, taskToUpdate);
+      
+      // Update task properties
+      taskToUpdate.todoText = params.replacement_todo_text;
+      
+      if (params.replacement_status) {
+        taskToUpdate.status = params.replacement_status;
       }
+      
+      // Handle comment replacement/addition
+      if (params.replacement_comment !== undefined) {
+        if (params.replacement_comment === "") {
+          // Empty string means clear the comment
+          taskToUpdate.comment = "";
+        } else {
+          // Replace or add new comment
+          taskToUpdate.comment = "";
+          appendComment(taskToUpdate, params.replacement_comment);
+        }
+      }
+      
+      // Insert the updated task at the same position
+      updatedNote = insertTaskAtPosition(updatedNote, taskToUpdate, originalPosition);
+      
+      // Update the note
+      await updateNote({plugin, filePath, updatedNote});
+      
+      // Create navigation targets for the edited task
+      const navigationTargets = createNavigationTargetsForTasks(
+        note,
+        [taskToUpdate],
+        filePath,
+        t('tools.navigation.navigateToEditedTodo')
+      );
+      
+      // Prepare success message
+      const statusText = params.replacement_status ? ` (status: ${params.replacement_status})` : '';
+      const commentText = params.replacement_comment ? ` with comment` : '';
+      
+      const resultMessage = t('tools.success.edit')
+        .replace('{{task}}', original_todo_text)
+        .replace('{{details}}', `${statusText}${commentText}`);
+
+      // Add navigation targets
+      navigationTargets.forEach(target => context.addNavigationTarget(target));
+
+      context.setLabel(t('tools.actions.editTodo.completed', { task: original_todo_text }));
+      context.progress(resultMessage);
+    } catch (error) {
+      context.setLabel(t('tools.actions.editTodo.failed', { task: original_todo_text }));
+      throw error;
     }
-    
-    // Insert the updated task at the same position
-    updatedNote = insertTaskAtPosition(updatedNote, taskToUpdate, originalPosition);
-    
-    // Update the note
-    await updateNote({plugin, filePath, updatedNote});
-    
-    // Create navigation targets for the edited task
-    const navigationTargets = createNavigationTargetsForTasks(
-      note,
-      [taskToUpdate],
-      filePath,
-      t('tools.navigation.navigateToEditedTodo')
-    );
-    
-    // Prepare success message
-    const statusText = params.replacement_status ? ` (status: ${params.replacement_status})` : '';
-    const commentText = params.replacement_comment ? ` with comment` : '';
-    
-    const resultMessage = t('tools.success.edit')
-      .replace('{{task}}', original_todo_text)
-      .replace('{{details}}', `${statusText}${commentText}`);
-
-    // Add navigation targets
-    navigationTargets.forEach(target => context.addNavigationTarget(target));
-
-    context.progress(resultMessage);
   }
 }; 

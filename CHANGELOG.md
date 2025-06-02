@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **User-Defined Tools**: Introduced comprehensive system for creating custom tools from Obsidian notes. Users can create tools by adding `ln-tool` tag to note frontmatter with JSON schema and JavaScript implementation. Includes security approval system, sandboxed execution, and example tools for YouTube transcript downloads and weather reports. Feature is disabled by default with clear security warnings.
+- **Security Approval System**: Added security approval system for user-defined tools with code verification and persistent approvals.
+- **Three Example User-Defined Tools**: Added three example user-defined tools: YouTube Transcript Tool, Weather Tool, and Template Tool.
+- **Tool Creator AI Mode**: Added **Tool Creator** mode for specialized assistance in building user-defined tools.
+- **Example User-Defined Tools in Starter Kit**: Example user-defined tools now included in starter kit instead of requiring commands to create.
+- **Shift-Click Tool Block Expansion**: Tool blocks with navigation targets can now be expanded/folded using shift-click without triggering navigation, providing better control over content visibility while preserving normal click-to-navigate behavior.
+
+### Removed
+- **Built-in YouTube Transcript Tool**: Removed the built-in `download_youtube_transcript` tool in favor of the user-defined YouTube transcript tool available in the starter kit. This simplifies the codebase while maintaining functionality through the more flexible user-defined tool system.
+
+
 ## [0.9.3] - 2025-06-02
 
 ### Added
@@ -38,19 +50,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Mobile Message Editing**: Edit messages using the main input area instead of cramped inline editing. Much better experience on phones and tablets.
 - **Conversation History**: Save, search, and revisit past conversations. Edit titles, add tags, and continue previous chats seamlessly.
 - **AI Context Optimization**: Improved AI context handling by removing HTML comments from context data to prevent instructional information from skewing AI responses.
-
-### Changed
-- **Updated User Guide**: Comprehensive documentation for the new setup process and features.
-- **Voice Recording Enhancement**: Add voice to existing text messages - transcription appends to current content.
-
-### Fixed
-- **Windows Starter Kit**: Fixed "folder already exists" error on Windows systems.
-- **Thinking Block Issues**: Resolved animation and API errors when stopping mid-thinking.
-- **Translation Completeness**: All tool messages now properly translated instead of showing English text.
-- **HTML Comment Tasks**: Fixed bug where commented-out tasks were incorrectly parsed as real tasks.
-- **Incomplete Tool Calls**: Robust handling when stopping generation during tool usage prevents API errors.
-- **Stop Button for Long-Running Tools**: Fixed stop button not working during tool execution for deep research and image generation. Tools now properly handle abort signals and can be cancelled while running external API operations.
-
 
 ## [0.7.4] - 2025-05-26
 
@@ -86,7 +85,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Voice Recording with Images**: Fixed issue where the microphone button would disappear when attaching images - users can now record voice notes even when images are attached
 - **Recording Input Behavior**: Input field and placeholder are now completely hidden during voice recording and transcription, image preview area is hidden during transcription, and image editing (paste, attach, remove) is disabled during recording and transcription
 - **Mobile Usage Example Pills**: Improved styling and visibility of usage example buttons (pills) on mobile devices with better contrast, touch-friendly sizing, proper Obsidian theme integration, and enhanced accessibility features
-
 
 ## [0.6.12] - 2025-05-23
 

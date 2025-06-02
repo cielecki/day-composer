@@ -2483,3 +2483,52 @@ If your plugin does not need CSS, delete this file.
     background-color: transparent;
   }
 }
+/* Tool Approval Modal Styles */
+.tool-approval-modal {
+  font-family: var(--font-interface);
+  line-height: 1.4;
+}
+
+.tool-approval-modal .tool-approval-header {
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 12px;
+}
+
+.tool-approval-modal pre {
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.tool-approval-modal button {
+  transition: all 0.2s ease;
+  font-family: var(--font-interface);
+  font-size: 14px;
+}
+
+.tool-approval-modal button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tool-approval-modal button:active {
+  transform: translateY(0);
+}
+
+.tool-approval-modal ul {
+  list-style-type: disc;
+}
+
+.tool-approval-modal li {
+  margin: 4px 0;
+}
+
+/* Ensure proper text wrapping in all sections */
+.tool-approval-modal p,
+.tool-approval-modal li,
+.tool-approval-modal h3 {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}

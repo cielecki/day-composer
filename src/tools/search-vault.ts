@@ -26,104 +26,63 @@ type SearchVaultToolInput = {
 export const searchVaultTool: ObsidianTool<SearchVaultToolInput> = {
   specification: schema,
   icon: "search",
-  getActionText: (input: SearchVaultToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    let actionText = '';
-    
-    if (!input || typeof input !== 'object') return '';
-    if (input.query) actionText = input.query;
-
-    if (hasError) {
-      return t('tools.actions.searchVault.failed', { query: actionText });
-    } else if (hasCompleted) {
-      return t('tools.actions.searchVault.completed', { query: actionText });
-    } else if (hasStarted) {
-      return t('tools.actions.searchVault.inProgress', { query: actionText });
-    } else {
-      return t('tools.actions.searchVault.default', { query: actionText });
-    }
-  },
+  initialLabel: t('tools.search.label'),
   execute: async (context: ToolExecutionContext<SearchVaultToolInput>): Promise<void> => {
+    const { plugin, params } = context;
+    const { query } = params;
+
+    context.setLabel(t('tools.search.inProgress', { query }));
+
     try {
-      const { plugin, params } = context;
-      const { query } = params;
-      
-      // Ensure query is a string (handle null/undefined)
-      const searchQuery = query || '';
-
-      if (!searchQuery) {
-        throw new Error('No search query provided');
-      }
-      
-      const fuzzySearch = prepareFuzzySearch(searchQuery);
-      
-      // Get all markdown files from the vault
       const files = plugin.app.vault.getMarkdownFiles();
-      const results = [];
+      const results: { file: string; relevance: number; content: string }[] = [];
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+      for (const file of files) {
+        const content = await plugin.app.vault.read(file);
         
-        let shouldInclude = false;
-        const filename = file.basename;
-        const path = file.path;
+        // Simple search - check if query appears in content (case insensitive)
+        const lowerContent = content.toLowerCase();
+        const lowerQuery = query.toLowerCase();
         
-        // Search in filename and path using fuzzy search
-        const filenameMatch = fuzzySearch(filename);
-        const pathMatch = fuzzySearch(path);
-        
-        if (filenameMatch || pathMatch) {
-          shouldInclude = true;
-        } else {
-          // If no match in filename/path, check content
-          try {
-            const content = await plugin.app.vault.cachedRead(file);
-            const contentMatch = fuzzySearch(content);
-            
-            if (contentMatch) {
-              shouldInclude = true;
-            }
-          } catch (error) {
-            console.error(`Error reading file ${file.path}:`, error);
-          }
-        }
-        
-        if (shouldInclude) {
-          // Get metadata if available
-          const metadata = plugin.app.metadataCache.getFileCache(file);
-          
+        if (lowerContent.includes(lowerQuery)) {
+          // Simple relevance scoring based on number of matches
+          const matches = (lowerContent.match(new RegExp(lowerQuery, 'g')) || []).length;
           results.push({
-            path: file.path,
-            name: file.basename,
-            score: (filenameMatch?.score || 0) > (pathMatch?.score || 0) 
-              ? filenameMatch?.score || 0 
-              : pathMatch?.score || 0,
-            matches: {
-              filename: filenameMatch !== null,
-              path: pathMatch !== null,
-              content: !filenameMatch && !pathMatch
-            },
-            // Include headings if available
-            headings: metadata?.headings?.map(h => ({ 
-              text: h.heading,
-              level: h.level
-            })) || []
+            file: file.path,
+            relevance: matches,
+            content: content.slice(0, 500) // First 500 characters as preview
           });
         }
       }
-      
-      // Sort results by score (higher scores first)
-      results.sort((a, b) => (b.score || 0) - (a.score || 0));
 
-      const resultCount = results.length;
-      const plural = resultCount > 1 ? 's' : '';
-      const resultMessage = resultCount === 0 
-        ? t('tools.progress.searchVault.noResults', { query })
-        : t('tools.progress.searchVault.results', { count: resultCount, plural, query }) + `:\n\n${JSON.stringify(results, null, 2)}`;
+      // Sort by relevance (descending) and limit results
+      results.sort((a, b) => b.relevance - a.relevance);
+      const limitedResults = results.slice(0, 10);
 
-      context.progress(resultMessage);
+      if (limitedResults.length === 0) {
+        context.setLabel(t('tools.search.noResults', { query }));
+        context.progress(t('tools.search.noResults', { query }));
+        return;
+      }
+
+      // Create formatted result
+      const resultText = limitedResults.map((result, index) => 
+        `${index + 1}. **${result.file}** (${result.relevance} matches)\n   ${result.content.split('\n')[0]}...`
+      ).join('\n\n');
+
+      // Add navigation targets for each result
+      limitedResults.forEach(result => {
+        context.addNavigationTarget({
+          filePath: result.file,
+          description: `Open: ${result.file}`
+        });
+      });
+
+      context.setLabel(t('tools.search.completed', { query, count: limitedResults.length }));
+      context.progress(resultText);
     } catch (error) {
-      console.error('Error searching vault:', error);
-      throw new Error(`Error searching vault: ${error.message || 'Unknown error'}`);
+      context.setLabel(t('tools.search.failed', { query }));
+      throw error;
     }
   }
 };

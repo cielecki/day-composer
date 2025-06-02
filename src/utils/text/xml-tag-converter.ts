@@ -1,3 +1,5 @@
+import { normalizeUnicodeLowercase } from './unicode-normalizer';
+
 /**
  * Converts a string to a valid XML tag name by replacing non-ASCII characters
  * with their ASCII equivalents and ensuring the result is a valid XML tag name
@@ -5,11 +7,8 @@
  * @returns A valid XML tag name
  */
 export function convertToValidTagName(text: string): string {
-	// Normalize the text using NFKD form, which separates diacritics
-	// Then remove all diacritics and convert to lowercase
-	let result = text.normalize('NFKD')
-		.replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-		.toLowerCase();
+	// Normalize Unicode, remove diacritics, and convert to lowercase
+	let result = normalizeUnicodeLowercase(text);
 
 	// Replace any remaining non-alphanumeric characters with underscores
 	result = result.replace(/[^a-z0-9]/g, '_');

@@ -62,125 +62,100 @@ type AbandonTodoToolInput = {
 export const abandonTodoTool: ObsidianTool<AbandonTodoToolInput> = {
   specification: schema,
   icon: "x-square",
-  getActionText: (input: AbandonTodoToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    let actionText = '';
-    if (!input || typeof input !== 'object') return '';
-    const todoCount = input.todos?.length || 0;
-    
-    if (todoCount === 1) {
-      actionText = `"${input.todos[0].todo_text}"`;
-    } else {
-      // Use proper pluralization based on count with static translation keys
-      let translation = '';
-      if (todoCount === 0) {
-        translation = t('tools.tasks.count.zero', { count: todoCount });
-      } else if (todoCount === 1) {
-        translation = t('tools.tasks.count.one', { count: todoCount });
-      } else if (todoCount % 10 >= 2 && todoCount % 10 <= 4 && (todoCount % 100 < 10 || todoCount % 100 >= 20)) {
-        translation = t('tools.tasks.count.few', { count: todoCount });
-      } else {
-        translation = t('tools.tasks.count.many', { count: todoCount });
-      }
-      
-      // Check if translation was successful, fallback to simple pluralization if not
-      if (translation && !translation.startsWith('tools.tasks.count.')) {
-        actionText = translation;
-      } else {
-        actionText = `${todoCount} ${t('tools.tasks.plural')}`;
-      }
-    }
-    
-    if (hasError) {
-      return t('tools.actions.abandon.failed').replace('{{task}}', actionText);
-    } else if (hasCompleted) {
-      return t('tools.actions.abandon.success').replace('{{task}}', actionText);
-    } else if (hasStarted) {
-      return t('tools.actions.abandon.inProgress').replace('{{task}}', '');
-    } else {
-      return t('tools.actions.abandon.default').replace('{{task}}', actionText);
-    }
-  },
+  initialLabel: t('tools.abandon.label'),
   execute: async (context: ToolExecutionContext<AbandonTodoToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos, time } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
+      context.setLabel(t('tools.actions.abandon.failed', { task: '' }));
       throw new ToolExecutionError("No to-do items provided");
     }
+    
+    const count = todos.length;
+    const todoText = count === 1 ? todos[0].todo_text : `${count} todos`;
+    
+    context.setLabel(t('tools.actions.abandon.inProgress', { task: todoText }));
     
     // Format the current time if provided (common for all tasks)
     const currentTime = getCurrentTime(time);
     
     const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
     
-    const note = await readNote({plugin, filePath});
-    
-    // Validate all tasks upfront - will throw if any validation fails
-    validateTasks(
-      note,
-      todos.map(todo => ({
-        todoText: todo.todo_text,
-        taskPredicate: (task) => task.status !== 'abandoned'
-      }))
-    );
-    
-    // Track tasks that will be abandoned
-    const abandonedTasks: string[] = [];
-    const movedTasks: Task[] = []; // Store references to the moved tasks
-    
-    // If we get here, all tasks were validated successfully
-    let updatedNote = JSON.parse(JSON.stringify(note));
-    
-    // Process each to-do item
-    for (const todo of todos) {
-      const { todo_text, comment } = todo;
+    try {
+      const note = await readNote({plugin, filePath});
       
-      // We already validated all tasks exist
-      const task = findTaskByDescription(updatedNote, todo_text, (task) => task.status !== 'abandoned');
+      // Validate all tasks upfront - will throw if any validation fails
+      validateTasks(
+        note,
+        todos.map(todo => ({
+          todoText: todo.todo_text,
+          taskPredicate: (task) => task.status !== 'abandoned'
+        }))
+      );
       
-      // Update status
-      task.status = 'abandoned';
+      // Track tasks that will be abandoned
+      const abandonedTasks: string[] = [];
+      const movedTasks: Task[] = []; // Store references to the moved tasks
       
-      // Add abandonment time to the todo text if provided
-      if (currentTime) {
-        task.todoText = `${task.todoText}${t('tasks.format.abandonedAt', { time: currentTime })}`;
+      // If we get here, all tasks were validated successfully
+      let updatedNote = JSON.parse(JSON.stringify(note));
+      
+      // Process each to-do item
+      for (const todo of todos) {
+        const { todo_text, comment } = todo;
+        
+        // We already validated all tasks exist
+        const task = findTaskByDescription(updatedNote, todo_text, (task) => task.status !== 'abandoned');
+        
+        // Update status
+        task.status = 'abandoned';
+        
+        // Add abandonment time to the todo text if provided
+        if (currentTime) {
+          task.todoText = `${task.todoText}${t('tasks.format.abandonedAt', { time: currentTime })}`;
+        }
+        
+        // Add comment if provided
+        if (comment) {
+          appendComment(task, comment);
+        }
+        
+        // Move the abandoned task to the current position (unified logic with check-todo and move-todo)
+        updatedNote = moveTaskToPosition(updatedNote, task);
+        
+        // Store the task reference for finding its new position later
+        movedTasks.push(task);
+        abandonedTasks.push(todo_text);
       }
       
-      // Add comment if provided
-      if (comment) {
-        appendComment(task, comment);
-      }
+      // Update the note with all abandoned tasks
+      await updateNote({plugin, filePath, updatedNote});
       
-      // Move the abandoned task to the current position (unified logic with check-todo and move-todo)
-      updatedNote = moveTaskToPosition(updatedNote, task);
+      // Create navigation targets for the moved tasks
+      const navigationTargets = createNavigationTargetsForTasks(
+        updatedNote,
+        movedTasks,
+        filePath,
+        `Navigate to abandoned todo{{count}}`
+      );
       
-      // Store the task reference for finding its new position later
-      movedTasks.push(task);
-      abandonedTasks.push(todo_text);
+      // Add navigation targets
+      navigationTargets.forEach(target => context.addNavigationTarget(target));
+      
+      // Prepare success message
+      const tasksDescription = abandonedTasks.length === 1 
+        ? `"${abandonedTasks[0]}"`
+        : `${abandonedTasks.length} ${t('tools.tasks.plural')}`;
+      
+      context.setLabel(t('tools.actions.abandon.success', { task: todoText }));
+      context.progress(t('tools.success.abandon', {
+        task: tasksDescription,
+        path: filePath
+      }));
+    } catch (error) {
+      context.setLabel(t('tools.actions.abandon.failed', { task: todoText }));
+      throw error;
     }
-    
-    // Update the note with all abandoned tasks
-    await updateNote({plugin, filePath, updatedNote});
-    
-    // Create navigation targets for the moved tasks
-    const navigationTargets = createNavigationTargetsForTasks(
-      updatedNote,
-      movedTasks,
-      filePath,
-      `Navigate to abandoned todo{{count}}`
-    );
-    
-    // Add navigation targets
-    navigationTargets.forEach(target => context.addNavigationTarget(target));
-    
-    // Prepare success message
-    const tasksDescription = abandonedTasks.length === 1 
-      ? `"${abandonedTasks[0]}"`
-      : `${abandonedTasks.length} ${t('tools.tasks.plural')}`;
-    
-    context.progress(t('tools.success.abandon', {
-      task: tasksDescription,
-      path: filePath
-    }));
   }
 };

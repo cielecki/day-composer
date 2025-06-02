@@ -76,126 +76,102 @@ type AddTodoToolInput = {
 export const addTodoTool: ObsidianTool<AddTodoToolInput> = {
 	specification: schema,
 	icon: "list-plus",
-	getActionText: (
-		input: AddTodoToolInput,
-		hasStarted: boolean,
-		hasCompleted: boolean,
-		hasError: boolean,
-	) => {
-		let actionText = "";
-		if (!input || typeof input !== "object") return '';
-		const todoCount = input.todos?.length || 0;
-		
-		if (todoCount === 1) {
-			actionText = `"${input.todos[0].todo_text}"`;
-		} else {
-			// Use proper pluralization based on count with static translation keys
-			let translation = '';
-			if (todoCount === 0) {
-				translation = t('tools.tasks.count.zero', { count: todoCount });
-			} else if (todoCount === 1) {
-				translation = t('tools.tasks.count.one', { count: todoCount });
-			} else if (todoCount % 10 >= 2 && todoCount % 10 <= 4 && (todoCount % 100 < 10 || todoCount % 100 >= 20)) {
-				translation = t('tools.tasks.count.few', { count: todoCount });
-			} else {
-				translation = t('tools.tasks.count.many', { count: todoCount });
-			}
-			
-			// Check if translation was successful, fallback to simple pluralization if not
-			if (translation && !translation.startsWith('tools.tasks.count.')) {
-				actionText = translation;
-			} else {
-				actionText = `${todoCount} ${t('tools.tasks.plural')}`;
-			}
-		}
-
-		if (hasError) {
-			return t('tools.actions.add.failed', { defaultValue: `Failed to add ${actionText}` }).replace('{{task}}', actionText);
-		} else if (hasCompleted) {
-			return t('tools.actions.add.success', { defaultValue: `Added ${actionText}` }).replace('{{task}}', actionText);
-		} else if (hasStarted) {
-			return t('tools.actions.add.inProgress', { defaultValue: 'Adding todo...' }).replace('{{task}}', '');
-		} else {
-			return t('tools.actions.add.default').replace('{{task}}', actionText);
-		}
-	},
+	initialLabel: t('tools.add.label'),
 	execute: async (context: ToolExecutionContext<AddTodoToolInput>): Promise<void> => {
 		const { plugin, params } = context;
 		const { todos, path, position, reference_todo_text } = params;
 
 		if (!todos || !Array.isArray(todos) || todos.length === 0) {
+			context.setLabel(t('tools.actions.add.failed', { task: '' }));
 			throw new ToolExecutionError("No to-do items provided");
 		}
 
+		const todoCount = todos.length;
+		let actionText = "";
+		
+		if (todoCount === 1) {
+			actionText = `"${todos[0].todo_text}"`;
+		} else {
+			actionText = `${todoCount} todos`;
+		}
+
+		context.setLabel(t('tools.actions.add.inProgress', { task: actionText }));
+
 		const filePath = path ? path : await getDailyNotePath(plugin.app);
 
-		// Check if file exists, create if it doesn't
-		const exists = await fileExists(filePath, plugin.app);
-		if (!exists) {
-			await createFile(filePath, "", plugin.app);
-		}
+		try {
+			// Check if file exists, create if it doesn't
+			const exists = await fileExists(filePath, plugin.app);
+			if (!exists) {
+				await createFile(filePath, "", plugin.app);
+			}
 
-		// Read the note
-		const note = await readNote({ plugin, filePath });
+			// Read the note
+			const note = await readNote({ plugin, filePath });
 
-		// Determine insertion position
-		const insertionIndex = determineInsertionPosition(
-			note,
-			position,
-			reference_todo_text,
-		);
-
-		// Create task objects and insert them
-		let updatedNote = JSON.parse(JSON.stringify(note));
-		const addedTasks: string[] = [];
-		const addedTaskObjects: Task[] = [];
-
-		for (let i = 0; i < todos.length; i++) {
-			const todo = todos[i];
-			const task: Task = {
-				type: "task",
-				status: "pending",
-				todoText: todo.todo_text,
-				comment: "",
-				lineIndex: -1, // Will be updated when the note is saved
-			};
-
-			// Insert at the calculated position + i to maintain order
-			updatedNote = insertTaskAtPosition(
-				updatedNote,
-				task,
-				insertionIndex + i,
+			// Determine insertion position
+			const insertionIndex = determineInsertionPosition(
+				note,
+				position,
+				reference_todo_text,
 			);
-			addedTasks.push(todo.todo_text);
-			addedTaskObjects.push(task);
+
+			// Create task objects and insert them
+			let updatedNote = JSON.parse(JSON.stringify(note));
+			const addedTasks: string[] = [];
+			const addedTaskObjects: Task[] = [];
+
+			for (let i = 0; i < todos.length; i++) {
+				const todo = todos[i];
+				const task: Task = {
+					type: "task",
+					status: "pending",
+					todoText: todo.todo_text,
+					comment: "",
+					lineIndex: -1, // Will be updated when the note is saved
+				};
+
+				// Insert at the calculated position + i to maintain order
+				updatedNote = insertTaskAtPosition(
+					updatedNote,
+					task,
+					insertionIndex + i,
+				);
+				addedTasks.push(todo.todo_text);
+				addedTaskObjects.push(task);
+			}
+
+			// Update the note
+			await updateNote({ plugin, filePath, updatedNote });
+
+			// Calculate line numbers for the added tasks
+			const lineNumbers: number[] = [];
+			for (let i = 0; i < addedTaskObjects.length; i++) {
+				lineNumbers.push(calculateLineNumberForNode(updatedNote, insertionIndex + i));
+			}
+
+			// Create navigation target
+			const navigationTarget = createNavigationTarget(
+				filePath,
+				lineNumbers,
+				`Navigate to added todo${addedTasks.length > 1 ? 's' : ''}`
+			);
+
+			context.addNavigationTarget(navigationTarget);
+
+			// Prepare success message
+			const tasksDescription = addedTasks.length === 1 
+				? `"${addedTasks[0]}"` 
+				: `${addedTasks.length} ${t('tools.tasks.plural')}`;
+				
+			context.setLabel(t('tools.actions.add.success', { task: actionText }));
+			context.progress(t('tools.success.add', {
+				task: tasksDescription,
+				path: filePath
+			}));
+		} catch (error) {
+			context.setLabel(t('tools.actions.add.failed', { task: actionText }));
+			throw error;
 		}
-
-		// Update the note
-		await updateNote({ plugin, filePath, updatedNote });
-
-		// Calculate line numbers for the added tasks
-		const lineNumbers: number[] = [];
-		for (let i = 0; i < addedTaskObjects.length; i++) {
-			lineNumbers.push(calculateLineNumberForNode(updatedNote, insertionIndex + i));
-		}
-
-		// Create navigation target
-		const navigationTarget = createNavigationTarget(
-			filePath,
-			lineNumbers,
-			`Navigate to added todo${addedTasks.length > 1 ? 's' : ''}`
-		);
-
-		context.addNavigationTarget(navigationTarget);
-
-		// Prepare success message
-		const tasksDescription = addedTasks.length === 1 
-			? `"${addedTasks[0]}"` 
-			: `${addedTasks.length} ${t('tools.tasks.plural')}`;
-			
-		context.progress(t('tools.success.add', {
-			task: tasksDescription,
-			path: filePath
-		}));
 	}
 };

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { LucideIcon } from './LucideIcon';
 import { getObsidianTools, NavigationTarget } from '../obsidian-tools';
 import { t } from '../i18n';
@@ -57,13 +57,22 @@ export const CollapsibleBlock: React.FC<CollapsibleBlockProps> = ({
   });
 
   const handleSummaryClick = useCallback((e: React.MouseEvent) => {
-    // If we have a click handler and this is clickable, handle the click
+    // Check if shift key is pressed for clickable blocks
+    if (isClickable && e.shiftKey) {
+      // Shift-click on clickable tool blocks should toggle expand/fold
+      e.preventDefault();
+      e.stopPropagation();
+      handleToggle(!isCurrentlyOpen);
+      return;
+    }
+    
+    // If we have a click handler and this is clickable, handle the click normally
     if (onClick && isClickable) {
       e.preventDefault();
       e.stopPropagation();
       onClick();
     }
-  }, [onClick, isClickable]);
+  }, [onClick, isClickable, handleToggle, isCurrentlyOpen]);
 
   // Handle native details toggle event
   const handleDetailsToggle = useCallback((e: React.SyntheticEvent<HTMLDetailsElement>) => {
@@ -114,6 +123,7 @@ interface ToolBlockProps {
   defaultOpen?: boolean;
   isError?: boolean;
   navigationTargets?: NavigationTarget[];
+  currentLabel?: string; // Current label from tool execution
 }
 
 export const ToolBlock: React.FC<ToolBlockProps> = ({
@@ -123,23 +133,35 @@ export const ToolBlock: React.FC<ToolBlockProps> = ({
   result,
   defaultOpen = false,
   isError = false,
-  navigationTargets = []
+  navigationTargets = [],
+  currentLabel
 }) => {
   const obsidianTools = getObsidianTools(undefined!);
   const [currentTargetIndex, setCurrentTargetIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [tool, setTool] = useState<any>(null);
+  
+  // Load tool asynchronously
+  useEffect(() => {
+    const loadTool = async () => {
+      try {
+        const foundTool = await obsidianTools.getToolByName(toolName);
+        setTool(foundTool || null);
+      } catch (error) {
+        console.error('Failed to get tool:', error);
+        setTool(null);
+      }
+    };
+    
+    loadTool();
+  }, [obsidianTools, toolName]);
   
   // Auto-detect errors from content
   const contentHasErrorIndicator = typeof result === 'string' && result.trim().startsWith('❌');
   const effectiveIsError = isError || contentHasErrorIndicator;
   
-  const tool = obsidianTools.getToolByName(toolName);
-  const actionText = tool?.getActionText(
-    toolInput, 
-    false,
-    isComplete,
-    effectiveIsError
-  );
+  // Use current label if available, otherwise tool's initial label as fallback
+  const actionText = currentLabel || tool?.initialLabel || toolName;
   const iconName = tool?.icon;
   
   // Use the passed navigation targets

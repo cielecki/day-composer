@@ -48,34 +48,24 @@ type GenerateImageToolInput = {
 export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
   specification: schema,
   icon: "image",
-  getActionText: (input: GenerateImageToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    let actionText = '';
-    if (!input || typeof input !== 'object') return '';
-    if (input.path) actionText = `"${input.path}"`;
-    
-    if (hasError) {
-      return t('tools.actions.generateImage.failed', { path: actionText });
-    } else if (hasCompleted) {
-      return t('tools.generateImage.success', { path: actionText });
-    } else if (hasStarted) {
-      return t('tools.generateImage.generating', { path: actionText });
-    } else {
-      return t('tools.actions.generateImage.default', { path: actionText });
-    }
-  },
+  initialLabel: t('tools.generateImage.label'),
   execute: async (context: ToolExecutionContext<GenerateImageToolInput>): Promise<void> => {
     const { plugin, params, signal } = context;
     const { prompt, path, size = "1024x1024", quality = "auto" } = params;
+
+    context.setLabel(t('tools.generateImage.generating', { path }));
 
     // Check abort signal at start
     if (signal.aborted) throw new ToolExecutionError(t('tools.generateImage.errors.aborted'));
 
     // Validate inputs
     if (!prompt || prompt.trim().length === 0) {
+      context.setLabel(t('tools.actions.generateImage.failed', { path }));
       throw new ToolExecutionError(t('tools.generateImage.errors.emptyPrompt'));
     }
 
     if (!path || path.trim().length === 0) {
+      context.setLabel(t('tools.actions.generateImage.failed', { path }));
       throw new ToolExecutionError(t('tools.generateImage.errors.emptyPath'));
     }
 
@@ -90,12 +80,14 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
     // Check if the file already exists
     const exists = await fileExists(normalizedPath, plugin.app);
     if (exists) {
+      context.setLabel(t('tools.actions.generateImage.failed', { path: normalizedPath }));
       throw new ToolExecutionError(t('tools.generateImage.errors.fileExists', { path: normalizedPath }));
     }
 
     // Check for OpenAI API key
     const settings = getPluginSettings();
     if (!settings.openAIApiKey) {
+      context.setLabel(t('tools.actions.generateImage.failed', { path: normalizedPath }));
       throw new ToolExecutionError(t('tools.generateImage.errors.noApiKey'));
     }
 
@@ -164,10 +156,13 @@ export const generateImageTool: ObsidianTool<GenerateImageToolInput> = {
         description: t('tools.generateImage.openImage')
       });
 
+      context.setLabel(t('tools.generateImage.success', { path: normalizedPath }));
       context.progress(t('tools.generateImage.success', { path: normalizedPath }));
 
     } catch (error: any) {
       console.error('Error generating image:', error);
+      
+      context.setLabel(t('tools.actions.generateImage.failed', { path: normalizedPath }));
       
       // Handle abort errors specifically - throw ToolExecutionError for user-facing message
       if (error.name === 'AbortError' || signal.aborted) {

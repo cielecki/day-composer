@@ -30,7 +30,8 @@ export const processToolUseBlocks = async (
 			tool_use_id: toolUseBlock.id,
 			content: "",
 			is_complete: false,
-			navigationTargets: []
+			navigation_targets: [],
+			current_label: undefined // Will be set by tool's initial label
 		};
 		
 		try {
@@ -46,8 +47,14 @@ export const processToolUseBlocks = async (
 				},
 				(navigationTarget) => {
 					// Add navigation targets as they become available
-					initialResult.navigationTargets = initialResult.navigationTargets || [];
-					initialResult.navigationTargets.push(navigationTarget);
+					initialResult.navigation_targets = initialResult.navigation_targets || [];
+					initialResult.navigation_targets.push(navigationTarget);
+					// Notify the UI about the update
+					onToolResultUpdate?.(toolUseBlock.id, { ...initialResult });
+				},
+				(label: string) => {
+					// Update the current label
+					initialResult.current_label = label;
 					// Notify the UI about the update
 					onToolResultUpdate?.(toolUseBlock.id, { ...initialResult });
 				}
@@ -60,7 +67,8 @@ export const processToolUseBlocks = async (
 				content: result.result,
 				is_error: result.isError,
 				is_complete: true,
-				navigationTargets: result.navigationTargets
+				navigation_targets: result.navigationTargets,
+				current_label: result.finalLabel
 			};
 			
 			toolResults.push(finalResult);
@@ -73,6 +81,7 @@ export const processToolUseBlocks = async (
 				content: `Error: ${error.message || "Unknown error"}`,
 				is_error: true,
 				is_complete: true,
+				current_label: initialResult.current_label // Keep last known label
 			};
 			toolResults.push(errorResult);
 			// Update with error result

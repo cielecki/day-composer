@@ -49,90 +49,25 @@ export const handoverModeTool: ObsidianTool<HandoverModeToolInput> = {
 		};
 	},
 	icon: "arrow-right-left",
-	getActionText: (input: HandoverModeToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-		if (!input || typeof input !== 'object') {
-			return 'Handover mode';
-		}
-
-		const modeId = input.mode_id;
-		let modeName = modeId;
-
-		// Try to get the actual mode name for better display
-		try {
-			if (modeManagerService.isContextAvailable()) {
-				const availableModes = modeManagerService.getAvailableModes();
-				const mode = availableModes.find(m => m.id === modeId);
-				if (mode) {
-					modeName = mode.name;
-				}
-			}
-		} catch (error) {
-			// Fall back to mode ID
-		}
-
-		if (hasError) {
-			return t("tools.handover.failedToSwitch", { modeName });
-		} else if (hasCompleted) {
-			return t("tools.handover.switched", { modeName });
-		} else if (hasStarted) {
-			return t("tools.handover.switching", { modeName });
-		} else {
-			return t("tools.actions.handover.default", { modeName });
-		}
-	},
+	initialLabel: t('tools.handover.label'),
 	execute: async (context: ToolExecutionContext<HandoverModeToolInput>): Promise<void> => {
+		const { plugin, params } = context;
+		const { mode_id } = params;
+
+		context.setLabel(t('tools.handover.inProgress', { mode: mode_id }));
+
 		try {
-			const { params } = context;
-			const { mode_id } = params;
-
-			// Validate input
-			if (!mode_id || typeof mode_id !== 'string') {
-				throw new ToolExecutionError(t("tools.handover.invalidModeId"));
-			}
-
-			// Check if the mode manager service is available
-			if (!modeManagerService.isContextAvailable()) {
-				throw new ToolExecutionError(t("tools.handover.noModes"));
-			}
-
-			// Get available modes for validation
-			const availableModes = modeManagerService.getAvailableModes();
-			const targetMode = availableModes.find(mode => mode.id === mode_id);
-
-			if (!targetMode) {
-				throw new ToolExecutionError(t("tools.handover.modeNotFound", { modeId: mode_id }));
-			}
-
-			// Get current mode for comparison
-			const currentModeId = modeManagerService.getActiveModeId();
-			
-			// Check if we're already in the requested mode
-			if (currentModeId === mode_id) {
-				context.progress(t("tools.handover.alreadyInMode", { modeName: targetMode.name }));
-				return;
-			}
-
-			// Perform the mode change
+			// Use the mode manager service to switch modes
 			await modeManagerService.changeModeById(mode_id);
-
-			// Success message with clear handover instructions for the new mode
-			const currentModeName = availableModes.find(m => m.id === currentModeId)?.name || currentModeId;
 			
-			context.progress(t("tools.handover.successMessage", { fromMode: currentModeName, toMode: targetMode.name }));
-			context.progress("");
-			context.progress(t("tools.handover.newModeActive", { modeName: targetMode.name }));
-			context.progress(t("tools.handover.description") + " " + targetMode.description || t("tools.handover.noDescription"));
-			context.progress("");
-			context.progress(t("tools.handover.handoverInstructions"));
+			// Add a message about the handover
+			const handoverMessage = t('tools.handover.noReason', { mode: mode_id });
 
+			context.setLabel(t('tools.handover.completed', { mode: mode_id }));
+			context.progress(handoverMessage);
 		} catch (error) {
-			console.error('Error in handover mode tool:', error);
-			
-			if (error instanceof ToolExecutionError) {
-				throw error;
-			} else {
-				throw new ToolExecutionError(t("tools.handover.switchFailed", { error: error.message }));
-			}
+			context.setLabel(t('tools.handover.failed', { mode: mode_id }));
+			throw error;
 		}
 	}
 }; 

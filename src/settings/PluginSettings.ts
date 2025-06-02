@@ -15,6 +15,7 @@ export class PluginSettings {
 	firecrawlApiKey = '';
 	speechToTextPrompt = '';
 	activeModeId = '';
+	userDefinedToolsEnabled = false; // Default disabled for security
 	tutorial: TutorialSettings = {
 		obsidianLanguageConfigured: false,
 		openaiKeyConfigured: false
@@ -33,6 +34,7 @@ export class PluginSettings {
         this.firecrawlApiKey = data?.firecrawlApiKey ?? '';
         this.speechToTextPrompt = data?.speechToTextPrompt ?? '';
         this.activeModeId = data?.activeModeId ?? '';
+        this.userDefinedToolsEnabled = data?.userDefinedToolsEnabled ?? false;
         
         // Handle migration from old obsidianLanguageConfigured field
         if (data?.obsidianLanguageConfigured !== undefined) {
@@ -55,6 +57,7 @@ export class PluginSettings {
             firecrawlApiKey: this.firecrawlApiKey,
             speechToTextPrompt: this.speechToTextPrompt,
             activeModeId: this.activeModeId,
+            userDefinedToolsEnabled: this.userDefinedToolsEnabled,
             tutorial: this.tutorial,
         };
         await this.plugin.saveData(settingsToSave);

@@ -15,6 +15,8 @@ import { getDefaultLNMode, mergeWithDefaultMode, DEFAULT_VOICE_INSTRUCTIONS } fr
 import { STARTER_KIT_DATA } from "./generated/starter-kit-data";
 import { ConfirmReloadModal } from "./components/ConfirmReloadModal";
 import { generateUniqueDirectoryName } from "./utils/tools/generate-unique-directory-name";
+import { UserDefinedToolManager } from "./user-tools/UserDefinedToolManager";
+import { sanitizeString } from './utils/text/string-sanitizer';
 
 /**
  * Recursively creates nested directories, ensuring parent directories exist first
@@ -61,7 +63,7 @@ const createStarterKit = async (app: App) => {
 
 		let baseStarterKitDirName = t('ui.starterKit.directoryName');
 
-		baseStarterKitDirName = baseStarterKitDirName + " v0.8";
+		baseStarterKitDirName = baseStarterKitDirName + " v0.9";
 
 		// Generate a unique directory name
 		const starterKitDirName = await generateUniqueDirectoryName(app, baseStarterKitDirName);
@@ -186,7 +188,7 @@ const createNewMode = async (app: App) => {
 
 		// Ensure ln_name is defined
 		const baseModeName = newMode.ln_name || t('ui.mode.newMode');
-		const sanitizedBaseName = baseModeName.replace(/[^a-zA-Z0-9 ]/g, "");
+		const sanitizedBaseName = sanitizeString(baseModeName, { allowSpaces: true, lowercase: false });
 
 		// Find a unique filename by incrementing a number if needed
 		let counter = 1;
@@ -305,6 +307,7 @@ const checkForUpdatesOnStartup = async (plugin: Plugin) => {
 
 export default class MyPlugin extends Plugin {
 	view: LifeNavigatorView | null = null;
+	userToolManager: UserDefinedToolManager | null = null;
 
 	async onload() {
 		console.log("Loading Life Navigator plugin");
@@ -321,6 +324,22 @@ export default class MyPlugin extends Plugin {
 
 		// Initialize the obsidian tools with this plugin instance
 		getObsidianTools(this);
+
+		// Always initialize user-defined tools manager (but only start it if enabled)
+		this.userToolManager = new UserDefinedToolManager(this);
+		
+		// Check if user-defined tools are enabled and initialize if so
+		const settings = getPluginSettings();
+		if (settings.userDefinedToolsEnabled) {
+			try {
+				await this.userToolManager.initialize();
+				console.log('[USER-TOOLS] User-defined tools initialized');
+			} catch (error) {
+				console.error('[USER-TOOLS] Failed to initialize user-defined tools:', error);
+			}
+		} else {
+			console.log('[USER-TOOLS] User-defined tools disabled, manager created but not initialized');
+		}
 
 		// Register the view type
 		this.registerView(LIFE_NAVIGATOR_VIEW_TYPE, (leaf) => {

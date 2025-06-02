@@ -19,16 +19,11 @@
       "noContent": "No chat content available"
     },
     "conversationTurn": "Error during conversation: {{error}}",
-    "documents": {
-      "notFound": "File not found: {{path}}"
-    },
     "failedToUpdatePlugin": "Failed to update plugin: {{error}}",
     "files": {
-      "createFailed": "Could not create target file at {{path}}: {{error}}",
       "formatFailed": "Failed to format document after task operation",
       "getFailed": "Failed to get file at {{path}}",
-      "notFound": "File not found at {{path}}",
-      "sourceNotFound": "Source file not found at {{path}}"
+      "notFound": "File not found at {{path}}"
     },
     "linkExpansion": {
       "couldNotResolve": "Could not resolve link target \"{{linkPath}}\""
@@ -40,9 +35,6 @@
       "multipleFound": "Multiple tasks found with description \"{{task}}\" in {{path}}. Please make your task description more specific.",
       "notFound": "To-do item \"{{task}}\" not found in {{path}}. If the task is in another file, please specify it in the file_path parameter.",
       "removeNotFound": "Task \"{{task}}\" not found in document"
-    },
-    "todos": {
-      "createError": "Error creating completed todo: {{error}}"
     },
     "tools": {
       "execution": "Error executing tool {{tool}}: {{error}}",
@@ -121,35 +113,54 @@
     },
     "security": {
       "title": "Security Notice"
+    },
+    "userTools": {
+      "enabled": {
+        "desc": "Allow execution of user-defined tools from Obsidian notes. Tools are created by adding 'ln-tool' tag to note frontmatter with JavaScript code.",
+        "name": "Enable User-Defined Tools"
+      },
+      "list": {
+        "controls": {
+          "approve": "Approve Tool",
+          "revoke": "Revoke Approval"
+        },
+        "disabled": "User-defined tools are disabled. Enable the feature above to see discovered tools.",
+        "noManager": "User tools manager not initialized. Try restarting Obsidian.",
+        "noTools": "No user-defined tools found. Create tools by adding <code>tags: [\"ln-tool\"]</code> to note frontmatter with JSON schema and JavaScript code blocks.",
+        "tooltips": {
+          "clickToOpen": "Click to open tool file in editor"
+        }
+      },
+      "security": {
+        "title": "Security Warning",
+        "warning": "User-defined tools execute JavaScript code that can access your vault, file system, and make network requests. Only enable this feature if you understand the security implications and trust all tool sources."
+      },
+      "securityWarning": "⚠️ SECURITY WARNING ⚠️\n\nUser-defined tools execute JavaScript code with full access to:\n• Your entire Obsidian vault\n• Local file system\n• Network requests\n• System resources\n\nThis can be dangerous if you run untrusted code.\n\nOnly enable this if you:\n• Understand JavaScript security risks\n• Will only run tools you trust\n• Review all tool code before approval\n\nDo you want to enable user-defined tools?",
+      "title": "User-Defined Tools"
     }
   },
   "tasks": {
     "format": {
       "abandonedAt": " (abandoned at {{time}})",
-      "completedAt": " (completed at {{time}})",
-      "movedFrom": " (from {{source}})",
-      "movedTo": " (→ {{target}})"
+      "completedAt": " (completed at {{time}})"
     }
   },
   "tools": {
+    "abandon": {
+      "label": "Abandon Todo"
+    },
     "actions": {
       "abandon": {
-        "default": "Abandon {{task}}",
         "failed": "Failed to abandon todo {{task}}",
         "inProgress": "Abandoning todo {{task}}...",
         "success": "Abandoned todo {{task}}"
       },
       "add": {
-        "default": "Add {{task}}",
         "failed": "Failed to add todo {{task}}",
         "inProgress": "Adding todo...",
         "success": "Added {{task}}"
       },
-      "appendDocument": {
-        "failed": "Failed to append to {{path}}"
-      },
-      "createCompletedTodo": {
-        "default": "Create completed todo {{task}}",
+      "createCompleted": {
         "failed": "Failed to create completed todo {{task}}",
         "inProgress": "Creating completed todo {{task}}...",
         "success": "Created completed todo {{task}}"
@@ -160,40 +171,23 @@
         "failed": "Failed to create {{path}}",
         "inProgress": "Creating {{path}}..."
       },
-      "downloadTranscript": {
-        "completed": "Downloaded transcript for {{url}}",
-        "inProgress": "Downloading transcript for {{url}}..."
-      },
       "editTodo": {
-        "failed": "Failed to edit todo {{task}}"
-      },
-      "findFilesByTag": {
-        "completed": "Found files with tag {{tag}}",
-        "failed": "Failed to find files with tag {{tag}}",
-        "ready": "Find files with tag {{tag}}",
-        "started": "Finding files with tag {{tag}}..."
+        "completed": "Edited todo {{task}}",
+        "failed": "Failed to edit todo {{task}}",
+        "inProgress": "Editing todo {{task}}..."
       },
       "generateImage": {
-        "default": "Generate image {{path}}",
         "failed": "Failed to generate image {{path}}"
       },
-      "handover": {
-        "default": "Handover to {{modeName}}"
+      "move": {
+        "failed": "Failed to move todo {{task}}",
+        "inProgress": "Moving todo {{task}}...",
+        "success": "Moved todo {{task}}"
       },
-      "listDirectory": {
-        "failed": "Failed to list directory: {{path}}"
-      },
-      "readDocument": {
-        "default": "Read {{path}}",
-        "failed": "Failed to read {{path}}",
-        "inProgress": "Reading {{path}}...",
-        "success": "Read {{path}}"
-      },
-      "searchVault": {
-        "completed": "Searched for {{query}}",
-        "default": "Search for {{query}}",
-        "failed": "Failed to search for {{query}}",
-        "inProgress": "Searching for {{query}}..."
+      "remove": {
+        "failed": "Failed to remove todo {{task}}",
+        "inProgress": "Removing todo {{task}}...",
+        "success": "Removed todo {{task}}"
       },
       "uncheck": {
         "failed": "Failed to uncheck todo {{task}}",
@@ -201,14 +195,24 @@
         "success": "Unchecked todo {{task}}"
       }
     },
-    "appendDocument": {
-      "progress": {
-        "success": "Content added to {{path}}"
-      }
+    "add": {
+      "label": "Add Todo"
+    },
+    "append": {
+      "completed": "Appended to {{path}}",
+      "failed": "Failed to append to {{path}}",
+      "inProgress": "Appending to {{path}}...",
+      "label": "Append to Document"
+    },
+    "check": {
+      "label": "Check Todo"
     },
     "checkForUpdates": "Check for Updates",
     "comments": {
       "removedTaskHeader": "REMOVED TASK"
+    },
+    "createCompleted": {
+      "label": "Create Completed Todo"
     },
     "createDocument": {
       "progress": {
@@ -227,7 +231,6 @@
         "noApiKey": "Firecrawl API Key not set. Please configure it in settings for deep research functionality.",
         "noResults": "No relevant information found for the given query.",
         "quotaExceeded": "Firecrawl API quota exceeded. Please check your billing and usage limits.",
-        "researchFailed": "Research operation failed",
         "timeout": "Research request timed out. Please try with a more specific query.",
         "unknownError": "Unknown error occurred during research"
       },
@@ -237,6 +240,8 @@
         "results": "Deep Research Results",
         "sources": "Sources"
       },
+      "inProgress": "Researching {{topic}}...",
+      "label": "Deep Research",
       "labels": {
         "completed": "Completed",
         "maxDepth": "Max Depth",
@@ -247,8 +252,6 @@
         "timeout": "Timeout",
         "url": "URL"
       },
-      "preparing": "Research \"{{query}}\"",
-      "preparingGeneric": "Preparing research...",
       "progress": {
         "loading": "Loading Firecrawl library...",
         "processing": "Processing research results...",
@@ -256,40 +259,22 @@
         "starting": "Starting deep research for: \"{{query}}\"",
         "validating": "Validating research parameters..."
       },
-      "researching": "Conducting deep research on \"{{query}}\"...",
-      "researchingGeneric": "Conducting deep research...",
       "result": {
         "message": "Successfully conducted deep research on \"{{query}}\" and saved report to {{path}}. Research included {{sourceCount}} sources with {{maxDepth}} depth iterations.",
         "navigationDescription": "Open research report"
       },
-      "success": "Deep research completed successfully",
-      "successWithQuery": "Deep research completed successfully for \"{{query}}\""
+      "success": "Deep research completed successfully"
+    },
+    "edit": {
+      "label": "Edit Todo"
     },
     "findFilesByTag": {
-      "errors": {
-        "general": "Error finding files by tag: {{error}}",
-        "tagRequired": "Tag parameter is required",
-        "unknown": "Unknown error occurred"
-      },
-      "navigation": {
-        "description": "Navigate to file {{index}}: {{name}}"
-      },
-      "results": {
-        "andMore": "and {{count}} more",
-        "content": "content",
-        "contentExcluded": "Content tags were excluded.",
-        "contentSnippet": "Content",
-        "frontmatter": "frontmatter",
-        "frontmatterExcluded": "Frontmatter tags were excluded.",
-        "header": "Found {{count}} file{{plural}} with tag \"{{searchTag}}\":",
-        "headings": "Headings",
-        "limitedResults": "Results limited to {{maxResults}} files. There may be more files with this tag.",
-        "line": "line",
-        "noFiles": "No files found with tag \"{{searchTag}}\".",
-        "path": "Path",
-        "scopeLimited": "Note: Search scope was limited.",
-        "tags": "Tags"
-      }
+      "completed": "Found {{count}} files with tag {{tag}}",
+      "failed": "Failed to find files with tag {{tag}}",
+      "foundFiles": "Found {{count}} files with tag {{tag}}",
+      "inProgress": "Finding files with tag {{tag}}...",
+      "label": "Find Files by Tag",
+      "noResults": "No files found with tag {{tag}}"
     },
     "generateImage": {
       "errors": {
@@ -305,6 +290,7 @@
         "quotaExceeded": "OpenAI API quota exceeded. Please check your billing and usage limits."
       },
       "generating": "Generating image for {{path}}...",
+      "label": "Generate Image",
       "openImage": "Open generated image",
       "progress": {
         "generatingWithModel": "Generating image with GPT-4o: \"{{prompt}}\"",
@@ -314,44 +300,54 @@
       "success": "Successfully created image at {{path}}"
     },
     "handover": {
-      "alreadyInMode": "Already in {{modeName}} mode. No change needed.",
-      "description": "Description:",
-      "failedToSwitch": "Failed to switch to {{modeName}}",
-      "handoverInstructions": "You have been handed control of this conversation. Please continue executing the user's task using your specialized capabilities and personality. Take over from here and provide appropriate assistance based on your mode's purpose.",
-      "invalidModeId": "Mode ID is required and must be a string",
-      "modeNotFound": "Mode with ID \"{{modeId}}\" not found.",
-      "newModeActive": "You are now operating as {{modeName}} mode.",
-      "noDescription": "No description available",
-      "noModes": "No modes available for switching.",
-      "successMessage": "Successfully switched from {{fromMode}} to {{toMode}} mode.",
-      "switchFailed": "Failed to switch mode: {{error}}",
-      "switched": "Switched to {{modeName}} mode",
-      "switching": "Switching to {{modeName}} mode..."
+      "completed": "Switched to {{mode}} mode",
+      "failed": "Failed to switch to {{mode}} mode",
+      "inProgress": "Switching to {{mode}} mode...",
+      "label": "Handover Mode",
+      "noReason": "Switching to {{mode}} mode"
+    },
+    "listDirectory": {
+      "completed": "Listed directory {{path}}",
+      "empty": "Directory {{path}} is empty",
+      "failed": "Failed to list directory {{path}}",
+      "header": "Contents of {{path}} ({{count}} items):",
+      "inProgress": "Listing directory {{path}}...",
+      "label": "List Directory"
+    },
+    "move": {
+      "label": "Move Todo"
     },
     "navigation": {
+      "navigateToCompletedTodo": "Navigate to completed todo",
       "navigateToEditedTodo": "Navigate to edited todo",
       "navigateToUncheckedTodo": "Navigate to unchecked todo",
       "openAppendedDocument": "Open appended document",
       "openCreatedDocument": "Open created document",
-      "openDownloadedTranscript": "Open downloaded transcript",
-      "openReadDocument": "Open read document"
+      "openDocument": "Open document"
     },
     "openLifeNavigator": "Open Life Navigator",
-    "position": {
-      "after": "after \"{{task}}\"",
-      "at": "at {{position}} position",
-      "before": "before \"{{task}}\""
-    },
     "progress": {
-      "downloadTranscript": {
-        "success": "Successfully downloaded YouTube transcript to {{path}}. Contains {{segments}} segments covering approximately {{duration}} minutes of video content."
-      },
-      "searchVault": {
-        "noResults": "No results found for \"{{query}}\"",
-        "results": "Found {{count}} result{{plural}} for \"{{query}}\""
+      "appendToDocument": {
+        "success": "Content appended to {{path}}"
       }
     },
+    "read": {
+      "completed": "Read document {{path}}",
+      "failed": "Failed to read document {{path}}",
+      "inProgress": "Reading document {{path}}...",
+      "label": "Read Document"
+    },
+    "remove": {
+      "label": "Remove Todo"
+    },
     "resetTutorial": "Reset Tutorial",
+    "search": {
+      "completed": "Search completed for {{query}}",
+      "failed": "Failed to search for {{query}}",
+      "inProgress": "Searching for {{query}}...",
+      "label": "Search Vault",
+      "noResults": "No results found for {{query}}"
+    },
     "success": {
       "abandon": "✓ Marked {{task}} as abandoned in {{path}}",
       "add": "✓ Added {{task}} to {{path}}",
@@ -362,13 +358,10 @@
       "uncheck": "✓ Unchecked \"{{task}}\" in {{path}}"
     },
     "tasks": {
-      "count": {
-        "few": "{{count}} tasks",
-        "many": "{{count}} tasks",
-        "one": "{{count}} task",
-        "zero": "no tasks"
-      },
       "plural": "tasks"
+    },
+    "uncheck": {
+      "label": "Uncheck Todo"
     }
   },
   "ui": {

@@ -5,6 +5,7 @@ import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
 import { t } from "../i18n";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
+import { TFile } from "obsidian";
 
 const schema = {
   name: "read_document",
@@ -28,46 +29,40 @@ type ReadDocumentToolInput = {
 export const readDocumentTool: ObsidianTool<ReadDocumentToolInput> = {
   specification: schema,
   icon: "file-text",
-  getActionText: (input: ReadDocumentToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    let actionText = '';
-    if (!input || typeof input !== 'object') return '';
-    if (input.path) actionText = `"${input.path}"`;
-    
-    if (hasError) {
-      return t('tools.actions.readDocument.failed', { path: actionText });
-    } else if (hasCompleted) {
-      return t('tools.actions.readDocument.success', { path: actionText });
-    } else if (hasStarted) {
-      return t('tools.actions.readDocument.inProgress', { path: actionText });
-    } else {
-      return t('tools.actions.readDocument.default', { path: actionText });
-    }
-  },
+  initialLabel: t('tools.read.label'),
   execute: async (context: ToolExecutionContext<ReadDocumentToolInput>): Promise<void> => {
+    const { plugin, params } = context;
+    const { path } = params;
+
+    context.setLabel(t('tools.read.inProgress', { path }));
+
     try {
-      const { plugin, params } = context;
-      const { path } = params;
-      
-      // Get the file
-      const file = getFile(path, plugin.app);
+      // Read the file content
+      const file = plugin.app.vault.getAbstractFileByPath(path);
       
       if (!file) {
-        throw new ToolExecutionError(t('errors.documents.notFound', { path }));
+        context.setLabel(t('tools.read.failed', { path }));
+        throw new ToolExecutionError(`File not found: ${path}`);
       }
       
-      // Read the content
-      const content = await readFile(file, plugin.app);
+      if (!(file instanceof TFile)) {
+        context.setLabel(t('tools.read.failed', { path }));
+        throw new ToolExecutionError(`Path is not a file: ${path}`);
+      }
+
+      const content = await plugin.app.vault.read(file);
       
       // Add navigation target
       context.addNavigationTarget({
         filePath: path,
-        description: t("tools.navigation.openReadDocument")
+        description: t("tools.navigation.openDocument")
       });
-      
+
+      context.setLabel(t('tools.read.completed', { path }));
       context.progress(content);
     } catch (error) {
-      console.error('Error reading document:', error);
-      throw new Error(`Error reading document: ${error.message || 'Unknown error'}`);
+      context.setLabel(t('tools.read.failed', { path }));
+      throw error;
     }
   }
 };

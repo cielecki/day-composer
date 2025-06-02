@@ -50,118 +50,109 @@ type RemoveTodoToolInput = {
 export const removeTodoTool: ObsidianTool<RemoveTodoToolInput> = {
   specification: schema,
   icon: "trash-2",
-  getActionText: (input: RemoveTodoToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    if (!input || typeof input !== 'object') return '';
-    
-    const todoCount = input.todos?.length || 0;
-    let actionText = '';
-    
-    if (todoCount === 1) {
-      actionText = `"${input.todos[0].todo_text}"`;
-    } else {
-      actionText = `${todoCount} todos`;
-    }
-    
-    if (hasError) {
-      return `Failed to remove ${actionText}`;
-    } else if (hasCompleted) {
-      return `Removed ${actionText}`;
-    } else if (hasStarted) {
-      return `Removing ${actionText}...`;
-    } else {
-      return `Remove ${actionText}`;
-    }
-  },
+  initialLabel: t('tools.remove.label'),
   execute: async (context: ToolExecutionContext<RemoveTodoToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
+      context.setLabel(t('tools.actions.remove.failed', { task: '' }));
       throw new ToolExecutionError("No to-do items provided");
     }
+
+    const count = todos.length;
+    const todoText = count === 1 ? todos[0].todo_text : `${count} todos`;
     
-    const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
-    const note = await readNote({plugin, filePath});
+    context.setLabel(t('tools.actions.remove.inProgress', { task: todoText }));
     
-    // Validate all tasks upfront - will throw if any validation fails
-    validateTasks(
-      note,
-      todos.map(todo => ({
-        todoText: todo.todo_text
-      }))
-    );
-    
-    // Track tasks that will be removed and comment block positions
-    const removedTasks: string[] = [];
-    const commentBlockPositions: number[] = [];
-    
-    // If we get here, all tasks were validated successfully
-    let updatedNote = JSON.parse(JSON.stringify(note));
-    
-    // Process each to-do item
-    for (const todo of todos) {
-      const { todo_text } = todo;
+    try {
+      const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
+      const note = await readNote({plugin, filePath});
       
-      // Find the task to remove
-      const taskToRemove = findTaskByDescription(updatedNote, todo_text, (task) => true);
-      
-      // Get the original position to insert the comment block
-      const originalPosition = updatedNote.content.findIndex((node: NoteNode) => 
-        node.type === 'task' && 
-        node.todoText === taskToRemove.todoText && 
-        node.status === taskToRemove.status
+      // Validate all tasks upfront - will throw if any validation fails
+      validateTasks(
+        note,
+        todos.map(todo => ({
+          todoText: todo.todo_text
+        }))
       );
       
-      // Remove the task from the document
-      updatedNote = removeTaskFromDocument(updatedNote, taskToRemove);
+      // Track tasks that will be removed and comment block positions
+      const removedTasks: string[] = [];
+      const commentBlockPositions: number[] = [];
       
-      // Create the comment block with the removed task information
-      const originalTaskText = formatTask(taskToRemove);
-      const removalComment = `<!-- ${t('tools.comments.removedTaskHeader')}:
+      // If we get here, all tasks were validated successfully
+      let updatedNote = JSON.parse(JSON.stringify(note));
+      
+      // Process each to-do item
+      for (const todo of todos) {
+        const { todo_text } = todo;
+        
+        // Find the task to remove
+        const taskToRemove = findTaskByDescription(updatedNote, todo_text, (task) => true);
+        
+        // Get the original position to insert the comment block
+        const originalPosition = updatedNote.content.findIndex((node: NoteNode) => 
+          node.type === 'task' && 
+          node.todoText === taskToRemove.todoText && 
+          node.status === taskToRemove.status
+        );
+        
+        // Remove the task from the document
+        updatedNote = removeTaskFromDocument(updatedNote, taskToRemove);
+        
+        // Create the comment block with the removed task information
+        const originalTaskText = formatTask(taskToRemove);
+        const removalComment = `<!-- ${t('tools.comments.removedTaskHeader')}:
 ${originalTaskText}
 -->`;
+        
+        // Create a text block for the removal comment
+        const commentBlock: TextBlock = {
+          type: 'text',
+          content: removalComment,
+          lineIndex: -1
+        };
+        
+        // Insert the comment block at the original position
+        updatedNote.content.splice(originalPosition, 0, commentBlock);
+        
+        // Track the position where we inserted the comment
+        commentBlockPositions.push(originalPosition);
+        removedTasks.push(todo_text);
+      }
       
-      // Create a text block for the removal comment
-      const commentBlock: TextBlock = {
-        type: 'text',
-        content: removalComment,
-        lineIndex: -1
-      };
+      // Update the note with all removals
+      await updateNote({plugin, filePath, updatedNote});
       
-      // Insert the comment block at the original position
-      updatedNote.content.splice(originalPosition, 0, commentBlock);
+      // Calculate line numbers for the comment blocks
+      const lineNumbers = commentBlockPositions.map(pos => 
+        calculateLineNumberForNode(updatedNote, pos)
+      );
       
-      // Track the position where we inserted the comment
-      commentBlockPositions.push(originalPosition);
-      removedTasks.push(todo_text);
+      // Create navigation target
+      const navigationTargets = [createNavigationTarget(
+        filePath,
+        lineNumbers,
+        `Navigate to removed todo${removedTasks.length > 1 ? 's' : ''}`
+      )];
+      
+      // Add navigation targets
+      navigationTargets.forEach(target => context.addNavigationTarget(target));
+      
+      // Prepare success message
+      const tasksDescription = removedTasks.length === 1 
+        ? `"${removedTasks[0]}"`
+        : `${removedTasks.length} ${t('tools.tasks.plural')}`;
+        
+      context.setLabel(t('tools.actions.remove.success', { task: todoText }));
+      context.progress(t('tools.success.remove', {
+        task: tasksDescription,
+        path: filePath
+      }));
+    } catch (error) {
+      context.setLabel(t('tools.actions.remove.failed', { task: todoText }));
+      throw error;
     }
-    
-    // Update the note with all removals
-    await updateNote({plugin, filePath, updatedNote});
-    
-    // Calculate line numbers for the comment blocks
-    const lineNumbers = commentBlockPositions.map(pos => 
-      calculateLineNumberForNode(updatedNote, pos)
-    );
-    
-    // Create navigation target
-    const navigationTargets = [createNavigationTarget(
-      filePath,
-      lineNumbers,
-      `Navigate to removed todo${removedTasks.length > 1 ? 's' : ''}`
-    )];
-    
-    // Add navigation targets
-    navigationTargets.forEach(target => context.addNavigationTarget(target));
-    
-    // Prepare success message
-    const tasksDescription = removedTasks.length === 1 
-      ? `"${removedTasks[0]}"`
-      : `${removedTasks.length} ${t('tools.tasks.plural')}`;
-      
-    context.progress(t('tools.success.remove', {
-      task: tasksDescription,
-      path: filePath
-    }));
   }
 }; 

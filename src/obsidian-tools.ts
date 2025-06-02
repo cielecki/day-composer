@@ -12,7 +12,6 @@ import { createCompletedTodoTool } from "./tools/create-completed-todo";
 import { handoverModeTool } from "./tools/handover-mode";
 import { editTodoTool } from "./tools/edit-todo";
 import { removeTodoTool } from "./tools/remove-todo";
-import { downloadYoutubeTranscriptTool } from "./tools/download-youtube-transcript";
 import { generateImageTool } from "./tools/generate-image";
 import { deepResearchTool } from "./tools/deep-research";
 import { listDirectoryTool } from "./tools/list-directory";
@@ -22,6 +21,7 @@ import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tool-filter";
 import { LNMode } from './utils/mode/LNMode';
 import { ToolExecutionContext } from './utils/chat/types';
+import { getPluginSettings } from './settings/PluginSettings';
 
 // Import React
 import React from "react";
@@ -57,12 +57,7 @@ export interface ObsidianTool<TInput> {
 		};
 	};
 	icon: string; // Lucide icon name
-	getActionText: (
-		input: TInput,
-		hasStarted: boolean,
-		hasCompleted: boolean,
-		hasError: boolean,
-	) => string;
+	initialLabel: string; // Initial label displayed in chat (tools can update this via setLabel)
 	// Context-based execution - no return value
 	execute: (context: ToolExecutionContext<TInput>) => Promise<void>;
 	// Optional method to render the tool result as a React component
@@ -93,7 +88,6 @@ export class ObsidianTools {
 		handoverModeTool,
 		editTodoTool,
 		removeTodoTool,
-		downloadYoutubeTranscriptTool,
 		generateImageTool,
 		deepResearchTool,
 	];
@@ -103,9 +97,40 @@ export class ObsidianTools {
 	}
 
 	/**
+	 * Ensure user-defined tools are initialized if enabled
+	 */
+	private async ensureUserDefinedToolsInitialized(): Promise<void> {
+		const settings = getPluginSettings();
+		
+		// Check if user-defined tools are enabled
+		if (settings.userDefinedToolsEnabled && this.plugin.userToolManager) {
+			// Check if tools need to be refreshed
+			const userTools = this.plugin.userToolManager.getTools();
+			const hasUserDefinedToolsInRegistry = this.tools.some(tool => 
+				tool.specification.name.startsWith('user_')
+			);
+			
+			// If no user-defined tools in registry but tools exist in manager, refresh
+			if (userTools.length > 0 && !hasUserDefinedToolsInRegistry) {
+				console.log('[USER-TOOLS] Lazy initialization: refreshing user-defined tools');
+				await this.plugin.userToolManager.refreshTools();
+			} else if (!hasUserDefinedToolsInRegistry) {
+				// No tools in manager either, do initial scan
+				console.log('[USER-TOOLS] Lazy initialization: performing initial tool scan');
+				await this.plugin.userToolManager.refreshTools();
+			}
+		} else if (settings.userDefinedToolsEnabled && !this.plugin.userToolManager) {
+			// User-defined tools are enabled but manager wasn't created, log a warning
+			console.warn('[USER-TOOLS] User-defined tools are enabled but manager not initialized. This should not happen.');
+		}
+	}
+
+	/**
 	 * Get all available tools in JSON schema format required by Anthropic
 	 */
-	getTools(): ObsidianTool<any>[] {
+	async getTools(): Promise<ObsidianTool<any>[]> {
+		// Ensure user-defined tools are initialized if needed
+		await this.ensureUserDefinedToolsInitialized();
 		return this.tools;
 	}
 
@@ -114,15 +139,17 @@ export class ObsidianTools {
 	 * @param mode The mode configuration to use for filtering
 	 * @returns Filtered array of tools based on mode settings
 	 */
-	getToolsForMode(mode: LNMode): ObsidianTool<any>[] {
-		return filterToolsByMode(this.tools, mode);
+	async getToolsForMode(mode: LNMode): Promise<ObsidianTool<any>[]> {
+		const tools = await this.getTools();
+		return filterToolsByMode(tools, mode);
 	}
 
 	/**
 	 * Get tool definition by name
 	 */
-	getToolByName(name: string): ObsidianTool<any> | undefined {
-		return this.getTools().find((tool) => tool.specification.name === name);
+	async getToolByName(name: string): Promise<ObsidianTool<any> | undefined> {
+		const tools = await this.getTools();
+		return tools.find((tool) => tool.specification.name === name);
 	}
 
 	/**
@@ -133,13 +160,15 @@ export class ObsidianTools {
 		toolInput: any,
 		signal: AbortSignal,
 		onProgress: (message: string) => void,
-		onNavigationTarget: (target: NavigationTarget) => void
-	): Promise<{ result: string; isError: boolean; navigationTargets: NavigationTarget[] }> {
+		onNavigationTarget: (target: NavigationTarget) => void,
+		onLabelUpdate?: (label: string) => void
+	): Promise<{ result: string; isError: boolean; navigationTargets: NavigationTarget[]; finalLabel?: string }> {
 		console.group(`🔄 Processing Tool Call: ${toolName}`);
 		console.log("Tool Input:", toolInput);
 
 		const navigationTargets: NavigationTarget[] = [];
 		const progressMessages: string[] = [];
+		let currentLabel: string | undefined;
 
 		try {
 			// Validate tool name
@@ -150,13 +179,16 @@ export class ObsidianTools {
 			// Make sure toolInput is an object (not null/undefined)
 			const input = toolInput || {};
 
-			const tool = this.getToolByName(toolName);
+			const tool = await this.getToolByName(toolName);
 
 			if (!tool) {
 				throw new ToolExecutionError(
 					t("errors.tools.unknown", { tool: toolName }) || `Unknown tool "${toolName}"`,
 				);
 			}
+
+			// Initialize label with tool's initial label
+			currentLabel = tool.initialLabel;
 
 			// Create the execution context
 			const context: ToolExecutionContext = {
@@ -170,6 +202,12 @@ export class ObsidianTools {
 				addNavigationTarget: (target: NavigationTarget) => {
 					navigationTargets.push(target);
 					onNavigationTarget(target);
+				},
+				setLabel: (text: string) => {
+					// Update the current label for this execution
+					currentLabel = text;
+					// Notify about label update
+					onLabelUpdate?.(text);
 				}
 			};
 
@@ -181,11 +219,13 @@ export class ObsidianTools {
 			
 			console.log("Tool Execution Completed. Final Result:", finalResult);
 			console.log("Navigation Targets:", navigationTargets);
+			console.log("Final Label:", currentLabel);
 			
 			return { 
 				result: finalResult || `${toolName} completed successfully`, 
 				isError: false, 
-				navigationTargets 
+				navigationTargets,
+				finalLabel: currentLabel
 			};
 		} catch (error) {
 			const errorMessage =
@@ -197,7 +237,12 @@ export class ObsidianTools {
 					});
 
 			console.error(errorMessage, error);
-			return { result: `❌ ${errorMessage}`, isError: true, navigationTargets };
+			return { 
+				result: `❌ ${errorMessage}`, 
+				isError: true, 
+				navigationTargets,
+				finalLabel: currentLabel
+			};
 		} finally {
 			console.groupEnd();
 		}

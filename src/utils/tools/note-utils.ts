@@ -12,6 +12,7 @@ import {
 import { ToolExecutionError } from "./tool-execution-error";
 import { formatMarkdown } from "./format-markdown";
 import { t } from "../../i18n";
+import { normalizeUnicode } from "../text/unicode-normalizer";
 
 export type NoteNode = Task | TextBlock;
 
@@ -160,9 +161,7 @@ export async function updateNote({
  * @returns Normalized text
  */
 export function normalizeText(text: string): string {
-	return text
-		.normalize('NFKD') // Decompose characters into base + diacritics
-		.replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+	return normalizeUnicode(text)
 		.replace(/[^\w\s]/g, '') // Remove remaining special characters
 		.toLowerCase()
 		.trim();

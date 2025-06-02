@@ -8,6 +8,7 @@ import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { generateUniqueFileName } from "../utils/tools/generate-unique-file-name";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
+import { normalizePath } from "obsidian";
 
 const schema = {
   name: "deep_research",
@@ -63,37 +64,13 @@ type DeepResearchToolInput = {
 export const deepResearchTool: ObsidianTool<DeepResearchToolInput> = {
   specification: schema,
   icon: "search",
-  getActionText: (input: DeepResearchToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    if (!input || typeof input !== 'object') return '';
-    
-    if (hasError) {
-      return t('tools.deepResearch.errors.general', { error: t('tools.deepResearch.errors.researchFailed') });
-    }
-    
-    if (hasCompleted) {
-      if (input.query) {
-        return t('tools.deepResearch.successWithQuery', { query: input.query });
-      } else {
-        return t('tools.deepResearch.success');
-      }
-    } else if (hasStarted) {
-      if (input.query) {
-        return t('tools.deepResearch.researching', { query: input.query });
-      } else {
-        return t('tools.deepResearch.researchingGeneric');
-      }
-    } else {
-      if (input.query) {
-        return t('tools.deepResearch.preparing', { query: input.query });
-      } else {
-        return t('tools.deepResearch.preparingGeneric');
-      }
-    }
-  },
+  initialLabel: t('tools.deepResearch.label'),
   execute: async (context: ToolExecutionContext<DeepResearchToolInput>): Promise<void> => {
     const { plugin, params, signal } = context;
     const { query, path, max_depth = 3, max_urls = 20, timeout = 180, overwrite = false } = params;
-    
+
+    context.setLabel(t('tools.deepResearch.inProgress', { topic: query }));
+
     try {
       const settings = getPluginSettings();
 

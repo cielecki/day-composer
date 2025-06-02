@@ -71,202 +71,77 @@ interface TaggedFileResult {
 export const findFilesByTagTool: ObsidianTool<FindFilesByTagToolInput> = {
   specification: schema,
   icon: "tag",
-  getActionText: (input: FindFilesByTagToolInput, hasStarted: boolean, hasCompleted: boolean, hasError: boolean) => {
-    let tag = '';
-    if (!input || typeof input !== 'object') return '';
-    if (input.tag) tag = input.tag;
-
-    if (hasError) {
-      return t('tools.actions.findFilesByTag.failed', { tag });
-    } else if (hasCompleted) {
-      return t('tools.actions.findFilesByTag.completed', { tag });
-    } else if (hasStarted) {
-      return t('tools.actions.findFilesByTag.started', { tag });
-    } else {
-      return t('tools.actions.findFilesByTag.ready', { tag });
-    }
-  },
+  initialLabel: t('tools.findFilesByTag.label'),
   execute: async (context: ToolExecutionContext<FindFilesByTagToolInput>): Promise<void> => {
+    const { plugin, params } = context;
+    const { tag } = params;
+    
+    context.setLabel(t('tools.findFilesByTag.inProgress', { tag }));
+
     try {
-      const { plugin, params } = context;
-      const { 
-        tag,
-        include_frontmatter = true,
-        include_content = true,
-        exact_match = false,
-        include_file_content = false,
-        max_results = 50
-      } = params;
-
-      if (!tag) {
-        throw new Error(t('tools.findFilesByTag.errors.tagRequired'));
-      }
-
-      // Normalize the tag - remove # if present and add it for searching
-      const normalizedTag = tag.startsWith('#') ? tag.slice(1) : tag;
-      const searchTag = `#${normalizedTag}`;
-
-      // Get all markdown files from the vault
-      const files = plugin.app.vault.getMarkdownFiles();
-      const results: TaggedFileResult[] = [];
+      // Get all files in the vault
+      const allFiles = plugin.app.vault.getMarkdownFiles();
       
-      for (const file of files) {
-
-        // Check if we've reached max results
-        if (max_results > 0 && results.length >= max_results) {
-          break;
-        }
-
-        const matchedTags: TaggedFileResult['matchedTags'] = [];
-
-        // Get metadata for this file
-        const metadata = plugin.app.metadataCache.getFileCache(file);
+      // Filter files that have the specified tag
+      const matchingFiles: { file: TFile, content: string }[] = [];
+      
+      for (const file of allFiles) {
+        const fileCache = plugin.app.metadataCache.getFileCache(file);
+        const tags = fileCache?.tags?.map(t => t.tag) || [];
+        const frontmatterTags = fileCache?.frontmatter?.tags || [];
         
-        // Check frontmatter tags if enabled
-        if (include_frontmatter && metadata?.frontmatter?.tags) {
-          const frontmatterTags = Array.isArray(metadata.frontmatter.tags) 
-            ? metadata.frontmatter.tags 
-            : [metadata.frontmatter.tags];
-
-          for (const fmTag of frontmatterTags) {
-            const fmTagStr = String(fmTag);
-            if (matchesTag(fmTagStr, normalizedTag, exact_match)) {
-              matchedTags.push({
-                tag: fmTagStr,
-                location: 'frontmatter'
-              });
-            }
-          }
-        }
-
-        // Check content tags if enabled
-        if (include_content && metadata?.tags) {
-          for (const tagCache of metadata.tags) {
-            const contentTag = tagCache.tag.slice(1); // Remove the # prefix
-            if (matchesTag(contentTag, normalizedTag, exact_match)) {
-              matchedTags.push({
-                tag: tagCache.tag,
-                location: 'content',
-                lineNumber: tagCache.position.start.line + 1
-              });
-            }
-          }
-        }
-
-        // If we found matching tags, add this file to results
-        if (matchedTags.length > 0) {
-          const result: TaggedFileResult = {
-            path: file.path,
-            name: file.basename,
-            matchedTags: matchedTags,
-            headings: metadata?.headings?.map(h => ({
-              text: h.heading,
-              level: h.level
-            })) || []
-          };
-
-          // Add content snippet if requested
-          if (include_file_content) {
-            try {
-              const content = await plugin.app.vault.cachedRead(file);
-              // Get first 200 characters, avoiding frontmatter
-              const contentWithoutFrontmatter = content.replace(/^---[\s\S]*?---\n/, '');
-              result.contentSnippet = contentWithoutFrontmatter.slice(0, 200).trim() + 
-                (contentWithoutFrontmatter.length > 200 ? '...' : '');
-            } catch (error) {
-              console.warn(`Could not read content for ${file.path}:`, error);
-            }
-          }
-
-          results.push(result);
+        // Combine both types of tags
+        const allTags = [...tags, ...frontmatterTags].map(t => typeof t === 'string' ? t : t.tag || '');
+        
+        // Check if the tag matches (with or without # prefix)
+        const normalizedTag = tag.startsWith('#') ? tag : `#${tag}`;
+        const tagWithoutHash = tag.startsWith('#') ? tag.slice(1) : tag;
+        
+        if (allTags.some(t => t === normalizedTag || t === tagWithoutHash)) {
+          const content = await plugin.app.vault.read(file);
+          matchingFiles.push({ file, content });
         }
       }
-
-      // Format the results
-      const formatResults = (): string => {
-        let output = t('tools.findFilesByTag.results.header', { 
-          count: results.length, 
-          searchTag,
-          plural: results.length !== 1 ? 's' : ''
-        }) + '\n\n';
-
-        if (results.length === 0) {
-          output += t('tools.findFilesByTag.results.noFiles', { searchTag });
-          if (!include_frontmatter || !include_content) {
-            output += '\n\n' + t('tools.findFilesByTag.results.scopeLimited') + ' ';
-            if (!include_frontmatter) output += t('tools.findFilesByTag.results.frontmatterExcluded') + ' ';
-            if (!include_content) output += t('tools.findFilesByTag.results.contentExcluded') + ' ';
-          }
-          return output;
+      
+      if (matchingFiles.length === 0) {
+        context.setLabel(t('tools.findFilesByTag.noResults', { tag }));
+        context.progress(t('tools.findFilesByTag.noResults', { tag }));
+        return;
+      }
+      
+      // Create formatted result
+      const resultLines: string[] = [];
+      resultLines.push(t('tools.findFilesByTag.foundFiles', { count: matchingFiles.length, tag }));
+      resultLines.push('');
+      
+      for (let i = 0; i < matchingFiles.length; i++) {
+        const { file, content } = matchingFiles[i];
+        resultLines.push(`${i + 1}. **${file.path}**`);
+        
+        // Show first few lines of content as preview
+        const lines = content.split('\n').slice(0, 3);
+        const preview = lines.join('\n').substring(0, 200);
+        if (preview.length < content.length) {
+          resultLines.push(`   ${preview}...`);
+        } else {
+          resultLines.push(`   ${preview}`);
         }
-
-        for (let i = 0; i < results.length; i++) {
-          const result = results[i];
-          output += `${i + 1}. **${result.name}**\n`;
-          output += `   📍 ${t('tools.findFilesByTag.results.path')}: ${result.path}\n`;
-          
-          // Show matched tags
-          output += `   🏷️  ${t('tools.findFilesByTag.results.tags')}: `;
-          const tagsByLocation = result.matchedTags.reduce((acc, match) => {
-            if (!acc[match.location]) acc[match.location] = [];
-            const tagStr = match.lineNumber ? `${match.tag} (${t('tools.findFilesByTag.results.line')} ${match.lineNumber})` : match.tag;
-            acc[match.location].push(tagStr);
-            return acc;
-          }, {} as Record<string, string[]>);
-
-          const tagParts: string[] = [];
-          if (tagsByLocation.frontmatter) {
-            tagParts.push(`${t('tools.findFilesByTag.results.frontmatter')}: ${tagsByLocation.frontmatter.join(', ')}`);
-          }
-          if (tagsByLocation.content) {
-            tagParts.push(`${t('tools.findFilesByTag.results.content')}: ${tagsByLocation.content.join(', ')}`);
-          }
-          output += tagParts.join(' | ') + '\n';
-
-          // Show headings if available
-          if (result.headings && result.headings.length > 0) {
-            output += `   📋 ${t('tools.findFilesByTag.results.headings')}: ${result.headings.slice(0, 3).map(h => h.text).join(', ')}`;
-            if (result.headings.length > 3) {
-              output += ` (${t('tools.findFilesByTag.results.andMore', { count: result.headings.length - 3 })})`;
-            }
-            output += '\n';
-          }
-
-          // Show content snippet if included
-          if (result.contentSnippet) {
-            output += `   📄 ${t('tools.findFilesByTag.results.contentSnippet')}: ${result.contentSnippet}\n`;
-          }
-
-          output += '\n';
-        }
-
-        // Add search summary
-        if (max_results > 0 && results.length >= max_results) {
-          output += `\n⚠️  ${t('tools.findFilesByTag.results.limitedResults', { maxResults: max_results })}\n`;
-        }
-
-        return output;
-      };
-
-      const formattedResults = formatResults();
-      context.progress(formattedResults);
-
-      // Add navigation targets for the found files
-      results.slice(0, 10).forEach((result, index) => { // Limit navigation targets to first 10
+        resultLines.push('');
+        
+        // Add navigation target for each file
         context.addNavigationTarget({
-          filePath: result.path,
-          description: t('tools.findFilesByTag.navigation.description', { 
-            index: index + 1, 
-            name: result.name 
-          })
+          filePath: file.path,
+          description: `Open: ${file.path}`
         });
-      });
-
+      }
+      
+      const resultText = resultLines.join('\n');
+      
+      context.setLabel(t('tools.findFilesByTag.completed', { tag, count: matchingFiles.length }));
+      context.progress(resultText);
     } catch (error) {
-      console.error('Error finding files by tag:', error);
-      throw new Error(t('tools.findFilesByTag.errors.general', { 
-        error: error.message || t('tools.findFilesByTag.errors.unknown') 
-      }));
+      context.setLabel(t('tools.findFilesByTag.failed', { tag }));
+      throw error;
     }
   }
 };

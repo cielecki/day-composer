@@ -125,31 +125,6 @@ Frontmatter only: tag="important", include_content=false
 - Useful for logging activities that were done but not previously planned
 - Includes completion timestamps
 
-## Content Tools
-
-### YouTube Transcript Download
-**Tool:** `download_youtube_transcript`
-- Downloads transcripts from YouTube videos and saves them to Obsidian files
-- Browser-compatible implementation using Obsidian's built-in request capabilities
-- Supports multiple languages with automatic fallback to English
-- Handles various YouTube URL formats (full URLs, short URLs, video IDs)
-- Configurable options:
-  - **Language**: Specify transcript language (e.g., 'en', 'pl', 'fr')
-  - **Include Timestamps**: Option to include/exclude timestamps in output
-  - **Overwrite**: Control whether to overwrite existing files
-- Output includes metadata (video URL, language, generation timestamp)
-- Formatted as clean markdown with proper structure
-- Works by extracting caption data from YouTube's web player
-
-**Example Usage:**
-```
-Download transcript from: https://www.youtube.com/watch?v=VIDEO_ID
-Save to: Transcripts/Video Title.md
-Language: en
-Include timestamps: true
-```
-
-**Note:** This tool requires that the YouTube video has captions available (either auto-generated or manually uploaded). Private videos or videos without captions will not work.
 
 ## System Tools
 
