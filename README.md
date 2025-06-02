@@ -45,20 +45,9 @@ All your personal information is stored locally in your Obsidian vault on your p
 
 ### Getting Started
 
-#### Prerequisites
-- Obsidian installed on your device
-- API keys for OpenAI and/or Anthropic
-- Basic familiarity with markdown (helpful but not required)
-
-#### Installation
-For detailed installation instructions, please refer to the [installation guide](docs/installation.md).
-
-#### Quick Start
-1. Install the Life Navigator plugin
-2. Create your starter kit with pre-configured modes and templates
-3. Fill in your personal context files (About Me, Relationships, Goals)
-4. Start your first daily note and ask the AI to plan your day
-5. Use voice input throughout the day to update progress and capture thoughts
+1. [Install Life Navigator](docs/installation.md) in your Obsidian vault
+2. Complete the guided setup with language selection and API key configuration
+3. Start using the pre-built LifeNavigator mode or create your own custom modes or download additional modes from the [Life Navigator Library](https://github.com/cielecki/life-navigator/tree/main/library)
 
 ### Documentation
 

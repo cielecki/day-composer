@@ -58,7 +58,7 @@
     - In the left ribbon of Obsidian, find a new compass icon labeled "Life Navigator"
     - Click it to open the plugin's side panel
 - Complete the guided setup:
-    Life Navigator will now guide you through a step-by-step setup process of choosing a language, creating a starter kit and setting up API keys.
+    Life Navigator will now guide you through a step-by-step setup process of choosing a language, creating a starter kit and setting up API keys. Once setup is complete, you'll have immediate access to Life Navigator Mode in chat, just press Start in order to continue your own personalised setup using AI.
 
 ## Step 5: **Mobile Setup**
 
@@ -100,4 +100,4 @@
 
 ## Next Steps
 
-After completing the installation and setup, please refer to the [User Guide](user-guide.md) for detailed instructions on how to use Life Navigator effectively. The guide will walk you through exploring the starter kit, customizing your information, and using the different AI modes.
+After completing the installation and setup, please refer to the [User Guide](user-guide.md) for detailed instructions on how to use Life Navigator effectively. The guide will walk you through exploring the available features, customizing your experience, and using the different AI modes.

@@ -363,25 +363,9 @@ export const LifeNavigatorApp: React.FC = () => {
 				<div className="empty-conversation">
 					<div className="markdown-content">
 						<MarkdownRenderer
-							content={activeMode ? activeMode.ln_description : t('ui.starterKit.noModes')}
+							content={activeMode ? activeMode.ln_description : "Welcome to Life Navigator! Select a mode from the dropdown above to get started."}
 						/>
 					</div>
-
-						{Object.keys(lnModesRef.current).length === 0 && (
-							<button
-								className="mod-cta"
-								onClick={() => {
-									if (window.app) {
-										// @ts-ignore - Using the Obsidian command API
-										window.app.commands.executeCommandById(
-											"life-navigator:create-starter-kit",
-										);
-									}
-								}}
-							>
-								{t('ui.mode.createStarterKit')}
-							</button>
-						)}
 
 					{activeMode && activeMode.ln_example_usages.length > 0 && (
 						<div className="ln-mode-pills-container">
@@ -420,7 +404,7 @@ export const LifeNavigatorApp: React.FC = () => {
 	};
 
 	// Check if setup is complete
-	const isSetupCompleted = isSetupComplete(lnModesRef.current);
+	const isSetupCompleted = isSetupComplete();
 	
 	const handleSetupComplete = useCallback(() => {
 		// Force re-render to show main interface
@@ -456,6 +440,7 @@ export const LifeNavigatorApp: React.FC = () => {
 	if (!isSetupCompleted) {
 		return (
 			<SetupFlow 
+				lnModes={lnModesRef.current}
 				onSetupComplete={handleSetupComplete}
 			/>
 		);
@@ -560,33 +545,35 @@ export const LifeNavigatorApp: React.FC = () => {
 							}}
 						>
 							{/* Actions */}
-							<div
-								style={{
-									padding: "8px 12px",
-									cursor: "pointer",
-									display: "flex",
-									alignItems: "center",
-									gap: "8px",
-									fontSize: "14px",
-									color: "var(--text-normal)",
-									whiteSpace: "normal",
-									wordBreak: "break-word",
-								}}
-								onClick={() => {
-									if (window.app && activeMode.ln_path) {
-										const file = window.app.vault.getAbstractFileByPath(activeMode.ln_path);
-										if (file instanceof TFile) {
-											window.app.workspace.getLeaf().openFile(file);
+							{!activeMode.ln_path.startsWith(':prebuilt:') && (
+								<div
+									style={{
+										padding: "8px 12px",
+										cursor: "pointer",
+										display: "flex",
+										alignItems: "center",
+										gap: "8px",
+										fontSize: "14px",
+										color: "var(--text-normal)",
+										whiteSpace: "normal",
+										wordBreak: "break-word",
+									}}
+									onClick={() => {
+										if (window.app && activeMode.ln_path) {
+											const file = window.app.vault.getAbstractFileByPath(activeMode.ln_path);
+											if (file instanceof TFile) {
+												window.app.workspace.getLeaf().openFile(file);
+											}
 										}
-									}
-									setDropdownOpen(false);
-								}}
-								onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
-								onMouseOut={e => (e.currentTarget.style.backgroundColor = "transparent")}
-							>
-								<LucideIcon name="external-link" size={16} color="var(--text-normal)" />
-								{t('ui.mode.openInEditor')}
-							</div>
+										setDropdownOpen(false);
+									}}
+									onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
+									onMouseOut={e => (e.currentTarget.style.backgroundColor = "transparent")}
+								>
+									<LucideIcon name="external-link" size={16} color="var(--text-normal)" />
+									{t('ui.mode.openInEditor')}
+								</div>
+							)}
 							<div
 								style={{
 									padding: "8px 12px",

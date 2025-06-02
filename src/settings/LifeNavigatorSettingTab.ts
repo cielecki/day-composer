@@ -57,98 +57,56 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 
 		securityNoteEl.innerHTML = `<strong>⚠️ ${t('settings.security.title')}</strong><br>${t('settings.secrets.securityNote')}`;
 
-		// Life Navigator Actions section
-		containerEl.createEl('h2', {text: t('settings.actions.title'), attr: { style: 'margin-top: 2em;' } });
+		// === LIFE NAVIGATOR ACTIONS ===
+		containerEl.createEl('h2', { text: t('settings.actions.title') });
 
-		// Create Starter Kit button
-		new Setting(containerEl)
-			.setName(t('settings.actions.createStarterKit.name'))
-			.setDesc(t('settings.actions.createStarterKit.desc'))
-			.addButton(button => button
-				.setButtonText(t('settings.actions.createStarterKit.button'))
-				.onClick(async () => {
-					// Get current plugin instance
-					const plugin = (this.app as any).plugins.plugins['life-navigator'] as LifeNavigatorPlugin;
-					if (plugin) {
-						button.setDisabled(true);
-						button.setButtonText(t('ui.setup.saving'));
-						try {
-							// Execute the create starter kit command
-							if (this.app && (this.app as any).commands) {
-								// @ts-ignore - Access Obsidian's commands API
-								await (this.app as any).commands.executeCommandById('life-navigator:create-starter-kit');
-							}
-						} catch (error) {
-							console.error('Error creating starter kit:', error);
-						} finally {
-							button.setDisabled(false);
-							button.setButtonText(t('settings.actions.createStarterKit.button'));
-						}
-					}
-				}));
-
-		// Check for updates button
+		// Check Updates button
 		new Setting(containerEl)
 			.setName(t('settings.actions.checkUpdates.name'))
 			.setDesc(t('settings.actions.checkUpdates.desc'))
-			.addButton(button => button
-				.setButtonText(t('settings.actions.checkUpdates.button'))
-				.onClick(async () => {
-					button.setDisabled(true);
-					button.setButtonText(t('ui.setup.saving'));
-					
-					try {
-						// Execute the check for updates command
-						if (this.app && (this.app as any).commands) {
-							// @ts-ignore - Access Obsidian's commands API
+			.addButton(button => {
+				button
+					.setButtonText(t('settings.actions.checkUpdates.button'))
+					.onClick(async () => {
+						button.setButtonText('Checking...');
+						button.setDisabled(true);
+
+						try {
+							// Execute the check for updates command
+							// @ts-ignore
 							await (this.app as any).commands.executeCommandById('life-navigator:check-for-updates');
+						} catch (error) {
+							console.error('Error checking for updates:', error);
+						} finally {
+							button.setButtonText(t('settings.actions.checkUpdates.button'));
+							button.setDisabled(false);
 						}
-					} catch (error) {
-						console.error('Error checking for updates:', error);
-					} finally {
-						button.setDisabled(false);
-						button.setButtonText(t('settings.actions.checkUpdates.button'));
-					}
-				}));
+					});
+			});
 
-		// View documentation button
-		new Setting(containerEl)
-			.setName(t('settings.actions.viewDocs.name'))
-			.setDesc(t('settings.actions.viewDocs.desc'))
-			.addButton(button => button
-				.setButtonText(t('settings.actions.viewDocs.button'))
-				.onClick(() => {
-					// Open GitHub documentation in default browser
-					window.open('https://github.com/cielecki/life-navigator/blob/main/docs/user-guide.md', '_blank');
-				}));
-
-		// Reset tutorial button
+		// Reset Tutorial button
 		new Setting(containerEl)
 			.setName(t('settings.actions.resetTutorial.name'))
 			.setDesc(t('settings.actions.resetTutorial.desc'))
-			.addButton(button => button
-				.setButtonText(t('settings.actions.resetTutorial.button'))
-				.onClick(async () => {
-					const confirmed = confirm(t('settings.actions.resetTutorial.confirm'));
-					if (!confirmed) return;
+			.addButton(button => {
+				button
+					.setButtonText(t('settings.actions.resetTutorial.button'))
+					.onClick(async () => {
+						button.setButtonText('Resetting...');
+						button.setDisabled(true);
 
-					button.setDisabled(true);
-					button.setButtonText(t('ui.setup.saving'));
-					
-					try {
-						// Execute the reset tutorial command
-						if (this.app && (this.app as any).commands) {
-							// @ts-ignore - Access Obsidian's commands API
+						try {
+							// Execute the reset tutorial command
+							// @ts-ignore
 							await (this.app as any).commands.executeCommandById('life-navigator:reset-tutorial');
+						} catch (error) {
+							console.error('Error resetting tutorial:', error);
+						} finally {
+							button.setButtonText(t('settings.actions.resetTutorial.button'));
+							button.setDisabled(false);
 						}
-					} catch (error) {
-						console.error('Error resetting tutorial:', error);
-						new Notice(t('settings.actions.resetTutorial.error', { error: error.message }));
-					} finally {
-						button.setDisabled(false);
-						button.setButtonText(t('settings.actions.resetTutorial.button'));
-					}
-				}));
+					});
+			});
 
 		// Advanced section
 		containerEl.createEl('h2', {text: t('settings.advanced.title'), attr: { style: 'margin-top: 2em;' } });

@@ -1,6 +1,5 @@
 import { Plugin, Notice, requestUrl } from 'obsidian';
 import { ConfirmReloadModal } from './components/ConfirmReloadModal';
-import { createStarterKit } from './create-starter-kit';
 import { initI18n, t } from './i18n';
 import { LifeNavigatorView, LIFE_NAVIGATOR_VIEW_TYPE } from './life-navigator-view';
 import { checkForAvailableUpdate, checkForUpdatesOnStartup } from './auto-update';
@@ -46,22 +45,12 @@ export class LifeNavigatorPlugin extends Plugin {
 
 		});
 
-
-		// Add command to create a Starter Kit
-		this.addCommand({
-			id: "create-starter-kit",
-			name: t("tools.createStarterKit"),
-			callback: async () => {
-				new Notice(t("messages.creatingStarterKit"));
-				await createStarterKit(this.app);
-			},
-		});
-
-		// Add command to create a single mode
+		// Add command to create a new mode
 		this.addCommand({
 			id: "create-new-mode",
 			name: t("tools.createNewMode"),
 			callback: async () => {
+				new Notice("Creating a new mode...");
 				await createNewMode(this.app);
 			},
 		});

@@ -58,10 +58,17 @@
   },
   "messages": {
     "checkingForUpdates": "Checking for updates...",
-    "creatingStarterKit": "Creating a Starter Kit...",
     "newVersionFoundDownloading": "New version {{latestVersion}} found! Downloading update from {{currentVersion}}...",
     "pluginUpToDate": "Life Navigator is up to date (version {{version}})",
     "updateAvailable": "Update available! Version {{latestVersion}} is now available (you have {{currentVersion}})"
+  },
+  "prebuiltModes": {
+    "lifeNavigator": {
+      "mainDescription": "I'm your intelligent companion for discovering and integrating Life Navigator content. I help you find the perfect modes, tools, and templates from our library based on your specific needs and preferences.\n\nTell me about your goals, challenges, or what you'd like to accomplish, and I'll explore our extensive library to find and recommend the most suitable content for you.",
+      "systemPrompt": "You are Life Navigator, an intelligent assistant that helps users discover, understand, and integrate Life Navigator content from the library. Your primary role is to:\n\n1. **Listen and Understand**: Ask thoughtful questions about the user's goals, challenges, and preferences to understand their needs\n2. **Discover Content**: Use library_list and library_view tools to explore available modes, tools, personalities, and templates\n3. **Recommend Solutions**: Suggest specific library content that matches their requirements\n4. **Facilitate Integration**: Help users understand how to use the content and adapt it to their workflow\n5. **Translate When Needed**: If content is in a different language than the user prefers, offer to translate and create adapted versions\n\nYou have access to the complete Life Navigator library and can browse, analyze, and recommend any content. Always start by understanding the user's context before making recommendations. Be proactive in suggesting relevant content combinations and explain how different pieces work together.\n\nWhen users describe their needs, think about:\n- What type of content would help them (modes, tools, templates)\n- How different pieces might work together\n- Whether existing content needs customization\n- Language preferences and cultural context\n\nAlways be helpful, curious, and focused on finding the perfect content match for each user's unique situation.",
+      "title": "Life Navigator",
+      "voiceInstructions": "Speak in a helpful, conversational tone. Keep responses concise but thorough. When recommending content, briefly explain why it's a good fit. Ask follow-up questions to better understand user needs."
+    }
   },
   "settings": {
     "actions": {
@@ -70,25 +77,14 @@
         "desc": "Check if there's a newer version of Life Navigator available and download it automatically.",
         "name": "Check for Updates"
       },
-      "createStarterKit": {
-        "button": "Create Starter Kit",
-        "desc": "Create a new starter kit with pre-configured AI modes and templates to get you started quickly.",
-        "name": "Create Starter Kit"
-      },
       "resetTutorial": {
         "button": "Reset Tutorial",
-        "confirm": "Are you sure you want to reset the tutorial? This will show the setup screens again next time you open Life Navigator.",
         "desc": "Reset the setup tutorial and onboarding flow. This will show the setup screens again next time you open Life Navigator.",
         "error": "Failed to reset tutorial: {{error}}",
         "name": "Reset Tutorial",
         "success": "Tutorial has been reset successfully"
       },
-      "title": "Life Navigator Actions",
-      "viewDocs": {
-        "button": "View Documentation",
-        "desc": "Open the Life Navigator user guide and documentation on GitHub in your browser.",
-        "name": "View Documentation"
-      }
+      "title": "Life Navigator Actions"
     },
     "advanced": {
       "title": "Advanced Settings"
@@ -227,6 +223,18 @@
         "inProgress": "Removing todo {{task}}...",
         "success": "Removed todo {{task}}"
       },
+      "secretList": {
+        "completed": "Listed configured secrets",
+        "default": "List Secrets",
+        "failed": "Failed to list secrets",
+        "inProgress": "Listing configured secrets..."
+      },
+      "secretSave": {
+        "completed": "Saved secret {{key}}",
+        "default": "Save Secret",
+        "failed": "Failed to save secret {{key}}",
+        "inProgress": "Saving secret {{key}}..."
+      },
       "uncheck": {
         "failed": "Failed to uncheck todo {{task}}",
         "inProgress": "Unchecking todo {{task}}...",
@@ -253,7 +261,6 @@
       }
     },
     "createNewMode": "Create New Mode",
-    "createStarterKit": "Create Starter Kit",
     "edit": {
       "label": "Edit Todo"
     },
@@ -315,6 +322,20 @@
       "label": "Search Vault",
       "noResults": "No results found for {{query}}"
     },
+    "secretList": {
+      "progress": {
+        "header": "📋 Configured Secrets ({{count}} total)",
+        "noSecrets": "No secrets are currently configured. Use the secret_save tool to add API keys and other secrets.",
+        "securityNote": "🔒 Security Note: Secret values are hidden for security. Only names are shown above."
+      }
+    },
+    "secretSave": {
+      "progress": {
+        "overwriting": "Secret {{key}} already exists. Overwriting...",
+        "securityReminder": "⚠️ Security Notice: Secrets are stored in your Obsidian config folder in plain text. Do not share your vault or config folder with others.",
+        "success": "Successfully saved secret {{key}}"
+      }
+    },
     "success": {
       "abandon": "✓ Marked {{task}} as abandoned in {{path}}",
       "add": "✓ Added {{task}} to {{path}}",
@@ -331,10 +352,10 @@
       "label": "Uncheck Todo"
     },
     "urlDownload": {
-      "completed": "Downloaded content from {{url}}",
-      "failed": "Failed to download from {{url}}",
-      "inProgress": "Downloading from {{url}}...",
-      "label": "Download URL"
+      "completed": "[TODO] Completed",
+      "failed": "[TODO] Failed",
+      "inProgress": "[TODO] In Progress",
+      "label": "[TODO] Label"
     }
   },
   "ui": {
@@ -374,7 +395,6 @@
       "systemPrompt": "System prompt for \"{{modeName}}\""
     },
     "mode": {
-      "createStarterKit": "Create a Starter Kit",
       "createdError": "Error creating mode: {{error}}",
       "createdSuccess": "Mode created successfully",
       "defaultDescription": "Default mode description",
@@ -417,23 +437,7 @@
         "skipButton": "Skip for now",
         "title": "Configure OpenAI API Key"
       },
-      "saving": "Saving...",
-      "starterKit": {
-        "button": "Create Starter Kit",
-        "description": "Get started by creating your starter kit with pre-configured AI modes and templates.",
-        "features": {
-          "examples": "Usage examples",
-          "modes": "Multiple AI personalities",
-          "templates": "Information templates"
-        },
-        "title": "Welcome to Life Navigator"
-      }
-    },
-    "starterKit": {
-      "createdError": "Error creating starter kit: {{error}}",
-      "createdSuccess": "Successfully created starter kit",
-      "directoryName": "Starter Kit",
-      "noModes": "## Welcome to Life Navigator\n\nTo get started, create a starter kit containing basic modes with the _#ln-mode_ tag."
+      "saving": "Saving..."
     },
     "thinking": {
       "completed": "Thought for a moment",

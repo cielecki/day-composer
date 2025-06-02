@@ -61,7 +61,7 @@ export class ConversationDatabase {
 			conversation.meta.title = "New Chat";
 		}
 
-		if (!conversation.storedConversation.titleGenerated && conversation.storedConversation.messages.length > 2) {
+		if (!conversation.storedConversation.titleGenerated && conversation.storedConversation.messages.length >= 2) {
 			conversation.meta.title = await generateConversationTitle(conversation.storedConversation.messages);
 			conversation.storedConversation.titleGenerated = true;
 		}

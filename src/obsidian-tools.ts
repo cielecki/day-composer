@@ -3,7 +3,8 @@ import { noteCreateTool } from "./tools/note-create";
 import { vaultSearchTool } from "./tools/vault-search";
 import { noteReadTool } from "./tools/note-read";
 import { noteEditTool } from "./tools/note-edit";
-import { urlDownloadTool } from "./tools/url-download";
+import { libraryListTool } from "./tools/library-list";
+import { libraryViewTool } from "./tools/library-view";
 import { taskCheckTool } from "./tools/task-check";
 import { taskAddTool } from "./tools/task-add";
 import { taskUncheckTool } from "./tools/task-uncheck";
@@ -17,6 +18,9 @@ import { vaultFindTool } from "./tools/vault-find";
 import { vaultFindFilesByTagTool } from "./tools/vault-find-files-by-tag";
 import { modeValidatorTool } from "./tools/mode-validator";
 import { toolValidatorTool } from "./tools/tool-validator";
+import { secretSaveTool } from "./tools/secret-save";
+import { secretListTool } from "./tools/secret-list";
+import { urlDownloadTool } from "./tools/url-download";
 import { ToolExecutionError } from "./utils/tools/tool-execution-error";
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tool-filter";
@@ -78,7 +82,8 @@ export class ObsidianTools {
 		vaultFindFilesByTagTool,
 		noteReadTool,
 		noteEditTool,
-		urlDownloadTool,
+		libraryListTool,
+		libraryViewTool,
 		taskCheckTool,
 		taskAddTool,
 		taskUncheckTool,
@@ -90,6 +95,9 @@ export class ObsidianTools {
 		taskRemoveTool,
 		modeValidatorTool,
 		toolValidatorTool,
+		secretSaveTool,
+		secretListTool,
+		urlDownloadTool,
 	];
 
 	constructor(plugin: LifeNavigatorPlugin) {

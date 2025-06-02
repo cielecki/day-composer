@@ -17,7 +17,7 @@ import * as yaml from "js-yaml";
 import { t } from '../i18n';
 import { getPluginSettings } from "../settings/LifeNavigatorSettings";
 import { modeManagerService } from "../services/ModeManagerService";
-import { DEFAULT_VOICE_INSTRUCTIONS } from "../utils/mode/ln-mode-defaults";
+import { getPrebuiltModes } from "../modes/PrebuiltModes";
 
 
 
@@ -190,6 +190,15 @@ export const LNModeProvider: React.FC<{
 			const files = app.vault.getMarkdownFiles();
 			const modesMap: Record<string, LNMode> = {};
 
+			// First, add all pre-built modes
+			const prebuiltModes = getPrebuiltModes();
+			for (const mode of prebuiltModes) {
+				if (mode.ln_path) {
+					modesMap[mode.ln_path] = mode;
+				}
+			}
+
+			// Then add file-based modes
 			for (const file of files) {
 				const mode = await extractLNModeFromFile(file);
 				if (mode && mode.ln_path) {
@@ -199,13 +208,15 @@ export const LNModeProvider: React.FC<{
 
 			lnModesRef.current = modesMap;
 			
-			// Update mode file paths ref
-			modeFilePathsRef.current = new Set(Object.keys(modesMap).filter((path) => path !== ""));
+			// Update mode file paths ref (only include file-based modes)
+			const fileModeKeys = Object.keys(modesMap).filter((path) => path !== "" && !path.startsWith(':prebuilt:'));
+			modeFilePathsRef.current = new Set(fileModeKeys);
 			
 			setForceUpdate(prev => prev + 1);
 			console.log(
-				`Loaded ${Object.keys(modesMap).length} modes with #ln-mode tag`
+				`Loaded ${Object.keys(modesMap).length} modes (${prebuiltModes.length} pre-built, ${Object.keys(modesMap).length - prebuiltModes.length} from files)`
 			);
+			
 			// If active mode no longer exists, set it to the first available mode
 			if (!modesMap[activeModeIdRef.current] && Object.keys(modesMap).length > 0) {
 				const firstModeId = Object.keys(modesMap)[0] || "";

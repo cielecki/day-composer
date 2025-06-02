@@ -58,10 +58,17 @@
   },
   "messages": {
     "checkingForUpdates": "Sprawdzanie aktualizacji...",
-    "creatingStarterKit": "Tworzenie pakietu startowego...",
     "newVersionFoundDownloading": "Znaleziono nową wersję {{latestVersion}}! Pobieranie aktualizacji z {{currentVersion}}...",
     "pluginUpToDate": "Life Navigator jest aktualny (wersja {{version}})",
     "updateAvailable": "Dostępna aktualizacja! Wersja {{latestVersion}} jest teraz dostępna (masz {{currentVersion}})"
+  },
+  "prebuiltModes": {
+    "lifeNavigator": {
+      "mainDescription": "Jestem Twoim inteligentnym towarzyszem do odkrywania i integrowania treści Life Navigator. Pomagam znaleźć idealne tryby, narzędzia i szablony z naszej biblioteki w oparciu o Twoje specyficzne potrzeby i preferencje.\n\nOpowiedz mi o swoich celach, wyzwaniach lub tym, co chciałbyś osiągnąć, a przeszukam naszą obszerną bibliotekę, aby znaleźć i polecić najbardziej odpowiednie treści dla Ciebie.",
+      "systemPrompt": "Jesteś Life Navigator, inteligentnym asystentem pomagającym użytkownikom odkrywać, rozumieć i integrować treści Life Navigator z biblioteki. Twoją główną rolą jest:\n\n1. **Słuchanie i Rozumienie**: Zadawaj przemyślane pytania o cele, wyzwania i preferencje użytkownika, aby zrozumieć ich potrzeby\n2. **Odkrywanie Treści**: Używaj narzędzi library_list i library_view do eksploracji dostępnych trybów, narzędzi, osobowości i szablonów\n3. **Rekomendowanie Rozwiązań**: Sugeruj konkretne treści z biblioteki pasujące do ich wymagań\n4. **Ułatwianie Integracji**: Pomagaj użytkownikom zrozumieć jak używać treści i dostosować je do ich przepływu pracy\n5. **Tłumaczenie w Razie Potrzeby**: Jeśli treść jest w innym języku niż preferuje użytkownik, oferuj tłumaczenie i tworzenie dostosowanych wersji\n\nMasz dostęp do kompletnej biblioteki Life Navigator i możesz przeglądać, analizować i rekomendować dowolne treści. Zawsze zacznij od zrozumienia kontekstu użytkownika przed składaniem rekomendacji. Bądź proaktywny w sugerowaniu odpowiednich kombinacji treści i wyjaśniaj jak różne elementy współpracują ze sobą.\n\nKiedy użytkownicy opisują swoje potrzeby, pomyśl o:\n- Jaki typ treści im pomoże (tryby, narzędzia, szablony)\n- Jak różne elementy mogą współpracować\n- Czy istniejące treści wymagają dostosowania\n- Preferencje językowe i kontekst kulturowy\n\nZawsze bądź pomocny, ciekawski i skoncentrowany na znalezieniu idealnego dopasowania treści dla unikalnej sytuacji każdego użytkownika.",
+      "title": "Life Navigator",
+      "voiceInstructions": "Mów pomocnym, konwersacyjnym tonem. Utrzymuj odpowiedzi zwięzłe ale dokładne. Rekomendując treści, krótko wyjaśnij dlaczego są dobrym wyborem. Zadawaj pytania uzupełniające, aby lepiej zrozumieć potrzeby użytkownika."
+    }
   },
   "settings": {
     "actions": {
@@ -70,25 +77,14 @@
         "desc": "Sprawdź, czy dostępna jest nowsza wersja Life Navigator i pobierz ją automatycznie.",
         "name": "Sprawdź aktualizacje"
       },
-      "createStarterKit": {
-        "button": "Utwórz pakiet startowy",
-        "desc": "Utwórz nowy pakiet startowy z predefiniowanymi trybami AI i szablonami, aby szybko rozpocząć pracę.",
-        "name": "Utwórz pakiet startowy"
-      },
       "resetTutorial": {
         "button": "Resetuj tutorial",
-        "confirm": "Czy na pewno chcesz zresetować tutorial? Spowoduje to ponowne wyświetlenie ekranów konfiguracji przy następnym otwarciu Life Navigator.",
         "desc": "Resetuj tutorial konfiguracji i proces wdrażania. Spowoduje to ponowne wyświetlenie ekranów konfiguracji przy następnym otwarciu Life Navigator.",
         "error": "Nie udało się zresetować tutoriala: {{error}}",
         "name": "Resetuj tutorial",
         "success": "Tutorial został pomyślnie zresetowany"
       },
-      "title": "Akcje Life Navigator",
-      "viewDocs": {
-        "button": "Zobacz dokumentację",
-        "desc": "Otwórz przewodnik użytkownika i dokumentację Life Navigator na GitHub w przeglądarce.",
-        "name": "Zobacz dokumentację"
-      }
+      "title": "Akcje Life Navigator"
     },
     "advanced": {
       "title": "Ustawienia zaawansowane"
@@ -227,6 +223,18 @@
         "inProgress": "Usuwanie todo {{task}}...",
         "success": "Usunięto todo {{task}}"
       },
+      "secretList": {
+        "completed": "Wyświetlono skonfigurowane sekrety",
+        "default": "Pokaż Sekrety",
+        "failed": "Nie udało się wyświetlić sekretów",
+        "inProgress": "Wyświetlanie skonfigurowanych sekretów..."
+      },
+      "secretSave": {
+        "completed": "Zapisano sekret {{key}}",
+        "default": "Zapisz Sekret",
+        "failed": "Nie udało się zapisać sekretu {{key}}",
+        "inProgress": "Zapisywanie sekretu {{key}}..."
+      },
       "uncheck": {
         "failed": "Nie udało się odznaczyć todo {{task}}",
         "inProgress": "Odznaczanie todo {{task}}...",
@@ -253,7 +261,6 @@
       }
     },
     "createNewMode": "Utwórz nowy tryb",
-    "createStarterKit": "Utwórz pakiet startowy",
     "edit": {
       "label": "Edytuj Todo"
     },
@@ -315,6 +322,20 @@
       "label": "Przeszukaj Vault",
       "noResults": "Nie znaleziono wyników dla {{query}}"
     },
+    "secretList": {
+      "progress": {
+        "header": "📋 Skonfigurowane Sekrety ({{count}} łącznie)",
+        "noSecrets": "Brak skonfigurowanych sekretów. Użyj narzędzia secret_save, aby dodać klucze API i inne sekrety.",
+        "securityNote": "🔒 Informacja o bezpieczeństwie: Wartości sekretów są ukryte ze względów bezpieczeństwa. Powyżej pokazane są tylko nazwy."
+      }
+    },
+    "secretSave": {
+      "progress": {
+        "overwriting": "Sekret {{key}} już istnieje. Nadpisywanie...",
+        "securityReminder": "⚠️ Informacja o bezpieczeństwie: Sekrety są przechowywane w folderze konfiguracyjnym Obsidian w postaci zwykłego tekstu. Nie udostępniaj swojego vault lub folderu konfiguracyjnego innym osobom.",
+        "success": "Pomyślnie zapisano sekret {{key}}"
+      }
+    },
     "success": {
       "abandon": "✓ Oznaczono {{task}} jako porzucone w {{path}}",
       "add": "✓ Dodano {{task}} do {{path}}",
@@ -331,10 +352,10 @@
       "label": "Odznacz Todo"
     },
     "urlDownload": {
-      "completed": "Pobrano zawartość z {{url}}",
-      "failed": "Nie udało się pobrać z {{url}}",
-      "inProgress": "Pobieranie z {{url}}...",
-      "label": "Pobierz URL"
+      "completed": "[TRANSLATE] Completed",
+      "failed": "[TRANSLATE] Failed",
+      "inProgress": "[TRANSLATE] In Progress",
+      "label": "[TRANSLATE] Label"
     }
   },
   "ui": {
@@ -374,7 +395,6 @@
       "systemPrompt": "Prompt systemowy dla \"{{modeName}}\""
     },
     "mode": {
-      "createStarterKit": "Utwórz pakiet startowy",
       "createdError": "Błąd tworzenia trybu: {{error}}",
       "createdSuccess": "Tryb utworzony pomyślnie",
       "defaultDescription": "Domyślny opis trybu",
@@ -417,23 +437,7 @@
         "skipButton": "Pomiń na razie",
         "title": "Skonfiguruj klucz API OpenAI"
       },
-      "saving": "Zapisywanie...",
-      "starterKit": {
-        "button": "Utwórz pakiet startowy",
-        "description": "Zacznij od utworzenia pakietu startowego z predefiniowanymi trybami AI i szablonami.",
-        "features": {
-          "examples": "Przykłady użycia",
-          "modes": "Wiele osobowości AI",
-          "templates": "Szablony informacji"
-        },
-        "title": "Witaj w Life Navigator"
-      }
-    },
-    "starterKit": {
-      "createdError": "Błąd podczas tworzenia pakietu startowego: {{error}}",
-      "createdSuccess": "Pomyślnie utworzono pakiet startowy",
-      "directoryName": "Pakiet Startowy",
-      "noModes": "## Witaj w Life Navigator\n\nAby rozpocząć, utwórz pakiet startowy zawierający podstawowe tryby z tagiem _#ln-mode_."
+      "saving": "Zapisywanie..."
     },
     "thinking": {
       "completed": "Myślano przez chwilę",

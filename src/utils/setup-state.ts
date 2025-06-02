@@ -2,7 +2,6 @@ import { getPluginSettings } from "../settings/LifeNavigatorSettings";
 
 export enum SetupStep {
 	CONFIGURE_LANGUAGE = "configure_language",
-	CREATE_STARTER_KIT = "create_starter_kit",
 	CONFIGURE_ANTHROPIC_KEY = "configure_anthropic_key", 
 	CONFIGURE_OPENAI_KEY = "configure_openai_key",
 	COMPLETE = "complete"
@@ -11,20 +10,19 @@ export enum SetupStep {
 export interface SetupState {
 	currentStep: SetupStep;
 	hasLanguageConfigured: boolean;
-	hasModes: boolean;
 	hasAnthropicKey: boolean;
 	hasOpenAIKey: boolean;
 	hasOpenAIConfigured: boolean; // Whether OpenAI has been configured or explicitly skipped
 }
 
 /**
- * Determines the current setup state based on language setting, available modes and API keys
+ * Determines the current setup state based on language setting and API keys
+ * Pre-built modes are always available, so mode creation is no longer required
  */
-export function getSetupState(lnModes: Record<string, any>): SetupState {
+export function getSetupState(): SetupState {
 	const settings = getPluginSettings();
 	
 	const hasLanguageConfigured = settings.tutorial.obsidianLanguageConfigured;
-	const hasModes = Object.keys(lnModes).length > 0;
 	const hasAnthropicKey = Boolean(settings.getSecret('ANTHROPIC_API_KEY') && settings.getSecret('ANTHROPIC_API_KEY')!.trim().length > 0);
 	const hasOpenAIKey = Boolean(settings.getSecret('OPENAI_API_KEY') && settings.getSecret('OPENAI_API_KEY')!.trim().length > 0);
 	const hasOpenAIConfigured = settings.tutorial.openaiKeyConfigured;
@@ -33,8 +31,6 @@ export function getSetupState(lnModes: Record<string, any>): SetupState {
 	
 	if (!hasLanguageConfigured) {
 		currentStep = SetupStep.CONFIGURE_LANGUAGE;
-	} else if (!hasModes) {
-		currentStep = SetupStep.CREATE_STARTER_KIT;
 	} else if (!hasAnthropicKey) {
 		currentStep = SetupStep.CONFIGURE_ANTHROPIC_KEY;
 	} else if (!hasOpenAIKey && !hasOpenAIConfigured) {
@@ -46,7 +42,6 @@ export function getSetupState(lnModes: Record<string, any>): SetupState {
 	return {
 		currentStep,
 		hasLanguageConfigured,
-		hasModes,
 		hasAnthropicKey,
 		hasOpenAIKey,
 		hasOpenAIConfigured
@@ -55,8 +50,19 @@ export function getSetupState(lnModes: Record<string, any>): SetupState {
 
 /**
  * Checks if setup is complete (all required components are configured)
+ * Pre-built modes are always available, so we only check for API keys
  */
-export function isSetupComplete(lnModes: Record<string, any>): boolean {
-	const state = getSetupState(lnModes);
+export function isSetupComplete(): boolean {
+	const state = getSetupState();
 	return state.currentStep === SetupStep.COMPLETE;
+}
+
+/**
+ * Reset tutorial state to show setup screens again
+ */
+export async function resetTutorialState(): Promise<void> {
+	const settings = getPluginSettings();
+	settings.tutorial.obsidianLanguageConfigured = false;
+	settings.tutorial.openaiKeyConfigured = false;
+	await settings.saveSettings();
 } 

@@ -8,6 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Library Index System**: Created comprehensive `library/index.md` file that catalogs all library content with descriptions and AI-guidance for when files should be downloaded. This enables intelligent file selection based on user context rather than browsing all files.
+- **Library Browse & View Tools**: New simplified tool pair for browsing and downloading Life Navigator library content:
+  - **Library List Tool** (`library_list`): Browse all available library content using curated index with descriptions and context guidance
+  - **Library View Tool** (`library_view`): Download and preview library content using relative paths from library_list
+  - **Index-Based Browsing**: Library list tool now reads from `library/index.md` instead of scanning repository via API for faster, more targeted results
+  - **Curated Descriptions**: Each file includes description and "Use When" guidance to help AI determine relevance
+  - **Simplified Architecture**: Uses relative paths instead of full URLs, removes unnecessary parameters and icons
+  - **Library-Focused**: Specifically designed for Life Navigator repository's `/library` directory
+  - **Markdown-Only**: Optimized for .md files, letting AI determine content types from paths
+  - **Download & Save**: Optional vault saving with auto-generated or custom filenames
+  - **Clean Integration**: Tools work together seamlessly - browse with list, download with view
+- **Secret Management Tools**: New built-in tools for managing secrets (API keys, tokens, passwords) in the plugin's storage system:
+  - **Secret Save Tool**: Allows AI to securely save secrets with validation, overwrite detection, and security reminders
+  - **Secret List Tool**: Lists configured secret names without exposing values for security review and management
+  - **Secure Storage**: Integrates with existing secrets management system used by user-defined tools
+  - **Validation**: Ensures secret keys follow naming conventions (uppercase with underscores)
+  - **Security Features**: Provides security notices about plain text storage and hides sensitive values
+  - **Global Access**: Saved secrets are available to user-defined tools via `getSecret()` function
 - **Mode and Tool Validation Tools**: Added two new built-in validation tools for quality assurance and debugging:
   - **Mode Validator Tool**: Validates Life Navigator mode files for completeness, correctness, and functionality. Checks frontmatter structure, required attributes, link expansion, system prompt rendering, and ensures all mode settings are valid.
   - **Tool Validator Tool**: Validates user-defined tool files for proper structure, schema validity, JavaScript code syntax, and integration with the tool system. Helps identify issues before tools are executed.
@@ -33,6 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tool Creator AI Mode**: Added **Tool Creator** mode for specialized assistance in building user-defined tools with comprehensive guidance and examples.
 - **Example User-Defined Tools in Starter Kit**: Example user-defined tools now included in starter kit instead of requiring commands to create.
 - **Shift-Click Tool Block Expansion**: Tool blocks with navigation targets can now be expanded/folded using shift-click without triggering navigation, providing better control over content visibility while preserving normal click-to-navigate behavior.
+- **Pre-built Modes System**: Introduced LifeNavigator mode that's always available and cannot be deleted
+- **Library Tools Integration**: Added `library-list` and `library-view` tools specifically for Life Navigator library content discovery
 
 ### Changed
 - **API Key Storage**: Migrated from specific API key fields (openAIApiKey, anthropicApiKey, firecrawlApiKey) to generic secrets system with backward compatibility.
@@ -41,6 +61,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Secrets**: Fixed issue where secrets edited in settings would not persist after app reload due to legacy loading overwriting the secrets object and improper async handling in the settings UI. The loading process now properly handles migration without overwriting new secrets, and all save operations are properly awaited. Additionally, the saveSettings() method now explicitly excludes legacy API keys from saved data, ensuring complete removal of old properties from data.json after migration.
 - **Vault Search Tool**: Improved vault search functionality to use Obsidian's built-in fuzzy search API (`prepareFuzzySearch`) instead of simple string matching. This provides more accurate search results with proper scoring, better relevance ranking, and fuzzy matching capabilities that match Obsidian's native search behavior. Search now covers both file paths and content with intelligent result prioritization.
 - **Vault Find Tool**: Renamed `vault_list_directory` tool to `vault_find` to better reflect its search capabilities similar to the Linux `find` command. Updated tool description, translations, and changed icon from folder to search to emphasize its find/search functionality rather than simple directory listing.
+- **Complete Starter Kit Removal**: Replaced starter kit system with pre-built modes for better user experience
+- **Setup Flow Simplification**: Removed starter kit creation step from setup since pre-built modes are always available
+- **Mode Management**: Pre-built modes are protected from deletion and don't show "Open in editor" option
 
 ### Fixed
 - **Waveform Visibility During Transcription**: Fixed waveform visualization to remain visible during transcription instead of disappearing. The waveform now stays static during transcription (showing the last recorded pattern) and is cleared after transcription completes. This provides better visual feedback by maintaining the visual indication during processing while stopping the distracting animation.
@@ -51,7 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Built-in Image Generation Tool**: Removed the built-in `generate_image` tool in favor of the user-defined image generation tool available in the starter kit. The new tool uses direct API requests instead of external dependencies, simplifying the codebase while maintaining full functionality.
 - **Built-in Deep Research Tool**: Removed the built-in `deep_research` tool in favor of the user-defined deep research tool available in the starter kit. The new tool uses direct API requests instead of external dependencies, simplifying the codebase while maintaining full functionality.
 - **Firecrawl SDK Dependency**: Removed `@mendable/firecrawl-js` package dependency as deep research functionality now uses direct API requests, reducing bundle size and external dependencies.
-
+- **Starter Kit System**: Completely removed starter kit creation, generation scripts, and related commands
 ## [0.9.3] - 2025-06-02
 
 ### Added

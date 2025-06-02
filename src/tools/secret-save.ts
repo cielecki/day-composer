@@ -1,0 +1,98 @@
+import { ObsidianTool } from "../obsidian-tools";
+import { ToolExecutionError } from "../utils/tools/tool-execution-error";
+import { ToolExecutionContext } from "../utils/chat/types";
+import { t } from "../i18n";
+import { getPluginSettings } from "../settings/LifeNavigatorSettings";
+
+const schema = {
+  name: "secret_save",
+  description: "Saves a secret (API key, token, password, etc.) to the plugin's secure storage system. The secret will be available to user-defined tools via the getSecret() function.",
+  input_schema: {
+    type: "object",
+    properties: {
+      secret_key: {
+        type: "string",
+        description: "The name/identifier for the secret (e.g., 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'MY_SECRET_TOKEN'). Use uppercase with underscores for consistency.",
+      },
+      secret_value: {
+        type: "string",
+        description: "The actual secret value to store (e.g., API key, token, password)",
+      },
+      description: {
+        type: "string",
+        description: "Optional description of what this secret is used for",
+        default: ""
+      },
+    },
+    required: ["secret_key", "secret_value"]
+  }
+};
+
+type SecretSaveToolInput = {
+  secret_key: string;
+  secret_value: string;
+  description?: string;
+}
+
+function validateSecretKey(key: string): void {
+  if (!key || key.trim().length === 0) {
+    throw new ToolExecutionError("Secret key cannot be empty.");
+  }
+  
+  // Check for valid characters (alphanumeric, underscore, hyphen)
+  if (!/^[A-Z0-9_-]+$/i.test(key)) {
+    throw new ToolExecutionError("Secret key can only contain letters, numbers, underscores, and hyphens.");
+  }
+  
+  // Recommend uppercase format
+  if (key !== key.toUpperCase()) {
+    throw new ToolExecutionError(`Secret key should be uppercase for consistency. Consider using "${key.toUpperCase()}" instead.`);
+  }
+}
+
+export const secretSaveTool: ObsidianTool<SecretSaveToolInput> = {
+  specification: schema,
+  icon: "key",
+  initialLabel: t('tools.actions.secretSave.default'),
+  execute: async (context: ToolExecutionContext<SecretSaveToolInput>): Promise<void> => {
+    const { plugin, params } = context;
+    const { secret_key, secret_value, description = "" } = params;
+
+    context.setLabel(t('tools.actions.secretSave.inProgress', { key: secret_key }));
+
+    try {
+      // Validate the secret key
+      validateSecretKey(secret_key);
+
+      // Get settings instance
+      const settings = getPluginSettings();
+
+      // Check if secret already exists
+      const existingSecret = settings.getSecret(secret_key);
+      if (existingSecret) {
+        context.progress(t('tools.secretSave.progress.overwriting', { key: secret_key }));
+      }
+
+      // Save the secret
+      settings.setSecret(secret_key, secret_value);
+      await settings.saveSettings();
+
+      // Success message
+      context.setLabel(t('tools.actions.secretSave.completed', { key: secret_key }));
+      
+      let successMessage = t('tools.secretSave.progress.success', { key: secret_key });
+      if (description && description.trim().length > 0) {
+        successMessage += ` (${description})`;
+      }
+      
+      context.progress(successMessage);
+      
+      // Security reminder
+      context.progress(t('tools.secretSave.progress.securityReminder'));
+
+    } catch (error) {
+      context.setLabel(t('tools.actions.secretSave.failed', { key: secret_key }));
+      throw error;
+    }
+  }
+}; 
