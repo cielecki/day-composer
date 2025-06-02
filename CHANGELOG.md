@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.3] - 2025-06-02
+
 ### Added
 - **Audio Pause/Resume and Caching**: Enhanced audio controls with true pause/resume functionality and intelligent caching. Audio can be paused and resumed from the exact same position, not just stopped and restarted. Generated audio is cached within components for instant playback on repeated requests, improving performance and reducing API calls. Separate play/pause and stop buttons provide better control over audio playback. Cache uses legacy TTS for reliable audio generation and consistent results. Stop button remains active when audio is paused and resets everything back to the initial state (speaker icon ready to start from beginning). Fixed race condition where stopping audio generation would still play audio when generation completed in background. Main input area properly shows stop button when audio is paused instead of send button.
 
