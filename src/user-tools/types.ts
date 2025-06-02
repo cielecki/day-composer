@@ -3,6 +3,7 @@ export interface UserDefinedTool {
   filePath: string;
   name: string;
   description: string;
+  version: string;
   
   // UI customization  
   icon: string;

@@ -2,6 +2,7 @@
 tags: ["ln-tool"]
 ln-tool-name: "Szablon Narzędzia"
 ln-tool-description: "Podstawowy szablon do tworzenia własnych niestandardowych narzędzi"
+ln-tool-version: "1.0.0"
 ln-tool-icon: "wrench"
 ln-tool-icon-color: "#6B7280"
 ln-tool-enabled: true

@@ -10,97 +10,122 @@ export interface TutorialSettings {
 }
 
 export class PluginSettings {
-	openAIApiKey = '';
-	anthropicApiKey = '';
-	firecrawlApiKey = '';
-	speechToTextPrompt = '';
+	// Generic secrets system - allows any string -> string mapping
+	secrets: Record<string, string> = {};
+	speechToTextPrompt: string = '';
 	activeModeId = '';
-	userDefinedToolsEnabled = false; // Default disabled for security
 	tutorial: TutorialSettings = {
 		obsidianLanguageConfigured: false,
 		openaiKeyConfigured: false
 	};
-    plugin: MyPlugin;
+	private plugin: MyPlugin | undefined;
 
-    constructor() {}
+	public init(plugin: MyPlugin) {
+		this.plugin = plugin;
+	}
 
-    async init(plugin: MyPlugin) {
-        this.plugin = plugin;
-        
-        const data = await plugin.loadData();
+	async saveSettings(): Promise<void> {
+		if (this.plugin) {
+			await this.plugin.saveData(this);
+		}
+	}
 
-        this.openAIApiKey = data?.openAIApiKey ?? '';
-        this.anthropicApiKey = data?.anthropicApiKey ?? '';
-        this.firecrawlApiKey = data?.firecrawlApiKey ?? '';
-        this.speechToTextPrompt = data?.speechToTextPrompt ?? '';
-        this.activeModeId = data?.activeModeId ?? '';
-        this.userDefinedToolsEnabled = data?.userDefinedToolsEnabled ?? false;
-        
-        // Handle migration from old obsidianLanguageConfigured field
-        if (data?.obsidianLanguageConfigured !== undefined) {
-        	this.tutorial = {
-        		obsidianLanguageConfigured: data.obsidianLanguageConfigured,
-        		openaiKeyConfigured: data.openaiKeyConfigured ?? false
-        	};
-        } else {
-        	this.tutorial = data?.tutorial ?? {
-        		obsidianLanguageConfigured: false,
-        		openaiKeyConfigured: false
-        	};
-        }
-    }
+	// Secret management methods
+	getSecretKeys(): string[] {
+		return Object.keys(this.secrets || {});
+	}
 
-    async saveSettings() {
-        const settingsToSave = {
-            openAIApiKey: this.openAIApiKey,
-            anthropicApiKey: this.anthropicApiKey,
-            firecrawlApiKey: this.firecrawlApiKey,
-            speechToTextPrompt: this.speechToTextPrompt,
-            activeModeId: this.activeModeId,
-            userDefinedToolsEnabled: this.userDefinedToolsEnabled,
-            tutorial: this.tutorial,
-        };
-        await this.plugin.saveData(settingsToSave);
-    }
+	getSecret(key: string): string | undefined {
+		return this.secrets?.[key];
+	}
 
-    // Reset tutorial/setup state
-    async resetTutorial() {
-    	this.tutorial = {
-    		obsidianLanguageConfigured: false,
-    		openaiKeyConfigured: false
-    	};
-    	await this.saveSettings();
-    }
+	setSecret(key: string, value: string): void {
+		if (!this.secrets) {
+			this.secrets = {};
+		}
+		this.secrets[key] = value;
+	}
 
-    // Getter for backward compatibility
-    get obsidianLanguageConfigured(): boolean {
-    	return this.tutorial.obsidianLanguageConfigured;
-    }
+	removeSecret(key: string): void {
+		if (this.secrets) {
+			delete this.secrets[key];
+		}
+	}
 
-    // Setter for backward compatibility
-    set obsidianLanguageConfigured(value: boolean) {
-    	this.tutorial.obsidianLanguageConfigured = value;
-    }
+	// Reset tutorial/setup state
+	async resetTutorial() {
+		this.tutorial = {
+			obsidianLanguageConfigured: false,
+			openaiKeyConfigured: false
+		};
+		await this.saveSettings();
+	}
 
-    get openaiKeyConfigured(): boolean {
-    	return this.tutorial.openaiKeyConfigured;
-    }
+	// Getter for backward compatibility
+	get obsidianLanguageConfigured(): boolean {
+		return this.tutorial.obsidianLanguageConfigured;
+	}
 
-    set openaiKeyConfigured(value: boolean) {
-    	this.tutorial.openaiKeyConfigured = value;
-    }
+	// Setter for backward compatibility
+	set obsidianLanguageConfigured(value: boolean) {
+		this.tutorial.obsidianLanguageConfigured = value;
+	}
+
+	get openaiKeyConfigured(): boolean {
+		return this.tutorial.openaiKeyConfigured;
+	}
+
+	set openaiKeyConfigured(value: boolean) {
+		this.tutorial.openaiKeyConfigured = value;
+	}
 }
 
-// Singleton pattern for PluginSettings
-let instance: PluginSettings | null = null;
+let pluginInstance: PluginSettings;
+
+export function createPluginSettings(plugin: MyPlugin): PluginSettings {
+	const settings = new PluginSettings();
+	settings.init(plugin);
+
+	// Load existing settings - this will be called asynchronously in main.ts
+	// For now, we'll just set up the structure and migration will happen in main.ts
+	pluginInstance = settings;
+	return settings;
+}
+
+export async function loadPluginSettings(plugin: MyPlugin): Promise<PluginSettings> {
+	const settings = getPluginSettings();
+	
+	// Load existing settings
+	const data = await plugin.loadData() || {};
+	Object.assign(settings, data);
+
+	// Migration: move old API keys to new secrets system with standard naming
+	if ((data as any).openAIApiKey) {
+		settings.setSecret('OPENAI_API_KEY', (data as any).openAIApiKey);
+		// Don't delete old key yet to ensure backwards compatibility
+	}
+	
+	if ((data as any).anthropicApiKey) {
+		settings.setSecret('ANTHROPIC_API_KEY', (data as any).anthropicApiKey);
+		// Don't delete old key yet to ensure backwards compatibility
+	}
+	
+	if ((data as any).firecrawlApiKey) {
+		settings.setSecret('FIRECRAWL_API_KEY', (data as any).firecrawlApiKey);
+		// Don't delete old key yet to ensure backwards compatibility
+	}
+
+	// Save settings if migration occurred
+	if ((data as any).openAIApiKey || (data as any).anthropicApiKey || (data as any).firecrawlApiKey) {
+		await settings.saveSettings();
+	}
+
+	return settings;
+}
 
 export function getPluginSettings(): PluginSettings {
-    if (!instance) {
-        instance = new PluginSettings();
-    }
-    return instance;
-}
-
-export function resetPluginSettings(): void {
-    instance = null;
+	if (!pluginInstance) {
+		throw new Error('Plugin settings not initialized. Call createPluginSettings first.');
+	}
+	return pluginInstance;
 }

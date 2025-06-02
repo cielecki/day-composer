@@ -184,12 +184,6 @@ export class UserDefinedToolManager {
     tool: UserDefinedTool, 
     context: ToolExecutionContext
   ): Promise<void> {
-    // Check if user-defined tools are enabled
-    const settings = (await this.plugin.loadData()) || {};
-    if (!settings.userDefinedToolsEnabled) {
-      throw new ToolExecutionError('User-defined tools are disabled. Enable them in settings.');
-    }
-
     // Check if tool is approved
     if (!this.approvalManager.isApproved(tool.filePath, tool.codeHash, tool.schemaHash)) {
       const approved = await this.approvalManager.requestApproval(tool);

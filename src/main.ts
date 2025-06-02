@@ -2,7 +2,8 @@ import { App,  Notice, Plugin, requestUrl } from 'obsidian';
 import { SampleSettingTab } from "./settings/SettingsTab";
 import {
 	getPluginSettings,
-	resetPluginSettings,
+	createPluginSettings,
+	loadPluginSettings,
 } from "./settings/PluginSettings";
 import { resetObsidianTools } from "./obsidian-tools";
 import { LIFE_NAVIGATOR_VIEW_TYPE, LifeNavigatorView } from "./life-navigator-view";
@@ -17,6 +18,9 @@ import { ConfirmReloadModal } from "./components/ConfirmReloadModal";
 import { generateUniqueDirectoryName } from "./utils/tools/generate-unique-directory-name";
 import { UserDefinedToolManager } from "./user-tools/UserDefinedToolManager";
 import { sanitizeString } from './utils/text/string-sanitizer';
+
+// Starter Kit Version - increment when making changes to starter kit content or structure
+const STARTER_KIT_VERSION = "v0.11";
 
 /**
  * Recursively creates nested directories, ensuring parent directories exist first
@@ -63,7 +67,7 @@ const createStarterKit = async (app: App) => {
 
 		let baseStarterKitDirName = t('ui.starterKit.directoryName');
 
-		baseStarterKitDirName = baseStarterKitDirName + " v0.9";
+		baseStarterKitDirName = baseStarterKitDirName + " " + STARTER_KIT_VERSION;
 
 		// Generate a unique directory name
 		const starterKitDirName = await generateUniqueDirectoryName(app, baseStarterKitDirName);
@@ -319,27 +323,15 @@ export default class MyPlugin extends Plugin {
 		await initI18n(this.app);
 
 		// Initialize the plugin settings
-		const pluginSettings = getPluginSettings();
-		pluginSettings.init(this);
+		createPluginSettings(this);
+		await loadPluginSettings(this);
 
 		// Initialize the obsidian tools with this plugin instance
 		getObsidianTools(this);
 
-		// Always initialize user-defined tools manager (but only start it if enabled)
+		// Initialize user-defined tools manager
 		this.userToolManager = new UserDefinedToolManager(this);
-		
-		// Check if user-defined tools are enabled and initialize if so
-		const settings = getPluginSettings();
-		if (settings.userDefinedToolsEnabled) {
-			try {
-				await this.userToolManager.initialize();
-				console.log('[USER-TOOLS] User-defined tools initialized');
-			} catch (error) {
-				console.error('[USER-TOOLS] Failed to initialize user-defined tools:', error);
-			}
-		} else {
-			console.log('[USER-TOOLS] User-defined tools disabled, manager created but not initialized');
-		}
+		await this.userToolManager.initialize();
 
 		// Register the view type
 		this.registerView(LIFE_NAVIGATOR_VIEW_TYPE, (leaf) => {
@@ -529,7 +521,6 @@ export default class MyPlugin extends Plugin {
 	onunload() {
 		console.log("Unloading Life Navigator plugin");
 		resetObsidianTools();
-		resetPluginSettings();
 	}
 }
 

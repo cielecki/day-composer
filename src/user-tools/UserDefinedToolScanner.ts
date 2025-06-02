@@ -61,10 +61,17 @@ export class UserDefinedToolScanner {
     
     const executeCode = jsCodeBlocks[0]; // Use first JS block
     
+    // Validate that version is present and not empty
+    const version = metadata?.frontmatter?.['ln-tool-version'];
+    if (!version || typeof version !== 'string' || version.trim() === '') {
+      throw new Error(`Tool version is required. Please add 'ln-tool-version: "1.0.0"' to the frontmatter of ${file.path}`);
+    }
+    
     return {
       filePath: file.path,
       name: metadata?.frontmatter?.['ln-tool-name'] || file.basename,
       description: metadata?.frontmatter?.['ln-tool-description'] || '',
+      version: version.trim(),
       icon: metadata?.frontmatter?.['ln-tool-icon'] || 'gear',
       iconColor: metadata?.frontmatter?.['ln-tool-icon-color'],
       executeCode,

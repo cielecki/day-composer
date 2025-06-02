@@ -2,6 +2,7 @@
 tags: ["ln-tool"]
 ln-tool-name: "Pobierz Transkrypcję YouTube"
 ln-tool-description: "Pobiera transkrypcję z filmów YouTube bez używania pakietów npm"
+ln-tool-version: "1.0.0"
 ln-tool-icon: "youtube"
 ln-tool-icon-color: "#ff0000"
 ln-tool-enabled: true

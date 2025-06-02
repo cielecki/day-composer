@@ -2,6 +2,7 @@
 tags: ["ln-tool"]
 ln-tool-name: "Get Weather"
 ln-tool-description: "Fetches current weather information for a specified location"
+ln-tool-version: "1.0.0"
 ln-tool-icon: "cloud"
 ln-tool-icon-color: "#87CEEB"
 ln-tool-enabled: true
@@ -47,7 +48,7 @@ This tool fetches current weather information for any location using the free Op
 
 ```javascript
 async function execute(context) {
-  const { params, plugin, progress, requestUrl, setLabel } = context;
+  const { params, plugin, progress, setLabel } = context;
   
   // Helper function for Unicode normalization (reusable across tools)
   function normalizeUnicode(text) {

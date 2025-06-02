@@ -2,6 +2,7 @@
 tags: ["ln-tool"]
 ln-tool-name: "Sprawdź Pogodę"
 ln-tool-description: "Pobiera aktualne informacje o pogodzie dla określonej lokalizacji"
+ln-tool-version: "1.0.0"
 ln-tool-icon: "cloud"
 ln-tool-icon-color: "#87CEEB"
 ln-tool-enabled: true
@@ -47,7 +48,7 @@ To narzędzie pobiera aktualne informacje o pogodzie dla dowolnej lokalizacji u�
 
 ```javascript
 async function execute(context) {
-  const { params, plugin, progress, requestUrl, setLabel } = context;
+  const { params, plugin, progress, setLabel } = context;
   
   // Funkcja pomocnicza do normalizacji Unicode (wielokrotnego użytku w narzędziach)
   function normalizeUnicode(text) {

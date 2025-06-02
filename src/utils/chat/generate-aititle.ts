@@ -11,7 +11,7 @@ export async function generateAITitle(
     try {
         const settings = getPluginSettings();
         const anthropicClient = new Anthropic({
-            apiKey: settings.anthropicApiKey,
+            apiKey: settings.getSecret('ANTHROPIC_API_KEY'),
             dangerouslyAllowBrowser: true
         });
 

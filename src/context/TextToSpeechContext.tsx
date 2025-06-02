@@ -64,7 +64,7 @@ export const TextToSpeechProvider: React.FC<{
 	
 	// Initialize streaming service when needed
 	const initializeStreamingService = useCallback(() => {
-		const apiKey = getPluginSettings().openAIApiKey;
+		const apiKey = getPluginSettings().getSecret('OPENAI_API_KEY');
 		const settings = getCurrentTTSSettings();
 		
 		if (apiKey && !streamingServiceRef.current) {
@@ -278,7 +278,7 @@ export const TextToSpeechProvider: React.FC<{
 					}
 					
 					// Verify we have a valid API key
-					if (!getPluginSettings().openAIApiKey) {
+					if (!getPluginSettings().getSecret('OPENAI_API_KEY')) {
 						console.error('No OpenAI API key available for TTS');
 						new Notice(t('errors.tts.noApiKey'));
 						resolve();
@@ -297,7 +297,7 @@ export const TextToSpeechProvider: React.FC<{
 					
 					console.log('Creating OpenAI client and sending TTS request');
 					const openai = new OpenAI({
-						apiKey: getPluginSettings().openAIApiKey,
+						apiKey: getPluginSettings().getSecret('OPENAI_API_KEY'),
 						dangerouslyAllowBrowser: true
 					});
 

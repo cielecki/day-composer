@@ -24,7 +24,7 @@ export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 		setIsConfiguring(true);
 		try {
 			const settings = getPluginSettings();
-			settings.openAIApiKey = apiKey.trim();
+			settings.setSecret('OPENAI_API_KEY', apiKey.trim());
 			settings.tutorial.openaiKeyConfigured = true;
 			await settings.saveSettings();
 			onKeyConfigured();

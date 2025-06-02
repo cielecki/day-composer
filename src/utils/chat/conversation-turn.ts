@@ -57,7 +57,7 @@ export const runConversationTurn = async (
 			let assistantMessage: Message | null = null;
 
 			try {
-				const apiKey = getPluginSettings().anthropicApiKey;
+				const apiKey = getPluginSettings().getSecret('ANTHROPIC_API_KEY');
 				const anthropicClient = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
 
 				const messagesForAPI = formatMessagesForAPI(context.messages);

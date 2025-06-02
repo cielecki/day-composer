@@ -95,7 +95,8 @@ export const SpeechToTextProvider: React.FC<{
     
     try {
       const pluginSettings = getPluginSettings();
-      if (!pluginSettings.openAIApiKey) {
+      const openaiApiKey = pluginSettings.getSecret('OPENAI_API_KEY');
+      if (!openaiApiKey) {
         throw new Error('OpenAI API key is not configured');
       }
       
@@ -107,7 +108,7 @@ export const SpeechToTextProvider: React.FC<{
       }
       
       const openai = new OpenAI({
-        apiKey: pluginSettings.openAIApiKey,
+        apiKey: openaiApiKey,
         dangerouslyAllowBrowser: true,
       });
       

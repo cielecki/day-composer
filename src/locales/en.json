@@ -93,30 +93,51 @@
     "advanced": {
       "title": "Advanced Settings"
     },
-    "apiKeys": {
-      "anthropic": "Anthropic API Key",
-      "anthropicDesc": "Your Anthropic API key for the main AI assistant functionality. Get it from <a href='https://console.anthropic.com/settings/keys'>Anthropic Console</a>.",
-      "enterAnthropicKey": "Enter your Anthropic API key",
-      "enterFirecrawlKey": "Enter your Firecrawl API key",
-      "enterOpenAIKey": "Enter your OpenAI API key",
-      "firecrawl": "Firecrawl API Key",
-      "firecrawlDesc": "Your Firecrawl API key for deep research functionality. Get it from <a href='https://firecrawl.dev/'>Firecrawl Dashboard</a>.",
-      "openai": "OpenAI API Key",
-      "openaiDesc": "Your OpenAI API key for text-to-speech functionality. Get it from <a href='https://platform.openai.com/api-keys'>OpenAI Platform</a>.",
-      "securityNote": "Important: Your API key is stored in your Obsidian config folder. Do not share your vault or config folder with others if you store your API key here.",
-      "title": "API Keys"
-    },
     "prompts": {
       "defaultPrompt": "# Domain\nA message or voice command issued by the user to the AI assistant.\n\n# Examples\n- Check off task ... umm ... I took out the trash\n- I made dinner\n- Add for tomorrow to remind me to reach out to John.\n\n# Glossary\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nStart of transcription:",
       "speechToTextPrompt": "Speech-to-text Prompt",
       "speechToTextPromptDesc": "The prompt that will be sent to the speech-to-text engine. This provides context to the AI model. You can use <a href='https://github.com/cielecki/life-navigator/blob/main/docs/link-expansion.md'>link expansion</a>."
+    },
+    "secrets": {
+      "addNew": {
+        "button": "Add Secret",
+        "desc": "Add a new API key or secret",
+        "name": "Add New Secret"
+      },
+      "description": "Manage API keys and secrets for user-defined tools. These are stored as key-value pairs for flexible use.",
+      "dialog": {
+        "addTitle": "Add New Secret",
+        "cancel": "Cancel",
+        "editTitle": "Edit Secret: {{key}}",
+        "errors": {
+          "emptyKey": "Secret name cannot be empty.",
+          "keyExists": "Secret '{{key}}' already exists. Do you want to overwrite it?"
+        },
+        "keyLabel": "Secret Name",
+        "keyPlaceholder": "e.g., OPENAI_API_KEY, ANTHROPIC_API_KEY, FIRECRAWL_API_KEY",
+        "save": "Save",
+        "saved": "Secret '{{key}}' has been saved.",
+        "updated": "Secret '{{key}}' has been updated.",
+        "valueLabel": "Secret Value",
+        "valuePlaceholder": "Enter the API key or secret value"
+      },
+      "list": {
+        "confirmDelete": "Are you sure you want to delete the secret '{{key}}'?",
+        "delete": "Delete",
+        "deleted": "Secret '{{key}}' has been deleted.",
+        "edit": "Edit",
+        "empty": "(empty)",
+        "noSecrets": "No secrets configured. Add API keys and secrets using the button above."
+      },
+      "securityNote": "Important: Your secrets are stored in your Obsidian config folder in plain text. Do not share your vault or config folder with others if you store sensitive API keys here.",
+      "title": "API Keys & Secrets"
     },
     "security": {
       "title": "Security Notice"
     },
     "userTools": {
       "enabled": {
-        "desc": "Allow execution of user-defined tools from Obsidian notes. Tools are created by adding 'ln-tool' tag to note frontmatter with JavaScript code.",
+        "desc": "Allow execution of user-defined tools from Obsidian notes.",
         "name": "Enable User-Defined Tools"
       },
       "list": {
@@ -126,14 +147,14 @@
         },
         "disabled": "User-defined tools are disabled. Enable the feature above to see discovered tools.",
         "noManager": "User tools manager not initialized. Try restarting Obsidian.",
-        "noTools": "No user-defined tools found. Create tools by adding <code>tags: [\"ln-tool\"]</code> to note frontmatter with JSON schema and JavaScript code blocks.",
+        "noTools": "No user-defined tools found. Use Tool Creator mode to create custom tools through chat.",
         "tooltips": {
           "clickToOpen": "Click to open tool file in editor"
         }
       },
       "security": {
-        "title": "Security Warning",
-        "warning": "User-defined tools execute JavaScript code that can access your vault, file system, and make network requests. Only enable this feature if you understand the security implications and trust all tool sources."
+        "title": "Security Notice",
+        "warning": "User-defined tools execute JavaScript code with full access to your vault, file system, and network requests. Each tool requires individual approval before execution. Always review tool code carefully before approving, and only approve tools from trusted sources."
       },
       "securityWarning": "⚠️ SECURITY WARNING ⚠️\n\nUser-defined tools execute JavaScript code with full access to:\n• Your entire Obsidian vault\n• Local file system\n• Network requests\n• System resources\n\nThis can be dangerous if you run untrusted code.\n\nOnly enable this if you:\n• Understand JavaScript security risks\n• Will only run tools you trust\n• Review all tool code before approval\n\nDo you want to enable user-defined tools?",
       "title": "User-Defined Tools"
@@ -175,9 +196,6 @@
         "completed": "Edited todo {{task}}",
         "failed": "Failed to edit todo {{task}}",
         "inProgress": "Editing todo {{task}}..."
-      },
-      "generateImage": {
-        "failed": "Failed to generate image {{path}}"
       },
       "move": {
         "failed": "Failed to move todo {{task}}",
@@ -221,50 +239,6 @@
     },
     "createNewMode": "Create New Mode",
     "createStarterKit": "Create Starter Kit",
-    "deepResearch": {
-      "errors": {
-        "aborted": "Research operation was cancelled by user",
-        "emptyPath": "File path cannot be empty",
-        "emptyQuery": "Research query cannot be empty",
-        "general": "Error conducting deep research: {{error}}",
-        "libraryLoad": "Failed to load Firecrawl library",
-        "noApiKey": "Firecrawl API Key not set. Please configure it in settings for deep research functionality.",
-        "noResults": "No relevant information found for the given query.",
-        "quotaExceeded": "Firecrawl API quota exceeded. Please check your billing and usage limits.",
-        "timeout": "Research request timed out. Please try with a more specific query.",
-        "unknownError": "Unknown error occurred during research"
-      },
-      "headers": {
-        "analysis": "Research Analysis",
-        "metadata": "Research Metadata",
-        "results": "Deep Research Results",
-        "sources": "Sources"
-      },
-      "inProgress": "Researching {{topic}}...",
-      "label": "Deep Research",
-      "labels": {
-        "completed": "Completed",
-        "maxDepth": "Max Depth",
-        "maxUrls": "Max URLs",
-        "query": "Query",
-        "source": "Source",
-        "sourcesFound": "Sources Found",
-        "timeout": "Timeout",
-        "url": "URL"
-      },
-      "progress": {
-        "loading": "Loading Firecrawl library...",
-        "processing": "Processing research results...",
-        "saving": "Saving research report...",
-        "starting": "Starting deep research for: \"{{query}}\"",
-        "validating": "Validating research parameters..."
-      },
-      "result": {
-        "message": "Successfully conducted deep research on \"{{query}}\" and saved report to {{path}}. Research included {{sourceCount}} sources with {{maxDepth}} depth iterations.",
-        "navigationDescription": "Open research report"
-      },
-      "success": "Deep research completed successfully"
-    },
     "edit": {
       "label": "Edit Todo"
     },
@@ -275,29 +249,6 @@
       "inProgress": "Finding files with tag {{tag}}...",
       "label": "Find Files by Tag",
       "noResults": "No files found with tag {{tag}}"
-    },
-    "generateImage": {
-      "errors": {
-        "aborted": "Image generation was cancelled by user",
-        "emptyPath": "Image path cannot be empty",
-        "emptyPrompt": "Image prompt cannot be empty",
-        "fileExists": "File already exists at {{path}}. Please choose a different path or delete the existing file.",
-        "general": "Error generating image: {{error}}",
-        "invalidRequest": "Invalid request to OpenAI API: {{error}}",
-        "noApiKey": "OpenAI API Key not set. Please configure it in settings for image generation.",
-        "noBase64Data": "Invalid image data format received from OpenAI API",
-        "noImageData": "No image data received from OpenAI API",
-        "quotaExceeded": "OpenAI API quota exceeded. Please check your billing and usage limits."
-      },
-      "generating": "Generating image for {{path}}...",
-      "label": "Generate Image",
-      "openImage": "Open generated image",
-      "progress": {
-        "generatingWithModel": "Generating image with GPT-4o: \"{{prompt}}\"",
-        "processing": "Processing generated image...",
-        "saving": "Saving image to vault..."
-      },
-      "success": "Successfully created image at {{path}}"
     },
     "handover": {
       "completed": "Switched to {{mode}} mode",

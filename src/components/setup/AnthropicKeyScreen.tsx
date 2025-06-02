@@ -21,7 +21,7 @@ export const AnthropicKeyScreen: React.FC<AnthropicKeyScreenProps> = ({
 		setIsConfiguring(true);
 		try {
 			const settings = getPluginSettings();
-			settings.anthropicApiKey = apiKey.trim();
+			settings.setSecret('ANTHROPIC_API_KEY', apiKey.trim());
 			await settings.saveSettings();
 			onKeyConfigured();
 		} catch (error) {

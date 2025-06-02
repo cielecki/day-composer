@@ -93,30 +93,52 @@
     "advanced": {
       "title": "Ustawienia zaawansowane"
     },
-    "apiKeys": {
-      "anthropic": "Klucz API Anthropic",
-      "anthropicDesc": "Twój klucz API Anthropic dla głównej funkcjonalności asystenta AI. Uzyskaj go z <a href='https://console.anthropic.com/settings/keys'>Konsoli Anthropic</a>.",
-      "enterAnthropicKey": "Wprowadź swój klucz API Anthropic",
-      "enterFirecrawlKey": "Wprowadź swój klucz API Firecrawl",
-      "enterOpenAIKey": "Wprowadź swój klucz API OpenAI",
-      "firecrawl": "Klucz API Firecrawl",
-      "firecrawlDesc": "Twój klucz API Firecrawl dla funkcjonalności głębokich badań. Uzyskaj go z <a href='https://firecrawl.dev/'>Panelu Firecrawl</a>.",
-      "openai": "Klucz API OpenAI",
-      "openaiDesc": "Twój klucz API OpenAI dla funkcjonalności zamiany tekstu na mowę. Uzyskaj go z <a href='https://platform.openai.com/api-keys'>Platformy OpenAI</a>.",
-      "securityNote": "Ważne: Twój klucz API jest przechowywany w folderze konfiguracyjnym Obsidian. Nie udostępniaj swojego vault'a ani folderu konfiguracyjnego innym, jeśli przechowujesz tutaj swój klucz API.",
-      "title": "Klucze API"
-    },
     "prompts": {
       "defaultPrompt": "# Domena\nKomunikat lub komenda głosowa wydawana przez użytkownika asystentowi AI.\n\n# Przykłady\n- Odfajcz zadanie ... eeee ... wyrzuciłem śmieci\n- Zrobiłem kolację\n- Dodaj na jutro, żebym pamiętał o odezwaniu się do Jana.\n\n# Słowniczek\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nPoczątek transkrypcji:",
       "speechToTextPrompt": "Prompt dla zamiany mowy na tekst",
       "speechToTextPromptDesc": "Prompt, który zostanie wysłany do silnika zamiany mowy na tekst. Dostarcza kontekstu dla modelu AI. Możesz użyć <a href='https://github.com/cielecki/life-navigator/blob/main/docs/link-expansion.md'>rozszerzania linków</a>."
     },
+    "secrets": {
+      "addNew": {
+        "button": "Dodaj Sekret",
+        "desc": "Dodaj nowy klucz API lub sekret",
+        "name": "Dodaj Nowy Sekret"
+      },
+      "description": "Zarządzaj kluczami API i sekretami dla narzędzi zdefiniowanych przez użytkownika. Są przechowywane jako pary klucz-wartość dla elastycznego użycia.",
+      "dialog": {
+        "addTitle": "Dodaj Nowy Sekret",
+        "cancel": "Anuluj",
+        "editTitle": "Edytuj Sekret: {{key}}",
+        "errors": {
+          "emptyKey": "Nazwa sekretu nie może być pusta.",
+          "keyExists": "Sekret '{{key}}' już istnieje. Czy chcesz go nadpisać?"
+        },
+        "keyLabel": "Nazwa Sekretu",
+        "keyPlaceholder": "np. OPENAI_API_KEY, ANTHROPIC_API_KEY, FIRECRAWL_API_KEY",
+        "save": "Zapisz",
+        "saved": "Sekret '{{key}}' został zapisany.",
+        "updated": "Sekret '{{key}}' został zaktualizowany.",
+        "valueLabel": "Wartość Sekretu",
+        "valuePlaceholder": "Wprowadź klucz API lub wartość sekretu"
+      },
+      "list": {
+        "confirmDelete": "Czy na pewno chcesz usunąć sekret '{{key}}'?",
+        "delete": "Usuń",
+        "deleted": "Sekret '{{key}}' został usunięty.",
+        "edit": "Edytuj",
+        "empty": "(pusty)",
+        "noSecrets": "Brak skonfigurowanych sekretów. Dodaj klucze API i sekrety używając przycisku powyżej."
+      },
+      "securityNote": "Ważne: Twoje sekrety są przechowywane w folderze konfiguracyjnym Obsidian w postaci zwykłego tekstu. Nie udostępniaj swojego vault'a ani folderu konfiguracyjnego innym, jeśli przechowujesz tutaj wrażliwe klucze API.",
+      "title": "Klucze API i Sekrety"
+    },
     "security": {
-      "title": "Informacja o bezpieczeństwie"
+      "title": "Informacja o Bezpieczeństwie",
+      "warning": "Narzędzia zdefiniowane przez użytkownika wykonują kod JavaScript który może uzyskać dostęp do twojego vault'a, systemu plików i wykonywać żądania sieciowe. Każde narzędzie wymaga indywidualnego zatwierdzenia przed wykonaniem. Zawsze dokładnie sprawdzaj kod narzędzia przed zatwierdzeniem i zatwierdź tylko narzędzia z zaufanych źródeł."
     },
     "userTools": {
       "enabled": {
-        "desc": "Zezwalaj na wykonywanie narzędzi zdefiniowanych przez użytkownika z notatek Obsidian. Narzędzia tworzy się dodając tag 'ln-tool' do metadanych notatki z kodem JavaScript.",
+        "desc": "Zezwalaj na wykonywanie narzędzi zdefiniowanych przez użytkownika z notatek Obsidian.",
         "name": "Włącz Narzędzia Zdefiniowane przez Użytkownika"
       },
       "list": {
@@ -126,14 +148,14 @@
         },
         "disabled": "Narzędzia zdefiniowane przez użytkownika są wyłączone. Włącz funkcję powyżej, aby zobaczyć odkryte narzędzia.",
         "noManager": "Menedżer narzędzi użytkownika nie został zainicjowany. Spróbuj uruchomić ponownie Obsidian.",
-        "noTools": "Nie znaleziono narzędzi zdefiniowanych przez użytkownika. Utwórz narzędzia dodając <code>tags: [\"ln-tool\"]</code> do metadanych notatki z blokami schemy JSON i kodu JavaScript.",
+        "noTools": "Nie znaleziono narzędzi zdefiniowanych przez użytkownika. Użyj trybu Tool Creator, aby tworzyć niestandardowe narzędzia poprzez rozmowę.",
         "tooltips": {
           "clickToOpen": "Kliknij aby otworzyć plik narzędzia w edytorze"
         }
       },
       "security": {
         "title": "Ostrzeżenie Bezpieczeństwa",
-        "warning": "Narzędzia zdefiniowane przez użytkownika wykonują kod JavaScript który może uzyskać dostęp do twojego vault'a, systemu plików i wykonywać żądania sieciowe. Włączaj tę funkcję tylko jeśli rozumiesz implikacje bezpieczeństwa i ufasz wszystkim źródłom narzędzi."
+        "warning": "Narzędzia zdefiniowane przez użytkownika wykonują kod JavaScript który może uzyskać dostęp do twojego vault'a, systemu plików i wykonywać żądania sieciowe. Każde narzędzie wymaga indywidualnego zatwierdzenia przed wykonaniem. Zawsze dokładnie sprawdzaj kod narzędzia przed zatwierdzeniem i zatwierdź tylko narzędzia z zaufanych źródeł."
       },
       "securityWarning": "⚠️ OSTRZEŻENIE BEZPIECZEŃSTWA ⚠️\n\nNarzędzia zdefiniowane przez użytkownika wykonują kod JavaScript z pełnym dostępem do:\n• Całego twojego vault'a Obsidian\n• Lokalnego systemu plików\n• Żądań sieciowych\n• Zasobów systemowych\n\nMoże to być niebezpieczne jeśli uruchomisz niezaufany kod.\n\nWłączaj to tylko jeśli:\n• Rozumiesz zagrożenia bezpieczeństwa JavaScript\n• Będziesz uruchamiać tylko zaufane narzędzia\n• Przejrzysz cały kod narzędzi przed zatwierdzeniem\n\nCzy chcesz włączyć narzędzia zdefiniowane przez użytkownika?",
       "title": "Narzędzia Zdefiniowane przez Użytkownika"
@@ -175,9 +197,6 @@
         "completed": "Edytowano todo {{task}}",
         "failed": "Nie udało się edytować todo {{task}}",
         "inProgress": "Edytowanie todo {{task}}..."
-      },
-      "generateImage": {
-        "failed": "Nie udało się wygenerować obrazu {{path}}"
       },
       "move": {
         "failed": "Nie udało się przenieść todo {{task}}",
@@ -221,50 +240,6 @@
     },
     "createNewMode": "Utwórz nowy tryb",
     "createStarterKit": "Utwórz pakiet startowy",
-    "deepResearch": {
-      "errors": {
-        "aborted": "Operacja badawcza została anulowana przez użytkownika",
-        "emptyPath": "Ścieżka pliku nie może być pusta",
-        "emptyQuery": "Zapytanie badawcze nie może być puste",
-        "general": "Błąd podczas przeprowadzania głębokiego badania: {{error}}",
-        "libraryLoad": "Nie udało się załadować biblioteki Firecrawl",
-        "noApiKey": "Klucz API Firecrawl nie jest ustawiony. Skonfiguruj go w ustawieniach dla funkcji głębokiego badania.",
-        "noResults": "Nie znaleziono odpowiednich informacji dla podanego zapytania.",
-        "quotaExceeded": "Przekroczono limit API Firecrawl. Sprawdź swoje limity rozliczeniowe i użycia.",
-        "timeout": "Żądanie badawcze przekroczyło limit czasu. Spróbuj z bardziej konkretnym zapytaniem.",
-        "unknownError": "Wystąpił nieznany błąd podczas badania"
-      },
-      "headers": {
-        "analysis": "Analiza Badawcza",
-        "metadata": "Metadane Badania",
-        "results": "Wyniki Głębokiego Badania",
-        "sources": "Źródła"
-      },
-      "inProgress": "Badanie {{topic}}...",
-      "label": "Głębokie Badanie",
-      "labels": {
-        "completed": "Ukończone",
-        "maxDepth": "Maks. Głębokość",
-        "maxUrls": "Maks. URL-e",
-        "query": "Zapytanie",
-        "source": "Źródło",
-        "sourcesFound": "Znalezione Źródła",
-        "timeout": "Limit Czasu",
-        "url": "URL"
-      },
-      "progress": {
-        "loading": "Ładowanie biblioteki Firecrawl...",
-        "processing": "Przetwarzanie wyników badania...",
-        "saving": "Zapisywanie raportu badawczego...",
-        "starting": "Rozpoczynanie głębokiego badania dla: \"{{query}}\"",
-        "validating": "Walidacja parametrów badania..."
-      },
-      "result": {
-        "message": "Pomyślnie przeprowadzono głębokie badanie na \"{{query}}\" i zapisano raport do {{path}}. Badanie obejmowało {{sourceCount}} źródeł z {{maxDepth}} iteracjami głębokości.",
-        "navigationDescription": "Otwórz raport badawczy"
-      },
-      "success": "Głębokie badanie ukończone pomyślnie"
-    },
     "edit": {
       "label": "Edytuj Todo"
     },
@@ -275,29 +250,6 @@
       "inProgress": "Wyszukiwanie plików z tagiem {{tag}}...",
       "label": "Znajdź Pliki po Tagu",
       "noResults": "Nie znaleziono plików z tagiem {{tag}}"
-    },
-    "generateImage": {
-      "errors": {
-        "aborted": "Generowanie obrazu zostało anulowane przez użytkownika",
-        "emptyPath": "Ścieżka obrazu nie może być pusta",
-        "emptyPrompt": "Prompt obrazu nie może być pusty",
-        "fileExists": "Plik już istnieje w {{path}}. Wybierz inną ścieżkę lub usuń istniejący plik.",
-        "general": "Błąd generowania obrazu: {{error}}",
-        "invalidRequest": "Nieprawidłowe żądanie do API OpenAI: {{error}}",
-        "noApiKey": "Klucz API OpenAI nie jest ustawiony. Skonfiguruj go w ustawieniach dla generowania obrazów.",
-        "noBase64Data": "Nieprawidłowy format danych obrazu otrzymany z API OpenAI",
-        "noImageData": "Nie otrzymano danych obrazu z API OpenAI",
-        "quotaExceeded": "Przekroczono limit API OpenAI. Sprawdź swoje limity rozliczeniowe i użycia."
-      },
-      "generating": "Generowanie obrazu dla {{path}}...",
-      "label": "Generuj Obraz",
-      "openImage": "Otwórz wygenerowany obraz",
-      "progress": {
-        "generatingWithModel": "Generowanie obrazu z GPT-4o: \"{{prompt}}\"",
-        "processing": "Przetwarzanie wygenerowanego obrazu...",
-        "saving": "Zapisywanie obrazu do vault'a..."
-      },
-      "success": "Pomyślnie utworzono obraz w {{path}}"
     },
     "handover": {
       "completed": "Przełączono na tryb {{mode}}",

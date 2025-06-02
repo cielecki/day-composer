@@ -21,7 +21,7 @@ export async function generateConversationTitle(
     // Try AI-generated title first
     try {
         const settings = getPluginSettings();
-        if (settings.anthropicApiKey && assistantMessage) {
+        if (settings.getSecret('ANTHROPIC_API_KEY') && assistantMessage) {
             const aiTitle = await generateAITitle(userMessage, assistantMessage, mode);
             if (aiTitle) return aiTitle;
         }

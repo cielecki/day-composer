@@ -2,6 +2,7 @@
 tags: ["ln-tool"]
 ln-tool-name: "Template Tool"
 ln-tool-description: "A basic template for creating your own custom tools"
+ln-tool-version: "1.0.0"
 ln-tool-icon: "wrench"
 ln-tool-icon-color: "#6B7280"
 ln-tool-enabled: true

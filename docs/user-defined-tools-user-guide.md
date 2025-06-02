@@ -43,6 +43,7 @@ A user-defined tool is an Obsidian note with three main sections:
 tags: ["ln-tool"]
 ln-tool-name: "My Custom Tool"
 ln-tool-description: "What this tool does"
+ln-tool-version: "1.0.0"
 ln-tool-icon: "gear"  # Lucide icon name
 ln-tool-icon-color: "#4caf50"  # Hex color code
 ln-tool-enabled: true

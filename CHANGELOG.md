@@ -8,16 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **User-Defined Tools**: Introduced comprehensive system for creating custom tools from Obsidian notes. Users can create tools by adding `ln-tool` tag to note frontmatter with JSON schema and JavaScript implementation. Includes security approval system, sandboxed execution, and example tools for YouTube transcript downloads and weather reports. Feature is disabled by default with clear security warnings.
+- **User-Defined Tools**: Introduced comprehensive system for creating custom tools from Obsidian notes. Users can create tools by adding `ln-tool` tag to note frontmatter with JSON schema and JavaScript implementation. Includes security approval system, sandboxed execution, and example tools for YouTube transcript downloads and weather reports. Feature is disabled by default with clear security warnings. Converted deep research functionality to user-defined tool using direct Firecrawl API requests instead of external dependencies. Converted image generation functionality to user-defined tool using direct OpenAI API requests instead of external dependencies.
+- **Generic Secrets Management**: Replaced specific API key fields with flexible secrets system allowing any key-value pairs. Includes UI for adding/editing/deleting secrets with automatic migration from old API keys. Updated to use industry-standard environment variable naming conventions (OPENAI_API_KEY, ANTHROPIC_API_KEY, FIRECRAWL_API_KEY) for better compatibility with other tools and development environments. Added global `getSecret()` function available to all user-defined tools for secure access to API keys and secrets.
 - **Security Approval System**: Added security approval system for user-defined tools with code verification and persistent approvals.
 - **Three Example User-Defined Tools**: Added three example user-defined tools: YouTube Transcript Tool, Weather Tool, and Template Tool.
-- **Tool Creator AI Mode**: Added **Tool Creator** mode for specialized assistance in building user-defined tools.
+- **Tool Creator AI Mode**: Added **Tool Creator** mode for specialized assistance in building user-defined tools with comprehensive guidance and examples.
 - **Example User-Defined Tools in Starter Kit**: Example user-defined tools now included in starter kit instead of requiring commands to create.
 - **Shift-Click Tool Block Expansion**: Tool blocks with navigation targets can now be expanded/folded using shift-click without triggering navigation, providing better control over content visibility while preserving normal click-to-navigate behavior.
 
+### Changed
+- **API Key Storage**: Migrated from specific API key fields (openAIApiKey, anthropicApiKey, firecrawlApiKey) to generic secrets system with backward compatibility.
+
 ### Removed
 - **Built-in YouTube Transcript Tool**: Removed the built-in `download_youtube_transcript` tool in favor of the user-defined YouTube transcript tool available in the starter kit. This simplifies the codebase while maintaining functionality through the more flexible user-defined tool system.
-
+- **Built-in Image Generation Tool**: Removed the built-in `generate_image` tool in favor of the user-defined image generation tool available in the starter kit. The new tool uses direct API requests instead of external dependencies, simplifying the codebase while maintaining full functionality.
+- **Built-in Deep Research Tool**: Removed the built-in `deep_research` tool in favor of the user-defined deep research tool available in the starter kit. The new tool uses direct API requests instead of external dependencies, simplifying the codebase while maintaining full functionality.
+- **Firecrawl SDK Dependency**: Removed `@mendable/firecrawl-js` package dependency as deep research functionality now uses direct API requests, reducing bundle size and external dependencies.
 
 ## [0.9.3] - 2025-06-02
 
@@ -154,3 +160,4 @@ change: enforce thinking in claude, as it's needed for handover to work
 - Standardized naming from "Starter Pack" to "Starter Kit" throughout the codebase for consistency
 
 ## [0.6.6] - 2025-05-22
+

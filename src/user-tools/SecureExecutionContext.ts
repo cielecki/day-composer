@@ -2,6 +2,7 @@ import { ToolExecutionError } from '../utils/tools/tool-execution-error';
 import { UserToolExecutionContext } from './types';
 import { createHash } from 'crypto';
 import { requestUrl } from 'obsidian';
+import { getPluginSettings } from '../settings/PluginSettings';
 
 export class SecureExecutionContext {
   private allowedAPIs: Set<string>;
@@ -19,6 +20,8 @@ export class SecureExecutionContext {
       'console.warn',
       'console.error',
       'requestUrl',
+      'getSecret',
+      'setSecret',
       'Date',
       'JSON',
       'Math',
@@ -35,6 +38,25 @@ export class SecureExecutionContext {
         error: (...args: any[]) => console.error('[USER-TOOL]', ...args)
       },
       requestUrl,
+      getSecret: (key: string) => {
+        try {
+          const settings = getPluginSettings();
+          return settings.getSecret(key);
+        } catch (error) {
+          console.warn('[USER-TOOL] Failed to get secret:', error);
+          return undefined;
+        }
+      },
+      setSecret: (key: string, value: string) => {
+        try {
+          const settings = getPluginSettings();
+          settings.setSecret(key, value);
+          return true;
+        } catch (error) {
+          console.warn('[USER-TOOL] Failed to set secret:', error);
+          return false;
+        }
+      },
       Date,
       JSON,
       Math,
@@ -97,6 +119,8 @@ export class SecureExecutionContext {
       // Declare safe globals
       const console = globals.console;
       const requestUrl = globals.requestUrl;
+      const getSecret = globals.getSecret;
+      const setSecret = globals.setSecret;
       const Date = globals.Date;
       const JSON = globals.JSON;
       const Math = globals.Math;

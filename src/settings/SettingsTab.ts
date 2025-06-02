@@ -1,11 +1,12 @@
 import MyPlugin from '../main';
-import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
+import { App, PluginSettingTab, Setting, Notice, Modal } from 'obsidian';
 import { getPluginSettings } from "./PluginSettings";
 import { t } from '../i18n';
 
 export class SampleSettingTab extends PluginSettingTab {
 	plugin: MyPlugin;
 	userToolsContainer: HTMLElement;
+	secretsContainer: HTMLElement;
 
 	constructor(app: App, plugin: MyPlugin) {
 		super(app, plugin);
@@ -19,73 +20,42 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		const settings = getPluginSettings();
 
-		// API Keys section
-		containerEl.createEl('h2', {text: t('settings.apiKeys.title')});
-
-		// Anthropic API Key setting
-		new Setting(containerEl)
-			.setName(t('settings.apiKeys.anthropic'))
-			.addText(text => {
-				text.setPlaceholder(t('settings.apiKeys.enterAnthropicKey'))
-					.setValue(settings.anthropicApiKey)
-					.onChange(async (value) => {
-						settings.anthropicApiKey = value;
-						await settings.saveSettings();
-					});
-				text.inputEl.type = 'password';
-			});
-
-		// Set HTML description to enable the link
-		const anthropicDesc = containerEl.querySelector('.setting-item:last-child .setting-item-description') as HTMLElement;
-		if (anthropicDesc) {
-			anthropicDesc.innerHTML = t('settings.apiKeys.anthropicDesc');
-		}
-
-		// OpenAI API Key setting
-		new Setting(containerEl)
-			.setName(t('settings.apiKeys.openai'))
-			.addText(text => {
-				text.setPlaceholder(t('settings.apiKeys.enterOpenAIKey'))
-					.setValue(settings.openAIApiKey)
-					.onChange(async (value) => {
-						settings.openAIApiKey = value;
-						await settings.saveSettings();
-					});
-				text.inputEl.type = 'password';
-			});
-
-		// Set HTML description to enable the link
-		const openaiDesc = containerEl.querySelector('.setting-item:last-child .setting-item-description') as HTMLElement;
-		if (openaiDesc) {
-			openaiDesc.innerHTML = t('settings.apiKeys.openaiDesc');
-		}
-
-		// Firecrawl API Key setting
-		new Setting(containerEl)
-			.setName(t('settings.apiKeys.firecrawl'))
-			.addText(text => {
-				text.setPlaceholder(t('settings.apiKeys.enterFirecrawlKey'))
-					.setValue(settings.firecrawlApiKey)
-					.onChange(async (value) => {
-						settings.firecrawlApiKey = value;
-						await settings.saveSettings();
-					});
-				text.inputEl.type = 'password';
-			});
-
-		// Set HTML description to enable the link
-		const firecrawlDesc = containerEl.querySelector('.setting-item:last-child .setting-item-description') as HTMLElement;
-		if (firecrawlDesc) {
-			firecrawlDesc.innerHTML = t('settings.apiKeys.firecrawlDesc');
-		}
-
-		// Security note for API keys
-		const securityNoteEl = containerEl.createEl('div', { 
-			cls: 'setting-item-description',
-			attr: { style: 'margin-top: 2em; padding: 1em; background: var(--background-secondary); border-radius: 6px; color: var(--text-warning);' }
+		// API Keys & Secrets section header with add button
+		const secretsHeaderContainer = containerEl.createEl('div', {
+			attr: { style: 'display: flex; align-items: center; justify-content: space-between; margin-bottom: 0;' }
+		});
+		
+		secretsHeaderContainer.createEl('h2', {text: t('settings.secrets.title')});
+		
+		// Add new secret button - plain button, right-aligned
+		const addSecretBtn = secretsHeaderContainer.createEl('button', {
+			text: t('settings.secrets.addNew.button'),
+			attr: { style: 'padding: 4px 12px; font-size: 13px;' }
+		});
+		addSecretBtn.addEventListener('click', () => {
+			this.showAddSecretDialog();
 		});
 
-		securityNoteEl.innerHTML = `<strong>⚠️ ${t('settings.security.title')}</strong><br>${t('settings.apiKeys.securityNote')}`;
+		// Description for secrets system
+		const secretsDescEl = containerEl.createEl('div', { 
+			cls: 'setting-item-description',
+			attr: { style: 'margin-bottom: 1em; padding-top: 1em; color: var(--text-muted); border-top: 1px solid var(--background-modifier-border);' }
+		});
+		secretsDescEl.innerHTML = t('settings.secrets.description');
+
+		// Container for secrets list
+		this.secretsContainer = containerEl.createEl('div', {cls: 'secrets-container'});
+
+		// Initial load of secrets display
+		await this.refreshSecretsDisplay();
+
+		// Security note for secrets
+		const securityNoteEl = containerEl.createEl('div', { 
+			cls: 'setting-item-description',
+			attr: { style: 'margin-top: 1em; padding: 1em; background: var(--background-secondary); border-radius: 6px; color: var(--text-warning);' }
+		});
+
+		securityNoteEl.innerHTML = `<strong>⚠️ ${t('settings.security.title')}</strong><br>${t('settings.secrets.securityNote')}`;
 
 		// Life Navigator Actions section
 		containerEl.createEl('h2', {text: t('settings.actions.title'), attr: { style: 'margin-top: 2em;' } });
@@ -201,34 +171,7 @@ export class SampleSettingTab extends PluginSettingTab {
 		promptDesc.descEl.innerHTML = t('settings.prompts.speechToTextPromptDesc');
 
 		// User-Defined Tools section (moved to bottom)
-		containerEl.createEl('h2', {text: t('settings.userTools.title'), attr: { style: 'margin-top: 2em;' } });
-
-		// User-defined tools toggle
-		const userToolsSetting = new Setting(containerEl)
-			.setName(t('settings.userTools.enabled.name'))
-			.setDesc(t('settings.userTools.enabled.desc'))
-			.addToggle(toggle => toggle
-				.setValue(settings.userDefinedToolsEnabled)
-				.onChange(async (value) => {
-					if (value) {
-						// Show security warning when enabling
-						const confirmed = confirm(t('settings.userTools.securityWarning'));
-						if (!confirmed) {
-							toggle.setValue(false);
-							return;
-						}
-					}
-					settings.userDefinedToolsEnabled = value;
-					await settings.saveSettings();
-					
-					// Refresh the tools display
-					await this.refreshUserToolsDisplay();
-					
-					// Initialize or cleanup user tools manager
-					if (value && this.plugin.userToolManager) {
-						await this.plugin.userToolManager.initialize();
-					}
-				}));
+		containerEl.createEl('h2', {text: t('settings.userTools.title'), attr: { style: 'margin: 0; margin-top: 2em; border-bottom: 1px solid var(--background-modifier-border); padding-bottom: 1em;' } });
 
 		// Container for discovered tools (will be populated dynamically)
 		this.userToolsContainer = containerEl.createEl('div', {cls: 'user-tools-container'});
@@ -244,21 +187,110 @@ export class SampleSettingTab extends PluginSettingTab {
 		securityWarningEl.innerHTML = `<strong>⚠️ ${t('settings.userTools.security.title')}</strong><br>${t('settings.userTools.security.warning')}`;
 	}
 
+	async refreshSecretsDisplay(): Promise<void> {
+		this.secretsContainer.empty();
+
+		const settings = getPluginSettings();
+		const secretKeys = settings.getSecretKeys();
+
+		if (secretKeys.length === 0) {
+			const noSecretsMsg = this.secretsContainer.createEl('div', {
+				cls: 'setting-item-description',
+				attr: { style: 'margin-top: 1em; color: var(--text-muted); font-style: italic;' }
+			});
+			noSecretsMsg.textContent = t('settings.secrets.list.noSecrets');
+			return;
+		}
+
+		// Display each secret with controls
+		for (const key of secretKeys) {
+			const value = settings.getSecret(key);
+			
+			const secretContainer = this.secretsContainer.createEl('div', {
+				cls: 'setting-item',
+				attr: { style: 'border: 1px solid var(--background-modifier-border); border-radius: 6px; padding: 12px; margin: 8px 0;' }
+			});
+
+			// Secret header with key name
+			const secretHeader = secretContainer.createEl('div', {
+				attr: { style: 'display: flex; flex-grow: 1; align-items: center; justify-content: space-between;' }
+			});
+
+			// Secret info on the left
+			const secretInfo = secretHeader.createEl('div', {
+				attr: { style: 'display: flex; align-items: center; gap: 8px;' }
+			});
+
+			// Secret name
+			const nameEl = secretInfo.createEl('div');
+			nameEl.createEl('strong', { 
+				text: key,
+			});
+
+			// Controls on the right - moved to container level like user tools
+			const controlsEl = secretContainer.createEl('div', {
+				attr: { style: 'display: flex; gap: 8px; align-items: center; justify-content: flex-end;' }
+			});
+
+			// Edit button
+			const editBtn = controlsEl.createEl('div', {
+				cls: 'clickable-icon',
+				attr: { 
+					'aria-label': t('settings.secrets.list.edit'),
+					'title': t('settings.secrets.list.edit')
+				}
+			});
+			editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="m18.5 2.5 3 3L12 15l-4 1 1-4Z"/></svg>`;
+			editBtn.addEventListener('click', () => {
+				this.showEditSecretDialog(key, value || '');
+			});
+
+			// Delete button
+			const deleteBtn = controlsEl.createEl('div', {
+				cls: 'clickable-icon',
+				attr: { 
+					'aria-label': t('settings.secrets.list.delete'),
+					'title': t('settings.secrets.list.delete')
+				}
+			});
+			deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c0 1 1 2 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`;
+			deleteBtn.addEventListener('click', async () => {
+				const confirmed = confirm(t('settings.secrets.list.confirmDelete', { key }));
+				if (confirmed) {
+					settings.removeSecret(key);
+					await settings.saveSettings();
+					await this.refreshSecretsDisplay();
+					new Notice(t('settings.secrets.list.deleted', { key }));
+				}
+			});
+		}
+	}
+
+	showAddSecretDialog(): void {
+		const modal = new AddSecretModal(this.app, (key, value) => {
+			const settings = getPluginSettings();
+			settings.setSecret(key, value);
+			settings.saveSettings();
+			this.refreshSecretsDisplay();
+		});
+		modal.open();
+	}
+
+	showEditSecretDialog(key: string, currentValue: string): void {
+		const modal = new EditSecretModal(this.app, key, currentValue, (value) => {
+			const settings = getPluginSettings();
+			settings.setSecret(key, value);
+			settings.saveSettings();
+			this.refreshSecretsDisplay();
+		});
+		modal.open();
+	}
+
 	async refreshUserToolsDisplay(): Promise<void> {
 		this.userToolsContainer.empty();
 
 		const settings = getPluginSettings();
 		
-		// If user-defined tools are disabled, show message
-		if (!settings.userDefinedToolsEnabled) {
-			const disabledMsg = this.userToolsContainer.createEl('div', {
-				cls: 'setting-item-description',
-				attr: { style: 'margin-top: 1em; color: var(--text-muted); font-style: italic;' }
-			});
-			disabledMsg.textContent = t('settings.userTools.list.disabled');
-			return;
-		}
-
 		// If no user tools manager, show error
 		if (!this.plugin.userToolManager) {
 			const errorMsg = this.userToolsContainer.createEl('div', {
@@ -400,5 +432,147 @@ export class SampleSettingTab extends PluginSettingTab {
 				}
 			});
 		}
+	}
+}
+
+class AddSecretModal extends Modal {
+	private onResult: (key: string, value: string) => void;
+
+	constructor(app: App, onResult: (key: string, value: string) => void) {
+		super(app);
+		this.onResult = onResult;
+	}
+
+	onOpen() {
+		const { contentEl } = this;
+		contentEl.empty();
+		contentEl.addClass('secret-modal');
+
+		const title = contentEl.createEl('h3', { text: t('settings.secrets.dialog.addTitle') });
+		title.style.marginBottom = '16px';
+
+		// Key input
+		const keyLabel = contentEl.createEl('label', { text: t('settings.secrets.dialog.keyLabel') });
+		keyLabel.style.cssText = 'display: block; margin-bottom: 4px; font-weight: bold;';
+
+		const keyInput = contentEl.createEl('input', { type: 'text' });
+		keyInput.placeholder = t('settings.secrets.dialog.keyPlaceholder');
+		keyInput.style.cssText = 'width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid var(--background-modifier-border); border-radius: 4px; background: var(--background-primary); color: var(--text-normal); box-sizing: border-box;';
+
+		// Value input
+		const valueLabel = contentEl.createEl('label', { text: t('settings.secrets.dialog.valueLabel') });
+		valueLabel.style.cssText = 'display: block; margin-bottom: 4px; font-weight: bold;';
+
+		const valueInput = contentEl.createEl('input', { type: 'text' });
+		valueInput.placeholder = t('settings.secrets.dialog.valuePlaceholder');
+		valueInput.style.cssText = 'width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid var(--background-modifier-border); border-radius: 4px; background: var(--background-primary); color: var(--text-normal); box-sizing: border-box;';
+
+		// Buttons
+		const buttonsEl = contentEl.createEl('div');
+		buttonsEl.style.cssText = 'display: flex; gap: 8px; justify-content: flex-end;';
+
+		const cancelBtn = buttonsEl.createEl('button', { text: t('settings.secrets.dialog.cancel') });
+		cancelBtn.onclick = () => this.close();
+
+		const saveBtn = buttonsEl.createEl('button', { text: t('settings.secrets.dialog.save') });
+		saveBtn.className = 'mod-cta';
+		saveBtn.onclick = async () => {
+			const key = keyInput.value.trim();
+			const value = valueInput.value;
+
+			if (!key) {
+				new Notice(t('settings.secrets.dialog.errors.emptyKey'));
+				return;
+			}
+
+			const settings = getPluginSettings();
+			if (settings.getSecret(key)) {
+				const confirmed = confirm(t('settings.secrets.dialog.errors.keyExists', { key }));
+				if (!confirmed) return;
+			}
+
+			this.onResult(key, value);
+			this.close();
+		};
+
+		// Focus the first input
+		setTimeout(() => keyInput.focus(), 10);
+
+		// Handle Enter key on inputs
+		const handleEnter = (e: KeyboardEvent) => {
+			if (e.key === 'Enter') {
+				saveBtn.click();
+			}
+		};
+		keyInput.addEventListener('keydown', handleEnter);
+		valueInput.addEventListener('keydown', handleEnter);
+	}
+
+	onClose() {
+		const { contentEl } = this;
+		contentEl.empty();
+	}
+}
+
+class EditSecretModal extends Modal {
+	private key: string;
+	private currentValue: string;
+	private onResult: (value: string) => void;
+
+	constructor(app: App, key: string, currentValue: string, onResult: (value: string) => void) {
+		super(app);
+		this.key = key;
+		this.currentValue = currentValue;
+		this.onResult = onResult;
+	}
+
+	onOpen() {
+		const { contentEl } = this;
+		contentEl.empty();
+		contentEl.addClass('secret-modal');
+
+		const title = contentEl.createEl('h3', { text: t('settings.secrets.dialog.editTitle', { key: this.key }) });
+		title.style.marginBottom = '16px';
+
+		// Value input
+		const valueLabel = contentEl.createEl('label', { text: t('settings.secrets.dialog.valueLabel') });
+		valueLabel.style.cssText = 'display: block; margin-bottom: 4px; font-weight: bold;';
+
+		const valueInput = contentEl.createEl('input', { type: 'text' });
+		valueInput.value = this.currentValue;
+		valueInput.placeholder = t('settings.secrets.dialog.valuePlaceholder');
+		valueInput.style.cssText = 'width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid var(--background-modifier-border); border-radius: 4px; background: var(--background-primary); color: var(--text-normal); box-sizing: border-box;';
+
+		// Buttons
+		const buttonsEl = contentEl.createEl('div');
+		buttonsEl.style.cssText = 'display: flex; gap: 8px; justify-content: flex-end;';
+
+		const cancelBtn = buttonsEl.createEl('button', { text: t('settings.secrets.dialog.cancel') });
+		cancelBtn.onclick = () => this.close();
+
+		const saveBtn = buttonsEl.createEl('button', { text: t('settings.secrets.dialog.save') });
+		saveBtn.className = 'mod-cta';
+		saveBtn.onclick = async () => {
+			this.onResult(valueInput.value);
+			this.close();
+		};
+
+		// Focus and select the input
+		setTimeout(() => {
+			valueInput.focus();
+			valueInput.select();
+		}, 10);
+
+		// Handle Enter key
+		valueInput.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter') {
+				saveBtn.click();
+			}
+		});
+	}
+
+	onClose() {
+		const { contentEl } = this;
+		contentEl.empty();
 	}
 }

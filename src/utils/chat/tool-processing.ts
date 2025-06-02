@@ -24,6 +24,9 @@ export const processToolUseBlocks = async (
 			break;
 		}
 		
+		// Get the tool to access its initial label
+		const tool = await obsidianTools.getToolByName(toolUseBlock.name);
+		
 		// Create initial incomplete result
 		const initialResult: ToolResultBlock = {
 			type: "tool_result",
@@ -31,7 +34,7 @@ export const processToolUseBlocks = async (
 			content: "",
 			is_complete: false,
 			navigation_targets: [],
-			current_label: undefined // Will be set by tool's initial label
+			current_label: tool?.initialLabel // Set to tool's initial label immediately
 		};
 		
 		try {

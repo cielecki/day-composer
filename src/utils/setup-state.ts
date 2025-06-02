@@ -25,8 +25,8 @@ export function getSetupState(lnModes: Record<string, any>): SetupState {
 	
 	const hasLanguageConfigured = settings.tutorial.obsidianLanguageConfigured;
 	const hasModes = Object.keys(lnModes).length > 0;
-	const hasAnthropicKey = Boolean(settings.anthropicApiKey && settings.anthropicApiKey.trim().length > 0);
-	const hasOpenAIKey = Boolean(settings.openAIApiKey && settings.openAIApiKey.trim().length > 0);
+	const hasAnthropicKey = Boolean(settings.getSecret('ANTHROPIC_API_KEY') && settings.getSecret('ANTHROPIC_API_KEY')!.trim().length > 0);
+	const hasOpenAIKey = Boolean(settings.getSecret('OPENAI_API_KEY') && settings.getSecret('OPENAI_API_KEY')!.trim().length > 0);
 	const hasOpenAIConfigured = settings.tutorial.openaiKeyConfigured;
 	
 	let currentStep: SetupStep;

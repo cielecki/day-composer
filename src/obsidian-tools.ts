@@ -12,8 +12,6 @@ import { createCompletedTodoTool } from "./tools/create-completed-todo";
 import { handoverModeTool } from "./tools/handover-mode";
 import { editTodoTool } from "./tools/edit-todo";
 import { removeTodoTool } from "./tools/remove-todo";
-import { generateImageTool } from "./tools/generate-image";
-import { deepResearchTool } from "./tools/deep-research";
 import { listDirectoryTool } from "./tools/list-directory";
 import { findFilesByTagTool } from "./tools/find-files-by-tag";
 import { ToolExecutionError } from "./utils/tools/tool-execution-error";
@@ -88,8 +86,6 @@ export class ObsidianTools {
 		handoverModeTool,
 		editTodoTool,
 		removeTodoTool,
-		generateImageTool,
-		deepResearchTool,
 	];
 
 	constructor(plugin: MyPlugin) {
@@ -97,13 +93,11 @@ export class ObsidianTools {
 	}
 
 	/**
-	 * Ensure user-defined tools are initialized if enabled
+	 * Ensure user-defined tools are initialized
 	 */
 	private async ensureUserDefinedToolsInitialized(): Promise<void> {
-		const settings = getPluginSettings();
-		
-		// Check if user-defined tools are enabled
-		if (settings.userDefinedToolsEnabled && this.plugin.userToolManager) {
+		// Check if user tools manager is available
+		if (this.plugin.userToolManager) {
 			// Check if tools need to be refreshed
 			const userTools = this.plugin.userToolManager.getTools();
 			const hasUserDefinedToolsInRegistry = this.tools.some(tool => 
@@ -119,9 +113,9 @@ export class ObsidianTools {
 				console.log('[USER-TOOLS] Lazy initialization: performing initial tool scan');
 				await this.plugin.userToolManager.refreshTools();
 			}
-		} else if (settings.userDefinedToolsEnabled && !this.plugin.userToolManager) {
-			// User-defined tools are enabled but manager wasn't created, log a warning
-			console.warn('[USER-TOOLS] User-defined tools are enabled but manager not initialized. This should not happen.');
+		} else {
+			// User tools manager not available
+			console.log('[USER-TOOLS] User tool manager not available');
 		}
 	}
 
@@ -260,6 +254,7 @@ export function getObsidianTools(plugin: MyPlugin): ObsidianTools {
 
 	console.log("Initializing ObsidianTools with provided plugin");
 	instance = new ObsidianTools(plugin);
+
 	return instance;
 }
 
