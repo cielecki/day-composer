@@ -103,17 +103,13 @@ export const LifeNavigatorApp: React.FC = () => {
 
 	// Actions
 	const clearChat = usePluginStore(state => state.clearChat);
-	const addMessage = usePluginStore(state => state.addMessage);
-	const setEditingMessage = usePluginStore(state => state.setEditingMessage);
 	const setActiveMode = usePluginStore(state => state.setActiveMode);
 	const resetTTS = usePluginStore(state => state.resetTTS);
 
 	// Use actual store methods instead of placeholder functions
 	const addUserMessage = usePluginStore(state => state.addUserMessage);
-	const editUserMessage = usePluginStore(state => state.editUserMessage);
 	const loadConversation = usePluginStore(state => state.loadConversation);
 	const getCurrentConversationId = usePluginStore(state => state.getCurrentConversationId);
-	const getConversationDatabase = usePluginStore(state => state.getConversationDatabase);
 	const getContext = usePluginStore(state => state.getContext);
 
 	// Get active mode
@@ -129,7 +125,7 @@ export const LifeNavigatorApp: React.FC = () => {
 		// First, add all stored tool results from the conversation
 		stableConversation.forEach((message) => {
 			if (Array.isArray(message.content)) {
-				message.content.forEach((item) => {
+				message.content.forEach((item: ContentBlock) => {
 					if (
 						typeof item === "object" &&
 						item !== null &&
@@ -742,9 +738,8 @@ export const LifeNavigatorApp: React.FC = () => {
 							<LucideIcon name="history" size={18} />
 						</button>
 
-						{getConversationDatabase() && (
+						{conversationHistoryOpen && (
 							<ConversationHistoryDropdown
-								database={getConversationDatabase()!}
 								onConversationSelect={handleConversationSelect}
 								isOpen={conversationHistoryOpen}
 								onToggle={() => setConversationHistoryOpen(!conversationHistoryOpen)}

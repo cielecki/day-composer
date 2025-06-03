@@ -8,6 +8,7 @@ enableMapSet();
 
 // Import slice interfaces and creators from their domain directories
 import { ChatSlice, createChatSlice } from '../chat/chat-store';
+import { ChatsDatabaseSlice, createChatsDatabaseSlice } from './chats-database-slice';
 import { ModesSlice, createModesSlice } from '../modes/modes-slice';
 import { TTSSlice, createTTSSlice } from '../tts/tts-slice';
 import { STTSlice, createSTTSlice } from '../stt/stt-store';
@@ -15,7 +16,7 @@ import { SettingsSlice, createSettingsSlice } from '../settings/settings-slice';
 import { SetupSlice, createSetupSlice } from '../setup/setup-slice';
 
 // Combined store interface
-export type PluginStore = ChatSlice & ModesSlice & TTSSlice & STTSlice & SettingsSlice & SetupSlice;
+export type PluginStore = ChatSlice & ChatsDatabaseSlice & ModesSlice & TTSSlice & STTSlice & SettingsSlice & SetupSlice;
 
 // Create the combined store with proper slice pattern
 export const usePluginStore = create<PluginStore>()(
@@ -24,6 +25,7 @@ export const usePluginStore = create<PluginStore>()(
       immer((...args) => ({
         // Spread all slices
         ...createChatSlice(...args),
+        ...createChatsDatabaseSlice(...args),
         ...createModesSlice(...args),
         ...createTTSSlice(...args),
         ...createSTTSlice(...args),

@@ -3,7 +3,6 @@ import type { PluginStore } from '../store/plugin-store';
 import { Message, ToolResultBlock } from '../utils/chat/types';
 import { Chat } from '../utils/chat/conversation';
 import { generateChatId } from '../utils/chat/generate-conversation-id';
-import { ConversationDatabase } from '../services/conversation-database';
 import { createUserMessage, extractUserMessageContent } from '../utils/chat/message-builder';
 import { runConversationTurn } from '../utils/chat/conversation-turn';
 import { handleTTS } from '../utils/chat/tts-integration';
@@ -12,7 +11,6 @@ import { expandLinks } from '../utils/links/expand-links';
 import { Notice } from 'obsidian';
 import { t } from '../i18n';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
-import { generateConversationTitle } from '../utils/chat/generate-conversation-title';
 
 // Extend Message type to include unique ID for React keys
 export interface MessageWithId extends Message {
@@ -61,7 +59,6 @@ export interface ChatSlice {
   addUserMessage: (userMessage: string, signal: AbortSignal, images?: any[]) => Promise<void>;
   editUserMessage: (messageIndex: number, newContent: string, signal: AbortSignal, images?: any[]) => Promise<void>;
   getCurrentConversationId: () => string | null;
-  getConversationDatabase: () => ConversationDatabase | null;
   getContext: () => Promise<string>;
   startEditingMessage: (messageIndex: number) => void;
   cancelEditingMessage: () => void;
@@ -105,7 +102,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
     conversationVersion: 0
   },
   
-  addMessage: (message) => set((state) => {
+  addMessage: (message) => set((state: PluginStore) => {
     // Ensure message has a unique ID for React reconciliation
     const messageWithId = ensureMessageId(message);
     
@@ -115,7 +112,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
     state.chats.conversationVersion += 1;
   }),
   
-  updateMessage: (index, message) => set((state) => {
+  updateMessage: (index, message) => set((state: PluginStore) => {
     const messages = state.chats.current.storedConversation.messages;
     if (index >= 0 && index < messages.length) {
       // Ensure message has ID (preserve existing ID if available)
@@ -133,7 +130,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
     }
   }),
   
-  clearChat: () => set((state) => {
+  clearChat: () => set((state: PluginStore) => {
     state.chats.current = {
       meta: {
         id: generateChatId(),
@@ -158,27 +155,27 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
     state.clearChat();
   },
   
-  setIsGenerating: (generating) => set((state) => {
+  setIsGenerating: (generating) => set((state: PluginStore) => {
     state.chats.isGenerating = generating;
   }),
   
-  setEditingMessage: (editing) => set((state) => {
+  setEditingMessage: (editing) => set((state: PluginStore) => {
     state.chats.editingMessage = editing;
   }),
   
-  updateLiveToolResult: (toolId, result) => set((state) => {
+  updateLiveToolResult: (toolId, result) => set((state: PluginStore) => {
     state.chats.liveToolResults.set(toolId, result);
   }),
   
-  clearLiveToolResults: () => set((state) => {
+  clearLiveToolResults: () => set((state: PluginStore) => {
     state.chats.liveToolResults.clear();
   }),
   
-  incrementChatVersion: () => set((state) => {
+  incrementChatVersion: () => set((state: PluginStore) => {
     state.chats.conversationVersion += 1;
   }),
   
-  setCurrentChat: (conversation) => set((state) => {
+  setCurrentChat: (conversation) => set((state: PluginStore) => {
     // Ensure all messages have IDs when loading conversation
     const messagesWithIds = conversation.storedConversation.messages.map(msg => ensureMessageId(msg));
     const conversationWithIds = {
@@ -215,11 +212,6 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
   getCurrentConversationId: () => {
     const state = get();
     return state.chats.current?.meta.id || null;
-  },
-  
-  getConversationDatabase: () => {
-    // Use the static plugin instance method
-    return LifeNavigatorPlugin.getConversationDatabase();
   },
   
   addUserMessage: async (userMessage, signal, images) => {
@@ -264,7 +256,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
     const newMessage = createUserMessage(newContent, images);
     conversationUpToEdit[messageIndex] = newMessage;
     
-    set((state) => {
+    set((state: PluginStore) => {
       state.chats.current.storedConversation.messages = conversationUpToEdit;
       state.chats.editingMessage = null;
       state.chats.conversationVersion += 1;
@@ -304,131 +296,27 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
   },
   
   // Conversation Persistence Actions
-  autoSaveConversation: async (isGeneratingResponse) => {
+  autoSaveConversation: async (isGeneratingResponse: boolean) => {
     const state = get();
     
     if (state.chats.current.storedConversation.messages.length > 0 && !isGeneratingResponse) {
-      try {
-        const database = state.getConversationDatabase();
-        if (!database) return;
-
-        // Update conversation with current mode before saving
-        set((state) => {
-          state.chats.current.storedConversation.modeId = state.modes.activeId;
-        });
-
-        const conversationId = await database.saveConversation(state.chats.current);
-        console.log(`Auto-saved conversation: ${conversationId}`);
-      } catch (error) {
-        console.error('Failed to auto-save conversation:', error);
-      }
+      await state.autoSaveConversation();
     }
   },
 
   saveConversationImmediately: async () => {
-    try {
-      const state = get();
-      const database = state.getConversationDatabase();
-      if (!database) return;
-
-      // Update conversation state with mode and title generation
-      set((state) => {
-        const currentMode = state.modes.available[state.modes.activeId];
-        state.chats.current.storedConversation.modeId = currentMode?.ln_path || state.modes.activeId;
-
-        // Set default title if needed
-        if (!state.chats.current.meta.title) {
-          state.chats.current.meta.title = "New Chat";
-        }
-      });
-
-      // Generate title if needed (async operation, do outside of set)
-      const currentState = get();
-      if (!currentState.chats.current.storedConversation.titleGenerated && 
-          currentState.chats.current.storedConversation.messages.length >= 2) {
-        const title = await generateConversationTitle(currentState.chats.current.storedConversation.messages);
-        
-        set((state) => {
-          state.chats.current.meta.title = title;
-          state.chats.current.storedConversation.titleGenerated = true;
-        });
-      }
-
-      const updatedState = get();
-      await database.saveConversation(updatedState.chats.current);
-      
-      console.log(`Immediately saved conversation with title: ${updatedState.chats.current.meta.title}`);
-    } catch (error) {
-      console.error('Failed to immediately save conversation:', error);
-    }
+    const state = get();
+    await state.saveConversation();
   },
 
-  saveCurrentConversation: async (title, tags) => {
-    try {
-      const state = get();
-      const database = state.getConversationDatabase();
-      if (!database) return null;
-
-      // Update conversation state
-      set((state) => {
-        state.chats.current.storedConversation.modeId = state.modes.activeId;
-        
-        // Apply custom title if provided
-        if (title) {
-          state.chats.current.meta.title = title;
-        }
-      });
-
-      const updatedState = get();
-      const conversationId = await database.saveConversation(updatedState.chats.current);
-      
-      new Notice('Conversation saved successfully');
-      return conversationId;
-    } catch (error) {
-      console.error('Failed to save conversation:', error);
-      new Notice('Failed to save conversation');
-      return null;
-    }
+  saveCurrentConversation: async (title?: string, tags?: string[]) => {
+    const state = get();
+    return await state.saveConversation(undefined, title, tags);
   },
 
-  loadConversation: async (conversationId) => {
-    try {
-      const database = get().getConversationDatabase();
-      if (!database) {
-        return false;
-      }
-
-      // Load the stored conversation data
-      const storedConversation = await database.loadConversation(conversationId);
-      
-      if (!storedConversation) {
-        new Notice('Conversation not found');
-        return false;
-      }
-
-      // Get metadata for the conversation
-      const meta = await database.getConversationMeta(conversationId);
-      
-      if (!meta) {
-        new Notice('Conversation metadata not found');
-        return false;
-      }
-
-      // Reconstruct the full conversation object
-      const conversation: Chat = {
-        meta: meta,
-        storedConversation: storedConversation
-      };
-
-      // Load the conversation into the current state
-      get().setCurrentChat(conversation);
-      
-      return true;
-    } catch (error) {
-      console.error('Failed to load conversation:', error);
-      new Notice('Failed to load conversation');
-      return false;
-    }
+  loadConversation: async (conversationId: string) => {
+    const state = get();
+    return await state.loadConversation(conversationId);
   },
   
   // Helper method for conversation turn logic

@@ -27,10 +27,36 @@ export const ensureContentBlocks = (
 };
 
 /**
+ * Filters out empty or invalid content blocks
+ */
+export const filterEmptyContentBlocks = (blocks: ContentBlock[]): ContentBlock[] => {
+	return blocks.filter(block => {
+		// Filter out text blocks with empty text
+		if (block.type === "text") {
+			return block.text && block.text.trim().length > 0;
+		}
+		// Filter out thinking blocks without content
+		if (block.type === "thinking") {
+			return block.thinking && block.thinking.trim().length > 0;
+		}
+		// Filter out incomplete tool_use blocks
+		if (block.type === "tool_use") {
+			return block.id && block.name;
+		}
+		// Filter out tool_result blocks without content
+		if (block.type === "tool_result") {
+			return block.tool_use_id && (block.content || block.is_error);
+		}
+		// Keep other block types by default
+		return true;
+	});
+};
+
+/**
  * Cleans and formats content blocks for API consumption
  */
 export const formatContentBlocks = (content: any[]): any[] => {
-	return content.map(block => {
+	const cleanedBlocks = content.map(block => {
 		if (block.type === "tool_use") {
 			// Clean up properties that Anthropic API doesn't expect
 			/* trunk-ignore(eslint/@typescript-eslint/no-unused-vars) */
@@ -53,6 +79,9 @@ export const formatContentBlocks = (content: any[]): any[] => {
 		}
 		return block;
 	}).filter(block => block !== null); // Remove null blocks (incomplete thinking)
+	
+	// Filter out empty content blocks before sending to API
+	return filterEmptyContentBlocks(cleanedBlocks);
 };
 
 /**

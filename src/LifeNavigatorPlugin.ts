@@ -5,29 +5,21 @@ import { LifeNavigatorView, LIFE_NAVIGATOR_VIEW_TYPE } from './life-navigator-vi
 import { checkForAvailableUpdate, checkForUpdatesOnStartup } from './auto-update';
 import { getObsidianTools, resetObsidianTools } from './obsidian-tools';
 import { LifeNavigatorSettingTab } from './settings/LifeNavigatorSettingTab';
-import { createPluginSettings, loadPluginSettings } from './settings/LifeNavigatorSettings';
+import { createPluginSettings, loadPluginSettings, LifeNavigatorSettings } from './settings/LifeNavigatorSettings';
 import { UserDefinedToolManager } from './user-tools/UserDefinedToolManager';
-import { ConversationDatabase } from './services/conversation-database';
 
 export class LifeNavigatorPlugin extends Plugin {
+	settings!: LifeNavigatorSettings;
 	private static _instance: LifeNavigatorPlugin | null = null;
 	
 	view: LifeNavigatorView | null = null;
 	userToolManager: UserDefinedToolManager | null = null;
-	conversationDatabase: ConversationDatabase | null = null;
 
 	/**
 	 * Get the current plugin instance
 	 */
 	static getInstance(): LifeNavigatorPlugin | null {
 		return LifeNavigatorPlugin._instance;
-	}
-
-	/**
-	 * Safely get the conversation database from the current instance
-	 */
-	static getConversationDatabase(): ConversationDatabase | null {
-		return LifeNavigatorPlugin._instance?.conversationDatabase || null;
 	}
 
 	async onload() {
@@ -49,10 +41,6 @@ export class LifeNavigatorPlugin extends Plugin {
 		// Initialize the plugin settings
 		createPluginSettings(this);
 		await loadPluginSettings(this);
-
-		// Initialize conversation database
-		this.conversationDatabase = new ConversationDatabase();
-		await this.conversationDatabase.initialize();
 
 		// Initialize the obsidian tools with this plugin instance
 		getObsidianTools(this);

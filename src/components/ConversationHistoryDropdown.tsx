@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ConversationDatabase } from '../services/conversation-database';
 import { ConversationMeta } from '../utils/chat/conversation';
 import { LucideIcon } from './LucideIcon';
+import { usePluginStore } from '../store/plugin-store';
 
 interface ConversationHistoryDropdownProps {
-    database: ConversationDatabase;
     onConversationSelect: (conversationId: string) => void;
     isOpen: boolean;
     onToggle: () => void;
@@ -12,7 +11,6 @@ interface ConversationHistoryDropdownProps {
 }
 
 export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownProps> = ({
-    database,
     onConversationSelect,
     isOpen,
     onToggle,
@@ -25,6 +23,11 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
     const [editTitle, setEditTitle] = useState('');
     const dropdownRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
+
+    // Use store methods instead of database prop
+    const listConversations = usePluginStore(state => state.listConversations);
+    const deleteConversation = usePluginStore(state => state.deleteConversation);
+    const updateConversationTitle = usePluginStore(state => state.updateConversationTitle);
 
     // Load conversations when dropdown opens
     useEffect(() => {
@@ -58,7 +61,7 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
         setLoading(true);
         try {
             // listConversations now returns conversations already sorted by recency (file modification time)
-            const allConversations = await database.listConversations();
+            const allConversations = await listConversations();
             setConversations(allConversations);
         } catch (error) {
             console.error('Failed to load conversations:', error);
@@ -83,7 +86,7 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
         e.stopPropagation();
         if (confirm('Are you sure you want to delete this conversation?')) {
             try {
-                await database.deleteConversation(conversationId);
+                await deleteConversation(conversationId);
                 await loadConversations();
             } catch (error) {
                 console.error('Failed to delete conversation:', error);
@@ -101,7 +104,7 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
         if (e.key === 'Enter') {
             e.preventDefault();
             try {
-                await database.updateConversationTitle(conversationId, editTitle);
+                await updateConversationTitle(conversationId, editTitle);
                 setEditingId(null);
                 setEditTitle('');
                 await loadConversations();

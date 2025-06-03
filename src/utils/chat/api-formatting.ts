@@ -10,20 +10,28 @@ export const formatMessagesForAPI = (messages: Message[]): Anthropic.Messages.Me
 	// First, validate and clean the messages to handle incomplete tool calls
 	const cleanedMessages = validateAndCleanMessages(messages);
 	
-	return cleanedMessages.map((msg) => {
+	const formattedMessages: Anthropic.Messages.MessageParam[] = [];
+	
+	for (const msg of cleanedMessages) {
 		let apiContent: Anthropic.Messages.MessageParam["content"];
 		const contentBlocks = ensureContentBlocks(msg.content); // Ensure array of blocks
+		const formattedBlocks = formatContentBlocks(contentBlocks);
 
-		apiContent = formatContentBlocks(contentBlocks);
-
-		// Handle case where content was empty/invalid
-		if (!apiContent || apiContent.length === 0) {
-			apiContent = [{ type: "text", text: "" }]; // Send empty text block if needed
+		// Handle case where content was empty/invalid after filtering
+		if (!formattedBlocks || formattedBlocks.length === 0) {
+			// Skip messages with no valid content blocks instead of sending empty text
+			// This prevents the "text content blocks must be non-empty" error
+			console.warn(`Skipping message with empty content blocks for role: ${msg.role}`);
+			continue;
 		}
 
-		return {
+		apiContent = formattedBlocks;
+
+		formattedMessages.push({
 			role: msg.role,
 			content: apiContent,
-		};
-	});
+		});
+	}
+	
+	return formattedMessages;
 }; 
