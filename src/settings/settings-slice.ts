@@ -1,5 +1,6 @@
 import { StateCreator } from 'zustand';
 import { LifeNavigatorSettings } from './LifeNavigatorSettings';
+import type { PluginStore } from '../store/plugin-store';
 
 // Settings slice interface
 export interface SettingsSlice {
@@ -20,16 +21,16 @@ export interface SettingsSlice {
   resetSettings: () => void;
 }
 
-// Type for StateCreator with immer middleware
+// Type for StateCreator with immer middleware - updated to use PluginStore
 type ImmerStateCreator<T> = StateCreator<
-  T,
+  PluginStore,
   [["zustand/immer", never]],
   [],
   T
 >;
 
-// Create settings slice
-export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set) => ({
+// Create settings slice - now get() returns full PluginStore type
+export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) => ({
   settings: {
     settings: new LifeNavigatorSettings(),
     secrets: {},

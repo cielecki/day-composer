@@ -11,28 +11,7 @@ import { getPluginSettings } from "../../settings/LifeNavigatorSettings";
 import { getDefaultLNMode, resolveAutoModel } from "../mode/ln-mode-defaults";
 import { t } from '../../i18n';
 import type { ObsidianTool } from "../../obsidian-tools";
-
-export interface ConversationTurnContext {
-	// Message management
-	messages: Message[];
-	addMessage: (message: Message) => void;
-	updateMessage: (message: Message) => void;
-	
-	// Mode and settings
-	lnModesRef: React.MutableRefObject<Record<string, any>>;
-	activeModeIdRef: React.MutableRefObject<string>;
-	
-	// Plugin reference for tools
-	plugin: any;
-	
-	// State management
-	setIsGeneratingResponse: (generating: boolean) => void;
-	onConversationChange: () => void;
-	
-	// Live tool results for real-time progress updates
-	updateLiveToolResult: (toolId: string, result: ToolResultBlock) => void;
-	clearLiveToolResults: () => void;
-}
+import { usePluginStore } from "../../store/plugin-store";
 
 /**
  * Runs a complete conversation turn with the AI, handling tool calls and streaming
@@ -40,18 +19,28 @@ export interface ConversationTurnContext {
 export const runConversationTurn = async (
 	systemPrompt: string,
 	tools: ObsidianTool<any>[],
-	signal: AbortSignal,
-	context: ConversationTurnContext
+	signal: AbortSignal
 ): Promise<Message | null> => {
+	const store = usePluginStore.getState();
+	
 	// Manage loading state within this function
-	context.setIsGeneratingResponse(true);
+	store.setIsGenerating(true);
 	let currentTurnAborted = false;
 	let finalAssistantMessageForTTS: Message | null = null;
 
 	// Clear any previous aborted tool results when starting a new turn
-	context.clearLiveToolResults();
+	store.clearLiveToolResults();
 
 	try {
+		// Get current messages array
+		const messages = [...store.chats.current.storedConversation.messages];
+		
+		// Validate messages array before starting
+		if (!Array.isArray(messages)) {
+			console.error("Invalid messages array in conversation turn");
+			return null;
+		}
+
 		// Outer try for the whole turn process
 		while (!signal.aborted && !currentTurnAborted) {
 			let assistantMessage: Message | null = null;
@@ -60,12 +49,15 @@ export const runConversationTurn = async (
 				const apiKey = getPluginSettings().getSecret('ANTHROPIC_API_KEY');
 				const anthropicClient = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
 
-				const messagesForAPI = formatMessagesForAPI(context.messages);
+				// Create a stable reference to messages for API formatting
+				const currentMessages = [...usePluginStore.getState().chats.current.storedConversation.messages];
+				const messagesForAPI = formatMessagesForAPI(currentMessages);
 
 				const defaultMode = getDefaultLNMode();
 
-				// Get API parameters from active mode or defaults (using refs for current values)
-				const currentActiveMode = context.lnModesRef.current[context.activeModeIdRef.current];
+				// Get API parameters from active mode or defaults
+				const currentStore = usePluginStore.getState();
+				const currentActiveMode = currentStore.modes.available[currentStore.modes.activeId];
 				const rawModel = currentActiveMode?.ln_model ?? defaultMode.ln_model;
 				
 				// Resolve "auto" model to actual model based on mode characteristics
@@ -97,15 +89,29 @@ export const runConversationTurn = async (
 				const callbacks: StreamProcessorCallbacks = {
 					onMessageStart: () => {
 						assistantMessage = { role: "assistant", content: [] };
-						context.addMessage(assistantMessage);
+						usePluginStore.getState().addMessage(assistantMessage);
 					},
 					onMessageUpdate: (message: Message) => {
+						// Validate message before updating
+						if (!message || typeof message !== 'object') {
+							console.warn("Invalid message in stream update, skipping");
+							return;
+						}
 						assistantMessage = message;
-						context.updateMessage(message);
+						const currentStore = usePluginStore.getState();
+						const messages = currentStore.chats.current.storedConversation.messages;
+						if (messages.length > 0) {
+							currentStore.updateMessage(messages.length - 1, message);
+						}
 					},
 					onMessageStop: (finalMessage: Message) => {
+						// Validate final message
+						if (!finalMessage || typeof finalMessage !== 'object') {
+							console.warn("Invalid final message in stream stop, skipping");
+							return;
+						}
 						assistantMessage = finalMessage;
-						context.onConversationChange();
+						usePluginStore.getState().saveConversationImmediately();
 					},
 					onAbort: () => {
 						currentTurnAborted = true;
@@ -117,7 +123,7 @@ export const runConversationTurn = async (
 
 				if (turnResult.aborted || signal.aborted) {
 					// Handle cleanup for aborted stream
-					handleStreamAbortCleanup(context);
+					handleStreamAbortCleanup();
 					currentTurnAborted = true;
 					break; // Exit the while loop
 				}
@@ -128,10 +134,17 @@ export const runConversationTurn = async (
 
 					if (toolUseBlocks.length > 0) {
 						const { getObsidianTools } = await import("../../obsidian-tools");
-						const obsidianTools = getObsidianTools(context.plugin);
+						const { LifeNavigatorPlugin } = await import("../../LifeNavigatorPlugin");
+						const plugin = LifeNavigatorPlugin.getInstance();
+						
+						if (!plugin) {
+							throw new Error('Plugin instance not available');
+						}
+						
+						const obsidianTools = getObsidianTools(plugin);
 						
 						// Clear any previous live tool results when starting new tool execution
-						context.clearLiveToolResults();
+						usePluginStore.getState().clearLiveToolResults();
 						
 						const { toolResults, abortedDuringProcessing } = await processToolUseBlocks(
 							toolUseBlocks,
@@ -139,20 +152,20 @@ export const runConversationTurn = async (
 							signal,
 							(toolId: string, updatedResult: ToolResultBlock) => {
 								// Update the live tool results for real-time UI display
-								context.updateLiveToolResult(toolId, updatedResult);
+								usePluginStore.getState().updateLiveToolResult(toolId, updatedResult);
 							}
 						);
 
 						if (abortedDuringProcessing || signal.aborted) {
 							// Handle cleanup for aborted tool processing
-							handleStreamAbortCleanup(context);
+							handleStreamAbortCleanup();
 							currentTurnAborted = true;
 							break; // Exit the while loop
 						}
 
 						// Add tool results message (as 'user' role for the next API call)
 						const toolResultsMessage: Message = { role: "user", content: toolResults };
-						context.addMessage(toolResultsMessage);
+						usePluginStore.getState().addMessage(toolResultsMessage);
 						// Continue the while loop
 					} else {
 						// No tool calls, this is the final message for this turn
@@ -164,9 +177,9 @@ export const runConversationTurn = async (
 					console.warn("API call completed but no final content received.");
 					// Remove the empty message from the conversation if it was added
 					if (assistantMessage) {
-						const cleanedMessages = cleanupLastMessage(context.messages);
-						// Update the conversation with cleaned messages
-						// Note: This would need to be handled by the context
+						const currentMessages = usePluginStore.getState().chats.current.storedConversation.messages;
+						const cleanedMessages = cleanupLastMessage(currentMessages);
+						// Note: This would need message cleanup in the store
 					}
 					currentTurnAborted = true; // Treat as an issue, stop the loop
 					break;
@@ -176,12 +189,12 @@ export const runConversationTurn = async (
 				// Catch errors from API/stream/tool handling
 				if (error instanceof APIUserAbortError) {
 					// Handle cleanup for aborted requests
-					handleStreamAbortCleanup(context);
+					handleStreamAbortCleanup();
 				} else {
 					console.error("Error during conversation turn processing:", error);
 					new Notice(t('errors.conversationTurn', { error: error instanceof Error ? error.message : "Unknown error" }));
 					// Also clean up incomplete tool calls on error
-					handleStreamAbortCleanup(context);
+					handleStreamAbortCleanup();
 				}
 				currentTurnAborted = true; // Stop the loop on error or abort
 				break; // Exit the while loop
@@ -190,11 +203,11 @@ export const runConversationTurn = async (
 
 		return finalAssistantMessageForTTS;
 	} finally {
-		context.setIsGeneratingResponse(false);
+		usePluginStore.getState().setIsGenerating(false);
 		// Only clear live tool results if the turn completed successfully
 		// If there were aborted tool calls, keep the live results to show their aborted status
 		if (!currentTurnAborted && !signal.aborted) {
-			context.clearLiveToolResults();
+			usePluginStore.getState().clearLiveToolResults();
 		}
 	}
 };
@@ -202,8 +215,10 @@ export const runConversationTurn = async (
 /**
  * Handles cleanup when a stream is aborted or encounters an error
  */
-const handleStreamAbortCleanup = (context: ConversationTurnContext): void => {
-	const lastMessage = context.messages[context.messages.length - 1];
+const handleStreamAbortCleanup = (): void => {
+	const store = usePluginStore.getState();
+	const messages = store.chats.current.storedConversation.messages;
+	const lastMessage = messages[messages.length - 1];
 	
 	if (lastMessage?.role === "assistant") {
 		const contentBlocks = Array.isArray(lastMessage.content) ? lastMessage.content : [];
@@ -214,7 +229,7 @@ const handleStreamAbortCleanup = (context: ConversationTurnContext): void => {
 		if (hasIncompleteThink) {
 			const updatedContent = clearThinkingInProgress(contentBlocks);
 			const updatedMessage = { ...lastMessage, content: updatedContent };
-			context.updateMessage(updatedMessage);
+			store.updateMessage(messages.length - 1, updatedMessage);
 		}
 		
 		// Mark any incomplete live tool results as complete to stop pulsing animation
@@ -236,14 +251,14 @@ const handleStreamAbortCleanup = (context: ConversationTurnContext): void => {
 					is_complete: true,
 					navigation_targets: []
 				};
-				context.updateLiveToolResult(toolId, abortedResult);
+				store.updateLiveToolResult(toolId, abortedResult);
 			}
 		}
 		
 		if (hasIncompleteTools || hasIncompleteThink) {
 			// Remove the incomplete message from conversation
-			const cleanedMessages = cleanupLastMessage(context.messages);
-			// Note: The context would need to handle this cleanup
+			const cleanedMessages = cleanupLastMessage(messages);
+			// Note: The store would need to handle this cleanup
 		}
 	}
 }; 

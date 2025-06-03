@@ -42,14 +42,18 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   abort,
 }) => {
   // Get specific state slices from Zustand store with granular subscriptions
-  const ttsState = usePluginStore(state => state.tts);
   const isRecording = usePluginStore(state => state.stt.isRecording);
-  const setEditingMessage = usePluginStore(state => state.setEditingMessage);
-  const setTTSPaused = usePluginStore(state => state.setTTSPaused);
-  const resetTTS = usePluginStore(state => state.resetTTS);
+  
+  // Extract individual values from TTS state - updated property names
+  const isSpeaking = usePluginStore(state => state.tts.isSpeaking);
+  const isGeneratingSpeech = usePluginStore(state => state.tts.isGeneratingSpeech);
+  const isPaused = usePluginStore(state => state.tts.isPaused);
+  const stopAudio = usePluginStore(state => state.stopAudio);
+  const pauseAudio = usePluginStore(state => state.pauseAudio);
+  const resumeAudio = usePluginStore(state => state.resumeAudio);
 
-  // Extract individual values from TTS state
-  const { isPlaying: isPlayingAudio, isGenerating: isGeneratingSpeech, isPaused } = ttsState;
+  // Use actual TTS store method
+  const speakText = usePluginStore(state => state.speakText);
 
   const [copyIcon, setCopyIcon] = useState<'copy' | 'check'>('copy');
   const [toolsCache, setToolsCache] = useState<Map<string, any>>(new Map());
@@ -57,30 +61,22 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   const contentBlocksToRender = ensureContentBlocksForDisplay(content);
   const toolResultsMap = toolResults;
 
-  // Temporary TTS functions - TODO: implement full TTS logic
-  const speakText = useCallback(async (text: string, signal: AbortSignal, autoPlay: boolean) => {
-    console.log('speakText called - need to implement full TTS logic');
-  }, []);
-
-  const pauseAudio = useCallback(() => {
-    setTTSPaused(true);
-  }, [setTTSPaused]);
-
-  const resumeAudio = useCallback(() => {
-    setTTSPaused(false);
-  }, [setTTSPaused]);
-
-  const stopAudio = useCallback(() => {
-    resetTTS();
-  }, [resetTTS]);
-
   // Helper to get plain text content
   const getPlainTextContent = (blocks: ContentBlock[]): string => {
-    return blocks
-      .filter(block => block.type === 'text')
-      .map(block => (block as any).text)
+    const textBlocks = blocks.filter(block => block.type === 'text');
+    
+    const result = textBlocks
+      .map(block => {
+        const text = (block as any).text;
+        return text;
+      })
       .join(' ');
+    
+    return result;
   };
+
+  // Use actual editing method from store
+  const startEditingMessage = usePluginStore(state => state.startEditingMessage);
 
   // Load tools asynchronously when needed
   useEffect(() => {
@@ -120,22 +116,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   // Handle edit message button click
   const handleEditClick = () => {
     if (role === 'user' && messageIndex !== undefined) {
-      // Extract text content from the message
-      const textContent = contentBlocksToRender
-        .filter(block => block.type === 'text')
-        .map(block => (block as any).text)
-        .join(' ');
-      
-      // Extract images if any
-      const images = contentBlocksToRender
-        .filter(block => block.type === 'image')
-        .map(block => block as any);
-      
-      setEditingMessage({
-        index: messageIndex,
-        content: textContent,
-        images: images.length > 0 ? images : undefined
-      });
+      startEditingMessage(messageIndex);
     }
   };
 
@@ -151,7 +132,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
       if (isPaused) {
         // If audio is paused, resume it
         resumeAudio();
-      } else if (isPlayingAudio) {
+      } else if (isSpeaking) {
         // If audio is playing, pause it
         pauseAudio();
       } else if (isGeneratingSpeech) {
@@ -335,7 +316,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
                     <>
                       {/* Play/Pause button */}
                       <button 
-                        className={`clickable-icon ${isPaused ? 'paused' : isPlayingAudio ? 'playing' : isGeneratingSpeech ? 'generating' : ''} ${isRecording ? 'disabled' : ''}`}
+                        className={`clickable-icon ${isPaused ? 'paused' : isSpeaking ? 'playing' : isGeneratingSpeech ? 'generating' : ''} ${isRecording ? 'disabled' : ''}`}
                         onClick={handleSpeakMessage}
                         disabled={isRecording}
                         aria-label={
@@ -343,7 +324,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
                             ? t('ui.message.recordingInProgress')
                             : isPaused
                               ? t('ui.message.resumeAudio')
-                              : isPlayingAudio 
+                              : isSpeaking 
                                 ? t('ui.message.pauseAudio') 
                                 : isGeneratingSpeech 
                                   ? t('ui.message.generatingSpeech') 
@@ -354,24 +335,12 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
                           <LucideIcon name="loader" size={18} />
                         ) : isPaused ? (
                           <LucideIcon name="play" size={18} />
-                        ) : isPlayingAudio ? (
+                        ) : isSpeaking ? (
                           <LucideIcon name="pause" size={18} />
                         ) : (
                           <LucideIcon name="volume-2" size={18} />
                         )}
                       </button>
-                      
-                      {/* Stop button - only show when audio is playing, paused, or generating */}
-                      {(isPlayingAudio || isPaused || isGeneratingSpeech) && (
-                        <button 
-                          className="clickable-icon stop-button"
-                          onClick={handleStopMessage}
-                          disabled={isRecording}
-                          aria-label={t('ui.message.stopAudio')}
-                        >
-                          <LucideIcon name="square" size={18} />
-                        </button>
-                      )}
                     </>
                   )}
                   {hasTextContent && (

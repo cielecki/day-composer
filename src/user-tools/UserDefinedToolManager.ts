@@ -110,23 +110,15 @@ export class UserDefinedToolManager {
     try {
       const discoveredTools = await this.scanner.scanForTools();
       
-      console.log(`[DEBUG] Raw discovered tools:`, discoveredTools);
-      
       // Update tool registry
       this.tools.clear();
       for (const tool of discoveredTools) {
-        console.log(`[DEBUG] Processing tool:`, tool.name, tool);
         this.tools.set(tool.name, tool);
-        console.log(`[DEBUG] Stored tool in map:`, tool.name);
       }
-
-      console.log(`[DEBUG] Tools map after processing:`, Array.from(this.tools.keys()));
-      console.log(`[DEBUG] Tools map size:`, this.tools.size);
 
       // Update obsidian tools registry
       this.updateObsidianToolsRegistry();
       
-      console.log(`[USER-TOOLS] Discovered ${discoveredTools.length} user-defined tools`);
     } catch (error) {
       console.error('[USER-TOOLS] Failed to refresh tools:', error);
     }

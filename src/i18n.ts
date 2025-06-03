@@ -1,6 +1,8 @@
 import i18next, { TOptions } from 'i18next';
 import en from './locales/en.json';
 import pl from './locales/pl.json';
+import { lifeNavigatorSystemPrompt as enLifeNavigatorSystemPrompt, lifeNavigatorMainDescription as enLifeNavigatorMainDescription } from './locales/prompts/lifeNavigator.en';
+import { lifeNavigatorSystemPrompt as plLifeNavigatorSystemPrompt, lifeNavigatorMainDescription as plLifeNavigatorMainDescription } from './locales/prompts/lifeNavigator.pl';
 import { App } from 'obsidian';
 
 export const initI18n = async (app: App) => {
@@ -19,10 +21,35 @@ export const initI18n = async (app: App) => {
   const initialLang = langMap[obsidianLang] || 'en';
   console.log('Mapped to plugin language:', initialLang);
 
+  // Merge translations with long texts from dedicated files
+  const enTranslations = {
+    ...en,
+    prebuiltModes: {
+      ...en.prebuiltModes,
+      lifeNavigator: {
+        ...en.prebuiltModes.lifeNavigator,
+        systemPrompt: enLifeNavigatorSystemPrompt,
+        mainDescription: enLifeNavigatorMainDescription
+      }
+    }
+  };
+
+  const plTranslations = {
+    ...pl,
+    prebuiltModes: {
+      ...pl.prebuiltModes,
+      lifeNavigator: {
+        ...pl.prebuiltModes.lifeNavigator,
+        systemPrompt: plLifeNavigatorSystemPrompt,
+        mainDescription: plLifeNavigatorMainDescription
+      }
+    }
+  };
+
   await i18next.init({
     resources: {
-      en: { translation: en },
-      pl: { translation: pl }
+      en: { translation: enTranslations },
+      pl: { translation: plTranslations }
     },
     lng: initialLang, // Set initial language based on Obsidian's setting
     fallbackLng: 'en',

@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 
 interface MarkdownRendererProps {
   content: string;
@@ -18,7 +19,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   return (
     <div className={className}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkBreaks]}
         components={{
           code: ({inline, className, children, ...props}: any) => {
             // Since ReactMarkdown doesn't reliably set the inline parameter,

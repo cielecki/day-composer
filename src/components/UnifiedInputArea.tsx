@@ -20,39 +20,24 @@ export const UnifiedInputArea: React.FC<{
 }> = ({ newAbortController, abort, editingMessage }) => {
   // Get specific state slices from Zustand store with granular subscriptions
   const isGeneratingResponse = usePluginStore(state => state.chats.isGenerating);
-  const ttsState = usePluginStore(state => state.tts);
-  const sttState = usePluginStore(state => state.stt);
   const setEditingMessage = usePluginStore(state => state.setEditingMessage);
   const resetTTS = usePluginStore(state => state.resetTTS);
 
-  // Extract individual values from audio state
-  const { isPlaying: isPlayingAudio, isGenerating: isGeneratingSpeech, isPaused } = ttsState;
-  const { isRecording, isTranscribing, lastTranscription } = sttState;
+  // Extract individual values from audio state - updated property names
+  const isSpeaking = usePluginStore(state => state.tts.isSpeaking);
+  const isGeneratingSpeech = usePluginStore(state => state.tts.isGeneratingSpeech);
+  const isRecording = usePluginStore(state => state.stt.isRecording);
+  const isTranscribing = usePluginStore(state => state.stt.isTranscribing);
+  const lastTranscription = usePluginStore(state => state.stt.lastTranscription);
+  const isPaused = usePluginStore(state => state.tts.isPaused);
 
-  // Temporary functions until fully migrated
-  const addUserMessage = useCallback(async (userMessage: string, signal: AbortSignal, images?: any[]): Promise<void> => {
-    console.log('addUserMessage called - need to implement full logic');
-  }, []);
-
-  const editUserMessage = useCallback(async (messageIndex: number, newContent: string, signal: AbortSignal, images?: any[]): Promise<void> => {
-    console.log('editUserMessage called - need to implement full logic');
-  }, []);
-
-  const cancelEditingMessage = useCallback(() => {
-    setEditingMessage(null);
-  }, [setEditingMessage]);
-
-  const startRecording = useCallback(async (signal: AbortSignal) => {
-    console.log('startRecording called - need to implement full logic');
-  }, []);
-
-  const finalizeRecording = useCallback(() => {
-    console.log('finalizeRecording called - need to implement full logic');
-  }, []);
-
-  const cancelTranscription = useCallback(() => {
-    console.log('cancelTranscription called - need to implement full logic');
-  }, []);
+  // Use actual store methods instead of placeholder functions
+  const addUserMessage = usePluginStore(state => state.addUserMessage);
+  const editUserMessage = usePluginStore(state => state.editUserMessage);
+  const cancelEditingMessage = usePluginStore(state => state.cancelEditingMessage);
+  const startRecording = usePluginStore(state => state.startRecording);
+  const finalizeRecording = usePluginStore(state => state.finalizeRecording);
+  const cancelTranscription = usePluginStore(state => state.cancelTranscription);
 
   const stopAudio = useCallback(() => {
     resetTTS();
@@ -114,7 +99,7 @@ export const UnifiedInputArea: React.FC<{
         : lastTranscription;
       
       // Always auto-send after transcription completes, whether editing or new message
-      if (isPlayingAudio || isGeneratingSpeech) {
+      if (isSpeaking || isGeneratingSpeech) {
         console.log("Transcription completed during audio playback - stopping audio and auto-sending");
         stopAudio();
       }
@@ -168,7 +153,7 @@ export const UnifiedInputArea: React.FC<{
     }
     // Update ref with current value for next comparison
     prevIsTranscribingRef.current = isTranscribing;
-  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, isPlayingAudio, isGeneratingSpeech, message, addUserMessage, editUserMessage, newAbortController, attachedImages, stopAudio, editingMessage]);
+  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, isSpeaking, isGeneratingSpeech, message, addUserMessage, editUserMessage, newAbortController, attachedImages, stopAudio, editingMessage]);
 
   // Add ResizeObserver to ensure textarea is properly sized
   useEffect(() => {
@@ -392,7 +377,7 @@ export const UnifiedInputArea: React.FC<{
       e.preventDefault();
 
       // If a response is being generated, abort it first before sending new message
-      if (isGeneratingResponse || isPlayingAudio || isGeneratingSpeech) {
+      if (isGeneratingResponse || isSpeaking || isGeneratingSpeech) {
         abort();
         // Use setTimeout to ensure abort is processed before sending the new message
         setTimeout(() => {
@@ -498,7 +483,7 @@ export const UnifiedInputArea: React.FC<{
       finalizeRecording();
     } else {
       // Stop any playing audio when starting to record
-      if (isPlayingAudio || isGeneratingSpeech) {
+      if (isSpeaking || isGeneratingSpeech) {
         console.log("Stopping audio playback before starting recording");
         stopAudio();
       }
@@ -511,11 +496,6 @@ export const UnifiedInputArea: React.FC<{
 
   // Handle cancel recording or transcription
   const handleCancelRecording = () => {
-    if (isTranscribing) {
-      // Cancel transcription first
-      cancelTranscription();
-    }
-    
     // Cancel recording if active
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -809,7 +789,7 @@ export const UnifiedInputArea: React.FC<{
               )}
 
               {/* Stop button - visible for generation, audio playback, and transcription (but NOT basic recording) */}
-              {(isGeneratingResponse || isPlayingAudio || isGeneratingSpeech || isPaused) && !isRecording && (
+              {(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isPaused) && !isRecording && (
                 <button
                   className="input-control-button stop-button"
                   onClick={handleStopAll}
@@ -829,7 +809,7 @@ export const UnifiedInputArea: React.FC<{
               )}
 
               {/* Send button - visible when not recording, AND nothing is being generated */}
-              {!isTranscribing && !isRecording && !(isGeneratingResponse || isPlayingAudio || isGeneratingSpeech || isPaused) && (
+              {!isTranscribing && !isRecording && !(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isPaused) && (
                 <button
                   className="input-control-button send-button"
                   onClick={handleSendMessage}

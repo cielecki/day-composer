@@ -27,8 +27,8 @@ export const processToolUseBlocks = async (
 		// Get the tool to access its initial label
 		const tool = await obsidianTools.getToolByName(toolUseBlock.name);
 		
-		// Create initial incomplete result
-		const initialResult: ToolResultBlock = {
+		// Create initial incomplete result - this will serve as a base template
+		let currentResult: ToolResultBlock = {
 			type: "tool_result",
 			tool_use_id: toolUseBlock.id,
 			content: "",
@@ -43,23 +43,33 @@ export const processToolUseBlocks = async (
 				toolUseBlock.input,
 				signal,
 				(message: string) => {
-					// Update the result content progressively
-					initialResult.content = initialResult.content ? `${initialResult.content}\n${message}` : message;
+					// Create new result object with updated content (immutable)
+					const newContent = currentResult.content ? `${currentResult.content}\n${message}` : message;
+					currentResult = {
+						...currentResult,
+						content: newContent
+					};
 					// Notify the UI about the update
-					onToolResultUpdate?.(toolUseBlock.id, { ...initialResult });
+					onToolResultUpdate?.(toolUseBlock.id, currentResult);
 				},
 				(navigationTarget) => {
-					// Add navigation targets as they become available
-					initialResult.navigation_targets = initialResult.navigation_targets || [];
-					initialResult.navigation_targets.push(navigationTarget);
+					// Create new result object with updated navigation targets (immutable)
+					currentResult = {
+						...currentResult,
+						navigation_targets: [...(currentResult.navigation_targets || []), navigationTarget]
+					};
 					// Notify the UI about the update
-					onToolResultUpdate?.(toolUseBlock.id, { ...initialResult });
+					onToolResultUpdate?.(toolUseBlock.id, currentResult);
 				},
 				(label: string) => {
-					// Update the current label
-					initialResult.current_label = label;
+					console.log("label", label);
+					// Create new result object with updated label (immutable)
+					currentResult = {
+						...currentResult,
+						current_label: label
+					};
 					// Notify the UI about the update
-					onToolResultUpdate?.(toolUseBlock.id, { ...initialResult });
+					onToolResultUpdate?.(toolUseBlock.id, currentResult);
 				}
 			);
 			
@@ -84,7 +94,7 @@ export const processToolUseBlocks = async (
 				content: `Error: ${error.message || "Unknown error"}`,
 				is_error: true,
 				is_complete: true,
-				current_label: initialResult.current_label // Keep last known label
+				current_label: currentResult.current_label // Keep last known label
 			};
 			toolResults.push(errorResult);
 			// Update with error result

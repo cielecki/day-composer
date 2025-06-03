@@ -20,7 +20,8 @@ export function getPrebuiltModes(): LNMode[] {
 		],
 		ln_tools_allowed: ['*'],
 		ln_tools_disallowed: ['*task_*'],
-		ln_model: 'auto'
+		ln_model: 'auto',
+		ln_expand_links: false
 	};
 
 	// Merge with defaults to ensure all required fields are present

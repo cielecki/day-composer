@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Conversation Save Tool**: New built-in tool for saving current conversations to notes in the vault:
+- **Link Expansion Control Parameter**: Added `ln_expand_links` parameter to mode configuration for controlling whether wikilinks are expanded in system prompts. Defaults to `true` for backward compatibility. Pre-built modes have this set to `false` to prevent link expansion. This allows fine-grained control over when [[Note Name]] 🔎 links should be processed and expanded with actual note content.
 - **Library Index System**: Created comprehensive `library/index.md` file that catalogs all library content with descriptions and AI-guidance for when files should be downloaded. This enables intelligent file selection based on user context rather than browsing all files.
 - **Library Browse & View Tools**: New simplified tool pair for browsing and downloading Life Navigator library content:
   - **Library List Tool** (`library_list`): Browse all available library content using curated index with descriptions and context guidance

@@ -1,21 +1,29 @@
 // Conversation Database Service - Individual File Storage
 // Each conversation stored as separate JSON file with metadata in filename
 
-import { App, normalizePath } from 'obsidian';
+import { normalizePath } from 'obsidian';
 import { generateConversationTitle } from '../utils/chat/generate-conversation-title';
 import { ensureDirectoryExists } from '../utils/fs/ensure-directory-exists';
 import { escapeFilename } from '../utils/fs/escape-filename';
 import { Chat, StoredConversation, CURRENT_SCHEMA_VERSION, ConversationMeta } from '../utils/chat/conversation';
 import { chatFileNameToIdAndTitle } from '../utils/chat/chat-file-name-to-id-and-title';
-
+import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 
 export class ConversationDatabase {
-	private app: App;
-	private conversationsDir: string;
+	private get app() {
+		const plugin = LifeNavigatorPlugin.getInstance();
+		if (!plugin?.app) {
+			throw new Error('LifeNavigator plugin not initialized');
+		}
+		return plugin.app;
+	}
 
-	constructor(app: App, pluginDir: string) {
-		this.app = app;
-		this.conversationsDir = normalizePath(`${pluginDir}/conversations`);
+	private get conversationsDir() {
+		const plugin = LifeNavigatorPlugin.getInstance();
+		if (!plugin) {
+			throw new Error('LifeNavigator plugin not initialized');
+		}
+		return normalizePath(`${plugin.manifest.dir}/conversations`);
 	}
 
 	/**
@@ -24,8 +32,6 @@ export class ConversationDatabase {
 	async initialize(): Promise<void> {
 		await ensureDirectoryExists(this.conversationsDir, this.app);
 	}
-
-	
 
 	/**
 	 * Get all conversation files
@@ -48,8 +54,6 @@ export class ConversationDatabase {
 			return [];
 		}
 	}
-
-
 
 	/**
 	 * Save a conversation to individual file

@@ -4,7 +4,6 @@ import { LifeNavigatorApp } from "./components/LifeNavigatorApp";
 import { Message } from "./utils/chat/types";
 import { LifeNavigatorPlugin } from './LifeNavigatorPlugin';
 import { t } from './i18n';
-import { ConversationDatabase } from "./services/conversation-database";
 import { initializeStore, cleanupStore } from "./store/store-initialization";
 
 export interface LifeNavigatorViewProps {
@@ -18,21 +17,11 @@ export class LifeNavigatorView extends ItemView {
 	private reactRoot: ReactDOM.Root | null = null;
 	private props: LifeNavigatorViewProps;
 	private _conversation: Message[] = [];
-	private conversationDatabase: ConversationDatabase;
 
 	constructor(leaf: WorkspaceLeaf, props: LifeNavigatorViewProps) {
 		super(leaf);
 		this.props = props;
 		this._conversation = props.initialMessages || [];
-
-		if (!this.props.plugin.manifest.dir) {
-			throw new Error('Plugin directory not available');
-		}
-
-		this.conversationDatabase = new ConversationDatabase(this.app, this.props.plugin.manifest.dir);
-		this.conversationDatabase.initialize().then(() => {
-			console.log('Conversation database and naming service initialized');
-		});
 	}
 
 	getViewType(): string {
@@ -65,17 +54,12 @@ export class LifeNavigatorView extends ItemView {
 	}
 
 	async onClose(): Promise<void> {
-		// Clean up resources
-		console.log("View closing, cleaning up resources");
-
-		// Clean up Zustand store
-		cleanupStore(this.props.plugin);
-
-		// Clean up React component
 		if (this.reactRoot) {
 			this.reactRoot.unmount();
 			this.reactRoot = null;
 		}
+
+		cleanupStore();
 	}
 
 	renderComponent(): void {

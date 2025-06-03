@@ -53,6 +53,7 @@ export function getDefaultLNMode(): LNMode {
     // Behavior defaults
     ln_system_prompt: "",
     ln_example_usages: [],
+    ln_expand_links: true, // Expand wikilinks by default
     
     // API parameters
     ln_model: "auto", // Default to auto-selection

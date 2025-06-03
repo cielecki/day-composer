@@ -21,6 +21,7 @@ import { toolValidatorTool } from "./tools/tool-validator";
 import { secretSaveTool } from "./tools/secret-save";
 import { secretListTool } from "./tools/secret-list";
 import { urlDownloadTool } from "./tools/url-download";
+import { conversationSaveTool } from "./tools/conversation-save";
 import { ToolExecutionError } from "./utils/tools/tool-execution-error";
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tool-filter";
@@ -98,6 +99,7 @@ export class ObsidianTools {
 		secretSaveTool,
 		secretListTool,
 		urlDownloadTool,
+		conversationSaveTool,
 	];
 
 	constructor(plugin: LifeNavigatorPlugin) {

@@ -1,16 +1,64 @@
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
-import { getStoreState } from '../store/plugin-store';
+import { usePluginStore, getStoreState } from '../store/plugin-store';
+
+let autoSaveTimeout: NodeJS.Timeout | null = null;
 
 /**
- * Initialize conversation store
+ * Initialize chat functionality with auto-save and other features
  */
-export async function initializeChatStore(plugin: LifeNavigatorPlugin): Promise<void> {
-  const state = getStoreState();
-  
-  // Initialize with empty conversation
-  // The conversation slice already has proper defaults
-  
-  console.log('Conversation store initialized');
+export async function initializeChatFeatures(plugin: LifeNavigatorPlugin): Promise<void> {
+  setupAutoSave(plugin);
+  console.log('Chat features initialized');
+}
+
+/**
+ * Cleanup chat functionality
+ */
+export function cleanupChatFeatures(): void {
+  if (autoSaveTimeout) {
+    clearTimeout(autoSaveTimeout);
+    autoSaveTimeout = null;
+  }
+  console.log('Chat features cleaned up');
+}
+
+/**
+ * Set up auto-save functionality that matches AIAgentContext behavior
+ */
+function setupAutoSave(plugin: LifeNavigatorPlugin): void {
+  // Subscribe to conversation changes
+  usePluginStore.subscribe(
+    (state) => ({
+      conversationVersion: state.chats.conversationVersion,
+      isGenerating: state.chats.isGenerating,
+      messages: state.chats.current.storedConversation.messages
+    }),
+    (currentState, previousState) => {
+      // Trigger auto-save when conversation version changes
+      if (currentState.conversationVersion !== previousState?.conversationVersion) {
+        // Clear previous timeout
+        if (autoSaveTimeout) {
+          clearTimeout(autoSaveTimeout);
+        }
+        
+        // Set up debounced auto-save (2 seconds like AIAgentContext)
+        autoSaveTimeout = setTimeout(async () => {
+          const state = getStoreState();
+          
+          // Only auto-save if not generating and has messages
+          if (!state.chats.isGenerating && state.chats.current.storedConversation.messages.length > 0) {
+            try {
+              // Use the store's auto-save action
+              await state.autoSaveConversation(state.chats.isGenerating);
+              console.log('Auto-saved conversation after 2s delay');
+            } catch (error) {
+              console.error('Failed to auto-save conversation:', error);
+            }
+          }
+        }, 2000);
+      }
+    }
+  );
 }
 
 /**
@@ -19,13 +67,4 @@ export async function initializeChatStore(plugin: LifeNavigatorPlugin): Promise<
 export function handleChatUpdate(): void {
   const { incrementChatVersion } = getStoreState();
   incrementChatVersion();
-}
-
-/**
- * Clean up conversation-related resources
- */
-export function cleanupChatStore(): void {
-  const state = getStoreState();
-  state.clearLiveToolResults();
-  console.log('Conversation store cleanup completed');
 } 

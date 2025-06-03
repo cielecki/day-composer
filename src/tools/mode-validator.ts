@@ -200,6 +200,9 @@ async function validateModeFile(app: any, file: TFile): Promise<ValidationResult
         : frontmatter.ln_example_usages
           ? [frontmatter.ln_example_usages]
           : [],
+      ln_expand_links: frontmatter.ln_expand_links !== undefined
+        ? String(frontmatter.ln_expand_links).toLowerCase() === "true"
+        : undefined,
       ln_model: frontmatter.ln_model,
       ln_thinking_budget_tokens: frontmatter.ln_thinking_budget_tokens !== undefined
         ? parseInt(String(frontmatter.ln_thinking_budget_tokens))
@@ -326,6 +329,13 @@ function validateModeFields(mode: LNMode, frontmatter: Record<string, any>, resu
     result.info.push(`Example usages: ${mode.ln_example_usages.length} defined`);
   } else {
     result.info.push("No example usages defined");
+  }
+
+  // Validate expand links
+  if (mode.ln_expand_links !== undefined) {
+    result.info.push(`Expand links: ${mode.ln_expand_links}`);
+  } else {
+    result.info.push("Expand links is undefined");
   }
 
   // Validate tool filtering

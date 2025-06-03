@@ -1,27 +1,29 @@
+import { initializeSettingsStore } from 'src/settings/settings-initialization';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
-import { initializeModesStore, cleanupModesStore } from '../modes/modes-initialization';
-import { initializeSettingsStore, cleanupSettingsStore } from '../settings/settings-initialization';
-import { initializeChatStore, cleanupChatStore } from '../chat/chat-initialization';
-import { initializeTTS, cleanupTTS } from '../tts/tts-initialization';
-import { initializeSTT, cleanupSTT } from '../stt/stt-initialization';
-import { initializeUIStore, cleanupUIStore } from '../ui/ui-initialization';
+import { initializeChatFeatures, cleanupChatFeatures } from '../chat/chat-initialization';
+import { initializeModesStore } from 'src/modes/modes-initialization';
+import { initializeSTT } from 'src/stt/stt-initialization';
+import { initializeTTS } from 'src/tts/tts-initialization';
+
+let initialized = false;
 
 /**
- * Initialize all store slices and their domain-specific logic
+ * Initialize the Zustand store with plugin instance
  */
 export async function initializeStore(plugin: LifeNavigatorPlugin): Promise<void> {
-  console.log('Initializing Zustand store and domain logic...');
-  
+  if (initialized) {
+    console.warn('Store already initialized');
+    return;
+  }
+
   try {
     // Initialize all domain slices in parallel
-    await Promise.all([
-      initializeModesStore(plugin),
-      initializeSettingsStore(plugin),
-      initializeChatStore(plugin),
-      initializeTTS(plugin),
-      initializeSTT(plugin),
-      initializeUIStore(plugin)
-    ]);
+
+    await initializeModesStore(plugin)
+    await initializeSettingsStore(plugin)
+    await initializeChatFeatures(plugin)
+    await initializeTTS(plugin)
+    await initializeSTT(plugin)
     
     console.log('Store initialization complete');
   } catch (error) {
@@ -31,30 +33,18 @@ export async function initializeStore(plugin: LifeNavigatorPlugin): Promise<void
 }
 
 /**
- * Cleanup all store slices and their domain-specific logic
+ * Clean up store resources
  */
-export function cleanupStore(plugin: LifeNavigatorPlugin): void {
-  console.log('Cleaning up Zustand store and domain logic...');
-  
-  try {
-    // Cleanup all domain slices
-    cleanupModesStore();
-    cleanupSettingsStore();
-    cleanupChatStore();
-    cleanupTTS();
-    cleanupSTT();
-    cleanupUIStore();
-    
-    console.log('Store cleanup complete');
-  } catch (error) {
-    console.error('Failed to cleanup store:', error);
+export function cleanupStore(): void {
+  if (!initialized) {
+    return;
   }
-}
 
-/**
- * Subscribe to store changes for persistence
- */
-export function setupStorePersistence(plugin: LifeNavigatorPlugin): void {
-  // This could be used to automatically save settings when they change
-  // For now, we'll rely on manual save operations
+  try {
+    cleanupChatFeatures();
+    initialized = false;
+    console.log('Store cleanup completed');
+  } catch (error) {
+    console.error('Error during store cleanup:', error);
+  }
 } 

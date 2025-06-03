@@ -70,8 +70,19 @@ export const vaultFindTool: ObsidianTool<VaultFindToolInput> = {
     context.setLabel(t('tools.find.inProgress', { path: directory_path || 'root' }));
 
     try {
-      // Normalize the path
-      const targetPath = directory_path.trim() === "" ? "" : normalizePath(directory_path);
+      // Normalize the path and handle special cases
+      let targetPath = directory_path.trim();
+      
+      // Handle current directory references
+      if (targetPath === "" || targetPath === ".") {
+        targetPath = "";
+      } else {
+        // Remove leading "./" if present
+        if (targetPath.startsWith("./")) {
+          targetPath = targetPath.substring(2);
+        }
+        targetPath = normalizePath(targetPath);
+      }
       
       // Get the folder (or root if path is empty)
       const folder = targetPath === "" ? plugin.app.vault.getRoot() : plugin.app.vault.getAbstractFileByPath(targetPath);

@@ -1,4 +1,3 @@
-
 export interface LNMode {
 	// Core identification
 	ln_name: string;
@@ -13,6 +12,7 @@ export interface LNMode {
 	// Behavior
 	ln_system_prompt: string; // The main content becomes this
 	ln_example_usages: string[]; // Message to automatically send when mode is activated
+	ln_expand_links: boolean; // Whether to expand wikilinks in content (default: true)
 
 
 	// API parameters

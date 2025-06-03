@@ -17,6 +17,8 @@ export async function initializeSettingsStore(plugin: LifeNavigatorPlugin): Prom
     
     // Load secrets from plugin data
     state.setSecrets(settings.secrets || {});
+
+    state.refreshSetupState();
     
     console.log('Settings store initialized');
   } finally {

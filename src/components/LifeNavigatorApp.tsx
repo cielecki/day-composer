@@ -18,10 +18,10 @@ import { TFile } from "obsidian";
 import { Modal } from "obsidian";
 import { t } from '../i18n';
 import { UnifiedInputArea } from "./UnifiedInputArea";
-import { isSetupComplete } from "../utils/setup-state";
 import { SetupFlow } from "./setup/SetupFlow";
 import { ConversationHistoryDropdown } from './ConversationHistoryDropdown';
 import { MarkdownRenderer } from './MarkdownRenderer';
+import { MessageWithId } from "../chat/chat-store";
 
 // Add Zustand store imports
 import {
@@ -82,14 +82,25 @@ export const LifeNavigatorApp: React.FC = () => {
 	const conversationHistoryButtonRef = useRef<HTMLButtonElement>(null);
 
 	// Access specific state slices from the store with granular subscriptions
-	const conversation = usePluginStore(state => state.chats.current.storedConversation.messages);
+	// Use stable selectors to prevent infinite loops
+	const conversationVersion = usePluginStore(state => state.chats.conversationVersion);
+	const rawConversation = usePluginStore(
+		useCallback((state) => state.chats.current.storedConversation.messages, [])
+	);
 	const isGeneratingResponse = usePluginStore(state => state.chats.isGenerating);
 	const editingMessage = usePluginStore(state => state.chats.editingMessage);
 	const liveToolResults = usePluginStore(state => state.chats.liveToolResults);
 	const availableModes = usePluginStore(state => state.modes.available);
 	const activeModeId = usePluginStore(state => state.modes.activeId);
-	const isPlayingAudio = usePluginStore(state => state.tts.isPlaying);
+	const isSpeaking = usePluginStore(state => state.tts.isSpeaking);
 	
+	// Create a stable reference to the conversation to prevent proxy issues
+	// Only recreate when the conversation version changes (indicating actual content changes)
+	const stableConversation = useMemo(() => {
+		// Create a new array reference to avoid proxy issues, but only when content actually changes
+		return rawConversation ? [...rawConversation] : [];
+	}, [rawConversation, conversationVersion]);
+
 	// Actions
 	const clearChat = usePluginStore(state => state.clearChat);
 	const addMessage = usePluginStore(state => state.addMessage);
@@ -97,40 +108,16 @@ export const LifeNavigatorApp: React.FC = () => {
 	const setActiveMode = usePluginStore(state => state.setActiveMode);
 	const resetTTS = usePluginStore(state => state.resetTTS);
 
+	// Use actual store methods instead of placeholder functions
+	const addUserMessage = usePluginStore(state => state.addUserMessage);
+	const editUserMessage = usePluginStore(state => state.editUserMessage);
+	const loadConversation = usePluginStore(state => state.loadConversation);
+	const getCurrentConversationId = usePluginStore(state => state.getCurrentConversationId);
+	const getConversationDatabase = usePluginStore(state => state.getConversationDatabase);
+	const getContext = usePluginStore(state => state.getContext);
+
 	// Get active mode
 	const activeMode = availableModes[activeModeId];
-
-	// Temporary functions until fully migrated
-	const addUserMessage = useCallback(async (userMessage: string, signal: AbortSignal, images?: any[]): Promise<void> => {
-		// TODO: Implement full conversation turn logic
-		console.log('addUserMessage called - need to implement full logic');
-	}, []);
-
-	const editUserMessage = useCallback(async (messageIndex: number, newContent: string, signal: AbortSignal, images?: any[]): Promise<void> => {
-		// TODO: Implement edit logic
-		console.log('editUserMessage called - need to implement full logic');
-	}, []);
-
-	const loadConversation = useCallback(async (conversationId: string): Promise<boolean> => {
-		// TODO: Implement conversation loading
-		console.log('loadConversation called - need to implement full logic');
-		return false;
-	}, []);
-
-	const getCurrentConversationId = useCallback((): string | null => {
-		// TODO: Implement conversation ID retrieval
-		return null;
-	}, []);
-
-	const getConversationDatabase = useCallback((): any => {
-		// TODO: Implement database access
-		return null;
-	}, []);
-
-	const getContext = useCallback(async (): Promise<string> => {
-		// TODO: Implement context retrieval
-		return '';
-	}, []);
 
 	const conversationContainerRef = useRef<HTMLDivElement>(null);
 
@@ -140,7 +127,7 @@ export const LifeNavigatorApp: React.FC = () => {
 		const resultsMap = new Map<string, ToolResultBlock>();
 
 		// First, add all stored tool results from the conversation
-		conversation.forEach((message) => {
+		stableConversation.forEach((message) => {
 			if (Array.isArray(message.content)) {
 				message.content.forEach((item) => {
 					if (
@@ -162,18 +149,18 @@ export const LifeNavigatorApp: React.FC = () => {
 		}
 
 		return resultsMap;
-	}, [conversation, liveToolResults]);
+	}, [stableConversation, liveToolResults]);
 
 	// Filter out user messages that contain only tool results
 	const filteredConversation = useMemo(() => {
-		let conversationToFilter = conversation;
+		let conversationToFilter = stableConversation;
 		
 		// If editing, only show messages up to (but NOT including) the one being edited
 		if (editingMessage) {
-			conversationToFilter = conversation.slice(0, editingMessage.index);
+			conversationToFilter = stableConversation.slice(0, editingMessage.index);
 		}
 
-		return conversationToFilter.filter((message) => {
+		const filtered = conversationToFilter.filter((message) => {
 			if (message.role === "assistant") {
 				return true;
 			}
@@ -196,19 +183,22 @@ export const LifeNavigatorApp: React.FC = () => {
 
 			return true;
 		});
-	}, [conversation, editingMessage]);
+
+		return filtered;
+	}, [stableConversation, editingMessage]);
 
 	// Create a mapping from filtered conversation indices to original conversation indices
-	const filteredToOriginalIndexMap = useMemo(() => {
-		const indexMap: number[] = [];
-		let originalIndex = 0;
+	const messageIndexMap = useMemo(() => {
+		const indexMap: Array<{ filteredIndex: number; originalIndex: number; messageId: string }> = [];
+		let filteredIndex = 0;
 		
-		for (const message of conversation) {
-			if (message.role === "assistant") {
-				indexMap.push(originalIndex);
-				originalIndex++;
-				continue;
+		stableConversation.forEach((message, originalIndex) => {
+			// Skip messages during editing
+			if (editingMessage && originalIndex >= editingMessage.index) {
+				return;
 			}
+
+			let shouldInclude = true;
 
 			if (message.role === "user" && Array.isArray(message.content)) {
 				const contentBlocks = message.content as ContentBlock[];
@@ -222,18 +212,24 @@ export const LifeNavigatorApp: React.FC = () => {
 							item.type === "tool_result",
 					);
 
-				if (!isOnlyToolResults) {
-					indexMap.push(originalIndex);
-				}
-			} else {
-				indexMap.push(originalIndex);
+				shouldInclude = !isOnlyToolResults;
 			}
-			
-			originalIndex++;
-		}
+
+			if (shouldInclude) {
+				const messageWithId = message as MessageWithId;
+				const messageId = messageWithId.messageId || `fallback-${originalIndex}`;
+				
+				indexMap.push({
+					filteredIndex,
+					originalIndex,
+					messageId
+				});
+				filteredIndex++;
+			}
+		});
 		
 		return indexMap;
-	}, [conversation]);
+	}, [stableConversation, editingMessage]);
 
 	// Helper function to scroll to bottom
 	const scrollToBottom = useCallback(() => {
@@ -299,7 +295,7 @@ export const LifeNavigatorApp: React.FC = () => {
 			// After a short delay, clean up any incomplete tool calls that may have been left
 			// We delay this to allow the abort to propagate through the async operations
 			setTimeout(() => {
-				const currentConversation = conversation;
+				const currentConversation = stableConversation;
 				if (currentConversation.length > 0) {
 					const lastMessage = currentConversation[currentConversation.length - 1];
 					
@@ -323,7 +319,7 @@ export const LifeNavigatorApp: React.FC = () => {
 		}
 		// Also stop any playing audio
 		resetTTS();
-	}, [abortController, setAbortController, resetTTS, conversation]);
+	}, [abortController, setAbortController, resetTTS, stableConversation]);
 
 
 	const toggleDropdown = useCallback(() => {
@@ -389,7 +385,7 @@ export const LifeNavigatorApp: React.FC = () => {
 	const renderEmptyConversation = () => {
 		if (
 			filteredConversation.length === 0 &&
-			!isPlayingAudio &&
+			!isSpeaking &&
 			!isGeneratingResponse
 		) {
 			return (
@@ -437,12 +433,8 @@ export const LifeNavigatorApp: React.FC = () => {
 	};
 
 	// Check if setup is complete
-	const isSetupCompleted = isSetupComplete();
+	const isSetupCompleted = usePluginStore(state => state.isSetupComplete());
 	
-	const handleSetupComplete = useCallback(() => {
-		// Force re-render to show main interface
-		setForceUpdate((prev: number) => prev + 1);
-	}, []);
 
 	// Refresh setup state check when component becomes visible or mounts
 	useEffect(() => {
@@ -474,7 +466,6 @@ export const LifeNavigatorApp: React.FC = () => {
 		return (
 			<SetupFlow 
 				lnModes={availableModes}
-				onSetupComplete={handleSetupComplete}
 			/>
 		);
 	}
@@ -675,27 +666,27 @@ export const LifeNavigatorApp: React.FC = () => {
 									{Object.values(availableModes).map((mode, index) => (
 										<div
 											key={index}
-											className="mode-option"
 											style={{
 												display: "flex",
 												alignItems: "center",
+												gap: "8px",
 												padding: "8px 12px",
 												cursor: "pointer",
-												borderRadius: "4px",
-												transition: "background-color 0.2s ease",
-											}}
-											onMouseEnter={(e) => {
-												(e.target as HTMLElement).style.backgroundColor =
-													"var(--background-modifier-hover)";
-											}}
-											onMouseLeave={(e) => {
-												(e.target as HTMLElement).style.backgroundColor =
-													"transparent";
+												backgroundColor:
+													mode.ln_path === activeMode?.ln_path
+														? "var(--background-modifier-hover)"
+														: "transparent",
+												position: "relative",
+												fontWeight: mode.ln_path === activeMode?.ln_path ? 500 : "normal",
+												whiteSpace: "normal",
+												wordBreak: "break-word",
 											}}
 											onClick={() => {
 												setActiveMode(mode.ln_path);
 												setDropdownOpen(false);
 											}}
+											onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
+											onMouseOut={e => (e.currentTarget.style.backgroundColor = mode.ln_path === activeMode?.ln_path ? "var(--background-modifier-hover)" : "transparent")}
 										>
 											{mode.ln_icon && (
 												<span
@@ -718,13 +709,14 @@ export const LifeNavigatorApp: React.FC = () => {
 													whiteSpace: "nowrap",
 													overflow: "hidden",
 													textOverflow: "ellipsis",
-													fontWeight: mode.ln_path === activeMode.ln_path ? 500 : "normal",
+													fontWeight: mode.ln_path === activeMode?.ln_path ? 500 : "normal",
 												}}
 											>
 												{mode.ln_name}
 											</span>
 										</div>
 									))}
+									
 								</>
 							)}
 						</div>
@@ -749,13 +741,15 @@ export const LifeNavigatorApp: React.FC = () => {
 							<LucideIcon name="history" size={18} />
 						</button>
 
-						<ConversationHistoryDropdown
-							database={getConversationDatabase()}
-							onConversationSelect={handleConversationSelect}
-							isOpen={conversationHistoryOpen}
-							onToggle={() => setConversationHistoryOpen(!conversationHistoryOpen)}
-							currentConversationId={getCurrentConversationId()}
-						/>
+						{getConversationDatabase() && (
+							<ConversationHistoryDropdown
+								database={getConversationDatabase()!}
+								onConversationSelect={handleConversationSelect}
+								isOpen={conversationHistoryOpen}
+								onToggle={() => setConversationHistoryOpen(!conversationHistoryOpen)}
+								currentConversationId={getCurrentConversationId()}
+							/>
+						)}
 					</div>
 				</div>
 			</div>
@@ -768,11 +762,11 @@ export const LifeNavigatorApp: React.FC = () => {
 
 				{filteredConversation.map((message, index) => (
 					<MessageDisplay
-						key={`msg-${index}`}
+						key={messageIndexMap[index].messageId}
 						role={message.role}
 						content={message.content}
 						toolResults={toolResultsMap}
-						messageIndex={filteredToOriginalIndexMap[index]}
+						messageIndex={messageIndexMap[index].originalIndex}
 						isLastMessage={index === filteredConversation.length - 1}
 						isGeneratingResponse={isGeneratingResponse}
 						newAbortController={newAbortController}

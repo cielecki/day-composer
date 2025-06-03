@@ -5,15 +5,40 @@ import { LifeNavigatorView, LIFE_NAVIGATOR_VIEW_TYPE } from './life-navigator-vi
 import { checkForAvailableUpdate, checkForUpdatesOnStartup } from './auto-update';
 import { getObsidianTools, resetObsidianTools } from './obsidian-tools';
 import { LifeNavigatorSettingTab } from './settings/LifeNavigatorSettingTab';
-import { createPluginSettings, loadPluginSettings, getPluginSettings } from './settings/LifeNavigatorSettings';
+import { createPluginSettings, loadPluginSettings } from './settings/LifeNavigatorSettings';
 import { UserDefinedToolManager } from './user-tools/UserDefinedToolManager';
+import { ConversationDatabase } from './services/conversation-database';
 
 export class LifeNavigatorPlugin extends Plugin {
+	private static _instance: LifeNavigatorPlugin | null = null;
+	
 	view: LifeNavigatorView | null = null;
 	userToolManager: UserDefinedToolManager | null = null;
+	conversationDatabase: ConversationDatabase | null = null;
+
+	/**
+	 * Get the current plugin instance
+	 */
+	static getInstance(): LifeNavigatorPlugin | null {
+		return LifeNavigatorPlugin._instance;
+	}
+
+	/**
+	 * Safely get the conversation database from the current instance
+	 */
+	static getConversationDatabase(): ConversationDatabase | null {
+		return LifeNavigatorPlugin._instance?.conversationDatabase || null;
+	}
 
 	async onload() {
 		console.log("Loading Life Navigator plugin");
+
+		// Set the static instance reference
+		if (!LifeNavigatorPlugin._instance) {
+			LifeNavigatorPlugin._instance = this;
+		} else {
+			throw new Error('LifeNavigatorPlugin instance already exists');
+		}
 
 		// Make app available globally for navigation service
 		(window as any).app = this.app;
@@ -24,6 +49,10 @@ export class LifeNavigatorPlugin extends Plugin {
 		// Initialize the plugin settings
 		createPluginSettings(this);
 		await loadPluginSettings(this);
+
+		// Initialize conversation database
+		this.conversationDatabase = new ConversationDatabase();
+		await this.conversationDatabase.initialize();
 
 		// Initialize the obsidian tools with this plugin instance
 		getObsidianTools(this);
@@ -50,8 +79,10 @@ export class LifeNavigatorPlugin extends Plugin {
 			name: t("tools.resetTutorial"),
 			callback: async () => {
 				try {
-					const settings = getPluginSettings();
-					await settings.resetTutorial();
+					// Use the setup slice from the store
+					const { getStoreState } = await import('./store/plugin-store');
+					const store = getStoreState();
+					await store.resetTutorialState();
 					new Notice(t('settings.actions.resetTutorial.success'));
 
 					// Optionally reload the plugin view to show setup screens
@@ -197,6 +228,14 @@ export class LifeNavigatorPlugin extends Plugin {
 
 	onunload() {
 		console.log("Unloading Life Navigator plugin");
+		
+		// Clear the static instance reference
+		if (LifeNavigatorPlugin._instance) {
+			LifeNavigatorPlugin._instance = null;
+		} else {
+			throw new Error('LifeNavigatorPlugin instance not found');
+		}
+		
 		resetObsidianTools();
 	}
 }
