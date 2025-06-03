@@ -37,6 +37,31 @@ export class LifeNavigatorSettings {
 			// Remove the plugin reference as it shouldn't be serialized
 			delete (dataToSave as any).plugin;
 			
+			// Encrypt secrets before saving
+			if (this.secrets && Object.keys(this.secrets).length > 0) {
+				try {
+					// Import store functions dynamically to avoid circular dependencies
+					const { getStoreState } = await import('../store/plugin-store');
+					const store = getStoreState();
+					
+					// Encrypt the secrets and store under 'encryptedSecrets' key
+					const encryptedSecrets = store.encryptSecretsForStorage(this.secrets);
+					(dataToSave as any).encryptedSecrets = encryptedSecrets;
+					
+					// Remove plain text secrets from storage
+					delete (dataToSave as any).secrets;
+					
+					console.log('Secrets encrypted for storage. Count:', Object.keys(this.secrets).length);
+				} catch (error) {
+					console.error('Failed to encrypt secrets, falling back to plain text storage:', error);
+					// Fallback: keep plain text secrets if encryption fails
+				}
+			} else {
+				// No secrets to encrypt, ensure both are cleared
+				delete (dataToSave as any).secrets;
+				delete (dataToSave as any).encryptedSecrets;
+			}
+			
 			await this.plugin.saveData(dataToSave);
 		}
 	}
@@ -110,7 +135,7 @@ export async function loadPluginSettings(plugin: LifeNavigatorPlugin): Promise<L
 	const data = await plugin.loadData() || {};
 	
 	// First, safely copy non-conflicting properties
-	const { openAIApiKey, anthropicApiKey, firecrawlApiKey, ...safeData } = data as any;
+	const { openAIApiKey, anthropicApiKey, firecrawlApiKey, secrets: plainTextSecrets, encryptedSecrets, ...safeData } = data as any;
 	Object.assign(settings, safeData);
 
 	// Ensure secrets object exists
@@ -120,7 +145,25 @@ export async function loadPluginSettings(plugin: LifeNavigatorPlugin): Promise<L
 
 	let migrationOccurred = false;
 
-	// Migration: move old API keys to new secrets system with standard naming
+	// Step 1: Handle encrypted secrets if they exist
+	if (encryptedSecrets && typeof encryptedSecrets === 'object') {
+		try {
+			// Import store functions dynamically to avoid circular dependencies
+			const { getStoreState } = await import('../store/plugin-store');
+			const store = getStoreState();
+			
+			// Decrypt secrets from storage
+			const decryptedSecrets = store.decryptSecretsFromStorage(encryptedSecrets);
+			Object.assign(settings.secrets, decryptedSecrets);
+			
+			console.log('Decrypted secrets from storage. Count:', Object.keys(decryptedSecrets).length);
+		} catch (error) {
+			console.error('Failed to decrypt secrets from storage:', error);
+			// Continue without encrypted secrets if decryption fails
+		}
+	}
+
+	// Step 2: Migration - handle old individual API keys format only (no plain text secrets support)
 	if (openAIApiKey) {
 		settings.setSecret('OPENAI_API_KEY', openAIApiKey);
 		migrationOccurred = true;
@@ -136,8 +179,14 @@ export async function loadPluginSettings(plugin: LifeNavigatorPlugin): Promise<L
 		migrationOccurred = true;
 	}
 
-	// Save settings if migration occurred to persist the new format and remove old keys
+	// Log if plain text secrets were found (but don't migrate them since this format was never released)
+	if (plainTextSecrets && typeof plainTextSecrets === 'object') {
+		console.warn('Found plain text secrets object in data.json - this format is not supported. Secrets should be encrypted or use the old individual API key format.');
+	}
+
+	// Save settings if migration occurred to persist encrypted format and remove old keys
 	if (migrationOccurred) {
+		console.log('Migration completed. Saving encrypted secrets...');
 		await settings.saveSettings();
 	}
 

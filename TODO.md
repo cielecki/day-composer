@@ -1,5 +1,6 @@
 # TODO
 
+- [ ] Is audio working?
 - [ ] Encrypted secrets storage?
 - [ ] **Interactive Creator Mode:** How to create guidance for users when creating their materials? Some nice mode? or docs? Maybe a tutorial agent? Create a creator mode that generates sections/files based on dialogue with the user instead of using standard starter kits. This would provide a more personalized and interactive setup experience. Maybe this should allow for downloading files from github based on needs of the user.
 - [ ] Jak robiłem kolejną transkrypcje podczas generacji coś się walneło, chyba ostatnie zmiany popsuły w tym zakresie coś.
@@ -19,10 +20,6 @@
 > 
 > Do NOT open a new PR for re-validation. Once you have pushed all of the required changes to your repo, the bot will update the labels on this PR within 6 hours. If you think some of the required changes are incorrect, please comment with `/skip` and the reason why you think the results are incorrect.
 
-- [ ] Do I want to be able to download any file from the repository?
-- [ ] Any other tools should be user tools?
-- [ ] Proper mature user defined calendar tool 
-- [ ] Prompt caching for anthropic
 
 # Stages
 - [ ] Onboard 5 people to the plugin
@@ -36,7 +33,10 @@
 - [ ] Article about wiki paradigm as markdown database (creating/using input output not chats and rag, AI helping with this)
 
 ## Nice to haves
-
+- [ ] Any other tools should be user tools?
+- [ ] Proper mature user defined calendar tool
+- [ ] Do I want to be able to download any file from the repository?
+- [ ] Prompt caching for anthropic
 - [ ] Introduce support for weekly and monthly summaries via ln-monthly-note and ln-weekly-note.
 - [ ] Creator prototype
 - [ ] Change the link emoji to 🧭?

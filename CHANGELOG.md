@@ -8,7 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Secrets Encryption**: Implemented AES-256 encryption for all secrets stored in the plugin's data.json file:
+  - **AES-256-CBC Encryption**: All secrets are now encrypted using industry-standard AES-256-CBC with random IVs per secret
+  - **Opaque Storage Keys**: Secret names are hashed to prevent casual inspection of what types of keys are stored
+  - **Automatic Migration**: Existing individual API keys (openAIApiKey, anthropicApiKey, firecrawlApiKey) are automatically migrated to encrypted storage on first load
+  - **Backward Compatibility**: Seamless migration from old individual API key format without data loss
+  - **Security Notice Updates**: Updated UI and tool messages to reflect encrypted storage while maintaining security warnings
+  - **Robust Error Handling**: Graceful fallback and error recovery if encryption/decryption fails
+- **File Move Tool**: New built-in tool for moving files from one location to another within the vault:
+  - **Automatic Directory Creation**: Creates destination directories if they don't exist
+  - **Path Validation**: Checks source file existence and prevents overwriting existing files
+  - **Navigation Integration**: Click tool call results to open the moved file in its new location
+  - **Comprehensive Error Handling**: Clear error messages for missing files, permission issues, and invalid paths
+  - **Full Internationalization**: Complete translation support for English and Polish
 - **Conversation Save Tool**: New built-in tool for saving current conversations to notes in the vault:
+  - **Markdown Format**: Conversations are now saved in clean markdown format with proper headers instead of XML format
+  - **Full Internationalization**: Complete translation support for English and Polish including all messages, labels, and error text
+  - **Metadata Headers**: Optional conversation metadata including date, mode, and message count
+  - **Auto-versioning**: Automatically creates versioned filenames when files already exist
+  - **Navigation Integration**: Click saved conversation tool calls to open the created files directly
 - **Link Expansion Control Parameter**: Added `ln_expand_links` parameter to mode configuration for controlling whether wikilinks are expanded in system prompts. Defaults to `true` for backward compatibility. Pre-built modes have this set to `false` to prevent link expansion. This allows fine-grained control over when [[Note Name]] 🔎 links should be processed and expanded with actual note content.
 - **Library Index System**: Created comprehensive `library/index.md` file that catalogs all library content with descriptions and AI-guidance for when files should be downloaded. This enables intelligent file selection based on user context rather than browsing all files.
 - **Library Browse & View Tools**: New simplified tool pair for browsing and downloading Life Navigator library content:
@@ -57,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Library Tools Integration**: Added `library-list` and `library-view` tools specifically for Life Navigator library content discovery
 
 ### Changed
+- **Conversation Database Migration to Zustand**: Migrated all conversation database operations from the separate ConversationDatabase service class into a dedicated ChatsDatabaseSlice as proper Zustand store actions. This improves state management consistency, ensures all database mutations happen within proper Immer contexts, and eliminates the state mutation issues that were occurring when the database service tried to modify read-only objects from the store. All database functionality remains the same but is now properly integrated into the store architecture.
 - **API Key Storage**: Migrated from specific API key fields (openAIApiKey, anthropicApiKey, firecrawlApiKey) to generic secrets system with backward compatibility.
 - **Setup Screen Overhaul**: Simplified setup screen CSS by removing excessive animations, transforms, and over-styled elements. Replaced 90s-era web design patterns with clean, modern styling that follows Obsidian's design principles. Reduced CSS from ~320 lines to ~90 lines while maintaining functionality and improving visual appeal. Improved language selection interface in setup flow with better visual hierarchy, cleaner current language indicator using a checkmark icon instead of text, and enhanced button styling with proper selected states.
 - **User-Defined Tool Naming**: Tool names now come from filenames (like modes) instead of frontmatter `ln-tool-name` field. This makes tool creation simpler and more consistent with how modes work. Tool files can be renamed to change the tool name, and no frontmatter field is required for naming.
@@ -68,8 +87,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Mode Management**: Pre-built modes are protected from deletion and don't show "Open in editor" option
 
 ### Fixed
+- **Empty Text Content Blocks API Error**: Fixed "text content blocks must be non-empty" error by implementing comprehensive validation and filtering:
+  - **Enhanced Message Validation**: Added filtering of empty text blocks in `validateAndCleanMessages` function to prevent empty content from being sent to Anthropic API
+  - **Improved API Formatting**: Modified `formatMessagesForAPI` to skip messages with no valid content blocks instead of sending empty text blocks
+  - **Content Block Filtering**: Added `filterEmptyContentBlocks` utility function to remove empty or invalid content blocks before API calls
+  - **Comprehensive Empty Block Detection**: Filters out text blocks with empty text, thinking blocks without content, incomplete tool_use blocks, and tool_result blocks without content
+  - **Graceful Degradation**: Messages with only empty content blocks are now skipped with warning logs instead of causing API errors
+- **Conversation Auto-Save State Mutation**: Fixed "Cannot assign to read only property 'title'" error during conversation auto-save by ensuring all object mutations happen within Zustand's `set()` function rather than directly mutating read-only objects from the store. The conversation database now expects fully prepared conversation objects, while all title generation and property updates are handled in the store actions using proper Immer patterns.
 - **Waveform Visibility During Transcription**: Fixed waveform visualization to remain visible during transcription instead of disappearing. The waveform now stays static during transcription (showing the last recorded pattern) and is cleared after transcription completes. This provides better visual feedback by maintaining the visual indication during processing while stopping the distracting animation.
 - **Configurable Vault Config Directory**: Fixed hardcoded `.obsidian` directory reference in daily notes settings to use the configurable vault config directory (`app.vault.configDir`) instead, ensuring compatibility with custom Obsidian configuration directories.
+- **First Message Edit Empty Chat Screen**: Fixed issue where editing the first message in chat would show an empty chat screen instead of displaying the message being edited. The filtering logic now properly handles the first message edit case by showing at least the first message to provide context during editing.
 
 ### Removed
 - **Built-in YouTube Transcript Tool**: Removed the built-in `download_youtube_transcript` tool in favor of the user-defined YouTube transcript tool available in the starter kit. This simplifies the codebase while maintaining functionality through the more flexible user-defined tool system.

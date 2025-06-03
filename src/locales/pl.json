@@ -120,7 +120,7 @@
         "edit": "Edytuj",
         "noSecrets": "Brak skonfigurowanych sekretów. Dodaj klucze API i sekrety używając przycisku powyżej."
       },
-      "securityNote": "Ważne: Twoje sekrety są przechowywane w folderze konfiguracyjnym Obsidian w postaci zwykłego tekstu. Nie udostępniaj swojego vault'a ani folderu konfiguracyjnego innym, jeśli przechowujesz tutaj wrażliwe klucze API.",
+      "securityNote": "Ważne: Twoje sekrety są zaszyfrowane przy użyciu AES-256 i przechowywane w folderze konfiguracyjnym Obsidian. Chociaż zapewnia to ochronę przed przypadkowym dostępem, każdy z dostępem do kodu źródłowego wtyczki może potencjalnie je odszyfrować. Nie udostępniaj swojego vault'a ani folderu konfiguracyjnego innym, jeśli przechowujesz tutaj wrażliwe klucze API.",
       "title": "Klucze API i Sekrety"
     },
     "security": {
@@ -371,7 +371,7 @@
     "secretSave": {
       "progress": {
         "overwriting": "Sekret {{key}} już istnieje. Nadpisywanie...",
-        "securityReminder": "⚠️ Informacja o bezpieczeństwie: Sekrety są przechowywane w folderze konfiguracyjnym Obsidian w postaci zwykłego tekstu. Nie udostępniaj swojego vault lub folderu konfiguracyjnego innym osobom.",
+        "securityReminder": "⚠️ Informacja o bezpieczeństwie: Sekrety są zaszyfrowane przy użyciu AES-256 i przechowywane w folderze konfiguracyjnym Obsidian. Chociaż zapewnia to ochronę przed przypadkowym dostępem, każdy z dostępem do kodu źródłowego wtyczki może potencjalnie je odszyfrować.",
         "success": "Pomyślnie zapisano sekret {{key}}"
       }
     },

@@ -120,7 +120,7 @@
         "edit": "Edit",
         "noSecrets": "No secrets configured. Add API keys and secrets using the button above."
       },
-      "securityNote": "Important: Your secrets are stored in your Obsidian config folder in plain text. Do not share your vault or config folder with others if you store sensitive API keys here.",
+      "securityNote": "Important: Your secrets are encrypted using AES-256 and stored in your Obsidian config folder. While this provides protection against casual inspection, anyone with access to the plugin source code can potentially decrypt them. Do not share your vault or config folder with others if you store sensitive API keys here.",
       "title": "API Keys & Secrets"
     },
     "security": {
@@ -371,7 +371,7 @@
     "secretSave": {
       "progress": {
         "overwriting": "Secret {{key}} already exists. Overwriting...",
-        "securityReminder": "⚠️ Security Notice: Secrets are stored in your Obsidian config folder in plain text. Do not share your vault or config folder with others.",
+        "securityReminder": "⚠️ Security Notice: Secrets are encrypted using AES-256 and stored in your Obsidian config folder. While this provides protection against casual inspection, anyone with access to the plugin source code can potentially decrypt them.",
         "success": "Successfully saved secret {{key}}"
       }
     },
