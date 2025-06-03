@@ -75,6 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Built-in Deep Research Tool**: Removed the built-in `deep_research` tool in favor of the user-defined deep research tool available in the starter kit. The new tool uses direct API requests instead of external dependencies, simplifying the codebase while maintaining full functionality.
 - **Firecrawl SDK Dependency**: Removed `@mendable/firecrawl-js` package dependency as deep research functionality now uses direct API requests, reducing bundle size and external dependencies.
 - **Starter Kit System**: Completely removed starter kit creation, generation scripts, and related commands
+- **New Mode Button and Command**: Removed the "New Mode" button from the UI dropdown and its associated command. Mode creation should now be handled through AI tools for a more integrated experience.
+
 ## [0.9.3] - 2025-06-02
 
 ### Added

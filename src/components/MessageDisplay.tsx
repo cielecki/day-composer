@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ContentBlock } from '../utils/chat/types';
 import { NavigationTarget } from '../obsidian-tools';
 import { ThinkingCollapsibleBlock, RedactedThinkingBlock as RedactedThinking, ToolBlock } from './CollapsibleBlock';
 import { getObsidianTools } from '../obsidian-tools';
-import { useAIAgent } from '../context/AIAgentContext';
-import { useTextToSpeech } from '../context/TextToSpeechContext';
-import { useSpeechToText } from '../context/SpeechToTextContext';
+import { usePluginStore } from '../store/plugin-store';
 import { t } from '../i18n';
 import { LucideIcon } from './LucideIcon';
 import { ToolResultBlock } from '../utils/chat/types';
@@ -43,14 +41,38 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   newAbortController,
   abort,
 }) => {
-  const { editUserMessage, startEditingMessage } = useAIAgent();
-  const { speakText, isPlayingAudio, isGeneratingSpeech, stopAudio, isPaused, pauseAudio, resumeAudio } = useTextToSpeech();
-  const { isRecording } = useSpeechToText();
+  // Get specific state slices from Zustand store with granular subscriptions
+  const ttsState = usePluginStore(state => state.tts);
+  const isRecording = usePluginStore(state => state.stt.isRecording);
+  const setEditingMessage = usePluginStore(state => state.setEditingMessage);
+  const setTTSPaused = usePluginStore(state => state.setTTSPaused);
+  const resetTTS = usePluginStore(state => state.resetTTS);
+
+  // Extract individual values from TTS state
+  const { isPlaying: isPlayingAudio, isGenerating: isGeneratingSpeech, isPaused } = ttsState;
+
   const [copyIcon, setCopyIcon] = useState<'copy' | 'check'>('copy');
   const [toolsCache, setToolsCache] = useState<Map<string, any>>(new Map());
 
   const contentBlocksToRender = ensureContentBlocksForDisplay(content);
   const toolResultsMap = toolResults;
+
+  // Temporary TTS functions - TODO: implement full TTS logic
+  const speakText = useCallback(async (text: string, signal: AbortSignal, autoPlay: boolean) => {
+    console.log('speakText called - need to implement full TTS logic');
+  }, []);
+
+  const pauseAudio = useCallback(() => {
+    setTTSPaused(true);
+  }, [setTTSPaused]);
+
+  const resumeAudio = useCallback(() => {
+    setTTSPaused(false);
+  }, [setTTSPaused]);
+
+  const stopAudio = useCallback(() => {
+    resetTTS();
+  }, [resetTTS]);
 
   // Helper to get plain text content
   const getPlainTextContent = (blocks: ContentBlock[]): string => {
@@ -98,7 +120,22 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   // Handle edit message button click
   const handleEditClick = () => {
     if (role === 'user' && messageIndex !== undefined) {
-      startEditingMessage(messageIndex);
+      // Extract text content from the message
+      const textContent = contentBlocksToRender
+        .filter(block => block.type === 'text')
+        .map(block => (block as any).text)
+        .join(' ');
+      
+      // Extract images if any
+      const images = contentBlocksToRender
+        .filter(block => block.type === 'image')
+        .map(block => block as any);
+      
+      setEditingMessage({
+        index: messageIndex,
+        content: textContent,
+        images: images.length > 0 ? images : undefined
+      });
     }
   };
 

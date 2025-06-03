@@ -29,11 +29,13 @@
     "@types/js-yaml": "^4.0.9",
     "axios": "^1.9.0",
     "i18next": "^25.1.2",
+    "immer": "^10.1.1",
     "js-yaml": "^4.1.0",
     "openai": "^4.98.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "zustand": "^5.0.5"
   }
 }

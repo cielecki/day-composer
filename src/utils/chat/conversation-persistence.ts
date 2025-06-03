@@ -1,10 +1,10 @@
 import { ConversationDatabase } from "../../services/conversation-database";
-import { Conversation } from "./conversation";
+import { Chat } from "./conversation";
 import { Notice } from "obsidian";
 
 export interface ConversationPersistenceContext {
 	conversationDatabase: ConversationDatabase;
-	getCurrentConversation: () => Conversation;
+	getCurrentConversation: () => Chat;
 	activeModeIdRef: React.MutableRefObject<string>;
 	lnModesRef: React.MutableRefObject<Record<string, any>>;
 }
@@ -81,7 +81,7 @@ export const saveCurrentConversation = async (
 export const loadConversation = async (
 	context: ConversationPersistenceContext,
 	conversationId: string,
-	setConversation: (conversation: Conversation) => void
+	setConversation: (conversation: Chat) => void
 ): Promise<boolean> => {
 	try {
 		// Load the stored conversation data
@@ -101,7 +101,7 @@ export const loadConversation = async (
 		}
 
 		// Reconstruct the full conversation object
-		const conversation: Conversation = {
+		const conversation: Chat = {
 			meta: meta,
 			storedConversation: storedConversation
 		};

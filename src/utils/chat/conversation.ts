@@ -17,7 +17,7 @@ export interface StoredConversation {
 	messages: Message[];
 }
 
-export interface Conversation {
+export interface Chat {
 	meta: ConversationMeta;
 	storedConversation: StoredConversation;
 }

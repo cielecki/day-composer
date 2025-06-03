@@ -2,13 +2,10 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import * as ReactDOM from "react-dom/client";
 import { LifeNavigatorApp } from "./components/LifeNavigatorApp";
 import { Message } from "./utils/chat/types";
-import { AIAgentProvider } from "./context/AIAgentContext";
-import { SpeechToTextProvider } from "./context/SpeechToTextContext";
 import { LifeNavigatorPlugin } from './LifeNavigatorPlugin';
-import { TextToSpeechProvider } from "./context/TextToSpeechContext";
-import { LNModeProvider } from "./context/LNModeContext";
 import { t } from './i18n';
 import { ConversationDatabase } from "./services/conversation-database";
+import { initializeStore, cleanupStore } from "./store/store-initialization";
 
 export interface LifeNavigatorViewProps {
 	plugin: LifeNavigatorPlugin;
@@ -55,6 +52,9 @@ export class LifeNavigatorView extends ItemView {
 		container.empty();
 		container.addClass("life-navigator-view");
 
+		// Initialize Zustand store
+		await initializeStore(this.props.plugin);
+
 		// Create a container for React
 		const reactContainer = container.createDiv({ cls: "react-container" });
 
@@ -68,6 +68,9 @@ export class LifeNavigatorView extends ItemView {
 		// Clean up resources
 		console.log("View closing, cleaning up resources");
 
+		// Clean up Zustand store
+		cleanupStore(this.props.plugin);
+
 		// Clean up React component
 		if (this.reactRoot) {
 			this.reactRoot.unmount();
@@ -80,17 +83,8 @@ export class LifeNavigatorView extends ItemView {
 
 		console.log(`Rendering LifeNavigatorView component with conversation: ${this._conversation.length} messages`);
 
-		this.reactRoot.render(
-			<LNModeProvider app={this.app}>
-				<TextToSpeechProvider>
-					<SpeechToTextProvider>
-						<AIAgentProvider plugin={this.props.plugin} conversationDatabase={this.conversationDatabase}>
-							<LifeNavigatorApp />
-						</AIAgentProvider>
-					</SpeechToTextProvider>
-				</TextToSpeechProvider>
-			</LNModeProvider>
-		);
+		// Render directly without context providers since we're using Zustand
+		this.reactRoot.render(<LifeNavigatorApp />);
 	}
 
 	// Add getState and setState methods

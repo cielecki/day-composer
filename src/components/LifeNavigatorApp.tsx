@@ -6,15 +6,12 @@ import React, {
 	useState,
 } from "react";
 import { MessageDisplay } from "./MessageDisplay";
-import { useTextToSpeech } from "../context/TextToSpeechContext";
 import { ThinkingMessage } from "./ThinkingMessage";
-import { useLNMode } from "../context/LNModeContext";
 import {
 	ToolResultBlock,
 	ContentBlock,
 } from "../utils/chat/types";
 import { NavigationTarget } from "../obsidian-tools";
-import { useAIAgent } from "../context/AIAgentContext";
 import { LucideIcon } from "./LucideIcon";
 import { LNModePill } from "./LNModePills";
 import { TFile } from "obsidian";
@@ -25,6 +22,11 @@ import { isSetupComplete } from "../utils/setup-state";
 import { SetupFlow } from "./setup/SetupFlow";
 import { ConversationHistoryDropdown } from './ConversationHistoryDropdown';
 import { MarkdownRenderer } from './MarkdownRenderer';
+
+// Add Zustand store imports
+import {
+	usePluginStore
+} from "../store/plugin-store";
 
 declare global {
 	interface Window {
@@ -79,27 +81,58 @@ export const LifeNavigatorApp: React.FC = () => {
 	const [conversationHistoryOpen, setConversationHistoryOpen] = useState(false);
 	const conversationHistoryButtonRef = useRef<HTMLButtonElement>(null);
 
-	const {
-		conversation,
-		clearConversation,
-		addUserMessage,
-		getContext,
-		editingMessage,
-		editUserMessage,
-		isGeneratingResponse,
-		loadConversation,
-		getCurrentConversationId,
-		getConversationDatabase,
-		liveToolResults,
-	} = useAIAgent();
+	// Access specific state slices from the store with granular subscriptions
+	const conversation = usePluginStore(state => state.chats.current.storedConversation.messages);
+	const isGeneratingResponse = usePluginStore(state => state.chats.isGenerating);
+	const editingMessage = usePluginStore(state => state.chats.editingMessage);
+	const liveToolResults = usePluginStore(state => state.chats.liveToolResults);
+	const availableModes = usePluginStore(state => state.modes.available);
+	const activeModeId = usePluginStore(state => state.modes.activeId);
+	const isPlayingAudio = usePluginStore(state => state.tts.isPlaying);
+	
+	// Actions
+	const clearChat = usePluginStore(state => state.clearChat);
+	const addMessage = usePluginStore(state => state.addMessage);
+	const setEditingMessage = usePluginStore(state => state.setEditingMessage);
+	const setActiveMode = usePluginStore(state => state.setActiveMode);
+	const resetTTS = usePluginStore(state => state.resetTTS);
 
-	// Use LNModes context
-	const { lnModesRef, activeModeIdRef, setActiveModeId } = useLNMode();
-	const activeMode = lnModesRef.current[activeModeIdRef.current];
+	// Get active mode
+	const activeMode = availableModes[activeModeId];
+
+	// Temporary functions until fully migrated
+	const addUserMessage = useCallback(async (userMessage: string, signal: AbortSignal, images?: any[]): Promise<void> => {
+		// TODO: Implement full conversation turn logic
+		console.log('addUserMessage called - need to implement full logic');
+	}, []);
+
+	const editUserMessage = useCallback(async (messageIndex: number, newContent: string, signal: AbortSignal, images?: any[]): Promise<void> => {
+		// TODO: Implement edit logic
+		console.log('editUserMessage called - need to implement full logic');
+	}, []);
+
+	const loadConversation = useCallback(async (conversationId: string): Promise<boolean> => {
+		// TODO: Implement conversation loading
+		console.log('loadConversation called - need to implement full logic');
+		return false;
+	}, []);
+
+	const getCurrentConversationId = useCallback((): string | null => {
+		// TODO: Implement conversation ID retrieval
+		return null;
+	}, []);
+
+	const getConversationDatabase = useCallback((): any => {
+		// TODO: Implement database access
+		return null;
+	}, []);
+
+	const getContext = useCallback(async (): Promise<string> => {
+		// TODO: Implement context retrieval
+		return '';
+	}, []);
 
 	const conversationContainerRef = useRef<HTMLDivElement>(null);
-
-	const { isPlayingAudio, stopAudio } = useTextToSpeech();
 
 	// Build a map of tool results (tool_use_id -> ToolResultBlock)
 	// Merge stored results with live results for real-time updates
@@ -289,8 +322,8 @@ export const LifeNavigatorApp: React.FC = () => {
 			}, 500);
 		}
 		// Also stop any playing audio
-		stopAudio();
-	}, [abortController, setAbortController, stopAudio, conversation]);
+		resetTTS();
+	}, [abortController, setAbortController, resetTTS, conversation]);
 
 
 	const toggleDropdown = useCallback(() => {
@@ -440,7 +473,7 @@ export const LifeNavigatorApp: React.FC = () => {
 	if (!isSetupCompleted) {
 		return (
 			<SetupFlow 
-				lnModes={lnModesRef.current}
+				lnModes={availableModes}
 				onSetupComplete={handleSetupComplete}
 			/>
 		);
@@ -637,32 +670,32 @@ export const LifeNavigatorApp: React.FC = () => {
 							</div>
 
 							{/* Mode list */}
-							{Object.keys(lnModesRef.current).length > 0 && (
+							{Object.keys(availableModes).length > 0 && (
 								<>
-									{Object.values(lnModesRef.current).map((mode, index) => (
+									{Object.values(availableModes).map((mode, index) => (
 										<div
 											key={index}
+											className="mode-option"
 											style={{
 												display: "flex",
 												alignItems: "center",
-												gap: "8px",
 												padding: "8px 12px",
 												cursor: "pointer",
-												backgroundColor:
-													mode.ln_path === activeMode.ln_path
-														? "var(--background-modifier-hover)"
-														: "transparent",
-												position: "relative",
-												fontWeight: mode.ln_path === activeMode.ln_path ? 500 : "normal",
-												whiteSpace: "normal",
-												wordBreak: "break-word",
+												borderRadius: "4px",
+												transition: "background-color 0.2s ease",
+											}}
+											onMouseEnter={(e) => {
+												(e.target as HTMLElement).style.backgroundColor =
+													"var(--background-modifier-hover)";
+											}}
+											onMouseLeave={(e) => {
+												(e.target as HTMLElement).style.backgroundColor =
+													"transparent";
 											}}
 											onClick={() => {
-												setActiveModeId(mode.ln_path);
+												setActiveMode(mode.ln_path);
 												setDropdownOpen(false);
 											}}
-											onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
-											onMouseOut={e => (e.currentTarget.style.backgroundColor = mode.ln_path === activeMode.ln_path ? "var(--background-modifier-hover)" : "transparent")}
 										>
 											{mode.ln_icon && (
 												<span
@@ -692,7 +725,6 @@ export const LifeNavigatorApp: React.FC = () => {
 											</span>
 										</div>
 									))}
-									
 								</>
 							)}
 						</div>
@@ -702,7 +734,7 @@ export const LifeNavigatorApp: React.FC = () => {
 					<button
 						className="clickable-icon"
 						aria-label={t('ui.chat.new')}
-						onClick={clearConversation}
+						onClick={clearChat}
 					>
 						<LucideIcon name="square-pen" size={18} />
 					</button>

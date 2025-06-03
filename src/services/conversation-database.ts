@@ -5,7 +5,7 @@ import { App, normalizePath } from 'obsidian';
 import { generateConversationTitle } from '../utils/chat/generate-conversation-title';
 import { ensureDirectoryExists } from '../utils/fs/ensure-directory-exists';
 import { escapeFilename } from '../utils/fs/escape-filename';
-import { Conversation, StoredConversation, CURRENT_SCHEMA_VERSION, ConversationMeta } from '../utils/chat/conversation';
+import { Chat, StoredConversation, CURRENT_SCHEMA_VERSION, ConversationMeta } from '../utils/chat/conversation';
 import { chatFileNameToIdAndTitle } from '../utils/chat/chat-file-name-to-id-and-title';
 
 
@@ -55,7 +55,7 @@ export class ConversationDatabase {
 	 * Save a conversation to individual file
 	 */
 	async saveConversation(
-		conversation: Conversation
+		conversation: Chat
 	): Promise<string> {
 		if (!conversation.meta.title) {
 			conversation.meta.title = "New Chat";
@@ -310,7 +310,7 @@ export class ConversationDatabase {
 			}
 
 			// Create updated conversation object
-			const conversation: Conversation = {
+			const conversation: Chat = {
 				meta: {
 					id: conversationId,
 					title,

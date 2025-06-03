@@ -15,8 +15,8 @@ import { Message } from "../utils/chat/types";
 import { useLNMode } from "./LNModeContext";
 import { t } from '../i18n';
 import { ConversationDatabase } from "../services/conversation-database";
-import { Conversation } from '../utils/chat/conversation';
-import { generateConversationId } from "../utils/chat/generate-conversation-id";
+import { Chat } from '../utils/chat/conversation';
+import { generateChatId } from "../utils/chat/generate-conversation-id";
 import { expandLinks } from "../utils/links/expand-links";
 import { ToolResultBlock } from "../utils/chat/types";
 
@@ -73,9 +73,9 @@ export const AIAgentProvider: React.FC<{
 	const app = plugin.app;
 
 	// Conversation database and tracking
-	const currentConversationRef = useRef<Conversation>({
+	const currentConversationRef = useRef<Chat>({
 		meta: {
-			id: generateConversationId(),
+			id: generateChatId(),
 			title: "",
 			filePath: "",
 			updatedAt: 0
@@ -115,7 +115,7 @@ export const AIAgentProvider: React.FC<{
 	const clearConversation = useCallback(() => {
 		currentConversationRef.current = {
 			meta: {
-				id: generateConversationId(),
+				id: generateChatId(),
 				title: "",
 				filePath: "",
 				updatedAt: 0
@@ -321,8 +321,8 @@ export const AIAgentProvider: React.FC<{
 		const success = await loadConversationUtil(
 			persistenceContext,
 			conversationId,
-			(conversation: Conversation) => {
-				currentConversationRef.current = conversation;
+			(chat: Chat) => {
+				currentConversationRef.current = chat;
 				conversationChangedRef.current = false;
 				setForceUpdate((prev) => prev + 1);
 			}

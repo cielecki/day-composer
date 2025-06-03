@@ -1,7 +1,5 @@
-import React, { useState, useRef, useEffect, KeyboardEvent } from "react";
-import { useAIAgent } from "../context/AIAgentContext";
-import { useSpeechToText } from "../context/SpeechToTextContext";
-import { useTextToSpeech } from "../context/TextToSpeechContext";
+import React, { useState, useRef, useEffect, KeyboardEvent, useCallback } from "react";
+import { usePluginStore } from "../store/plugin-store";
 import { t } from '../i18n';
 import { LucideIcon } from './LucideIcon';
 
@@ -20,16 +18,45 @@ export const UnifiedInputArea: React.FC<{
   abort: () => void;
   editingMessage?: { index: number; content: string; images?: any[] } | null;
 }> = ({ newAbortController, abort, editingMessage }) => {
-  const { addUserMessage, isGeneratingResponse, editUserMessage, cancelEditingMessage } = useAIAgent();
-  const {
-    isRecording,
-    isTranscribing,
-    lastTranscription,
-    startRecording,
-    finalizeRecording,
-    cancelTranscription,
-  } = useSpeechToText();
-  const { isPlayingAudio, isGeneratingSpeech, stopAudio, isPaused } = useTextToSpeech();
+  // Get specific state slices from Zustand store with granular subscriptions
+  const isGeneratingResponse = usePluginStore(state => state.chats.isGenerating);
+  const ttsState = usePluginStore(state => state.tts);
+  const sttState = usePluginStore(state => state.stt);
+  const setEditingMessage = usePluginStore(state => state.setEditingMessage);
+  const resetTTS = usePluginStore(state => state.resetTTS);
+
+  // Extract individual values from audio state
+  const { isPlaying: isPlayingAudio, isGenerating: isGeneratingSpeech, isPaused } = ttsState;
+  const { isRecording, isTranscribing, lastTranscription } = sttState;
+
+  // Temporary functions until fully migrated
+  const addUserMessage = useCallback(async (userMessage: string, signal: AbortSignal, images?: any[]): Promise<void> => {
+    console.log('addUserMessage called - need to implement full logic');
+  }, []);
+
+  const editUserMessage = useCallback(async (messageIndex: number, newContent: string, signal: AbortSignal, images?: any[]): Promise<void> => {
+    console.log('editUserMessage called - need to implement full logic');
+  }, []);
+
+  const cancelEditingMessage = useCallback(() => {
+    setEditingMessage(null);
+  }, [setEditingMessage]);
+
+  const startRecording = useCallback(async (signal: AbortSignal) => {
+    console.log('startRecording called - need to implement full logic');
+  }, []);
+
+  const finalizeRecording = useCallback(() => {
+    console.log('finalizeRecording called - need to implement full logic');
+  }, []);
+
+  const cancelTranscription = useCallback(() => {
+    console.log('cancelTranscription called - need to implement full logic');
+  }, []);
+
+  const stopAudio = useCallback(() => {
+    resetTTS();
+  }, [resetTTS]);
 
   // Input state
   const [message, setMessage] = useState("");
