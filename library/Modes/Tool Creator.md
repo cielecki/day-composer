@@ -61,9 +61,9 @@ You provide practical, working code examples and guide users through the complet
 ```yaml
 ---
 tags: ["ln-tool"]
-ln-tool-description: "Brief description of what your tool does"
-ln-tool-icon: "icon-name"
-ln-tool-enabled: true
+ln_description: "Brief description of what your tool does"
+ln_icon: "icon-name"
+ln_enabled: true
 ---
 ```
 
@@ -78,10 +78,10 @@ ln-tool-enabled: true
 ```markdown
 ---
 tags: ["ln-tool"]
-ln-tool-description: "Description of what the tool does"
-ln-tool-version: "1.0.0"
-ln-tool-icon: "wrench"
-ln-tool-enabled: true
+ln_description: "Description of what the tool does"
+ln_version: "1.0.0"
+ln_icon: "wrench"
+ln_enabled: true
 ---
 
 # Your Tool Name
@@ -128,10 +128,10 @@ async function execute(input, { progress, setLabel, addNavigationTarget, plugin 
 
 ### 1. Frontmatter Requirements
 - **tags**: Must be `["ln-tool"]` (exactly this format)
-- **ln-tool-description**: Brief, clear description
-- **ln-tool-version**: Version number (required for change tracking)
-- **ln-tool-icon**: Lucide icon name (e.g., "wrench", "search", "file")
-- **ln-tool-enabled**: Set to `true` to enable the tool
+- **ln_description**: Brief, clear description
+- **ln_version**: Version number (required for change tracking)
+- **ln_icon**: Lucide icon name (e.g., "wrench", "search", "file")
+- **ln_enabled**: Set to `true` to enable the tool
 - **Tool name**: Automatically taken from the filename (no frontmatter needed)
 
 ### 2. JSON Schema Design
@@ -192,10 +192,10 @@ const content = await plugin.app.vault.read(file);
 ```markdown
 ---
 tags: ["ln-tool"]
-ln-tool-description: "Creates a new note with specified title and content"
-ln-tool-version: "1.0.0"
-ln-tool-icon: "file-plus"
-ln-tool-enabled: true
+ln_description: "Creates a new note with specified title and content"
+ln_version: "1.0.0"
+ln_icon: "file-plus"
+ln_enabled: true
 ---
 
 # Quick Note Creator
@@ -265,10 +265,10 @@ async function execute(input, { progress, setLabel, addNavigationTarget, plugin 
 ```markdown
 ---
 tags: ["ln-tool"]
-ln-tool-description: "Organizes files into folders based on tags"
-ln-tool-version: "1.0.0"
-ln-tool-icon: "folder-tree"
-ln-tool-enabled: true
+ln_description: "Organizes files into folders based on tags"
+ln_version: "1.0.0"
+ln_icon: "folder-tree"
+ln_enabled: true
 ---
 
 # Tag-based File Organizer

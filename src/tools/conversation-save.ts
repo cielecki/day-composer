@@ -74,12 +74,12 @@ function generateDefaultPath(title: string): string {
 export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
   specification: schema,
   icon: "save",
-  initialLabel: "Save conversation",
+  initialLabel: t('tools.conversationSave.label'),
   execute: async (context: ToolExecutionContext<ConversationSaveToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { path, title, include_metadata = true, auto_version = true } = params;
 
-    context.setLabel("Saving conversation...");
+    context.setLabel(t('tools.conversationSave.inProgress'));
 
     try {
       // Get the current conversation from the store
@@ -88,7 +88,7 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
       const conversationTitle = title || store.chats.current.meta.title || 'Untitled Conversation';
 
       if (!conversation || conversation.length === 0) {
-        throw new ToolExecutionError("No conversation to save - the current conversation is empty.");
+        throw new ToolExecutionError(t('tools.conversationSave.progress.empty'));
       }
 
       // Generate the file path if not provided
@@ -101,9 +101,9 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
       if (exists) {
         if (auto_version) {
           targetPath = await getVersionedPath(finalPath, plugin.app);
-          context.progress(`Creating versioned file: ${targetPath}`);
+          context.progress(t('tools.conversationSave.progress.versionedFile', { path: targetPath }));
         } else {
-          throw new ToolExecutionError(`File already exists at ${finalPath}. Set auto_version to true to create a versioned file.`);
+          throw new ToolExecutionError(t('tools.conversationSave.progress.fileExists', { path: finalPath }));
         }
       }
 
@@ -133,14 +133,14 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
       // Add navigation target
       context.addNavigationTarget({
         filePath: targetPath,
-        description: "Open saved conversation"
+        description: t('tools.conversationSave.navigation.openSavedConversation')
       });
 
-      context.setLabel(`Saved conversation to "${targetPath}"`);
-      context.progress(`Successfully saved conversation with ${conversation.length} messages to: ${targetPath}`);
+      context.setLabel(t('tools.conversationSave.completed', { path: targetPath }));
+      context.progress(t('tools.conversationSave.progress.success', { count: conversation.length, path: targetPath }));
       
     } catch (error) {
-      context.setLabel("Failed to save conversation");
+      context.setLabel(t('tools.conversationSave.failed'));
       throw error;
     }
   }

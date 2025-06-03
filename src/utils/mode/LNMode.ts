@@ -8,12 +8,14 @@ export interface LNMode {
 	ln_icon_color: string;
 	ln_description: string; // Used in UI to show what this mode does
 
+	// Common attributes (shared with tools)
+	ln_version?: string; // Version for tracking mode evolution
+	ln_enabled?: boolean; // Whether the mode is enabled (default: true)
 
 	// Behavior
 	ln_system_prompt: string; // The main content becomes this
 	ln_example_usages: string[]; // Message to automatically send when mode is activated
 	ln_expand_links: boolean; // Whether to expand wikilinks in content (default: true)
-
 
 	// API parameters
 	ln_model: string; // Anthropic model to use (e.g., "claude-sonnet-4-20250514")

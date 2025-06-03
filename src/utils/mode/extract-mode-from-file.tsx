@@ -77,6 +77,10 @@ export const extractLNModeFromFile = async (
 			ln_icon_color: frontmatter.ln_icon_color,
 			ln_description: frontmatter.ln_description,
 
+			// Common attributes (shared with tools)
+			ln_version: frontmatter.ln_version,
+			...(frontmatter.ln_enabled !== undefined ? { ln_enabled: String(frontmatter.ln_enabled).toLowerCase() === "true" } : {}),
+
 			// Behavior
 			ln_example_usages: Array.isArray(
 				frontmatter.ln_example_usages
@@ -88,13 +92,10 @@ export const extractLNModeFromFile = async (
 
 			...(frontmatter.ln_expand_links !== undefined ? { ln_expand_links: String(frontmatter.ln_expand_links).toLowerCase() === "true"}: {}),
 
-
-
 			// API parameters
 			ln_model: frontmatter.ln_model,
 			...(frontmatter.ln_thinking_budget_tokens !== undefined ? { ln_thinking_budget_tokens: parseInt(String(frontmatter.ln_thinking_budget_tokens)) } : {}),
 			...(frontmatter.ln_max_tokens !== undefined ? { ln_max_tokens: parseInt(String(frontmatter.ln_max_tokens)) } : {}),
-
 
 			// TTS settings
 			...(frontmatter.ln_voice_autoplay !== undefined ? { ln_voice_autoplay: String(frontmatter.ln_voice_autoplay).toLowerCase() === "true" } : {}),

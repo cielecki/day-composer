@@ -1,9 +1,9 @@
 ---
 tags: ["ln-tool"]
-ln-tool-description: "Conducts comprehensive web research using Firecrawl's deep research API and saves detailed reports with citations"
-ln-tool-version: "1.0.0"
-ln-tool-icon: "search"
-ln-tool-enabled: true
+ln_description: "Conducts comprehensive web research using Firecrawl's deep research API and saves detailed reports with citations"
+ln_version: "1.0.0"
+ln_icon: "search"
+ln_enabled: true
 ---
 
 # Deep Research Tool

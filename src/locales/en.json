@@ -64,6 +64,8 @@
   },
   "prebuiltModes": {
     "lifeNavigator": {
+      "mainDescription": "Main Description",
+      "systemPrompt": "System Prompt",
       "title": "Life Navigator",
       "voiceInstructions": "Speak in a helpful, conversational tone. Keep responses concise but thorough. When recommending content, briefly explain why it's a good fit. Ask follow-up questions to better understand user needs."
     }
@@ -249,6 +251,21 @@
     "comments": {
       "removedTaskHeader": "REMOVED TASK"
     },
+    "conversationSave": {
+      "completed": "Saved conversation to {{path}}",
+      "failed": "Failed to save conversation",
+      "inProgress": "Saving conversation...",
+      "label": "Save Conversation",
+      "navigation": {
+        "openSavedConversation": "Open saved conversation"
+      },
+      "progress": {
+        "empty": "No conversation to save - the current conversation is empty",
+        "fileExists": "File already exists at {{path}}. Set auto_version to true to create a versioned file",
+        "success": "Successfully saved conversation with {{count}} messages to: {{path}}",
+        "versionedFile": "Creating versioned file: {{path}}"
+      }
+    },
     "createCompleted": {
       "label": "Create Completed Todo"
     },
@@ -260,6 +277,18 @@
     },
     "edit": {
       "label": "Edit Todo"
+    },
+    "fileMove": {
+      "completed": "Moved file from {{source}} to {{destination}}",
+      "creatingDirectories": "Creating destination directory: {{dir}}",
+      "failed": "Failed to move file {{source}}",
+      "inProgress": "Moving file from {{source}} to {{destination}}...",
+      "label": "Move File",
+      "moving": "Moving {{source}} to {{destination}}",
+      "navigation": {
+        "openMovedFile": "Open moved file"
+      },
+      "success": "Moved file from {{source}} to {{destination}}"
     },
     "find": {
       "completed": "Found content in {{path}}",
@@ -392,8 +421,7 @@
       "pauseAudio": "Pause audio",
       "recordingInProgress": "Recording in progress",
       "resumeAudio": "Resume audio",
-      "speak": "Read aloud",
-      "stopAudio": "Stop audio"
+      "speak": "Read aloud"
     },
     "modal": {
       "copied": "Copied!",

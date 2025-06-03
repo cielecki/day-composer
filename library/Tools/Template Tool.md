@@ -1,9 +1,9 @@
 ---
 tags: ["ln-tool"]
-ln-tool-description: "A basic template for creating your own custom tools"
-ln-tool-version: "1.0.0"
-ln-tool-icon: "wrench"
-ln-tool-enabled: true
+ln_description: "A basic template for creating your own custom tools"
+ln_version: "1.0.0"
+ln_icon: "wrench"
+ln_enabled: true
 ---
 
 # Template Tool
@@ -20,13 +20,12 @@ This is a basic template for creating user-defined tools. Copy this file and mod
 ### 2. Update the Frontmatter
 Required fields in the YAML frontmatter:
 - **`tags`**: Must include `["ln-tool"]` for the tool to be discovered
-- **`ln-tool-name`**: The display name for your tool
-- **`ln-tool-description`**: Brief description of what the tool does  
-- **`ln-tool-version`**: Version number (increment when making changes)
-- **`ln-tool-enabled`**: Set to `true` to enable the tool
+- **`ln_description`**: Brief description of what the tool does  
+- **`ln_version`**: Version number (increment when making changes)
+- **`ln_enabled`**: Set to `true` to enable the tool
 
 Optional customization:
-- **`ln-tool-icon`**: Choose from [Lucide icons](https://lucide.dev/)
+- **`ln_icon`**: Choose from [Lucide icons](https://lucide.dev/)
 
 ### 2. Modify the Schema
 - **Add parameters**: Define what inputs your tool needs
@@ -47,75 +46,84 @@ Optional customization:
 2. Go to Life Navigator settings
 3. Find your tool in the User-Defined Tools section  
 4. Click "Approve" to enable it
-5. Test it in conversation with your AI assistant
 
-## Tool Template Schema
+## Schema
 
 ```json
 {
   "name": "template_tool",
-  "description": "A template tool that demonstrates basic functionality",
+  "description": "A basic template for user-defined tools",
   "input_schema": {
     "type": "object",
     "properties": {
-      "message": {
-        "type": "string", 
-        "description": "A message to display"
+      "title": {
+        "type": "string",
+        "description": "Title for the created note"
       },
-      "count": {
-        "type": "number",
-        "description": "Number of times to repeat the message"
+      "content": {
+        "type": "string", 
+        "description": "Content to include in the note"
+      },
+      "tags": {
+        "type": "array",
+        "description": "Optional tags to add to the note",
+        "items": {
+          "type": "string"
+        }
       }
     },
-    "required": ["message"]
+    "required": ["title"]
   }
 }
 ```
 
-## Tool Implementation
+## Implementation
 
 ```javascript
 async function execute(input, { progress, setLabel, addNavigationTarget, plugin }) {
   try {
-    // Update the tool label to show it's running
-    setLabel("Running template tool...");
+    setLabel("Creating note...");
+    progress("Starting template tool...");
     
-    // Show initial progress
-    progress("Starting template tool execution");
+    // Get input parameters
+    const { title, content = "", tags = [] } = input;
     
-    // Get input parameters with defaults
-    const message = input.message || "Hello from template tool!";
-    const count = input.count || 1;
+    // Create the note content
+    let noteContent = `# ${title}\n\n`;
     
-    // Simulate some work with progress updates
-    for (let i = 1; i <= count; i++) {
-      progress(`Processing iteration ${i} of ${count}`);
-      
-      // Create a simple note with the message
-      const fileName = `Template Output ${i} - ${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.md`;
-      const content = `# Template Tool Output\n\nMessage: ${message}\nIteration: ${i}\nGenerated: ${new Date().toLocaleString()}`;
-      
-      // Create the file
-      await plugin.app.vault.create(fileName, content);
-      
-      // Add navigation target so user can click to open the file
-      addNavigationTarget({
-        type: 'file',
-        path: fileName,
-        label: `Open ${fileName}`
-      });
-      
-      // Small delay to show progress
-      await new Promise(resolve => setTimeout(resolve, 500));
+    if (content) {
+      noteContent += `${content}\n\n`;
     }
     
-    // Update final status
-    setLabel(`Template tool completed (${count} files created)`);
-    progress(`✅ Template tool finished successfully! Created ${count} file(s).`);
+    // Add frontmatter with tags if provided
+    if (tags.length > 0) {
+      const frontmatter = `---\ntags: [${tags.map(tag => `"${tag}"`).join(", ")}]\n---\n\n`;
+      noteContent = frontmatter + noteContent;
+    }
+    
+    // Create the file
+    const fileName = `${title}.md`;
+    const file = await plugin.app.vault.create(fileName, noteContent);
+    
+    // Add navigation target so user can click to open the file
+    addNavigationTarget({
+      type: 'file',
+      path: file.path,
+      label: `Open ${title}`
+    });
+    
+    progress(`✅ Created note: ${title}`);
+    setLabel("Completed");
+    
+    return {
+      success: true,
+      filePath: file.path,
+      message: `Successfully created note: ${title}`
+    };
     
   } catch (error) {
     progress(`❌ Error: ${error.message}`);
-    setLabel("Template tool failed");
+    setLabel("Failed");
     throw error;
   }
 }

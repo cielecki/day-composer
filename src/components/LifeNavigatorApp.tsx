@@ -386,7 +386,8 @@ export const LifeNavigatorApp: React.FC = () => {
 		if (
 			filteredConversation.length === 0 &&
 			!isSpeaking &&
-			!isGeneratingResponse
+			!isGeneratingResponse &&
+			!editingMessage
 		) {
 			return (
 				<div className="empty-conversation">

@@ -64,6 +64,8 @@
   },
   "prebuiltModes": {
     "lifeNavigator": {
+      "mainDescription": "Główny opis",
+      "systemPrompt": "Prompt systemowy",
       "title": "Life Navigator",
       "voiceInstructions": "Mów pomocnym, konwersacyjnym tonem. Utrzymuj odpowiedzi zwięzłe ale dokładne. Rekomendując treści, krótko wyjaśnij dlaczego są dobrym wyborem. Zadawaj pytania uzupełniające, aby lepiej zrozumieć potrzeby użytkownika."
     }
@@ -249,6 +251,21 @@
     "comments": {
       "removedTaskHeader": "USUNIĘTE ZADANIE"
     },
+    "conversationSave": {
+      "completed": "Zapisano rozmowę do {{path}}",
+      "failed": "Nie udało się zapisać rozmowy",
+      "inProgress": "Zapisywanie rozmowy...",
+      "label": "Zapisz Rozmowę",
+      "navigation": {
+        "openSavedConversation": "Otwórz zapisaną rozmowę"
+      },
+      "progress": {
+        "empty": "Brak rozmowy do zapisania - aktualna rozmowa jest pusta",
+        "fileExists": "Plik już istnieje w {{path}}. Ustaw auto_version na true, aby utworzyć wersję pliku",
+        "success": "Pomyślnie zapisano rozmowę z {{count}} wiadomościami do: {{path}}",
+        "versionedFile": "Tworzenie wersjonowanego pliku: {{path}}"
+      }
+    },
     "createCompleted": {
       "label": "Utwórz Ukończone Todo"
     },
@@ -259,7 +276,19 @@
       }
     },
     "edit": {
-      "label": "Edytuj Todo"
+      "label": "Edytuj zadanie"
+    },
+    "fileMove": {
+      "completed": "Przeniesiono plik z {{source}} do {{destination}}",
+      "creatingDirectories": "Tworzenie katalogu docelowego: {{dir}}",
+      "failed": "Nie udało się przenieść pliku {{source}}",
+      "inProgress": "Przenoszenie pliku z {{source}} do {{destination}}...",
+      "label": "Przenieś plik",
+      "moving": "Przenoszenie {{source}} do {{destination}}",
+      "navigation": {
+        "openMovedFile": "Otwórz przeniesiony plik"
+      },
+      "success": "Przeniesiono plik z {{source}} do {{destination}}"
     },
     "find": {
       "completed": "Znaleziono zawartość w {{path}}",
@@ -392,8 +421,7 @@
       "pauseAudio": "Zatrzymaj audio",
       "recordingInProgress": "Nagrywanie w toku",
       "resumeAudio": "Wznów audio",
-      "speak": "Przeczytaj na głos",
-      "stopAudio": "Zatrzymaj audio"
+      "speak": "Przeczytaj na głos"
     },
     "modal": {
       "copied": "Skopiowano!",

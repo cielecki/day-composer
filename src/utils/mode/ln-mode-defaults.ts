@@ -50,6 +50,10 @@ export function getDefaultLNMode(): LNMode {
     ln_icon_color: "#888888",
     ln_description: "",
     
+    // Common attributes (shared with tools)
+    ln_version: undefined, // No default version
+    ln_enabled: true, // Enabled by default
+    
     // Behavior defaults
     ln_system_prompt: "",
     ln_example_usages: [],

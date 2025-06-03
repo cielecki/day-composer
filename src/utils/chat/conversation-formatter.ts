@@ -1,21 +1,20 @@
 import { t } from '../../i18n';
-import { convertToValidTagName } from '../text/xml-tag-converter';
 
 /**
- * Format the conversation into a readable string
+ * Format the conversation into a readable markdown string
  * @param conversation The conversation to format
- * @returns A formatted string representation of the conversation
+ * @returns A formatted markdown representation of the conversation
  */
 export function formatConversationContent(conversation: any[]): string {
 	if (!conversation || conversation.length === 0) {
 		return t('errors.chat.noContent');
 	}
 
-	// Get the translated tag names and convert them to valid XML tags
-	const userTagName = convertToValidTagName(t('chat.userMessage'));
-	const assistantTagName = convertToValidTagName(t('chat.assistantMessage'));
+	// Get the translated role names for markdown headers
+	const userRoleName = t('chat.userMessage');
+	const assistantRoleName = t('chat.assistantMessage');
 	
-	// Build a formatted representation of the conversation with XML tags for each message
+	// Build a formatted representation of the conversation with markdown headers
 	const conversationContent = conversation
 		.map((message) => {
 			// Skip tool result messages
@@ -49,20 +48,14 @@ export function formatConversationContent(conversation: any[]): string {
 				return null;
 			}
 
-			// Format with appropriate tag based on role
-			const tagName = message.role === "user" ? userTagName : assistantTagName;
+			// Format with appropriate markdown header based on role
+			const roleName = message.role === "user" ? userRoleName : assistantRoleName;
 			
-			// Indent the content for better readability
-			const indentedContent = textContent
-				.split('\n')
-				.map(line => `    ${line}`)
-				.join('\n');
-			
-			return `  <${tagName}>\n${indentedContent}\n  </${tagName}>`;
+			// Use markdown format with proper headers
+			return `## ${roleName}\n\n${textContent}`;
 		})
 		.filter(Boolean) // Remove null entries
-		.join("\n\n");
+		.join("\n\n---\n\n");
 		
-	// Format the conversation as XML with proper indentation
 	return conversationContent;
 } 

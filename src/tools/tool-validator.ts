@@ -223,7 +223,7 @@ async function validateToolFile(app: any, file: TFile): Promise<ValidationResult
 
 function validateRequiredFrontmatterFields(frontmatter: Record<string, any>, result: ValidationResult): void {
   // Check for required fields
-  const requiredFields = ['ln-tool-version', 'ln-tool-description'];
+  const requiredFields = ['ln_version', 'ln_description'];
   
   for (const field of requiredFields) {
     if (!frontmatter[field]) {
@@ -236,8 +236,8 @@ function validateRequiredFrontmatterFields(frontmatter: Record<string, any>, res
   }
 
   // Check version format
-  if (frontmatter['ln-tool-version']) {
-    const version = String(frontmatter['ln-tool-version']).trim();
+  if (frontmatter.ln_version) {
+    const version = String(frontmatter.ln_version).trim();
     if (!/^\d+\.\d+\.\d+/.test(version)) {
       result.warnings.push(`Tool version '${version}' doesn't follow semantic versioning (e.g., '1.0.0')`);
     } else {
@@ -246,21 +246,21 @@ function validateRequiredFrontmatterFields(frontmatter: Record<string, any>, res
   }
 
   // Check optional fields
-  if (frontmatter['ln-tool-icon']) {
-    result.info.push(`Icon: ${frontmatter['ln-tool-icon']}`);
+  if (frontmatter.ln_icon) {
+    result.info.push(`Icon: ${frontmatter.ln_icon}`);
   } else {
     result.info.push("No custom icon specified - will use default 'wrench' icon");
   }
 
-  if (frontmatter['ln-tool-enabled'] !== undefined) {
-    const enabled = frontmatter['ln-tool-enabled'];
+  if (frontmatter.ln_enabled !== undefined) {
+    const enabled = frontmatter.ln_enabled;
     if (typeof enabled === 'boolean') {
       result.info.push(`Tool enabled: ${enabled}`);
     } else {
-      result.warnings.push(`ln-tool-enabled should be a boolean (true/false), got: ${typeof enabled}`);
+      result.warnings.push(`ln_enabled should be a boolean (true/false), got: ${typeof enabled}`);
     }
   } else {
-    result.info.push("Tool enabled by default (no ln-tool-enabled specified)");
+    result.info.push("Tool enabled by default (no ln_enabled specified)");
   }
 }
 

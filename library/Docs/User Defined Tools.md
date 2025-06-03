@@ -164,9 +164,10 @@ const data = await response.json();
 ```markdown
 ---
 tags: ["ln-tool"]
-ln-tool-description: "Creates a note with template and metadata"
-ln-tool-icon: "file-plus"
-ln-tool-enabled: true
+ln_description: "Creates a note with template and metadata"
+ln_version: "1.0.0"
+ln_icon: "file-plus"
+ln_enabled: true
 ---
 
 # Smart Note Creator
@@ -205,61 +206,67 @@ Creates a new note with a template structure and metadata.
 ## Implementation
 
 ```javascript
-async function execute(context) {
-  const { params, plugin, progress, addNavigationTarget, setLabel } = context;
-  
-  setLabel("Creating note...");
-  
-  const { title, tags = [], template = "basic" } = params;
-  
-  progress(`Creating note: ${title}`);
-  
-  // Generate content based on template
-  let content = `# ${title}\n\n`;
-  content += `Created: ${new Date().toISOString()}\n`;
-  
-  if (tags.length > 0) {
-    content += `Tags: ${tags.map(tag => `#${tag}`).join(' ')}\n`;
+async function execute(input, { progress, setLabel, addNavigationTarget, plugin }) {
+  try {
+    setLabel("Creating note...");
+    
+    const { title, tags = [], template = "basic" } = input;
+    
+    progress(`Creating note: ${title}`);
+    
+    // Generate content based on template
+    let content = `# ${title}\n\n`;
+    content += `Created: ${new Date().toISOString()}\n`;
+    
+    if (tags.length > 0) {
+      content += `Tags: ${tags.map(tag => `#${tag}`).join(' ')}\n`;
+    }
+    
+    content += `\n## Notes\n\n`;
+    
+    switch (template) {
+      case 'meeting':
+        content += `### Attendees\n- \n\n### Agenda\n- \n\n### Notes\n\n### Action Items\n- [ ] \n\n`;
+        break;
+      case 'project':
+        content += `### Objective\n\n### Tasks\n- [ ] \n\n### Resources\n\n### Timeline\n\n`;
+        break;
+      case 'daily':
+        content += `### Today's Goals\n- [ ] \n\n### Notes\n\n### Tomorrow\n- [ ] \n\n`;
+        break;
+      case 'research':
+        content += `### Research Question\n\n### Sources\n\n### Findings\n\n### Conclusions\n\n`;
+        break;
+    }
+    
+    // Create unique filename using proper Unicode normalization
+    function normalizeUnicode(text) {
+      return text
+        .normalize('NFKD') // Decompose characters into base + diacritics
+        .replace(/[\u0300-\u036f]/g, ''); // Remove combining diacritical marks
+    }
+    
+    const sanitizedTitle = normalizeUnicode(title).replace(/[^a-zA-Z0-9 ]/g, '').trim();
+    const filename = `${sanitizedTitle}.md`;
+    
+    // Create the file
+    const file = await plugin.app.vault.create(filename, content);
+    
+    // Add navigation
+    addNavigationTarget({
+      type: 'file',
+      path: file.path,
+      label: `Open note: ${title}`
+    });
+    
+    setLabel("Note created");
+    progress(`Successfully created: ${filename}`);
+    
+  } catch (error) {
+    progress(`❌ Error: ${error.message}`);
+    setLabel("Failed");
+    throw error;
   }
-  
-  content += `\n## Notes\n\n`;
-  
-  switch (template) {
-    case 'meeting':
-      content += `### Attendees\n- \n\n### Agenda\n- \n\n### Notes\n\n### Action Items\n- [ ] \n\n`;
-      break;
-    case 'project':
-      content += `### Objective\n\n### Tasks\n- [ ] \n\n### Resources\n\n### Timeline\n\n`;
-      break;
-    case 'daily':
-      content += `### Today's Goals\n- [ ] \n\n### Notes\n\n### Tomorrow\n- [ ] \n\n`;
-      break;
-    case 'research':
-      content += `### Research Question\n\n### Sources\n\n### Findings\n\n### Conclusions\n\n`;
-      break;
-  }
-  
-  // Create unique filename using proper Unicode normalization
-  function normalizeUnicode(text) {
-    return text
-      .normalize('NFKD') // Decompose characters into base + diacritics
-      .replace(/[\u0300-\u036f]/g, ''); // Remove combining diacritical marks
-  }
-  
-  const sanitizedTitle = normalizeUnicode(title).replace(/[^a-zA-Z0-9 ]/g, '').trim();
-  const filename = `${sanitizedTitle}.md`;
-  
-  // Create the file
-  await plugin.app.vault.create(filename, content);
-  
-  // Add navigation
-  addNavigationTarget({
-    filePath: filename,
-    description: `Open note: ${title}`
-  });
-  
-  setLabel("Note created");
-  progress(`Successfully created: ${filename}`);
 }
 ```
 ```
@@ -277,11 +284,11 @@ When you first run a tool:
 
 ### Finding Your Tools
 Tools are automatically discovered when you:
-- Add `ln-tool: true` to any note's frontmatter
+- Add `["ln-tool"]` to the tags array in any note's frontmatter
 - Save the note with valid schema and JavaScript code
 
 ### Disabling Tools
-- Set `ln-tool-enabled: false` in frontmatter
+- Set `ln_enabled: false` in frontmatter
 - Or disable the entire feature in settings
 
 ### Updating Tools
@@ -316,7 +323,7 @@ Tools are automatically discovered when you:
 ## Troubleshooting
 
 ### Tool Not Appearing
-- Check that `ln-tool: true` is in frontmatter
+- Check that `tags: ["ln-tool"]` is in frontmatter
 - Verify JSON schema is valid
 - Ensure JavaScript code block exists
 - Check that tool is enabled in frontmatter
