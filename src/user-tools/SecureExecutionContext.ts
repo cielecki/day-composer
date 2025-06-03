@@ -3,6 +3,7 @@ import { UserToolExecutionContext } from './types';
 import { createHash } from 'crypto';
 import { requestUrl } from 'obsidian';
 import { getPluginSettings } from '../settings/LifeNavigatorSettings';
+import { getStoreState } from '../store/plugin-store';
 
 export class SecureExecutionContext {
   private allowedAPIs: Set<string>;
@@ -39,23 +40,12 @@ export class SecureExecutionContext {
       },
       requestUrl,
       getSecret: (key: string) => {
-        try {
-          const settings = getPluginSettings();
-          return settings.getSecret(key);
-        } catch (error) {
-          console.warn('[USER-TOOL] Failed to get secret:', error);
-          return undefined;
-        }
+        const settings = getPluginSettings();
+        return settings.getSecret(key);
       },
-      setSecret: (key: string, value: string) => {
-        try {
-          const settings = getPluginSettings();
-          settings.setSecret(key, value);
-          return true;
-        } catch (error) {
-          console.warn('[USER-TOOL] Failed to set secret:', error);
-          return false;
-        }
+      setSecret: async (key: string, value: string) => {
+        const store = getStoreState();
+        await store.setSecret(key, value);
       },
       Date,
       JSON,

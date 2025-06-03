@@ -14,14 +14,15 @@ export interface SettingsSlice {
   // Actions
   updateSettings: (updates: Partial<LifeNavigatorSettings>) => void;
   setSettings: (settings: LifeNavigatorSettings) => void;
-  setSecret: (key: string, value: string) => void;
-  removeSecret: (key: string) => void;
+  setSecret: (key: string, value: string) => Promise<void>;
+  removeSecret: (key: string) => Promise<void>;
   setSecrets: (secrets: Record<string, string>) => void;
   setSettingsLoading: (loading: boolean) => void;
   resetSettings: () => void;
+  saveSettings: () => Promise<void>;
 }
 
-// Type for StateCreator with immer middleware - updated to use PluginStore
+// Define the state creator type with immer
 type ImmerStateCreator<T> = StateCreator<
   PluginStore,
   [["zustand/immer", never]],
@@ -46,16 +47,42 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
     state.settings.secrets = settings.secrets || {};
   }),
   
-  setSecret: (key, value) => set((state) => {
-    state.settings.secrets[key] = value;
-  }),
+  setSecret: async (key, value) => {
+    const state = get();
+    
+    // Update the store state
+    set((state) => {
+      state.settings.secrets[key] = value;
+      // Also update the settings instance secrets
+      if (!state.settings.settings.secrets) {
+        state.settings.settings.secrets = {};
+      }
+      state.settings.settings.secrets[key] = value;
+    });
+    
+    // Save to plugin data
+    await state.settings.settings.saveSettings();
+  },
   
-  removeSecret: (key) => set((state) => {
-    delete state.settings.secrets[key];
-  }),
+  removeSecret: async (key) => {
+    const state = get();
+    
+    // Update the store state
+    set((state) => {
+      delete state.settings.secrets[key];
+      // Also update the settings instance secrets
+      if (state.settings.settings.secrets) {
+        delete state.settings.settings.secrets[key];
+      }
+    });
+    
+    // Save to plugin data
+    await state.settings.settings.saveSettings();
+  },
   
   setSecrets: (secrets) => set((state) => {
     state.settings.secrets = secrets;
+    state.settings.settings.secrets = { ...secrets };
   }),
   
   setSettingsLoading: (loading) => set((state) => {
@@ -66,5 +93,10 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
     state.settings.settings = new LifeNavigatorSettings();
     state.settings.secrets = {};
     state.settings.isLoading = false;
-  })
+  }),
+  
+  saveSettings: async () => {
+    const state = get();
+    await state.settings.settings.saveSettings();
+  }
 }); 

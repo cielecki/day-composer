@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { t } from '../../i18n';
 import { getPluginSettings } from '../../settings/LifeNavigatorSettings';
+import { getStoreState } from '../../store/plugin-store';
 import { LucideIcon } from '../LucideIcon';
 
 interface OpenAIKeyScreenProps {
@@ -21,8 +22,10 @@ export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 		
 		setIsConfiguring(true);
 		try {
+			const store = getStoreState();
+			await store.setSecret('OPENAI_API_KEY', apiKey.trim());
+			
 			const settings = getPluginSettings();
-			settings.setSecret('OPENAI_API_KEY', apiKey.trim());
 			settings.tutorial.openaiKeyConfigured = true;
 			await settings.saveSettings();
 			onKeyConfigured();

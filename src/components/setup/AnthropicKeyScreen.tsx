@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { t } from '../../i18n';
 import { getPluginSettings } from '../../settings/LifeNavigatorSettings';
+import { getStoreState } from '../../store/plugin-store';
 import { LucideIcon } from '../LucideIcon';
 
 interface AnthropicKeyScreenProps {
@@ -18,8 +19,10 @@ export const AnthropicKeyScreen: React.FC<AnthropicKeyScreenProps> = ({
 		
 		setIsConfiguring(true);
 		try {
+			const store = getStoreState();
+			await store.setSecret('ANTHROPIC_API_KEY', apiKey.trim());
+			
 			const settings = getPluginSettings();
-			settings.setSecret('ANTHROPIC_API_KEY', apiKey.trim());
 			await settings.saveSettings();
 			onKeyConfigured();
 		} catch (error) {

@@ -1,6 +1,7 @@
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { App, PluginSettingTab, Setting, Notice, Modal, getIcon } from 'obsidian';
 import { getPluginSettings } from "./LifeNavigatorSettings";
+import { getStoreState } from '../store/plugin-store';
 import { t } from '../i18n';
 
 export class LifeNavigatorSettingTab extends PluginSettingTab {
@@ -148,8 +149,8 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 	async refreshSecretsDisplay(): Promise<void> {
 		this.secretsContainer.empty();
 
-		const settings = getPluginSettings();
-		const secretKeys = settings.getSecretKeys();
+		const store = getStoreState();
+		const secretKeys = Object.keys(store.settings.secrets);
 
 		if (secretKeys.length === 0) {
 			const noSecretsMsg = this.secretsContainer.createEl('div', {
@@ -162,7 +163,7 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 
 		// Display each secret with controls
 		for (const key of secretKeys) {
-			const value = settings.getSecret(key);
+			const value = store.settings.secrets[key];
 			
 			const secretContainer = this.secretsContainer.createEl('div', {
 				cls: 'setting-item',
@@ -215,16 +216,18 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			deleteBtn.addEventListener('click', async () => {
 				const confirmed = confirm(t('settings.secrets.list.confirmDelete', { key }));
 				if (confirmed) {
-					settings.removeSecret(key);
+					const store = getStoreState();
+					await store.removeSecret(key);
 					
 					// Reset tutorial state if relevant API keys are deleted
+					const settings = getPluginSettings();
 					if (key === 'OPENAI_API_KEY') {
 						settings.tutorial.openaiKeyConfigured = false;
 					}
 					// If Anthropic key is deleted and OpenAI key doesn't exist,
 					// reset OpenAI configured state too
 					if (key === 'ANTHROPIC_API_KEY') {
-						const hasOpenAIKey = Boolean(settings.getSecret('OPENAI_API_KEY') && settings.getSecret('OPENAI_API_KEY')!.trim().length > 0);
+						const hasOpenAIKey = Boolean(store.settings.secrets['OPENAI_API_KEY'] && store.settings.secrets['OPENAI_API_KEY'].trim().length > 0);
 						if (!hasOpenAIKey) {
 							settings.tutorial.openaiKeyConfigured = false;
 						}
@@ -243,10 +246,11 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 
 	showAddSecretDialog(): void {
 		const modal = new AddSecretModal(this.app, async (key, value) => {
-			const settings = getPluginSettings();
-			settings.setSecret(key, value);
+			const store = getStoreState();
+			await store.setSecret(key, value);
 			
 			// Update tutorial state if relevant API keys are configured
+			const settings = getPluginSettings();
 			if (key === 'OPENAI_API_KEY') {
 				if (value.trim().length > 0) {
 					settings.tutorial.openaiKeyConfigured = true;
@@ -258,14 +262,14 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 				if (value.trim().length > 0) {
 					// If Anthropic key is set and we don't have OpenAI key, 
 					// we should proceed past the OpenAI step
-					const hasOpenAIKey = Boolean(settings.getSecret('OPENAI_API_KEY') && settings.getSecret('OPENAI_API_KEY')!.trim().length > 0);
+					const hasOpenAIKey = Boolean(store.settings.secrets['OPENAI_API_KEY'] && store.settings.secrets['OPENAI_API_KEY'].trim().length > 0);
 					if (!hasOpenAIKey) {
 						settings.tutorial.openaiKeyConfigured = true;
 					}
 				} else {
 					// If Anthropic key is empty and OpenAI key doesn't exist,
 					// reset OpenAI configured state too
-					const hasOpenAIKey = Boolean(settings.getSecret('OPENAI_API_KEY') && settings.getSecret('OPENAI_API_KEY')!.trim().length > 0);
+					const hasOpenAIKey = Boolean(store.settings.secrets['OPENAI_API_KEY'] && store.settings.secrets['OPENAI_API_KEY'].trim().length > 0);
 					if (!hasOpenAIKey) {
 						settings.tutorial.openaiKeyConfigured = false;
 					}
@@ -283,10 +287,11 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 
 	showEditSecretDialog(key: string, currentValue: string): void {
 		const modal = new EditSecretModal(this.app, key, currentValue, async (value) => {
-			const settings = getPluginSettings();
-			settings.setSecret(key, value);
+			const store = getStoreState();
+			await store.setSecret(key, value);
 			
 			// Update tutorial state if relevant API keys are configured
+			const settings = getPluginSettings();
 			if (key === 'OPENAI_API_KEY') {
 				if (value.trim().length > 0) {
 					settings.tutorial.openaiKeyConfigured = true;
@@ -298,14 +303,14 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 				if (value.trim().length > 0) {
 					// If Anthropic key is set and we don't have OpenAI key, 
 					// we should proceed past the OpenAI step
-					const hasOpenAIKey = Boolean(settings.getSecret('OPENAI_API_KEY') && settings.getSecret('OPENAI_API_KEY')!.trim().length > 0);
+					const hasOpenAIKey = Boolean(store.settings.secrets['OPENAI_API_KEY'] && store.settings.secrets['OPENAI_API_KEY'].trim().length > 0);
 					if (!hasOpenAIKey) {
 						settings.tutorial.openaiKeyConfigured = true;
 					}
 				} else {
 					// If Anthropic key is cleared and OpenAI key doesn't exist,
 					// reset OpenAI configured state too
-					const hasOpenAIKey = Boolean(settings.getSecret('OPENAI_API_KEY') && settings.getSecret('OPENAI_API_KEY')!.trim().length > 0);
+					const hasOpenAIKey = Boolean(store.settings.secrets['OPENAI_API_KEY'] && store.settings.secrets['OPENAI_API_KEY'].trim().length > 0);
 					if (!hasOpenAIKey) {
 						settings.tutorial.openaiKeyConfigured = false;
 					}
@@ -529,8 +534,8 @@ class AddSecretModal extends Modal {
 				return;
 			}
 
-			const settings = getPluginSettings();
-			if (settings.getSecret(key)) {
+			const store = getStoreState();
+			if (store.settings.secrets[key]) {
 				const confirmed = confirm(t('settings.secrets.dialog.errors.keyExists', { key }));
 				if (!confirmed) return;
 			}

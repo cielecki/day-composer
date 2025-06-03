@@ -3,6 +3,7 @@ import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { ToolExecutionContext } from "../utils/chat/types";
 import { t } from "../i18n";
 import { getPluginSettings } from "../settings/LifeNavigatorSettings";
+import { getStoreState } from "../store/plugin-store";
 
 const schema = {
   name: "secret_save",
@@ -32,7 +33,7 @@ type SecretSaveToolInput = {
   secret_key: string;
   secret_value: string;
   description?: string;
-}
+};
 
 function validateSecretKey(key: string): void {
   if (!key || key.trim().length === 0) {
@@ -55,28 +56,25 @@ export const secretSaveTool: ObsidianTool<SecretSaveToolInput> = {
   icon: "key",
   initialLabel: t('tools.actions.secretSave.default'),
   execute: async (context: ToolExecutionContext<SecretSaveToolInput>): Promise<void> => {
-    const { plugin, params } = context;
+    const { params } = context;
     const { secret_key, secret_value, description = "" } = params;
 
     context.setLabel(t('tools.actions.secretSave.inProgress', { key: secret_key }));
 
     try {
-      // Validate the secret key
-      validateSecretKey(secret_key);
-
-      // Get settings instance
-      const settings = getPluginSettings();
-
-      // Check if secret already exists
-      const existingSecret = settings.getSecret(secret_key);
-      if (existingSecret) {
-        context.progress(t('tools.secretSave.progress.overwriting', { key: secret_key }));
+      // Validate input
+      if (!secret_key || !secret_key.trim()) {
+        throw new ToolExecutionError("Secret key cannot be empty");
       }
-
-      // Save the secret
-      settings.setSecret(secret_key, secret_value);
-      await settings.saveSettings();
-
+      
+      if (!secret_value || !secret_value.trim()) {
+        throw new ToolExecutionError("Secret value cannot be empty");
+      }
+      
+      // Use store to save the secret
+      const store = getStoreState();
+      await store.setSecret(secret_key.trim(), secret_value.trim());
+      
       // Success message
       context.setLabel(t('tools.actions.secretSave.completed', { key: secret_key }));
       
