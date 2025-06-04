@@ -4,7 +4,6 @@ import { LifeNavigatorApp } from "./components/LifeNavigatorApp";
 import { Message } from "./utils/chat/types";
 import { LifeNavigatorPlugin } from './LifeNavigatorPlugin';
 import { t } from './i18n';
-import { initializeStore, cleanupStore } from "./store/store-initialization";
 
 export interface LifeNavigatorViewProps {
 	plugin: LifeNavigatorPlugin;
@@ -15,13 +14,10 @@ export const LIFE_NAVIGATOR_VIEW_TYPE = "life-navigator-view";
 
 export class LifeNavigatorView extends ItemView {
 	private reactRoot: ReactDOM.Root | null = null;
-	private props: LifeNavigatorViewProps;
 	private _conversation: Message[] = [];
 
-	constructor(leaf: WorkspaceLeaf, props: LifeNavigatorViewProps) {
+	constructor(leaf: WorkspaceLeaf) {
 		super(leaf);
-		this.props = props;
-		this._conversation = props.initialMessages || [];
 	}
 
 	getViewType(): string {
@@ -41,9 +37,6 @@ export class LifeNavigatorView extends ItemView {
 		container.empty();
 		container.addClass("life-navigator-view");
 
-		// Initialize Zustand store
-		await initializeStore(this.props.plugin);
-
 		// Create a container for React
 		const reactContainer = container.createDiv({ cls: "react-container" });
 
@@ -58,8 +51,6 @@ export class LifeNavigatorView extends ItemView {
 			this.reactRoot.unmount();
 			this.reactRoot = null;
 		}
-
-		cleanupStore();
 	}
 
 	renderComponent(): void {

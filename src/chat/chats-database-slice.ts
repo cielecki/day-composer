@@ -1,8 +1,7 @@
-import { StateCreator } from 'zustand';
-import type { PluginStore } from './plugin-store';
+import type { ImmerStateCreator } from '../store/plugin-store';
 import { Chat, ConversationMeta, StoredConversation } from '../utils/chat/conversation';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
-import { generateConversationTitle } from '../utils/chat/generate-conversation-title';
+import { generateChatTitle } from '../utils/chat/generate-conversation-title';
 import { Notice } from 'obsidian';
 import { t } from '../i18n';
 import { normalizePath } from 'obsidian';
@@ -32,14 +31,6 @@ export interface ChatsDatabaseSlice {
   // Helper methods
   getConversationDatabase: () => null; // Deprecated - functionality moved to this slice
 }
-
-// Type for the store creator with Immer support
-type ImmerStateCreator<T> = StateCreator<
-  PluginStore,
-  [["zustand/immer", never]],
-  [],
-  T
->;
 
 // Create database slice - migrating all ConversationDatabase functionality
 export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (set, get) => {
@@ -97,7 +88,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         const app = getApp();
         await ensureDirectoryExists(conversationsDir, app);
         
-        set((state: PluginStore) => {
+        set((state) => {
           state.database.isInitialized = true;
         });
       } catch (error) {
@@ -112,7 +103,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         const conversationsDir = getConversationsDir();
 
         // Prepare the conversation within the store action
-        set((state: PluginStore) => {
+        set((state) => {
           // Set the mode ID
           state.chats.current.storedConversation.modeId = state.modes.activeId;
           
@@ -128,11 +119,11 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         const currentState = get();
         if (!currentState.chats.current.storedConversation.titleGenerated && 
             currentState.chats.current.storedConversation.messages.length >= 2) {
-          const generatedTitle = await generateConversationTitle(
+          const generatedTitle = await generateChatTitle(
             currentState.chats.current.storedConversation.messages
           );
           
-          set((state: PluginStore) => {
+          set((state) => {
             state.chats.current.meta.title = generatedTitle;
             state.chats.current.storedConversation.titleGenerated = true;
           });

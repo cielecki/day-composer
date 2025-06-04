@@ -1,6 +1,4 @@
-import { StateCreator } from 'zustand';
-import type { PluginStore } from '../store/plugin-store';
-import { getPluginSettings } from '../settings/LifeNavigatorSettings';
+import type { ImmerStateCreator } from '../store/plugin-store';
 import { Notice, moment } from 'obsidian';
 import { t } from '../i18n';
 import OpenAI from 'openai';
@@ -20,13 +18,6 @@ export interface STTSlice {
   cancelTranscription: () => void;
 }
 
-type ImmerStateCreator<T> = StateCreator<
-  PluginStore,
-  [["zustand/immer", never]],
-  [],
-  T
->;
-
 export const createSTTSlice: ImmerStateCreator<STTSlice> = (set, get) => {  
   // Internal refs for recording management
   let mediaRecorder: MediaRecorder | null = null;
@@ -45,8 +36,8 @@ export const createSTTSlice: ImmerStateCreator<STTSlice> = (set, get) => {
     transcriptionAbortController = new AbortController();
     
     try {
-      const pluginSettings = getPluginSettings();
-      const openaiApiKey = pluginSettings.getSecret('OPENAI_API_KEY');
+      const store = get();
+      const openaiApiKey = store.getSecret('OPENAI_API_KEY');
       if (!openaiApiKey) {
         throw new Error('OpenAI API key is not configured');
       }
@@ -73,7 +64,7 @@ export const createSTTSlice: ImmerStateCreator<STTSlice> = (set, get) => {
       
       const currentLang = moment.locale(); // e.g., 'en', 'pl'
       let targetLanguageForApi = currentLang;
-      let promptToUse = pluginSettings.speechToTextPrompt;
+      let promptToUse = store.settings.speechToTextPrompt;
 
       // Fallback logic for prompt
       if (!promptToUse) {

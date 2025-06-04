@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { t } from '../../i18n';
-import { getPluginSettings } from '../../settings/LifeNavigatorSettings';
-import { getStoreState } from '../../store/plugin-store';
+import { getStore } from '../../store/plugin-store';
 import { LucideIcon } from '../LucideIcon';
 
 interface OpenAIKeyScreenProps {
@@ -22,12 +21,9 @@ export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 		
 		setIsConfiguring(true);
 		try {
-			const store = getStoreState();
-			await store.setSecret('OPENAI_API_KEY', apiKey.trim());
-			
-			const settings = getPluginSettings();
-			settings.tutorial.openaiKeyConfigured = true;
-			await settings.saveSettings();
+			await getStore().setSecret('OPENAI_API_KEY', apiKey.trim());
+			getStore().setOpenaiKeyConfigured(true);
+			await getStore().saveSettings();
 			onKeyConfigured();
 		} catch (error) {
 			console.error('Error saving OpenAI API key:', error);
@@ -41,11 +37,8 @@ export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 		setIsSkipping(true);
 		
 		try {
-			const settings = getPluginSettings();
-			console.log('Setting openaiKeyConfigured to true');
-			settings.tutorial.openaiKeyConfigured = true;
-			await settings.saveSettings();
-			console.log('Settings saved, calling onSkip');
+			getStore().setOpenaiKeyConfigured(true);
+			await getStore().saveSettings();
 			onSkip();
 		} catch (error) {
 			console.error('Error saving skip state:', error);

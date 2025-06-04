@@ -1,13 +1,13 @@
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
-import { usePluginStore, getStoreState } from '../store/plugin-store';
+import { usePluginStore, getStore } from '../store/plugin-store';
 
 let autoSaveTimeout: NodeJS.Timeout | null = null;
 
 /**
  * Initialize chat functionality with auto-save and other features
  */
-export async function initializeChatFeatures(plugin: LifeNavigatorPlugin): Promise<void> {
-  setupAutoSave(plugin);
+export async function initializeChatFeatures(): Promise<void> {
+  setupAutoSave();
   console.log('Chat features initialized');
 }
 
@@ -25,7 +25,7 @@ export function cleanupChatFeatures(): void {
 /**
  * Set up auto-save functionality that matches AIAgentContext behavior
  */
-function setupAutoSave(plugin: LifeNavigatorPlugin): void {
+function setupAutoSave(): void {
   // Subscribe to conversation changes
   usePluginStore.subscribe(
     (state) => ({
@@ -43,7 +43,7 @@ function setupAutoSave(plugin: LifeNavigatorPlugin): void {
         
         // Set up debounced auto-save (2 seconds like AIAgentContext)
         autoSaveTimeout = setTimeout(async () => {
-          const state = getStoreState();
+          const state = getStore();
           
           // Only auto-save if not generating and has messages
           if (!state.chats.isGenerating && state.chats.current.storedConversation.messages.length > 0) {
@@ -65,6 +65,6 @@ function setupAutoSave(plugin: LifeNavigatorPlugin): void {
  * Handle conversation updates from external sources
  */
 export function handleChatUpdate(): void {
-  const { incrementChatVersion } = getStoreState();
+  const { incrementChatVersion } = getStore();
   incrementChatVersion();
 } 

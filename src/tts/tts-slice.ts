@@ -1,12 +1,11 @@
-import { StateCreator } from 'zustand';
-import type { PluginStore } from '../store/plugin-store';
+import type { ImmerStateCreator } from '../store/plugin-store';
 import { TTSStreamingService } from '../services/TTSStreamingService';
-import { getPluginSettings, TTSVoice, TTS_VOICES } from '../settings/LifeNavigatorSettings';
-import { DEFAULT_VOICE_INSTRUCTIONS } from '../utils/mode/ln-mode-defaults';
 import { getDefaultLNMode } from '../utils/mode/ln-mode-defaults';
 import { Notice } from 'obsidian';
 import { t } from '../i18n';
-import OpenAI from 'openai';
+
+export type TTSVoice = "alloy" | "ash" | "coral" | "echo" | "fable" | "onyx" | "nova" | "sage" | "shimmer";
+export const TTS_VOICES: TTSVoice[] = ['alloy', 'ash', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer'];
 
 // Cache interface for storing generated audio
 interface TTSCache {
@@ -43,14 +42,6 @@ export interface TTSSlice {
   clearCache: () => void;
 }
 
-// Type for StateCreator with immer middleware - updated to use PluginStore
-type ImmerStateCreator<T> = StateCreator<
-  PluginStore,
-  [["zustand/immer", never]],
-  [],
-  T
->;
-
 // Create TTS slice - now get() returns full PluginStore type
 export const createTTSSlice: ImmerStateCreator<TTSSlice> = (set, get) => {
   // Internal refs for service management
@@ -73,7 +64,7 @@ export const createTTSSlice: ImmerStateCreator<TTSSlice> = (set, get) => {
   };
 
   const initializeStreamingService = () => {
-    const apiKey = getPluginSettings().getSecret('OPENAI_API_KEY');
+    const apiKey = get().getSecret('OPENAI_API_KEY');
     const settings = getCurrentTTSSettings();
     
     if (apiKey && !streamingServiceRef) {
@@ -241,7 +232,7 @@ export const createTTSSlice: ImmerStateCreator<TTSSlice> = (set, get) => {
         return Promise.resolve();
       }
 
-      const settings = getPluginSettings();
+      const store = get();
       state.stopAudio();
 
       // Create internal abort controller
@@ -302,7 +293,7 @@ export const createTTSSlice: ImmerStateCreator<TTSSlice> = (set, get) => {
         }
         
         // Verify we have a valid API key
-        if (!settings.getSecret('OPENAI_API_KEY')) {
+        if (!store.getSecret('OPENAI_API_KEY')) {
           console.error('No OpenAI API key available for TTS');
           new Notice(t('errors.tts.noApiKey'));
           return;
@@ -332,7 +323,7 @@ export const createTTSSlice: ImmerStateCreator<TTSSlice> = (set, get) => {
         const response = await fetch('https://api.openai.com/v1/audio/speech', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${settings.getSecret('OPENAI_API_KEY')}`,
+            'Authorization': `Bearer ${store.getSecret('OPENAI_API_KEY')}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({

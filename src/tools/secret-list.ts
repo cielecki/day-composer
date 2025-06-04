@@ -1,7 +1,7 @@
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
 import { t } from "../i18n";
-import { getPluginSettings } from "../settings/LifeNavigatorSettings";
+import { getStore } from "../store/plugin-store";
 
 const schema = {
   name: "secret_list",
@@ -23,11 +23,11 @@ export const secretListTool: ObsidianTool<SecretListToolInput> = {
     context.setLabel(t('tools.actions.secretList.inProgress'));
 
     try {
-      // Get settings instance
-      const settings = getPluginSettings();
+      // Get store instance
+      const store = getStore();
 
       // Get all secret keys
-      const secretKeys = settings.getSecretKeys();
+      const secretKeys = store.getSecretKeys();
 
       if (secretKeys.length === 0) {
         context.setLabel(t('tools.actions.secretList.completed'));
@@ -45,7 +45,7 @@ export const secretListTool: ObsidianTool<SecretListToolInput> = {
       let resultMessage = t('tools.secretList.progress.header', { count: sortedKeys.length });
       resultMessage += '\n\n';
       
-      sortedKeys.forEach((key, index) => {
+      sortedKeys.forEach((key: string, index: number) => {
         resultMessage += `${index + 1}. **${key}**\n`;
       });
 

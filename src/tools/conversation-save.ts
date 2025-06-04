@@ -1,7 +1,7 @@
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from "../utils/chat/types";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { getStoreState } from "../store/plugin-store";
+import { getStore } from "../store/plugin-store";
 import { formatConversationContent } from "../utils/chat/conversation-formatter";
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
@@ -83,7 +83,7 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
 
     try {
       // Get the current conversation from the store
-      const store = getStoreState();
+      const store = getStore();
       const conversation = store.chats.current.storedConversation.messages;
       const conversationTitle = title || store.chats.current.meta.title || 'Untitled Conversation';
 

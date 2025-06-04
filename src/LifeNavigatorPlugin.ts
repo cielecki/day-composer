@@ -5,20 +5,20 @@ import { LifeNavigatorView, LIFE_NAVIGATOR_VIEW_TYPE } from './life-navigator-vi
 import { checkForAvailableUpdate, checkForUpdatesOnStartup } from './auto-update';
 import { getObsidianTools, resetObsidianTools } from './obsidian-tools';
 import { LifeNavigatorSettingTab } from './settings/LifeNavigatorSettingTab';
-import { createPluginSettings, loadPluginSettings, LifeNavigatorSettings } from './settings/LifeNavigatorSettings';
 import { UserDefinedToolManager } from './user-tools/UserDefinedToolManager';
+import { initializeStore } from './store/store-initialization';
 
 export class LifeNavigatorPlugin extends Plugin {
-	settings!: LifeNavigatorSettings;
 	private static _instance: LifeNavigatorPlugin | null = null;
 	
 	view: LifeNavigatorView | null = null;
 	userToolManager: UserDefinedToolManager | null = null;
 
-	/**
-	 * Get the current plugin instance
-	 */
-	static getInstance(): LifeNavigatorPlugin | null {
+	static getInstance(): LifeNavigatorPlugin {
+		if (!LifeNavigatorPlugin._instance) {
+			throw new Error('LifeNavigatorPlugin instance not found');
+		}
+
 		return LifeNavigatorPlugin._instance;
 	}
 
@@ -38,9 +38,8 @@ export class LifeNavigatorPlugin extends Plugin {
 		// Initialize i18n
 		await initI18n(this.app);
 
-		// Initialize the plugin settings
-		createPluginSettings(this);
-		await loadPluginSettings(this);
+		// Initialize Zustand store
+		await initializeStore();
 
 		// Initialize the obsidian tools with this plugin instance
 		getObsidianTools(this);
@@ -52,10 +51,7 @@ export class LifeNavigatorPlugin extends Plugin {
 		// Register the view type
 		this.registerView(LIFE_NAVIGATOR_VIEW_TYPE, (leaf) => {
 			// Create view with empty context first
-			this.view = new LifeNavigatorView(leaf, {
-				initialMessages: [],
-				plugin: this,
-			});
+			this.view = new LifeNavigatorView(leaf);
 
 			return this.view;
 
@@ -68,7 +64,7 @@ export class LifeNavigatorPlugin extends Plugin {
 			callback: async () => {
 				try {
 					// Use the setup slice from the store
-					const { getStoreState } = await import('./store/plugin-store');
+					const { getStore: getStoreState } = await import('./store/plugin-store');
 					const store = getStoreState();
 					await store.resetTutorialState();
 					new Notice(t('settings.actions.resetTutorial.success'));

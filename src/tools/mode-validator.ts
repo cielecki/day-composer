@@ -6,8 +6,8 @@ import { TFile } from "obsidian";
 import { LNMode } from "../utils/mode/LNMode";
 import { mergeWithDefaultMode, validateModeSettings, ANTHROPIC_MODELS } from "../utils/mode/ln-mode-defaults";
 import { expandLinks } from "../utils/links/expand-links";
-import { TTS_VOICES } from "../settings/LifeNavigatorSettings";
 import * as yaml from "js-yaml";
+import { TTS_VOICES } from "src/tts/tts-slice";
 
 const schema = {
   name: "mode_validator",

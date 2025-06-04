@@ -1,6 +1,5 @@
-import { StateCreator } from 'zustand';
 import { LNMode } from '../utils/mode/LNMode';
-import type { PluginStore } from '../store/plugin-store';
+import type { ImmerStateCreator } from '../store/plugin-store';
 
 // Modes slice interface
 export interface ModesSlice {
@@ -21,14 +20,6 @@ export interface ModesSlice {
   setModesLoading: (loading: boolean) => void;
   setFileWatcherActive: (active: boolean) => void;
 }
-
-// Type for StateCreator with immer middleware - updated to use PluginStore
-type ImmerStateCreator<T> = StateCreator<
-  PluginStore,
-  [["zustand/immer", never]],
-  [],
-  T
->;
 
 export const createModesSlice: ImmerStateCreator<ModesSlice> = (set, get) => ({
   modes: {
@@ -53,10 +44,9 @@ export const createModesSlice: ImmerStateCreator<ModesSlice> = (set, get) => ({
     });
     
     // Persist to settings
-    const { getPluginSettings } = await import('../settings/LifeNavigatorSettings');
-    const settings = getPluginSettings();
-    settings.activeModeId = modeId;
-    await settings.saveSettings();
+    const store = get();
+    store.updateSettings({ activeModeId: modeId });
+    await store.saveSettings();
   },
   
   updateMode: (modeId, mode) => set((state) => {

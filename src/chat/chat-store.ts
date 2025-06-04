@@ -1,5 +1,4 @@
-import { StateCreator } from 'zustand';
-import type { PluginStore } from '../store/plugin-store';
+import type { ImmerStateCreator } from '../store/plugin-store';
 import { Message, ToolResultBlock } from '../utils/chat/types';
 import { Chat } from '../utils/chat/conversation';
 import { generateChatId } from '../utils/chat/generate-conversation-id';
@@ -71,14 +70,6 @@ export interface ChatSlice {
   loadConversation: (conversationId: string) => Promise<boolean>;
 }
 
-// Type for StateCreator with immer middleware - updated to use PluginStore
-type ImmerStateCreator<T> = StateCreator<
-  PluginStore,
-  [["zustand/immer", never]],
-  [],
-  T
->;
-
 // Create conversation slice - now get() returns full PluginStore type
 export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
   chats: {
@@ -102,7 +93,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
     conversationVersion: 0
   },
   
-  addMessage: (message) => set((state: PluginStore) => {
+  addMessage: (message) => set((state) => {
     // Ensure message has a unique ID for React reconciliation
     const messageWithId = ensureMessageId(message);
     
@@ -112,7 +103,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
     state.chats.conversationVersion += 1;
   }),
   
-  updateMessage: (index, message) => set((state: PluginStore) => {
+  updateMessage: (index, message) => set((state) => {
     const messages = state.chats.current.storedConversation.messages;
     if (index >= 0 && index < messages.length) {
       // Ensure message has ID (preserve existing ID if available)
@@ -130,7 +121,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
     }
   }),
   
-  clearChat: () => set((state: PluginStore) => {
+  clearChat: () => set((state) => {
     state.chats.current = {
       meta: {
         id: generateChatId(),
@@ -155,27 +146,27 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
     state.clearChat();
   },
   
-  setIsGenerating: (generating) => set((state: PluginStore) => {
+  setIsGenerating: (generating) => set((state) => {
     state.chats.isGenerating = generating;
   }),
   
-  setEditingMessage: (editing) => set((state: PluginStore) => {
+  setEditingMessage: (editing) => set((state) => {
     state.chats.editingMessage = editing;
   }),
   
-  updateLiveToolResult: (toolId, result) => set((state: PluginStore) => {
+  updateLiveToolResult: (toolId, result) => set((state) => {
     state.chats.liveToolResults.set(toolId, result);
   }),
   
-  clearLiveToolResults: () => set((state: PluginStore) => {
+  clearLiveToolResults: () => set((state) => {
     state.chats.liveToolResults.clear();
   }),
   
-  incrementChatVersion: () => set((state: PluginStore) => {
+  incrementChatVersion: () => set((state) => {
     state.chats.conversationVersion += 1;
   }),
   
-  setCurrentChat: (conversation) => set((state: PluginStore) => {
+  setCurrentChat: (conversation) => set((state) => {
     // Ensure all messages have IDs when loading conversation
     const messagesWithIds = conversation.storedConversation.messages.map(msg => ensureMessageId(msg));
     const conversationWithIds = {
@@ -256,7 +247,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
     const newMessage = createUserMessage(newContent, images);
     conversationUpToEdit[messageIndex] = newMessage;
     
-    set((state: PluginStore) => {
+    set((state) => {
       state.chats.current.storedConversation.messages = conversationUpToEdit;
       state.chats.editingMessage = null;
       state.chats.conversationVersion += 1;

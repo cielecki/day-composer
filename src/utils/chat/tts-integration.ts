@@ -1,7 +1,7 @@
 import { Message } from "./types";
 import { extractTextForTTS, ensureContentBlocks } from "./content-blocks";
 import { getDefaultLNMode } from "../mode/ln-mode-defaults";
-import { getStoreState } from "../../store/plugin-store";
+import { getStore } from "../../store/plugin-store";
 
 /**
  * Handles TTS for assistant messages based on mode settings
@@ -12,10 +12,8 @@ export const handleTTS = async (
 ): Promise<void> => {
 	if (!finalAssistantMessage) return;
 	
-	const state = getStoreState();
-	
 	// Skip automatic TTS if recording is active
-	if (state.stt.isRecording) {
+	if (getStore().stt.isRecording) {
 		return;
 	}
 	
@@ -24,13 +22,13 @@ export const handleTTS = async (
 	
 	// Get current mode and check autoplay setting
 	const defaultMode = getDefaultLNMode();
-	const currentActiveMode = state.modes.available[state.modes.activeId];
+	const currentActiveMode = getStore().modes.available[getStore().modes.activeId];
 	const autoplayEnabled = currentActiveMode?.ln_voice_autoplay || defaultMode.ln_voice_autoplay;
 	
 	// Only auto-play if both the global setting and the mode-specific autoplay are enabled
 	if (autoplayEnabled && textForTTS.trim().length > 0) {
 		try {
-			await state.speakText(textForTTS, signal);
+			await getStore().speakText(textForTTS, signal);
 			if (signal.aborted) {
 				console.log("TTS aborted.");
 			} else {

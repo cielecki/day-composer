@@ -2,8 +2,7 @@ import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionError } from "../utils/tools/tool-execution-error";
 import { ToolExecutionContext } from "../utils/chat/types";
 import { t } from "../i18n";
-import { getPluginSettings } from "../settings/LifeNavigatorSettings";
-import { getStoreState } from "../store/plugin-store";
+import { getStore } from "../store/plugin-store";
 
 const schema = {
   name: "secret_save",
@@ -72,7 +71,7 @@ export const secretSaveTool: ObsidianTool<SecretSaveToolInput> = {
       }
       
       // Use store to save the secret
-      const store = getStoreState();
+      const store = getStore();
       await store.setSecret(secret_key.trim(), secret_value.trim());
       
       // Success message

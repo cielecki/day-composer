@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { t } from '../../i18n';
-import { getPluginSettings } from '../../settings/LifeNavigatorSettings';
+import { getStore } from '../../store/plugin-store';
 import { LucideIcon } from '../LucideIcon';
 
 interface LanguageSelectionScreenProps {
@@ -31,9 +31,8 @@ export const LanguageSelectionScreen: React.FC<LanguageSelectionScreenProps> = (
 			window.localStorage.setItem('language', languageCode);
 			
 			// Mark language as configured in plugin settings
-			const settings = getPluginSettings();
-			settings.tutorial.obsidianLanguageConfigured = true;
-			await settings.saveSettings();
+			getStore().setObsidianLanguageConfigured(true);
+			await getStore().saveSettings();
 
 			if (languageCode !== currentLanguage) {
 				if (window.app && (window.app as any).commands) {

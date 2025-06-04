@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { getPluginSettings } from "../../settings/LifeNavigatorSettings";
+import { getStore } from "../../store/plugin-store";
 import { LNMode } from '../mode/LNMode';
 
 
@@ -9,9 +9,9 @@ export async function generateAITitle(
     mode?: LNMode
 ): Promise<string | null> {
     try {
-        const settings = getPluginSettings();
+        const store = getStore();
         const anthropicClient = new Anthropic({
-            apiKey: settings.getSecret('ANTHROPIC_API_KEY'),
+            apiKey: store.getSecret('ANTHROPIC_API_KEY'),
             dangerouslyAllowBrowser: true
         });
 

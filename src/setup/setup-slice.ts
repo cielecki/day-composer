@@ -1,6 +1,5 @@
 import { StateCreator } from 'zustand';
 import type { PluginStore } from '../store/plugin-store';
-import { getPluginSettings } from '../settings/LifeNavigatorSettings';
 
 export enum SetupStep {
 	CONFIGURE_LANGUAGE = "configure_language",
@@ -11,10 +10,6 @@ export enum SetupStep {
 
 export interface SetupState {
 	currentStep: SetupStep;
-	hasLanguageConfigured: boolean;
-	hasAnthropicKey: boolean;
-	hasOpenAIKey: boolean;
-	hasOpenAIConfigured: boolean;
 }
 
 // Setup slice interface
@@ -50,13 +45,10 @@ export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => ({
   
   refreshSetupState: () => set((state) => {
     try {
-      const settings = getPluginSettings();
-      
-      const hasLanguageConfigured = settings.tutorial.obsidianLanguageConfigured;
-      const hasAnthropicKey = Boolean(settings.getSecret('ANTHROPIC_API_KEY') && settings.getSecret('ANTHROPIC_API_KEY')!.trim().length > 0);
-      const hasOpenAIKey = Boolean(settings.getSecret('OPENAI_API_KEY') && settings.getSecret('OPENAI_API_KEY')!.trim().length > 0);
-      const hasOpenAIConfigured = settings.tutorial.openaiKeyConfigured;
-      
+      const hasLanguageConfigured = get().getObsidianLanguageConfigured();
+      const hasAnthropicKey = Boolean(get().getSecret('ANTHROPIC_API_KEY') && get().getSecret('ANTHROPIC_API_KEY')!.trim().length > 0);
+      const hasOpenAIKey = Boolean(get().getSecret('OPENAI_API_KEY') && get().getSecret('OPENAI_API_KEY')!.trim().length > 0);
+      const hasOpenAIConfigured = get().getOpenaiKeyConfigured();
       
       let currentStep: SetupStep;
       
@@ -75,27 +67,15 @@ export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => ({
       }
       
       state.setup.currentStep = currentStep;
-      state.setup.hasLanguageConfigured = hasLanguageConfigured;
-      state.setup.hasAnthropicKey = hasAnthropicKey;
-      state.setup.hasOpenAIKey = hasOpenAIKey;
-      state.setup.hasOpenAIConfigured = hasOpenAIConfigured;
     } catch (error) {
       // If settings are not initialized yet, return default state
       console.log('Setup slice: Settings not initialized yet, using default state');
       state.setup.currentStep = SetupStep.CONFIGURE_LANGUAGE;
-      state.setup.hasLanguageConfigured = false;
-      state.setup.hasAnthropicKey = false;
-      state.setup.hasOpenAIKey = false;
-      state.setup.hasOpenAIConfigured = false;
     }
   }),
   
   resetTutorialState: async () => {
-    const { getPluginSettings } = await import('../settings/LifeNavigatorSettings');
-    const settings = getPluginSettings();
-    settings.tutorial.obsidianLanguageConfigured = false;
-    settings.tutorial.openaiKeyConfigured = false;
-    await settings.saveSettings();
+    await get().resetTutorial();
     
     // Refresh state after resetting
     get().refreshSetupState();

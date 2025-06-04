@@ -2,8 +2,7 @@ import { ToolExecutionError } from '../utils/tools/tool-execution-error';
 import { UserToolExecutionContext } from './types';
 import { createHash } from 'crypto';
 import { requestUrl } from 'obsidian';
-import { getPluginSettings } from '../settings/LifeNavigatorSettings';
-import { getStoreState } from '../store/plugin-store';
+import { getStore } from '../store/plugin-store';
 
 export class SecureExecutionContext {
   private allowedAPIs: Set<string>;
@@ -40,11 +39,10 @@ export class SecureExecutionContext {
       },
       requestUrl,
       getSecret: (key: string) => {
-        const settings = getPluginSettings();
-        return settings.getSecret(key);
+        return getStore().getSecret(key);
       },
       setSecret: async (key: string, value: string) => {
-        const store = getStoreState();
+        const store = getStore();
         await store.setSecret(key, value);
       },
       Date,

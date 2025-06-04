@@ -1,5 +1,5 @@
 import { LNMode } from './LNMode';
-import { TTS_VOICES, TTSVoice } from "../../settings/LifeNavigatorSettings";
+import { TTS_VOICES, TTSVoice } from "src/tts/tts-slice";
 
 // Available Anthropic models
 export const ANTHROPIC_MODELS = [

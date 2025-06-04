@@ -1,8 +1,9 @@
 import { App, TFile } from "obsidian";
+import { LifeNavigatorPlugin } from "src/LifeNavigatorPlugin";
 
 // Helper to check if file has or had the #ln-mode tag
-export function hasModeTag(app: App, file: TFile): boolean {
-	const cache = app.metadataCache.getFileCache(file);
+export function hasModeTag(file: TFile): boolean {
+	const cache = LifeNavigatorPlugin.getInstance().app.metadataCache.getFileCache(file);
 	const tags = cache?.tags?.map((tag) => tag.tag) || [];
 	const frontmatterTags = cache?.frontmatter?.tags || [];
 

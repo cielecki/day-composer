@@ -1,13 +1,13 @@
 import { Anthropic, APIUserAbortError } from "@anthropic-ai/sdk";
 import { Notice } from "obsidian";
 import { MessageCreateParamsStreaming } from "@anthropic-ai/sdk/resources/messages/messages";
-import { Message, ContentBlock, ToolResultBlock } from "./types";
+import { Message, ToolResultBlock } from "./types";
 import { formatMessagesForAPI } from "./api-formatting";
 import { processAnthropicStream, StreamProcessorCallbacks } from "./stream-processor";
 import { processToolUseBlocks } from "./tool-processing";
 import { getToolUseBlocks, hasIncompleteToolCalls, hasIncompleteThinking, clearThinkingInProgress } from "./content-blocks";
 import { cleanupLastMessage } from "./message-validation";
-import { getPluginSettings } from "../../settings/LifeNavigatorSettings";
+import { getStore } from "../../store/plugin-store";
 import { getDefaultLNMode, resolveAutoModel } from "../mode/ln-mode-defaults";
 import { t } from '../../i18n';
 import type { ObsidianTool } from "../../obsidian-tools";
@@ -46,7 +46,7 @@ export const runConversationTurn = async (
 			let assistantMessage: Message | null = null;
 
 			try {
-				const apiKey = getPluginSettings().getSecret('ANTHROPIC_API_KEY');
+				const apiKey = getStore().getSecret('ANTHROPIC_API_KEY');
 				const anthropicClient = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
 
 				// Create a stable reference to messages for API formatting
