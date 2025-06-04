@@ -102,7 +102,7 @@
     "prompts": {
       "defaultPrompt": "# Domain\nA message or voice command issued by the user to the AI assistant.\n\n# Examples\n- Check off task ... umm ... I took out the trash\n- I made dinner\n- Add for tomorrow to remind me to reach out to John.\n\n# Glossary\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nStart of transcription:",
       "speechToTextPrompt": "Speech-to-text Prompt",
-      "speechToTextPromptDesc": "The prompt that will be sent to the speech-to-text engine. This provides context to the AI model. You can use <a href='https://github.com/cielecki/life-navigator/blob/main/docs/link-expansion.md'>link expansion</a>."
+      "speechToTextPromptDesc": "The prompt that will be sent to the speech-to-text engine. This provides context to the AI model. You can use <a href='https://github.com/cielecki/life-navigator/blob/main/library/Docs/Link%20Expansion.md'>link expansion</a>."
     },
     "secrets": {
       "addNew": {

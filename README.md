@@ -45,14 +45,14 @@ All your personal information is stored locally in your Obsidian vault on your p
 
 ### Getting Started
 
-1. [Install Life Navigator](docs/installation.md) in your Obsidian vault
+1. [Install Life Navigator](library/Docs/Installation.md) in your Obsidian vault
 2. Complete the guided setup with language selection and API key configuration
-3. Start using the pre-built LifeNavigator mode or create your own custom modes or download additional modes from the [Life Navigator Library](https://github.com/cielecki/life-navigator/tree/main/library)
+3. Start using the pre-built LifeNavigator mode or create your own custom modes or download additional modes from the [Life Navigator Library](library/)
 
 ### Documentation
 
-- **[Installation Guide](docs/installation.md)** - Step-by-step setup instructions
-- **[User Guide](docs/user-guide.md)** - Comprehensive guide to using Life Navigator
+- **[Installation Guide](library/Docs/Installation.md)** - Step-by-step setup instructions
+- **[User Guide](library/Docs/User%20Guide.md)** - Comprehensive guide to using Life Navigator
 - **[Development Guide](docs/developing.md)** - For contributors and developers
 - **[Roadmap](docs/roadmap.md)** - Future features and improvements
 

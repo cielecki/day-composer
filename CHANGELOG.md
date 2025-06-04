@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Documentation Links**: Fixed broken links in README.md that were pointing to non-existent files in docs/ directory. Updated links to point to correct paths in library/Docs/ directory with proper URL encoding for file names with spaces.
+- **Localization Links**: Fixed broken documentation links in both English and Polish localization files (src/locales/en.json and src/locales/pl.json) that were pointing to outdated paths for link expansion documentation.
 - **Chat Title Localization**: Fixed bug where chat titles in history were displayed in English despite having Polish language set.
 - **Conversation History Dropdown Toggle**: Fixed issue where clicking the history button while the dropdown was open would cause the dropdown to briefly close and then reopen. Implemented professional wrapper container pattern used by major UI libraries.
 - **Conversation History Dropdown Localization**: Added proper translation support for conversation history dropdown empty states, loading messages, and search placeholder. Messages now display correctly in both English and Polish.
