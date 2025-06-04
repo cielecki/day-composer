@@ -6,6 +6,18 @@
     "assistantMessage": "wiadomość asystenta",
     "current": "Bieżąca rozmowa",
     "empty": "Rozmowa jest pusta. Rozpocznij konwersację, aby zobaczyć zawartość.",
+    "titleGeneration": {
+      "aiPrompt": "Na podstawie tej wymiany rozmowy wygeneruj zwięzły, opisowy tytuł (maksymalnie 3-4 słowa, 30 znaków):",
+      "assistantLabel": "Asystent:",
+      "examples": "Przykłady:\n- \"Plany weekendowe\"\n- \"Pomoc z React\"\n- \"Porady treningowe\"\n- \"Porady podróżnicze\"",
+      "instructions": "Wygeneruj tytuł, który oddaje główny temat lub intencję. Odpowiedz tylko tytułem, nic więcej.",
+      "userLabel": "Użytkownik:"
+    },
+    "titles": {
+      "newChat": "Nowa rozmowa",
+      "question": "Pytanie",
+      "quickChat": "Szybka rozmowa"
+    },
     "userMessage": "wiadomość użytkownika"
   },
   "dateTime": {

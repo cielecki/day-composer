@@ -6,6 +6,18 @@
     "assistantMessage": "assistant message",
     "current": "Current Chat",
     "empty": "Chat is empty. Start a conversation to see content here.",
+    "titleGeneration": {
+      "aiPrompt": "Based on this conversation exchange, generate a concise, descriptive title (maximum 3-4 words, 30 characters):",
+      "assistantLabel": "Assistant:",
+      "examples": "Examples:\n- \"Weekend Plans\"\n- \"React Help\"\n- \"Workout Tips\"\n- \"Travel Advice\"",
+      "instructions": "Generate a title that captures the main topic or intent. Only respond with the title, nothing else.",
+      "userLabel": "User:"
+    },
+    "titles": {
+      "newChat": "New Chat",
+      "question": "Question",
+      "quickChat": "Quick Chat"
+    },
     "userMessage": "user message"
   },
   "dateTime": {

@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { getStore } from 'src/store/plugin-store';
 import { LNMode } from 'src/types/LNMode';
-
+import { t } from 'src/i18n';
 
 export async function generateAITitle(
     userMessage: string,
@@ -15,20 +15,14 @@ export async function generateAITitle(
             dangerouslyAllowBrowser: true
         });
 
-        const modeContext = mode ? `The conversation is in "${mode.ln_name}" mode. ` : "";
+        const prompt = `${t('chat.titleGeneration.aiPrompt')}
 
-        const prompt = `${modeContext}Based on this conversation exchange, generate a concise, descriptive title (maximum 4-5 words):
+${t('chat.titleGeneration.userLabel')} ${userMessage.substring(0, 200)}
+${t('chat.titleGeneration.assistantLabel')} ${assistantMessage.substring(0, 200)}
 
-User: ${userMessage.substring(0, 200)}
-Assistant: ${assistantMessage.substring(0, 200)}
+${t('chat.titleGeneration.instructions')}
 
-Generate a title that captures the main topic or intent. Use format "${mode?.ln_name || 'Chat'}: [Topic]".
-Examples:
-- "Bro: Weekend Plans"
-- "Assistant: React Help" 
-- "Coach: Workout Tips"
-
-Only respond with the title, nothing else.`;
+${t('chat.titleGeneration.examples')}`;
 
         const response = await anthropicClient.messages.create({
             model: "claude-3-haiku-20240307",
@@ -44,9 +38,10 @@ Only respond with the title, nothing else.`;
             ? response.content[0].text.trim()
             : null;
 
-        // Validate title format and length
-        if (title && title.length <= 50 && title.includes(":")) {
-            return title;
+        // Validate title length (no longer expecting colon since we removed mode names)
+        if (title && title.length <= 50 && title.length > 0) {
+            // Clean up any potential quotation marks from the AI response
+            return title.replace(/^["']|["']$/g, '');
         }
 
         return null;
