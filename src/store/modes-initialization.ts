@@ -70,18 +70,18 @@ async function loadLNModes(): Promise<void> {
       `Loaded ${Object.keys(modesMap).length} modes (${prebuiltModes.length} pre-built, ${Object.keys(modesMap).length - prebuiltModes.length} from files)`
     );
     
-    // Get current settings to check for active mode
+    // Set the active mode from settings, regardless of whether it exists yet
+    // This preserves user's choice and allows UI to show loading state if needed
     const store = getStore();
-    const currentActiveModeId = store.settings.activeModeId;
+    const desiredModeId = store.settings.activeModeId;
     
-    // If active mode no longer exists, set it to the first available mode
-    if (!modesMap[currentActiveModeId] && Object.keys(modesMap).length > 0) {
+    if (desiredModeId) {
+      // Always set the user's desired mode - UI will handle loading state if mode doesn't exist
+      state.setActiveMode(desiredModeId);
+    } else if (Object.keys(modesMap).length > 0) {
+      // No preference set - use first available mode
       const firstModeId = Object.keys(modesMap)[0] || "";
       state.setActiveMode(firstModeId);
-      store.updateSettings({ activeModeId: firstModeId });
-      await store.saveSettings();
-    } else if (currentActiveModeId) {
-      state.setActiveMode(currentActiveModeId);
     }
   } catch (error) {
     console.error("Error loading LN modes:", error);

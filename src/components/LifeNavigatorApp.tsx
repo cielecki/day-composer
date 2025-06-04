@@ -21,6 +21,7 @@ import { SetupFlow } from "./setup/SetupFlow";
 import { ConversationHistoryDropdown } from './ConversationHistoryDropdown';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { MessageWithId } from '../store/chat-store';
+import { useAutoscroll } from '../hooks/useAutoscroll';
 
 // Add Zustand store imports
 import {
@@ -91,6 +92,7 @@ export const LifeNavigatorApp: React.FC = () => {
 	const liveToolResults = usePluginStore(state => state.chats.liveToolResults);
 	const availableModes = usePluginStore(state => state.modes.available);
 	const activeModeId = usePluginStore(state => state.modes.activeId);
+	const isModesLoading = usePluginStore(state => state.modes.isLoading);
 	const isSpeaking = usePluginStore(state => state.tts.isSpeaking);
 	
 	// Create a stable reference to the conversation to prevent proxy issues
@@ -226,53 +228,26 @@ export const LifeNavigatorApp: React.FC = () => {
 		return indexMap;
 	}, [stableConversation, editingMessage]);
 
-	// Helper function to scroll to bottom
-	const scrollToBottom = useCallback(() => {
-		if (conversationContainerRef.current) {
-			const container = conversationContainerRef.current;
-			requestAnimationFrame(() => {
-				container.scrollTop = container.scrollHeight;
-			});
+	// Unified autoscroll hook - handles both static and streaming updates
+	const { scrollRef: autoscrollRef, scrollToBottom } = useAutoscroll(
+		filteredConversation, // Dependency - scroll when conversation changes
+		{
+			threshold: 100,        // Consider "at bottom" when within 100px
+			smooth: true,          // Use smooth scrolling
+			enabled: true,         // Always enabled
+			isStreaming: isGeneratingResponse // Switch between modes
 		}
-	}, []);
+	);
 
-	// Effect to scroll to bottom when conversation history updates (but not during streaming)
+	// Keep both refs in sync
 	useEffect(() => {
-		// Only scroll on conversation changes when not generating to avoid double-scrolling
-		if (!isGeneratingResponse) {
-			scrollToBottom();
+		if (autoscrollRef.current) {
+			conversationContainerRef.current = autoscrollRef.current;
 		}
-	}, [filteredConversation, scrollToBottom, isGeneratingResponse]);
+	}, [autoscrollRef]);
 
-	// Effect to handle autoscroll during streaming
-	useEffect(() => {
-		if (isGeneratingResponse && conversationContainerRef.current) {
-			const container = conversationContainerRef.current;
-			
-			// Create a MutationObserver to watch for content changes during streaming
-			const observer = new MutationObserver(() => {
-				// Debounce the scroll to avoid excessive scrolling
-				requestAnimationFrame(() => {
-					container.scrollTop = container.scrollHeight;
-				});
-			});
-
-			// Observe changes to the conversation container and its children
-			observer.observe(container, {
-				childList: true,
-				subtree: true,
-				characterData: true,
-			});
-
-			// Scroll immediately when generation starts
-			scrollToBottom();
-
-			// Cleanup observer when generation stops or component unmounts
-			return () => {
-				observer.disconnect();
-			};
-		}
-	}, [isGeneratingResponse, scrollToBottom]);
+	// Check if the active mode is actually available
+	const isModeLoading = activeModeId && !availableModes[activeModeId];
 
 	const newAbortController = useCallback(() => {
 		const abortController = new AbortController();
@@ -401,44 +376,53 @@ export const LifeNavigatorApp: React.FC = () => {
 			!isGeneratingResponse &&
 			!editingMessage
 		) {
+			// Show normal mode content when loaded
+			if (activeMode) {
+				return (
+					<div className="empty-conversation">
+						<div className="markdown-content">
+							<MarkdownRenderer
+								content={activeMode.ln_description}
+							/>
+						</div>
+
+						{activeMode.ln_example_usages.length > 0 && (
+							<div className="ln-mode-pills-container">
+								{activeMode.ln_example_usages.map((usage, index) => (
+									<LNModePill
+										key={index}
+										id={`${index}`}
+										name={usage}
+										onClick={() => {
+											// If the mode has an auto-trigger message, send it
+											if (usage) {
+												console.log(
+													`Auto-triggering message for mode ${activeMode.ln_name}: "${usage}"`,
+												);
+
+												// Need to create a new abort controller here
+												const abortController = newAbortController();
+
+												// Wait a short moment before sending to ensure state updates have propagated
+												setTimeout(() => {
+													addUserMessage(
+														usage,
+														abortController.signal,
+													);
+												}, 100);
+											}
+										}}
+									/>
+								))}
+							</div>
+						)}
+					</div>
+				);
+			}
+
 			return (
 				<div className="empty-conversation">
-					<div className="markdown-content">
-						<MarkdownRenderer
-							content={activeMode ? activeMode.ln_description : "Welcome to Life Navigator! Select a mode from the dropdown above to get started."}
-						/>
-					</div>
-
-					{activeMode && activeMode.ln_example_usages.length > 0 && (
-						<div className="ln-mode-pills-container">
-							{activeMode.ln_example_usages.map((usage, index) => (
-								<LNModePill
-									key={index}
-									id={`${index}`}
-									name={usage}
-									onClick={() => {
-										// If the mode has an auto-trigger message, send it
-										if (usage) {
-											console.log(
-												`Auto-triggering message for mode ${activeMode.ln_name}: "${usage}"`,
-											);
-
-											// Need to create a new abort controller here
-											const abortController = newAbortController();
-
-											// Wait a short moment before sending to ensure state updates have propagated
-											setTimeout(() => {
-												addUserMessage(
-													usage,
-													abortController.signal,
-												);
-											}, 100);
-										}
-									}}
-								/>
-							))}
-						</div>
-					)}
+					
 				</div>
 			);
 		}
@@ -492,7 +476,7 @@ export const LifeNavigatorApp: React.FC = () => {
 				>
 					{/* Flex row for dropdown and menu button */}
 					<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-						{activeMode && <div
+						<div
 							className="active-mode-indicator"
 							onClick={toggleDropdown}
 							style={{
@@ -510,27 +494,73 @@ export const LifeNavigatorApp: React.FC = () => {
 							}}
 							ref={modeIndicatorRef}
 						>
-							{activeMode.ln_icon && (
-								<span
-									style={{
-										display: "flex",
-										alignItems: "center",
-										justifyContent: "center",
-									}}
-								>
-									<LucideIcon
-										name={activeMode.ln_icon}
-										size={18}
-										color={
-											activeMode.ln_icon_color ||
-											"var(--text-normal)"
-										}
-									/>
-								</span>
+							{isModeLoading ? (
+								// Loading state - show generic loading with appropriate icon
+								<>
+									<span
+										style={{
+											display: "flex",
+											alignItems: "center",
+											justifyContent: "center",
+										}}
+									>
+										<LucideIcon
+											name={isModesLoading ? "loader-2" : "clock"}
+											size={18}
+											color="var(--text-muted)"
+											className={isModesLoading ? "animate-spin" : ""}
+										/>
+									</span>
+									<span style={{ fontWeight: 500, color: "var(--text-muted)" }}>
+										{t('ui.mode.loading')}
+									</span>
+								</>
+							) : activeMode ? (
+								// Normal state - show loaded mode
+								<>
+									{activeMode.ln_icon && (
+										<span
+											style={{
+												display: "flex",
+												alignItems: "center",
+												justifyContent: "center",
+											}}
+										>
+											<LucideIcon
+												name={activeMode.ln_icon}
+												size={18}
+												color={
+													activeMode.ln_icon_color ||
+													"var(--text-normal)"
+												}
+											/>
+										</span>
+									)}
+									<span style={{ fontWeight: 500 }}>
+										{activeMode.ln_name}
+									</span>
+								</>
+							) : (
+								// No mode selected state
+								<>
+									<span
+										style={{
+											display: "flex",
+											alignItems: "center",
+											justifyContent: "center",
+										}}
+									>
+										<LucideIcon
+											name="help-circle"
+											size={18}
+											color="var(--text-muted)"
+										/>
+									</span>
+									<span style={{ fontWeight: 500, color: "var(--text-muted)" }}>
+										Select a mode
+									</span>
+								</>
 							)}
-							<span style={{ fontWeight: 500 }}>
-								{activeMode.ln_name}
-							</span>
 							<span
 								style={{
 									display: "flex",
@@ -556,7 +586,7 @@ export const LifeNavigatorApp: React.FC = () => {
 									<polyline points="6 9 12 15 18 9"></polyline>
 								</svg>
 							</span>
-						</div> }
+						</div>
 					</div>
 
 					{/* Mode selection dropdown */}
@@ -581,92 +611,96 @@ export const LifeNavigatorApp: React.FC = () => {
 								flexDirection: "column"
 							}}
 						>
-							{/* Actions */}
-							{!activeMode.ln_path.startsWith(':prebuilt:') && (
-								<div
-									style={{
-										padding: "8px 12px",
-										cursor: "pointer",
-										display: "flex",
-										alignItems: "center",
-										gap: "8px",
-										fontSize: "14px",
-										color: "var(--text-normal)",
-										whiteSpace: "normal",
-										wordBreak: "break-word",
-									}}
-									onClick={() => {
-										if (window.app && activeMode.ln_path) {
-											const file = window.app.vault.getAbstractFileByPath(activeMode.ln_path);
-											if (file instanceof TFile) {
-												window.app.workspace.getLeaf().openFile(file);
-											}
-										}
-										setDropdownOpen(false);
-									}}
-									onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
-									onMouseOut={e => (e.currentTarget.style.backgroundColor = "transparent")}
-								>
-									<LucideIcon name="external-link" size={16} color="var(--text-normal)" />
-									{t('ui.mode.openInEditor')}
-								</div>
-							)}
-							<div
-								style={{
-									padding: "8px 12px",
-									cursor: "pointer",
-									display: "flex",
-									alignItems: "center",
-									gap: "8px",
-									fontSize: "14px",
-									color: "var(--text-normal)",
-									whiteSpace: "normal",
-									wordBreak: "break-word",
-								}}
-								onClick={() => {
-									openSimpleObsidianModal(
-										window.app,
-										t('ui.modal.modeSettings').replace('{{modeName}}', activeMode.ln_name),
-										JSON.stringify(activeMode, null, 2)
-									);
-									setDropdownOpen(false);
-								}}
-								onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
-								onMouseOut={e => (e.currentTarget.style.backgroundColor = "transparent")}
-							>
-								<LucideIcon name="settings" size={16} color="var(--text-normal)" /> 
-								{t('ui.mode.viewSettings')}
-							</div>
-							<div
-								style={{
-									padding: "8px 12px",
-									cursor: "pointer",
-									display: "flex",
-									alignItems: "center",
-									gap: "8px",
-									fontSize: "14px",
-									color: "var(--text-normal)",
-									whiteSpace: "normal",
-									wordBreak: "break-word",
-								}}
-								onClick={async () => {
-									const systemPrompt = await getContext();
-									openSimpleObsidianModal(
-										window.app,
-										t('ui.modal.systemPrompt').replace('{{modeName}}', activeMode.ln_name),
-										systemPrompt || ""
-									);
-									setDropdownOpen(false);
-								}}
-								onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
-								onMouseOut={e => (e.currentTarget.style.backgroundColor = "transparent")}
-							>
-								<LucideIcon name="terminal" size={16} color="var(--text-normal)" />
-								{t('ui.mode.viewSystemPrompt')}
-							</div>
+							{/* Actions - only show when activeMode is loaded */}
+							{activeMode && (
+								<>
+									{!activeMode.ln_path.startsWith(':prebuilt:') && (
+										<div
+											style={{
+												padding: "8px 12px",
+												cursor: "pointer",
+												display: "flex",
+												alignItems: "center",
+												gap: "8px",
+												fontSize: "14px",
+												color: "var(--text-normal)",
+												whiteSpace: "normal",
+												wordBreak: "break-word",
+											}}
+											onClick={() => {
+												if (window.app && activeMode.ln_path) {
+													const file = window.app.vault.getAbstractFileByPath(activeMode.ln_path);
+													if (file instanceof TFile) {
+														window.app.workspace.getLeaf().openFile(file);
+													}
+												}
+												setDropdownOpen(false);
+											}}
+											onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
+											onMouseOut={e => (e.currentTarget.style.backgroundColor = "transparent")}
+										>
+											<LucideIcon name="external-link" size={16} color="var(--text-normal)" />
+											{t('ui.mode.openInEditor')}
+										</div>
+									)}
+									<div
+										style={{
+											padding: "8px 12px",
+											cursor: "pointer",
+											display: "flex",
+											alignItems: "center",
+											gap: "8px",
+											fontSize: "14px",
+											color: "var(--text-normal)",
+											whiteSpace: "normal",
+											wordBreak: "break-word",
+										}}
+										onClick={() => {
+											openSimpleObsidianModal(
+												window.app,
+												t('ui.modal.modeSettings').replace('{{modeName}}', activeMode.ln_name),
+												JSON.stringify(activeMode, null, 2)
+											);
+											setDropdownOpen(false);
+										}}
+										onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
+										onMouseOut={e => (e.currentTarget.style.backgroundColor = "transparent")}
+									>
+										<LucideIcon name="settings" size={16} color="var(--text-normal)" /> 
+										{t('ui.mode.viewSettings')}
+									</div>
+									<div
+										style={{
+											padding: "8px 12px",
+											cursor: "pointer",
+											display: "flex",
+											alignItems: "center",
+											gap: "8px",
+											fontSize: "14px",
+											color: "var(--text-normal)",
+											whiteSpace: "normal",
+											wordBreak: "break-word",
+										}}
+										onClick={async () => {
+											const systemPrompt = await getContext();
+											openSimpleObsidianModal(
+												window.app,
+												t('ui.modal.systemPrompt').replace('{{modeName}}', activeMode.ln_name),
+												systemPrompt || ""
+											);
+											setDropdownOpen(false);
+										}}
+										onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
+										onMouseOut={e => (e.currentTarget.style.backgroundColor = "transparent")}
+									>
+										<LucideIcon name="terminal" size={16} color="var(--text-normal)" />
+										{t('ui.mode.viewSystemPrompt')}
+									</div>
 
-							{/* Separator */}
-							<div style={{ borderTop: "1px solid var(--background-modifier-border)", margin: "4px 0" }} />
+									{/* Separator */}
+									<div style={{ borderTop: "1px solid var(--background-modifier-border)", margin: "4px 0" }} />
+								</>
+							)}
 
 							{/* "switch to" label */}
 							<div style={{ padding: "8px 12px", fontSize: "14px", color: "var(--text-muted)", whiteSpace: "normal", wordBreak: "break-word" }}>
@@ -770,7 +804,7 @@ export const LifeNavigatorApp: React.FC = () => {
 
 			<div
 				className="conversation-container"
-				ref={conversationContainerRef}
+				ref={autoscrollRef}
 			>
 				{renderEmptyConversation()}
 

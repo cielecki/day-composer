@@ -463,6 +463,7 @@
       "files": {
         "noFrontmatter": "Plik {{filename}} nie ma frontmattera, używam wartości domyślnych z treścią pliku jako prompt systemowy"
       },
+      "loading": "Ładowanie...",
       "openInEditor": "Otwórz w edytorze",
       "switchTo": "Przełącz na:",
       "viewSettings": "Pokaż ustawienia trybu",

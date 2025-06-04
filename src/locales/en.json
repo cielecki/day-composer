@@ -463,6 +463,7 @@
       "files": {
         "noFrontmatter": "File {{filename}} has no frontmatter, using defaults with file content as system prompt"
       },
+      "loading": "Loading...",
       "openInEditor": "Open in editor",
       "switchTo": "Switch to:",
       "viewSettings": "View mode settings",

@@ -31,5 +31,14 @@ node scripts/translation-cleanup.mjs - it automatically analyzes translation key
 To check if the plugin builds correctly:
 npm run build
 
+## Changelogs
+
+the past entries there are not good
+
+Keep the new ones short,understandable by non-technical people. So a psychologist, a non technical bussiness or marketing person - all of they must be able to easily understand those changelogs.
+
+Furthermore this changelog is for users of the plugin so they only care about the things that affect them, describe the changes with, the potentially non technical, user as a reader in mind.
+
+## Rembember
 
 REMEMBER ALWAYS ASK FOR USER ACCEPTANCE BEFORE STARTING TO MODIFY ANYTHING
