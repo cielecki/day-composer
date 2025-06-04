@@ -4,7 +4,7 @@ import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from '../types/chat-types';
 import { t } from 'src/i18n';
 import { fileExists } from "../utils/fs/file-exists";
-import { ToolExecutionError } from '../types/tool-execution-error';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 
 const schema = {
   name: "note_edit",
@@ -68,7 +68,9 @@ type NoteEditToolInput = {
 export const noteEditTool: ObsidianTool<NoteEditToolInput> = {
   specification: schema,
   icon: "edit",
-  initialLabel: t('tools.noteEdit.label'),
+  get initialLabel() {
+    return t('tools.noteEdit.label');
+  },
   execute: async (context: ToolExecutionContext<NoteEditToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { path, edits } = params;

@@ -18,7 +18,9 @@ type SecretListToolInput = Record<string, never>;
 export const secretListTool: ObsidianTool<SecretListToolInput> = {
   specification: schema,
   icon: "list",
-  initialLabel: t('tools.actions.secretList.default'),
+  get initialLabel() {
+    return t('tools.actions.secretList.default');
+  },
   execute: async (context: ToolExecutionContext<SecretListToolInput>): Promise<void> => {
     context.setLabel(t('tools.actions.secretList.inProgress'));
 

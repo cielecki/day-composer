@@ -50,7 +50,9 @@ type TaskRemoveToolInput = {
 export const taskRemoveTool: ObsidianTool<TaskRemoveToolInput> = {
   specification: schema,
   icon: "trash-2",
-  initialLabel: t('tools.remove.label'),
+  get initialLabel() {
+    return t('tools.remove.label');
+  },
   execute: async (context: ToolExecutionContext<TaskRemoveToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos } = params;

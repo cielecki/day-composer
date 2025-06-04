@@ -1,7 +1,7 @@
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from '../types/chat-types';
 import { t } from 'src/i18n';
-import { ToolExecutionError } from '../types/tool-execution-error';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { requestUrl } from "obsidian";
 
 const schema = {
@@ -98,7 +98,9 @@ function containsBinaryData(content: string): boolean {
 export const urlDownloadTool: ObsidianTool<UrlDownloadToolInput> = {
   specification: schema,
   icon: "download",
-  initialLabel: t('tools.urlDownload.label'),
+  get initialLabel() {
+    return t('tools.urlDownload.label');
+  },
   execute: async (context: ToolExecutionContext<UrlDownloadToolInput>): Promise<void> => {
     const { params } = context;
     const { url } = params;

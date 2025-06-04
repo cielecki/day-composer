@@ -117,8 +117,6 @@ export function validateModeSettings(mode: LNMode): LNMode {
        mode.ln_max_tokens <= 0)) {
     validatedMode.ln_max_tokens = defaultMode.ln_max_tokens;
   }
-
-  console.log("validatedMode", validatedMode);
   
   return validatedMode;
 }

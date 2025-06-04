@@ -70,7 +70,9 @@ interface TaggedFileResult {
 export const vaultFindFilesByTagTool: ObsidianTool<VaultFindFilesByTagToolInput> = {
   specification: schema,
   icon: "tag",
-  initialLabel: t('tools.findFilesByTag.label'),
+  get initialLabel() {
+    return t('tools.findFilesByTag.label');
+  },
   execute: async (context: ToolExecutionContext<VaultFindFilesByTagToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { tag } = params;

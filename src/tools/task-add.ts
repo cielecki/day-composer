@@ -71,7 +71,9 @@ type TaskAddToolInput = {
 export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 	specification: schema,
 	icon: "list-plus",
-	initialLabel: t('tools.add.label'),
+	get initialLabel() {
+		return t('tools.add.label');
+	},
 	execute: async (context: ToolExecutionContext<TaskAddToolInput>): Promise<void> => {
 		const { plugin, params } = context;
 		const { todos, path, position, reference_todo_text } = params;

@@ -70,7 +70,9 @@ type TaskMoveToolInput = {
 export const taskMoveTool: ObsidianTool<TaskMoveToolInput> = {
   specification: schema,
   icon: "move",
-  initialLabel: t('tools.move.label'),
+  get initialLabel() {
+    return t('tools.move.label');
+  },
   execute: async (context: ToolExecutionContext<TaskMoveToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos, position, reference_todo_text } = params;

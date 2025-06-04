@@ -1,7 +1,7 @@
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from '../types/chat-types';
 import { t } from 'src/i18n';
-import { ToolExecutionError } from '../types/tool-execution-error';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { TFile } from "obsidian";
 
 const schema = {
@@ -26,7 +26,9 @@ type NoteReadToolInput = {
 export const noteReadTool: ObsidianTool<NoteReadToolInput> = {
   specification: schema,
   icon: "file-text",
-  initialLabel: t('tools.read.label'),
+  get initialLabel() {
+    return t('tools.read.label');
+  },
   execute: async (context: ToolExecutionContext<NoteReadToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { path } = params;

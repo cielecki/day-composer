@@ -40,7 +40,9 @@ type TaskUncheckToolInput = {
 export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
   specification: schema,
   icon: "square",
-  initialLabel: t('tools.uncheck.label'),
+  get initialLabel() {
+    return t('tools.uncheck.label');
+  },
   execute: async (context: ToolExecutionContext<TaskUncheckToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const todoDescription = params.todo_text;

@@ -41,7 +41,9 @@ export const modeHandoverTool: ObsidianTool<HandoverModeToolInput> = {
 		};
 	},
 	icon: "arrow-right-left",
-	initialLabel: t('tools.handover.label'),
+	get initialLabel() {
+		return t('tools.handover.label');
+	},
 	execute: async (context: ToolExecutionContext<HandoverModeToolInput>): Promise<void> => {
 		const { plugin, params } = context;
 		const { mode_id } = params;

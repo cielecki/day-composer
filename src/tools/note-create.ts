@@ -1,7 +1,7 @@
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionError } from '../types/tool-execution-error';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { ToolExecutionContext } from '../types/chat-types';
 import { t } from 'src/i18n';
 
@@ -54,7 +54,9 @@ async function getVersionedPath(basePath: string, app: any): Promise<string> {
 export const noteCreateTool: ObsidianTool<NoteCreateToolInput> = {
   specification: schema,
   icon: "file-plus",
-  initialLabel: t('tools.actions.createDocument.default', { path: '' }),
+	get initialLabel() {
+		return t('tools.actions.createDocument.default', { path: '' });
+	},
   execute: async (context: ToolExecutionContext<NoteCreateToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { path, content, auto_version = false } = params;

@@ -1,5 +1,5 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionError } from '../types/tool-execution-error';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { ToolExecutionContext } from '../types/chat-types';
 import { t } from 'src/i18n';
 
@@ -22,7 +22,9 @@ const INDEX_PATH = 'library/index.md';
 export const libraryListTool: ObsidianTool<LibraryListInput> = {
 	specification: schema,
 	icon: "library",
-	initialLabel: t('tools.library.list.label'),
+	get initialLabel() {
+		return t('tools.library.list.label');
+	},
 	execute: async (context: ToolExecutionContext<LibraryListInput>): Promise<void> => {
 		try {
 			context.setLabel(t('tools.library.list.inProgress'));

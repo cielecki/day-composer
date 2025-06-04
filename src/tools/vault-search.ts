@@ -24,9 +24,11 @@ type VaultSearchToolInput = {
 
 export const vaultSearchTool: ObsidianTool<VaultSearchToolInput> = {
   specification: schema,
-  icon: "search",
-  initialLabel: t('tools.search.label'),
-  execute: async (context: ToolExecutionContext<VaultSearchToolInput>): Promise<void> => {
+  	icon: "search",
+	get initialLabel() {
+		return t('tools.search.label');
+	},
+	execute: async (context: ToolExecutionContext<VaultSearchToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { query } = params;
 

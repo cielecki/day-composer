@@ -1,5 +1,5 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionError } from '../types/tool-execution-error';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { ToolExecutionContext } from '../types/chat-types';
 import { t } from 'src/i18n';
 import { getStore } from "../store/plugin-store";
@@ -53,7 +53,9 @@ function validateSecretKey(key: string): void {
 export const secretSaveTool: ObsidianTool<SecretSaveToolInput> = {
   specification: schema,
   icon: "key",
-  initialLabel: t('tools.actions.secretSave.default'),
+  get initialLabel() {
+    return t('tools.actions.secretSave.default');
+  },
   execute: async (context: ToolExecutionContext<SecretSaveToolInput>): Promise<void> => {
     const { params } = context;
     const { secret_key, secret_value, description = "" } = params;

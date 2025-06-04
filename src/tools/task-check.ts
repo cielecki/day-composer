@@ -61,7 +61,9 @@ type TaskCheckToolInput = {
 export const taskCheckTool: ObsidianTool<TaskCheckToolInput> = {
   specification: schema,
   icon: "check-circle",
-  initialLabel: t('tools.check.label'),
+  get initialLabel() {
+    return t('tools.check.label');
+  },
   execute: async (context: ToolExecutionContext<TaskCheckToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos, time } = params;

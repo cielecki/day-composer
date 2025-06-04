@@ -1,7 +1,7 @@
 import { TFile, TFolder, normalizePath } from "obsidian";
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from '../types/chat-types';
-import { ToolExecutionError } from '../types/tool-execution-error';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { t } from 'src/i18n';
 
 const schema = {
@@ -62,7 +62,9 @@ interface DirectoryItem {
 export const vaultFindTool: ObsidianTool<VaultFindToolInput> = {
   specification: schema,
   icon: "search",
-  initialLabel: t('tools.find.label'),
+  get initialLabel() {
+    return t('tools.find.label');
+  },
   execute: async (context: ToolExecutionContext<VaultFindToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { directory_path = "", recursive = false, include_files = true, include_folders = true, file_types = [] } = params;

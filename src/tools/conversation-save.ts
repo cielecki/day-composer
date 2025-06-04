@@ -1,6 +1,6 @@
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from '../types/chat-types';
-import { ToolExecutionError } from '../types/tool-execution-error';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { getStore } from "../store/plugin-store";
 import { formatConversationContent } from "../utils/chat/conversation-formatter";
 import { createFile } from "../utils/fs/create-file";
@@ -74,7 +74,9 @@ function generateDefaultPath(title: string): string {
 export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
   specification: schema,
   icon: "save",
-  initialLabel: t('tools.conversationSave.label'),
+  get initialLabel() {
+    return t('tools.conversationSave.label');
+  },
   execute: async (context: ToolExecutionContext<ConversationSaveToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { path, title, include_metadata = true, auto_version = true } = params;

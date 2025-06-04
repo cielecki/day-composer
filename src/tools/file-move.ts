@@ -2,7 +2,7 @@ import { TFile, normalizePath } from "obsidian";
 import { fileExists } from "../utils/fs/file-exists";
 import { getFile } from "../utils/fs/get-file";
 import { ensureDirectoryExists } from "../utils/fs/ensure-directory-exists";
-import { ToolExecutionError } from '../types/tool-execution-error';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from '../types/chat-types';
 import { t } from 'src/i18n';
@@ -40,7 +40,9 @@ type FileMoveToolInput = {
 export const fileMoveTool: ObsidianTool<FileMoveToolInput> = {
   specification: schema,
   icon: "move",
-  initialLabel: t('tools.fileMove.label'),
+  get initialLabel() {
+    return t('tools.fileMove.label');
+  },
   execute: async (context: ToolExecutionContext<FileMoveToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { source_path, destination_path, create_directories = true } = params;

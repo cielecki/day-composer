@@ -1,7 +1,6 @@
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from '../types/chat-types';
-import { t } from 'src/i18n';
-import { ToolExecutionError } from '../types/tool-execution-error';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { TFile } from "obsidian";
 import { UserDefinedTool } from "../types/user-tools";
 import { UserDefinedToolScanner } from "../user-tools/UserDefinedToolScanner";

@@ -52,7 +52,9 @@ type TaskEditToolInput = {
 export const taskEditTool: ObsidianTool<TaskEditToolInput> = {
   specification: schema,
   icon: "edit",
-  initialLabel: t('tools.edit.label'),
+  get initialLabel() {
+    return t('tools.edit.label');
+  },
   execute: async (context: ToolExecutionContext<TaskEditToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { original_todo_text } = params;

@@ -1,7 +1,7 @@
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from '../types/chat-types';
 import { t } from 'src/i18n';
-import { ToolExecutionError } from '../types/tool-execution-error';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { requestUrl } from "obsidian";
 
 const schema = {
@@ -41,7 +41,9 @@ const LIBRARY_PATH = 'library';
 export const libraryViewTool: ObsidianTool<LibraryViewInput> = {
   specification: schema,
   icon: "eye",
-  initialLabel: t('tools.library.view.label'),
+  get initialLabel() {
+    return t('tools.library.view.label');
+  },
   execute: async (context: ToolExecutionContext<LibraryViewInput>): Promise<void> => {
     const { params } = context;
     const { path, save_to_vault = false, filename } = params;

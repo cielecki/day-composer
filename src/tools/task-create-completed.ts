@@ -47,7 +47,9 @@ type TaskCreateCompletedToolInput = {
 export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput> = {
   specification: schema,
   icon: "check-circle",
-  initialLabel: t('tools.createCompleted.label'),
+  get initialLabel() {
+    return t('tools.createCompleted.label');
+  },
   execute: async (context: ToolExecutionContext<TaskCreateCompletedToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todo_text, comment, file_path, completion_time } = params;

@@ -62,7 +62,9 @@ type TaskAbandonToolInput = {
 export const taskAbandonTool: ObsidianTool<TaskAbandonToolInput> = {
   specification: schema,
   icon: "x-square",
-  initialLabel: t('tools.abandon.label'),
+  get initialLabel() {
+    return t('tools.abandon.label');
+  },
   execute: async (context: ToolExecutionContext<TaskAbandonToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos, time } = params;
