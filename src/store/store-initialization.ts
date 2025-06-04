@@ -14,12 +14,17 @@ export async function initializeStore(): Promise<void> {
   }
 
   try {
-    // Initialize all domain slices in parallel
-
-    await initializeModesStore()
+    // Initialize settings first to ensure secrets are loaded before other initialization
+    // that might call saveSettings()
     await initializeSettingsStore()
+    
+    // Then initialize modes (which may call saveSettings if active mode needs to be updated)
+    await initializeModesStore()
+    
+    // Finally initialize chat features
     await initializeChatFeatures()
     
+    initialized = true;
     console.log('Store initialization complete');
   } catch (error) {
     console.error('Failed to initialize store:', error);

@@ -370,7 +370,6 @@
     },
     "secretSave": {
       "progress": {
-        "overwriting": "Secret {{key}} already exists. Overwriting...",
         "securityReminder": "⚠️ Security Notice: Secrets are encrypted using AES-256 and stored in your Obsidian config folder. While this provides protection against casual inspection, anyone with access to the plugin source code can potentially decrypt them.",
         "success": "Successfully saved secret {{key}}"
       }
@@ -402,6 +401,15 @@
       "pastedImage": "Pasted image"
     },
     "chat": {
+      "conversationDeleteFailed": "Failed to delete conversation",
+      "conversationDeleted": "Conversation deleted",
+      "conversationLoadFailed": "Failed to load conversation",
+      "conversationMetadataNotFound": "Conversation metadata not found",
+      "conversationNotFound": "Conversation not found",
+      "conversationSaveFailed": "Failed to save conversation",
+      "conversationSaved": "Conversation saved",
+      "conversationTitleUpdateFailed": "Failed to update conversation title",
+      "conversationTitleUpdated": "Conversation title updated",
       "history": "Chat History",
       "new": "New Chat"
     },
@@ -471,7 +479,16 @@
         "skipButton": "Skip for now",
         "title": "Configure OpenAI API Key"
       },
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "validation": {
+        "invalid": "Invalid API key",
+        "reasons": {
+          "invalidOrExpired": "Invalid or expired API key",
+          "networkError": "Network error or service unavailable",
+          "quotaExceeded": "API quota exceeded, but key is valid",
+          "unexpectedResponse": "Unexpected response from API"
+        }
+      }
     },
     "thinking": {
       "completed": "Thought for a moment",

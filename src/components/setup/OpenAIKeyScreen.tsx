@@ -15,20 +15,40 @@ export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 	const [apiKey, setApiKey] = useState('');
 	const [isConfiguring, setIsConfiguring] = useState(false);
 	const [isSkipping, setIsSkipping] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string>('');
 
 	const handleSaveKey = async () => {
 		if (!apiKey.trim()) return;
 		
 		setIsConfiguring(true);
+		setErrorMessage('');
+		
 		try {
-			await getStore().setSecret('OPENAI_API_KEY', apiKey.trim());
-			getStore().setOpenaiKeyConfigured(true);
-			await getStore().saveSettings();
-			onKeyConfigured();
+			// Validate the key first
+			const result = await getStore().validateOpenAIKey(apiKey.trim());
+			
+			if (result.valid) {
+				// If valid, save and continue
+				await getStore().setSecret('OPENAI_API_KEY', apiKey.trim());
+				await getStore().saveSettings();
+				onKeyConfigured();
+			} else {
+				// If invalid, show error
+				setErrorMessage(result.reason || t('ui.setup.validation.invalid'));
+			}
 		} catch (error) {
-			console.error('Error saving OpenAI API key:', error);
+			console.error('Error validating OpenAI API key:', error);
+			setErrorMessage(t('ui.setup.validation.reasons.networkError'));
 		} finally {
 			setIsConfiguring(false);
+		}
+	};
+
+	const handleKeyChange = (value: string) => {
+		setApiKey(value);
+		// Reset error when key changes
+		if (errorMessage) {
+			setErrorMessage('');
 		}
 	};
 
@@ -37,7 +57,13 @@ export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 		setIsSkipping(true);
 		
 		try {
-			getStore().setOpenaiKeyConfigured(true);
+			// Set the skipped flag instead of configured flag
+			getStore().updateSettings({
+				tutorial: {
+					...getStore().settings.tutorial,
+					openaiKeySkipped: true
+				}
+			});
 			await getStore().saveSettings();
 			onSkip();
 		} catch (error) {
@@ -78,10 +104,10 @@ export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 				<div className="setup-input-focused">
 					<input
 						type="password"
-						className="setup-input-large"
+						className={`setup-input-large ${errorMessage ? 'validation-error' : ''}`}
 						placeholder={t('ui.setup.openaiKey.placeholder')}
 						value={apiKey}
-						onChange={(e) => setApiKey(e.target.value)}
+						onChange={(e) => handleKeyChange(e.target.value)}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter' && apiKey.trim()) {
 								handleSaveKey();
@@ -89,6 +115,15 @@ export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 						}}
 						autoFocus
 					/>
+					{errorMessage && (
+						<div className="validation-message error">
+							<LucideIcon 
+								name="x-circle" 
+								size={16} 
+							/>
+							<span>{errorMessage}</span>
+						</div>
+					)}
 				</div>
 
 				<div className="setup-actions-focused">

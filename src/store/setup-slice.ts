@@ -48,7 +48,7 @@ export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => ({
       const hasLanguageConfigured = get().getObsidianLanguageConfigured();
       const hasAnthropicKey = Boolean(get().getSecret('ANTHROPIC_API_KEY') && get().getSecret('ANTHROPIC_API_KEY')!.trim().length > 0);
       const hasOpenAIKey = Boolean(get().getSecret('OPENAI_API_KEY') && get().getSecret('OPENAI_API_KEY')!.trim().length > 0);
-      const hasOpenAIConfigured = get().getOpenaiKeyConfigured();
+      const hasOpenAISkipped = Boolean(get().settings.tutorial.openaiKeySkipped);
       
       let currentStep: SetupStep;
       
@@ -58,9 +58,9 @@ export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => ({
       } else if (!hasAnthropicKey) {
         currentStep = SetupStep.CONFIGURE_ANTHROPIC_KEY;
         console.log('→ Step: CONFIGURE_ANTHROPIC_KEY (no Anthropic key)');
-      } else if (!hasOpenAIKey && !hasOpenAIConfigured) {
+      } else if (!hasOpenAIKey && !hasOpenAISkipped) {
         currentStep = SetupStep.CONFIGURE_OPENAI_KEY;
-        console.log('→ Step: CONFIGURE_OPENAI_KEY (no OpenAI key and not configured)');
+        console.log('→ Step: CONFIGURE_OPENAI_KEY (no OpenAI key and not skipped)');
       } else {
         currentStep = SetupStep.COMPLETE;
         console.log('→ Step: COMPLETE (all requirements met)');

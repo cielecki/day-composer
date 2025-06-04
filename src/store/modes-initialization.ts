@@ -9,6 +9,7 @@ import { LNMode } from '../types/LNMode';
 // Store event references for cleanup
 let fileEventRefs: EventRef[] = [];
 let modeFilePathsSet = new Set<string>();
+let loadLNModesTimeout: NodeJS.Timeout | null = null;
 
 /**
  * Initialize modes store and setup file watching
@@ -88,6 +89,20 @@ async function loadLNModes(): Promise<void> {
 }
 
 /**
+ * Debounced version of loadLNModes to prevent excessive reloading
+ */
+function debouncedLoadLNModes(delay: number = 300): void {
+  if (loadLNModesTimeout) {
+    clearTimeout(loadLNModesTimeout);
+  }
+  
+  loadLNModesTimeout = setTimeout(() => {
+    loadLNModes();
+    loadLNModesTimeout = null;
+  }, delay);
+}
+
+/**
  * Setup file watchers for mode files
  */
 function setupModeFileWatchers(): void {
@@ -100,11 +115,10 @@ function setupModeFileWatchers(): void {
   // When a file is created
   const createRef = LifeNavigatorPlugin.getInstance().app.vault.on("create", (file) => {
     if (file instanceof TFile && file.extension === "md") {
-      console.log("File created:", file.path);
       // Wait for metadata to be indexed
       setTimeout(() => {
         if (hasModeTag(file)) {
-          loadLNModes();
+          debouncedLoadLNModes();
         }
       }, 100);
     }
@@ -121,7 +135,7 @@ function setupModeFileWatchers(): void {
       setTimeout(() => {
         const hasTag = hasModeTag(file);
         if (hadTag || hasTag) {
-          loadLNModes();
+          debouncedLoadLNModes();
         }
       }, 100);
     }
@@ -137,7 +151,7 @@ function setupModeFileWatchers(): void {
       
       if (wasMode) {
         console.log("Reloading modes after mode file deletion");
-        loadLNModes();
+        debouncedLoadLNModes();
       }
     }
   });
@@ -150,12 +164,12 @@ function setupModeFileWatchers(): void {
       const wasMode = modeFilePathsSet.has(oldPath);
       
       if (wasMode) {
-        loadLNModes();
+        debouncedLoadLNModes();
       } else {
         // Wait for metadata to be indexed
         setTimeout(() => {
           if (hasModeTag(file)) {
-            loadLNModes();
+            debouncedLoadLNModes();
           }
         }, 100);
       }
@@ -172,7 +186,7 @@ function setupModeFileWatchers(): void {
 
       // Only reload if tag status changed
       if (hadTag !== hasTag) {
-        loadLNModes();
+        debouncedLoadLNModes();
       }
     }
   });
@@ -216,6 +230,12 @@ export function getAllModes(): Record<string, LNMode> {
  */
 export function cleanupModesStore(): void {
   const state = getStore();
+  
+  // Clear any pending debounced load
+  if (loadLNModesTimeout) {
+    clearTimeout(loadLNModesTimeout);
+    loadLNModesTimeout = null;
+  }
   
   // Clean up file event listeners
   fileEventRefs.forEach((ref) => {

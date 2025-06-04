@@ -218,18 +218,16 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 					const store = getStore();
 					await store.removeSecret(key);
 					
-									// Reset tutorial state if relevant API keys are deleted
-				if (key === 'OPENAI_API_KEY') {
-					store.setOpenaiKeyConfigured(false);
-				}
-				// If Anthropic key is deleted and OpenAI key doesn't exist,
-				// reset OpenAI configured state too
-				if (key === 'ANTHROPIC_API_KEY') {
-					const hasOpenAIKey = Boolean(store.settings.secrets['OPENAI_API_KEY'] && store.settings.secrets['OPENAI_API_KEY'].trim().length > 0);
-					if (!hasOpenAIKey) {
-						store.setOpenaiKeyConfigured(false);
+					// Reset tutorial state if relevant API keys are deleted
+					if (key === 'OPENAI_API_KEY') {
+						// Reset the skipped flag when OpenAI key is deleted
+						store.updateSettings({
+							tutorial: {
+								...store.settings.tutorial,
+								openaiKeySkipped: false
+							}
+						});
 					}
-				}
 				
 				await store.saveSettings();
 					await this.refreshSecretsDisplay();
@@ -247,31 +245,7 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			const store = getStore();
 			await store.setSecret(key, value);
 			
-			// Update tutorial state if relevant API keys are configured
-			if (key === 'OPENAI_API_KEY') {
-				if (value.trim().length > 0) {
-					store.setOpenaiKeyConfigured(true);
-				} else {
-					store.setOpenaiKeyConfigured(false);
-				}
-			}
-			if (key === 'ANTHROPIC_API_KEY') {
-				if (value.trim().length > 0) {
-					// If Anthropic key is set and we don't have OpenAI key, 
-					// we should proceed past the OpenAI step
-					const hasOpenAIKey = Boolean(store.settings.secrets['OPENAI_API_KEY'] && store.settings.secrets['OPENAI_API_KEY'].trim().length > 0);
-					if (!hasOpenAIKey) {
-						store.setOpenaiKeyConfigured(true);
-					}
-				} else {
-					// If Anthropic key is empty and OpenAI key doesn't exist,
-					// reset OpenAI configured state too
-					const hasOpenAIKey = Boolean(store.settings.secrets['OPENAI_API_KEY'] && store.settings.secrets['OPENAI_API_KEY'].trim().length > 0);
-					if (!hasOpenAIKey) {
-						store.setOpenaiKeyConfigured(false);
-					}
-				}
-			}
+
 			
 			await store.saveSettings();
 			await this.refreshSecretsDisplay();
@@ -287,31 +261,7 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			const store = getStore();
 			await store.setSecret(key, value);
 			
-			// Update tutorial state if relevant API keys are configured
-			if (key === 'OPENAI_API_KEY') {
-				if (value.trim().length > 0) {
-					store.setOpenaiKeyConfigured(true);
-				} else {
-					store.setOpenaiKeyConfigured(false);
-				}
-			}
-			if (key === 'ANTHROPIC_API_KEY') {
-				if (value.trim().length > 0) {
-					// If Anthropic key is set and we don't have OpenAI key, 
-					// we should proceed past the OpenAI step
-					const hasOpenAIKey = Boolean(store.settings.secrets['OPENAI_API_KEY'] && store.settings.secrets['OPENAI_API_KEY'].trim().length > 0);
-					if (!hasOpenAIKey) {
-						store.setOpenaiKeyConfigured(true);
-					}
-				} else {
-					// If Anthropic key is cleared and OpenAI key doesn't exist,
-					// reset OpenAI configured state too
-					const hasOpenAIKey = Boolean(store.settings.secrets['OPENAI_API_KEY'] && store.settings.secrets['OPENAI_API_KEY'].trim().length > 0);
-					if (!hasOpenAIKey) {
-						store.setOpenaiKeyConfigured(false);
-					}
-				}
-			}
+
 			
 			await store.saveSettings();
 			await this.refreshSecretsDisplay();

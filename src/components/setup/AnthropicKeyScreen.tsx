@@ -12,18 +12,39 @@ export const AnthropicKeyScreen: React.FC<AnthropicKeyScreenProps> = ({
 }) => {
 	const [apiKey, setApiKey] = useState('');
 	const [isConfiguring, setIsConfiguring] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string>('');
 
 	const handleSaveKey = async () => {
 		if (!apiKey.trim()) return;
 		
 		setIsConfiguring(true);
+		setErrorMessage('');
+		
 		try {
-			await getStore().setSecret('ANTHROPIC_API_KEY', apiKey.trim());
-			onKeyConfigured();
+			// Validate the key first
+			const result = await getStore().validateAnthropicKey(apiKey.trim());
+			
+			if (result.valid) {
+				// If valid, save and continue
+				await getStore().setSecret('ANTHROPIC_API_KEY', apiKey.trim());
+				onKeyConfigured();
+			} else {
+				// If invalid, show error
+				setErrorMessage(result.reason || t('ui.setup.validation.invalid'));
+			}
 		} catch (error) {
-			console.error('Error saving Anthropic API key:', error);
+			console.error('Error validating Anthropic API key:', error);
+			setErrorMessage(t('ui.setup.validation.reasons.networkError'));
 		} finally {
 			setIsConfiguring(false);
+		}
+	};
+
+	const handleKeyChange = (value: string) => {
+		setApiKey(value);
+		// Reset error when key changes
+		if (errorMessage) {
+			setErrorMessage('');
 		}
 	};
 
@@ -57,10 +78,10 @@ export const AnthropicKeyScreen: React.FC<AnthropicKeyScreenProps> = ({
 				<div className="setup-input-focused">
 					<input
 						type="password"
-						className="setup-input-large"
+						className={`setup-input-large ${errorMessage ? 'validation-error' : ''}`}
 						placeholder={t('ui.setup.anthropicKey.placeholder')}
 						value={apiKey}
-						onChange={(e) => setApiKey(e.target.value)}
+						onChange={(e) => handleKeyChange(e.target.value)}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter' && apiKey.trim()) {
 								handleSaveKey();
@@ -68,6 +89,15 @@ export const AnthropicKeyScreen: React.FC<AnthropicKeyScreenProps> = ({
 						}}
 						autoFocus
 					/>
+					{errorMessage && (
+						<div className="validation-message error">
+							<LucideIcon 
+								name="x-circle" 
+								size={16} 
+							/>
+							<span>{errorMessage}</span>
+						</div>
+					)}
 				</div>
 
 				<div className="setup-actions-focused">

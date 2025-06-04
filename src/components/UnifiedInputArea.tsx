@@ -502,6 +502,11 @@ export const UnifiedInputArea: React.FC<{
       abortControllerRef.current = null;
     }
     
+    // Cancel transcription if active
+    if (isTranscribing) {
+      cancelTranscription();
+    }
+    
     // Don't call the main abort() here as it handles different operations
     // The recording/transcription cancellation should be handled separately
     // from generation/audio playback cancellation

@@ -370,7 +370,6 @@
     },
     "secretSave": {
       "progress": {
-        "overwriting": "Sekret {{key}} już istnieje. Nadpisywanie...",
         "securityReminder": "⚠️ Informacja o bezpieczeństwie: Sekrety są zaszyfrowane przy użyciu AES-256 i przechowywane w folderze konfiguracyjnym Obsidian. Chociaż zapewnia to ochronę przed przypadkowym dostępem, każdy z dostępem do kodu źródłowego wtyczki może potencjalnie je odszyfrować.",
         "success": "Pomyślnie zapisano sekret {{key}}"
       }
@@ -402,6 +401,15 @@
       "pastedImage": "Wklejony obraz"
     },
     "chat": {
+      "conversationDeleteFailed": "Nie udało się usunąć rozmowy",
+      "conversationDeleted": "Rozmowa usunięta",
+      "conversationLoadFailed": "Nie udało się wczytać rozmowy",
+      "conversationMetadataNotFound": "Nie znaleziono metadanych rozmowy",
+      "conversationNotFound": "Nie znaleziono rozmowy",
+      "conversationSaveFailed": "Nie udało się zapisać rozmowy",
+      "conversationSaved": "Rozmowa zapisana",
+      "conversationTitleUpdateFailed": "Nie udało się zaktualizować tytułu rozmowy",
+      "conversationTitleUpdated": "Tytuł rozmowy zaktualizowany",
       "history": "Historia rozmów",
       "new": "Nowa rozmowa"
     },
@@ -471,7 +479,16 @@
         "skipButton": "Pomiń na razie",
         "title": "Skonfiguruj klucz API OpenAI"
       },
-      "saving": "Zapisywanie..."
+      "saving": "Zapisywanie...",
+      "validation": {
+        "invalid": "Nieprawidłowy klucz API",
+        "reasons": {
+          "invalidOrExpired": "Nieprawidłowy lub wygasły klucz API",
+          "networkError": "Błąd sieci lub usługa niedostępna",
+          "quotaExceeded": "Przekroczono limit API, ale klucz jest prawidłowy",
+          "unexpectedResponse": "Nieoczekiwana odpowiedź z API"
+        }
+      }
     },
     "thinking": {
       "completed": "Myślano przez chwilę",

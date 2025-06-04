@@ -1,19 +1,21 @@
-import { ImmerStateCreator } from './plugin-store';
+import CryptoJS from 'crypto-js';
+import type { ImmerStateCreator } from './plugin-store';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
-import * as CryptoJS from 'crypto-js';
+import { apiKeyValidationService, type APIKeyValidationResult } from '../services/APIKeyValidationService';
 
 export interface TutorialSettings {
 	obsidianLanguageConfigured: boolean;
-	openaiKeyConfigured: boolean; // Tracks if OpenAI has been configured or explicitly skipped
+	openaiKeySkipped?: boolean; // Tracks if user explicitly skipped OpenAI configuration
 	// Future tutorial/setup related settings can be added here
 }
 
-// Hard-coded encryption key and IV generation
+// Hard-coded encryption key for secrets
 // ⚠️ Security Notice: This provides obfuscation, not strong security
 // Anyone with access to the plugin source can extract this key
-const ENCRYPTION_KEY = CryptoJS.enc.Hex.parse(
-  "4c69666e617669676174696e673a537572766976696e674c6966654e6176694b6579323536"
-);
+// Use SHA256 to ensure exactly 32 bytes for AES-256
+const ENCRYPTION_KEY = CryptoJS.SHA256("life-navigator-secrets-key-v1");
+
+
 
 export interface SettingsSlice {
   // State - moved from LifeNavigatorSettings class
@@ -48,8 +50,10 @@ export interface SettingsSlice {
   // Backward compatibility getters/setters
   getObsidianLanguageConfigured: () => boolean;
   setObsidianLanguageConfigured: (value: boolean) => void;
-  getOpenaiKeyConfigured: () => boolean;
-  setOpenaiKeyConfigured: (value: boolean) => void;
+
+  // API Key validation methods
+  validateOpenAIKey: (apiKey: string) => Promise<APIKeyValidationResult>;
+  validateAnthropicKey: (apiKey: string) => Promise<APIKeyValidationResult>;
 
   loadSettings: () => Promise<void>;
 }
@@ -61,16 +65,11 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
     return CryptoJS.lib.WordArray.random(16); // 128-bit IV
   }  
 
-  /** Hash a label to create an opaque key for storage */
-  function hashLabel(label: string): string {
-    // Use first 24 hex chars (~12 bytes) to avoid collisions for small number of keys
-    return CryptoJS.SHA256(label).toString(CryptoJS.enc.Hex).slice(0, 24);
-  }
-
-  /** Encrypt plaintext -> IV|cipher (both hex) joined by ":" */
-  function encryptValue(plainText: string): string {
+  /** Encrypt secrets object -> IV:cipher (both hex) */
+  function encryptSecrets(secrets: Record<string, string>): string {
+    const plaintext = JSON.stringify(secrets);
     const iv = randomIv();
-    const cipher = CryptoJS.AES.encrypt(plainText, ENCRYPTION_KEY, {
+    const cipher = CryptoJS.AES.encrypt(plaintext, ENCRYPTION_KEY, {
       iv,
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7,
@@ -78,60 +77,37 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
     return iv.toString(CryptoJS.enc.Hex) + ":" + cipher.ciphertext.toString(CryptoJS.enc.Hex);
   }
 
-  /** Decrypt IV|cipher (hex:hex) -> plaintext */
-  function decryptValue(stored: string): string {
-    const [ivHex, cipherHex] = stored.split(":");
+  /** Decrypt IV:cipher (hex:hex) -> secrets object */
+  function decryptSecrets(encryptedData: string): Record<string, string> {
+    const [ivHex, cipherHex] = encryptedData.split(":");
     if (!ivHex || !cipherHex) {
       throw new Error("Invalid encrypted data format");
     }
     
     const iv = CryptoJS.enc.Hex.parse(ivHex);
+    const ciphertext = CryptoJS.enc.Hex.parse(cipherHex);
+    
     const cipherParams = CryptoJS.lib.CipherParams.create({
-      ciphertext: CryptoJS.enc.Hex.parse(cipherHex),
+      ciphertext: ciphertext
     });
     
-    const plain = CryptoJS.AES.decrypt(cipherParams, ENCRYPTION_KEY, {
-      iv,
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7,
-    });
-    
-    return plain.toString(CryptoJS.enc.Utf8);
-  }
-
-  /** Encrypt secrets object for storage */
-  function encryptSecrets(secrets: Record<string, string>): Record<string, string> {
-    const encrypted: Record<string, string> = {};
-    
-    for (const [key, value] of Object.entries(secrets)) {
-      // Embed the original key name inside the encrypted payload
-      const payload = `${key}\n${value}`;
-      const hashedKey = hashLabel(key);
-      encrypted[hashedKey] = encryptValue(payload);
-    }
-    
-    return encrypted;
-  }
-
-  /** Decrypt secrets object from storage */
-  function decryptSecrets(encryptedSecrets: Record<string, string>): Record<string, string> {
-    const decrypted: Record<string, string> = {};
-    
-    for (const [hashedKey, encryptedValue] of Object.entries(encryptedSecrets)) {
-      try {
-        const decryptedPayload = decryptValue(encryptedValue);
-        const [key, value] = decryptedPayload.split('\n', 2);
-        
-        if (key && value !== undefined) {
-          decrypted[key] = value;
-        }
-      } catch (error) {
-        console.error('Failed to decrypt secret with hashed key:', hashedKey, error);
-        // Continue with other secrets instead of failing completely
+    const plain = CryptoJS.AES.decrypt(
+      cipherParams, 
+      ENCRYPTION_KEY, 
+      {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
       }
+    );
+    
+    const decryptedText = plain.toString(CryptoJS.enc.Utf8);
+    
+    if (!decryptedText || decryptedText.length === 0) {
+      throw new Error("Decryption failed - empty result");
     }
     
-    return decrypted;
+    return JSON.parse(decryptedText);
   }
   
   return {
@@ -141,7 +117,7 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
       activeModeId: '',
       tutorial: {
         obsidianLanguageConfigured: false,
-        openaiKeyConfigured: false
+        openaiKeySkipped: false
       },
       isLoading: false
     },
@@ -180,7 +156,7 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
       state.settings.activeModeId = '';
       state.settings.tutorial = {
         obsidianLanguageConfigured: false,
-        openaiKeyConfigured: false
+        openaiKeySkipped: false
       };
       state.settings.isLoading = false;
     }),
@@ -203,23 +179,20 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
         // Encrypt secrets before saving
         if (state.settings.secrets && Object.keys(state.settings.secrets).length > 0) {
           try {
-            // Encrypt the secrets and store under 'encryptedSecrets' key
+            // Encrypt the entire secrets object and store under 's' key
             const encryptedSecrets = encryptSecrets(state.settings.secrets);
-            (dataToSave as any).encryptedSecrets = encryptedSecrets;
-            
-            // Remove plain text secrets from storage
-            delete (dataToSave as any).secrets;
-            
-            console.log('Secrets encrypted for storage. Count:', Object.keys(state.settings.secrets).length);
+            (dataToSave as any).s = encryptedSecrets;
           } catch (error) {
-            console.error('Failed to encrypt secrets, falling back to plain text storage:', error);
-            // Fallback: keep plain text secrets if encryption fails
+            console.error('Failed to encrypt secrets:', error);
+            throw error; // Don't save if encryption fails
           }
         } else {
-          // No secrets to encrypt, ensure both are cleared
-          delete (dataToSave as any).secrets;
-          delete (dataToSave as any).encryptedSecrets;
+          // No secrets to encrypt, ensure encrypted field is cleared
+          delete (dataToSave as any).s;
         }
+        
+        // Remove secrets from data to save (they're now encrypted in 's')
+        delete (dataToSave as any).secrets;
     
         await LifeNavigatorPlugin.getInstance().saveData(dataToSave);
     },
@@ -240,7 +213,7 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
       set((state) => {
         state.settings.tutorial = {
           obsidianLanguageConfigured: false,
-          openaiKeyConfigured: false
+          openaiKeySkipped: false
         };
       });
       await get().saveSettings();
@@ -256,16 +229,14 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
       state.settings.tutorial.obsidianLanguageConfigured = value;
     }),
 
-    getOpenaiKeyConfigured: () => {
-      const state = get();
-      return state.settings.tutorial.openaiKeyConfigured;
+    // API Key validation methods
+    validateOpenAIKey: async (apiKey) => {
+      return await apiKeyValidationService.validateOpenAIKey(apiKey);
     },
 
-    setOpenaiKeyConfigured: (value) => set((state) => {
-      state.settings.tutorial.openaiKeyConfigured = value;
-    }),
-
-
+    validateAnthropicKey: async (apiKey) => {
+      return await apiKeyValidationService.validateAnthropicKey(apiKey);
+    },
 
     // Loading function for settings - replaces loadPluginSettings
     loadSettings: async() => {
@@ -273,7 +244,7 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
       const data = await LifeNavigatorPlugin.getInstance().loadData() || {};
       
       // First, safely copy non-conflicting properties
-      const { openAIApiKey, anthropicApiKey, firecrawlApiKey, secrets: plainTextSecrets, encryptedSecrets, ...safeData } = data as any;
+      const { openAIApiKey, anthropicApiKey, firecrawlApiKey, s: encryptedSecrets, ...safeData } = data as any;
       
       // Update settings with safe data
       get().updateSettings(safeData);
@@ -282,20 +253,17 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
       let loadedSecrets: Record<string, string> = {};
 
       // Step 1: Handle encrypted secrets if they exist
-      if (encryptedSecrets && typeof encryptedSecrets === 'object') {
+      if (encryptedSecrets && typeof encryptedSecrets === 'string') {
         try {
-          // Decrypt secrets from storage
           const decryptedSecrets = decryptSecrets(encryptedSecrets);
           Object.assign(loadedSecrets, decryptedSecrets);
-          
-          console.log('Decrypted secrets from storage. Count:', Object.keys(decryptedSecrets).length);
         } catch (error) {
           console.error('Failed to decrypt secrets from storage:', error);
           // Continue without encrypted secrets if decryption fails
         }
       }
 
-      // Step 2: Migration - handle old individual API keys format only (no plain text secrets support)
+      // Step 2: Migration - handle old individual API keys format
       if (openAIApiKey) {
         loadedSecrets['OPENAI_API_KEY'] = openAIApiKey;
         migrationOccurred = true;
@@ -311,19 +279,13 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
         migrationOccurred = true;
       }
 
-      // Log if plain text secrets were found (but don't migrate them since this format was never released)
-      if (plainTextSecrets && typeof plainTextSecrets === 'object') {
-        console.warn('Found plain text secrets object in data.json - this format is not supported. Secrets should be encrypted or use the old individual API key format.');
-      }
-
       // Set the loaded secrets
       if (Object.keys(loadedSecrets).length > 0) {
         get().setSecrets(loadedSecrets);
-      }
-
-      // Save settings if migration occurred to persist encrypted format and remove old keys
-      if (migrationOccurred) {
-        console.log('Migration completed. Saving encrypted secrets...');
+        // Always save after setting secrets to ensure persistence
+        await get().saveSettings();
+      } else if (migrationOccurred) {
+        // Save settings if migration occurred to persist encrypted format and remove old keys
         await get().saveSettings();
       }
     },
