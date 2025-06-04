@@ -270,8 +270,38 @@ export function determineInsertionPosition(
 	referenceTodoText?: string,
 ): number {
 	if (position === "beginning") {
-		// Insert at the first pending task or beginning
-		return findCurrentSpot(note);
+		// Find the first pending task
+		let firstPendingIndex = -1;
+		for (let i = 0; i < note.content.length; i++) {
+			if (note.content[i].type === 'task' && (note.content[i] as Task).status === 'pending') {
+				firstPendingIndex = i;
+				break;
+			}
+		}
+		
+		// If no pending tasks, search from the end of document for last completed task
+		if (firstPendingIndex === -1) {
+			for (let i = note.content.length - 1; i >= 0; i--) {
+				const node = note.content[i];
+				if (node.type === 'task' && (node as Task).status !== 'pending') {
+					return i + 1; // Insert after the last completed task
+				}
+			}
+			return 0; // If no completed tasks found, insert at beginning
+		}
+		
+		// Search backwards from first pending task to find last completed task
+		for (let i = firstPendingIndex - 1; i >= 0; i--) {
+			const node = note.content[i];
+			
+			// If we find a completed task, insert after it
+			if (node.type === 'task' && (node as Task).status !== 'pending') {
+				return i + 1; // Insert after this completed task
+			}
+		}
+		
+		// If no completed tasks found before first pending, insert at beginning
+		return 0;
 	} else if (position === "end") {
 		// Insert at the end of the document
 		return note.content.length;

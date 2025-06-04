@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Task Positioning Logic**: Fixed completed tasks being placed after headings instead of grouping with existing completed tasks. Completed tasks now insert immediately after the last completed task in the document, maintaining chronological order and ignoring markdown structure.
 - **Tool Name Display**: Fixed issue where technical tool names (like "task_add") were displayed instead of user-friendly names due to i18next not being initialized when tools are loaded at module load time.
 - **Documentation Links**: Fixed broken links in README.md that were pointing to non-existent files in docs/ directory. Updated links to point to correct paths in library/Docs/ directory with proper URL encoding for file names with spaces.
 - **Localization Links**: Fixed broken documentation links in both English and Polish localization files (src/locales/en.json and src/locales/pl.json) that were pointing to outdated paths for link expansion documentation.
