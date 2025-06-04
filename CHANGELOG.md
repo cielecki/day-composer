@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Chat Title Localization**: Fixed bug where chat titles in history were displayed in English despite having Polish language set.
 - **Conversation History Dropdown Toggle**: Fixed issue where clicking the history button while the dropdown was open would cause the dropdown to briefly close and then reopen. Implemented professional wrapper container pattern used by major UI libraries.
 - **Conversation History Dropdown Localization**: Added proper translation support for conversation history dropdown empty states, loading messages, and search placeholder. Messages now display correctly in both English and Polish.
+- **Mode Selection Persistence**: Fixed issue where selected mode would revert to Life Navigator after app restart. Mode selection is now properly saved to settings and restored on app startup.
+- **Prebuilt Mode Path Typo**: Fixed typo in prebuilt Life Navigator mode path from `:prebuilt:live-navigator` to `:prebuilt:life-navigator`.
+- **Task Check Tool Localization**: Fixed hardcoded "failed to check" error messages to be properly translated to Polish when interface language is set to Polish. All task check tool status messages (failed, in progress, success) now respect language settings.
 
 ...
 

@@ -207,6 +207,11 @@
         "inProgress": "Dodawanie todo...",
         "success": "Dodano {{task}}"
       },
+      "check": {
+        "failed": "Nie udało się oznaczyć {{task}}",
+        "inProgress": "Oznaczanie {{task}}...",
+        "success": "Oznaczono {{task}}"
+      },
       "createCompleted": {
         "failed": "Nie udało się utworzyć ukończonego todo {{task}}",
         "inProgress": "Tworzenie ukończonego todo {{task}}...",

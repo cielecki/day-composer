@@ -30,3 +30,6 @@ node scripts/translation-cleanup.mjs - it automatically analyzes translation key
 
 To check if the plugin builds correctly:
 npm run build
+
+
+REMEMBER ALWAYS ASK FOR USER ACCEPTANCE BEFORE STARTING TO MODIFY ANYTHING

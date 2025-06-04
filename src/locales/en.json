@@ -207,6 +207,11 @@
         "inProgress": "Adding todo...",
         "success": "Added {{task}}"
       },
+      "check": {
+        "failed": "Failed to check {{task}}",
+        "inProgress": "Checking {{task}}...",
+        "success": "Checked {{task}}"
+      },
       "createCompleted": {
         "failed": "Failed to create completed todo {{task}}",
         "inProgress": "Creating completed todo {{task}}...",
