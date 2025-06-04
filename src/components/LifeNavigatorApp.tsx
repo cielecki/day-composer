@@ -102,7 +102,7 @@ export const LifeNavigatorApp: React.FC = () => {
 
 	// Actions
 	const clearChat = usePluginStore(state => state.clearChat);
-	const setActiveMode = usePluginStore(state => state.setActiveMode);
+	const setActiveModeWithPersistence = usePluginStore(state => state.setActiveModeWithPersistence);
 	const resetTTS = usePluginStore(state => state.resetTTS);
 
 	// Use actual store methods instead of placeholder functions
@@ -694,8 +694,8 @@ export const LifeNavigatorApp: React.FC = () => {
 												whiteSpace: "normal",
 												wordBreak: "break-word",
 											}}
-											onClick={() => {
-												setActiveMode(mode.ln_path);
+											onClick={async () => {
+												await setActiveModeWithPersistence(mode.ln_path);
 												setDropdownOpen(false);
 											}}
 											onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
