@@ -78,7 +78,7 @@ export const LifeNavigatorApp: React.FC = () => {
 	const menuRef = useRef<HTMLDivElement>(null);
 	const [, setForceUpdate] = useState(0);
 	const [conversationHistoryOpen, setConversationHistoryOpen] = useState(false);
-	const conversationHistoryButtonRef = useRef<HTMLButtonElement>(null);
+	const conversationHistoryContainerRef = useRef<HTMLDivElement>(null);
 
 	// Access specific state slices from the store with granular subscriptions
 	// Use stable selectors to prevent infinite loops
@@ -358,6 +358,23 @@ export const LifeNavigatorApp: React.FC = () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
 	}, [menuOpen]);
+
+	// Add useEffect for conversation history dropdown click-away
+	useEffect(() => {
+		if (!conversationHistoryOpen) return;
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				conversationHistoryContainerRef.current &&
+				!conversationHistoryContainerRef.current.contains(event.target as Node)
+			) {
+				setConversationHistoryOpen(false);
+			}
+		};
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [conversationHistoryOpen]);
 
 	const handleConversationSelect = async (conversationId: string) => {
 		try {
@@ -727,12 +744,14 @@ export const LifeNavigatorApp: React.FC = () => {
 						<LucideIcon name="square-pen" size={18} />
 					</button>
 
-					<div style={{ position: "relative" }}>
+					<div 
+						style={{ position: "relative" }}
+						ref={conversationHistoryContainerRef}
+					>
 						<button
 							className="clickable-icon"
 							aria-label={t('ui.chat.history')}
 							onClick={() => setConversationHistoryOpen(!conversationHistoryOpen)}
-							ref={conversationHistoryButtonRef}
 						>
 							<LucideIcon name="history" size={18} />
 						</button>
@@ -741,7 +760,7 @@ export const LifeNavigatorApp: React.FC = () => {
 							<ConversationHistoryDropdown
 								onConversationSelect={handleConversationSelect}
 								isOpen={conversationHistoryOpen}
-								onToggle={() => setConversationHistoryOpen(!conversationHistoryOpen)}
+								onToggle={() => setConversationHistoryOpen(false)}
 								currentConversationId={getCurrentConversationId()}
 							/>
 						)}

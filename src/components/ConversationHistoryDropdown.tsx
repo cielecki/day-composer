@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ConversationMeta } from 'src/utils/chat/conversation';
 import { LucideIcon } from './LucideIcon';
 import { usePluginStore } from '../store/plugin-store';
+import { t } from 'src/i18n';
 
 interface ConversationHistoryDropdownProps {
     onConversationSelect: (conversationId: string) => void;
@@ -40,22 +41,6 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
         }
     }, [isOpen]);
 
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                onToggle();
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isOpen, onToggle]);
 
     const loadConversations = async () => {
         setLoading(true);
@@ -144,7 +129,7 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
                 <input
                     ref={searchInputRef}
                     type="text"
-                    placeholder="Search conversations..."
+                    placeholder={t('ui.chat.historySearchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="search-input"
@@ -155,11 +140,11 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
             <div className="conversations-list">
                 {loading ? (
                     <div className="loading-state">
-                        Loading conversations...
+                        {t('ui.chat.historyLoading')}
                     </div>
                 ) : filteredConversations.length === 0 ? (
-                    <div className="empty-state">
-                        {searchQuery ? 'No conversations found' : 'No conversations yet'}
+                    <div className="history-empty-state">
+                        {searchQuery ? t('ui.chat.historyNoResults') : t('ui.chat.historyEmpty')}
                     </div>
                 ) : (
                     filteredConversations.map((conversation) => (

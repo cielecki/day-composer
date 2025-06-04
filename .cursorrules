@@ -4,7 +4,7 @@ When making changes to the code:
   - For CHANGELOG.md: Only add if it's a genuinely new feature/fix not already listed in the unreleased section. If the feature/fix is already there, you may update details but don't add duplicate entries
   - For .gitmessage: Check what's currently being worked on. If making fixes to something already mentioned, don't add the same level fixes again - just update existing details if needed
   - Read both files first to understand the current implementation scope before adding new content
-- Plan and investigate the implementation first before writing code, always seek aproval of the plan from the user
+- Plan and investigate the implementation first before writing code, always ask for acceptance before starting to modify anything
 - Remove any entries to the translation files that are no longer needed
 - If you made any changes to the starter kit bump the starter kit version in main.ts
 - Avoid code duplication, create reusable functions and components

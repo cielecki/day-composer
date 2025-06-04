@@ -2072,7 +2072,7 @@ If your plugin does not need CSS, delete this file.
   border-color: var(--interactive-accent);
 }
 
-.life-navigator-view .conversation-history-dropdown .empty-state {
+.life-navigator-view .conversation-history-dropdown .history-empty-state {
   padding: 32px 16px;
   text-align: center;
   color: var(--text-muted);

@@ -14,9 +14,7 @@
       "userLabel": "User:"
     },
     "titles": {
-      "newChat": "New Chat",
-      "question": "Question",
-      "quickChat": "Quick Chat"
+      "newChat": "New Chat"
     },
     "userMessage": "user message"
   },
@@ -423,6 +421,10 @@
       "conversationTitleUpdateFailed": "Failed to update conversation title",
       "conversationTitleUpdated": "Conversation title updated",
       "history": "Chat History",
+      "historyEmpty": "No conversations yet",
+      "historyLoading": "Loading conversations...",
+      "historyNoResults": "No conversations found",
+      "historySearchPlaceholder": "Search conversations...",
       "new": "New Chat"
     },
     "input": {

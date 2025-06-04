@@ -14,9 +14,7 @@
       "userLabel": "Użytkownik:"
     },
     "titles": {
-      "newChat": "Nowa rozmowa",
-      "question": "Pytanie",
-      "quickChat": "Szybka rozmowa"
+      "newChat": "Nowa rozmowa"
     },
     "userMessage": "wiadomość użytkownika"
   },
@@ -423,6 +421,10 @@
       "conversationTitleUpdateFailed": "Nie udało się zaktualizować tytułu rozmowy",
       "conversationTitleUpdated": "Tytuł rozmowy zaktualizowany",
       "history": "Historia rozmów",
+      "historyEmpty": "Brak rozmów",
+      "historyLoading": "Ładowanie rozmów...",
+      "historyNoResults": "Nie znaleziono rozmów",
+      "historySearchPlaceholder": "Szukaj rozmów...",
       "new": "Nowa rozmowa"
     },
     "input": {
