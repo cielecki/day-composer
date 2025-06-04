@@ -9,92 +9,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Chat scrolling**: Chat now stays put when you scroll up to read old messages, instead of jumping to the bottom every time new text appears
-- **Remembering mode**: Mode is now remembered between sessions
-
-...
+- **Mode memory**: Your selected mode is now remembered when you restart the app
 
 ## [0.10.1] - 2025-06-04
 
 ### Fixed
-- **Task Positioning Logic**: Fixed completed tasks being placed after headings instead of grouping with existing completed tasks. Completed tasks now insert immediately after the last completed task in the document, maintaining chronological order and ignoring markdown structure.
-- **Tool Name Display**: Fixed issue where technical tool names (like "task_add") were displayed instead of user-friendly names due to i18next not being initialized when tools are loaded at module load time.
-- **Documentation Links**: Fixed broken links in README.md that were pointing to non-existent files in docs/ directory. Updated links to point to correct paths in library/Docs/ directory with proper URL encoding for file names with spaces.
-- **Localization Links**: Fixed broken documentation links in both English and Polish localization files (src/locales/en.json and src/locales/pl.json) that were pointing to outdated paths for link expansion documentation.
-- **Chat Title Localization**: Fixed bug where chat titles in history were displayed in English despite having Polish language set.
-- **Conversation History Dropdown Toggle**: Fixed issue where clicking the history button while the dropdown was open would cause the dropdown to briefly close and then reopen. Implemented professional wrapper container pattern used by major UI libraries.
-- **Conversation History Dropdown Localization**: Added proper translation support for conversation history dropdown empty states, loading messages, and search placeholder. Messages now display correctly in both English and Polish.
-- **Mode Selection Persistence**: Fixed issue where selected mode would revert to Life Navigator after app restart. Mode selection is now properly saved to settings and restored on app startup.
-- **Prebuilt Mode Path Typo**: Fixed typo in prebuilt Life Navigator mode path from `:prebuilt:live-navigator` to `:prebuilt:life-navigator`.
-- **Task Check Tool Localization**: Fixed hardcoded "failed to check" error messages to be properly translated to Polish when interface language is set to Polish. All task check tool status messages (failed, in progress, success) now respect language settings.
+- **Task organization**: Completed tasks now stay organized together instead of appearing in random places
+- **Tool names**: Fixed confusing technical names showing up - you now see friendly names like "Add Task" instead of "task_add"  
+- **Broken links**: Fixed links in documentation that weren't working
+- **Polish language**: Chat titles in history now show in Polish when you have Polish selected
+- **History dropdown**: Fixed annoying flicker when clicking the conversation history button
+- **Language consistency**: All dropdown messages and search boxes now properly show in your selected language
+- **Error messages**: Task-related error messages now appear in Polish when you have Polish selected
 
 ## [0.10.0] - 2025-06-04
 
 ### Added
-- **LifeNavigator mode**: Introduced LifeNavigator mode that provides guidance and instructions for the user. It is always available and cannot be deleted.
+- **LifeNavigator mode**: New built-in mode that helps guide you and gives instructions. It's always available and can't be deleted.
 
-- **Library of tools, modes and notesl**: Replaced starter kit system with library which LifeNavigator mode can download and setup other modes from. Built a basic library of tools, modes and notes to start with.
+- **Tool and mode library**: New library system where LifeNavigator can download and set up helpful tools and modes for you. Comes with useful tools and modes to get started.
 
-- **Generic Secrets Management**: Replaced specific API key fields with flexible encrypted secrets system allowing any key-value pairs. Includes UI for adding/editing/deleting secrets with automatic migration from old API keys. Updated to use industry-standard environment variable naming conventions (OPENAI_API_KEY, ANTHROPIC_API_KEY, FIRECRAWL_API_KEY) for better compatibility with other tools and development environments. Added global `getSecret()` function available to all user-defined tools for secure access to API keys and secrets.
+- **Better secrets management**: Improved way to store your API keys and other sensitive information securely. Your old API keys are automatically moved over.
 
-- **New built in tools available for AI**:
-    - **Comprehensive Note Editing Tool**: Replaced simple append-to functionality with advanced `note_edit` tool supporting multiple edit operations
-    - **File Move Tool**: New built-in tool for moving files from one location to another within the vault
-    - **Conversation Save Tool**: New built-in tool for saving current conversations to notes in the vault
-    - **Mode Validator Tool**: Validates Life Navigator mode files for completeness, correctness, and functionality. Checks frontmatter structure, required attributes, link expansion, system prompt rendering, and ensures all mode settings are valid.
-    - **Tool Validator Tool**: Validates user-defined tool files for proper structure, schema validity, JavaScript code syntax, and integration with the tool system. Helps identify issues before tools are executed.
-    - **URL Download Tool**: Simple tool for downloading content from any URL and displaying it directly in the chat
-    - **Vault Find Tool**: Renamed `vault_list_directory` tool to `vault_find` to better reflect its search capabilities similar to the Linux `find` command. Updated tool description, translations, and changed icon from folder to search to emphasize its find/search functionality rather than simple directory listing.
-    - **Library Tools Integration**: Added `library-list` and `library-view` tools specifically for Life Navigator library content discovery
+- **New tools for the AI to help you**:
+    - **Advanced note editing**: AI can now make complex edits to your notes, not just add text at the end
+    - **File moving**: AI can move files to different folders in your vault
+    - **Save conversations**: AI can save your current chat to a note in your vault
+    - **Check modes and tools**: AI can verify that your custom modes and tools are set up correctly
+    - **Download from web**: AI can grab content from any website and show it in the chat
+    - **Better file search**: Improved search tool (renamed from "list directory" to "find")
+    - **Browse library**: AI can explore and recommend tools and modes from the library
 
-- **Link Expansion Control Parameter**: Added `ln_expand_links` parameter to mode configuration for controlling whether wikilinks are expanded in system prompts. Defaults to `true` for backward compatibility. Pre-built modes have this set to `false` to prevent link expansion. This allows fine-grained control over when [[Note Name]] 🔎 links should be processed and expanded with actual note content.
+- **Link control for modes**: You can now control whether your custom modes automatically expand note links or not
 
-- **User-Defined Tools**: Introduced comprehensive system for creating custom tools from Obsidian notes. Users can create tools by adding `ln-tool` tag to note frontmatter with JSON schema and JavaScript implementation. Includes security approval system, sandboxed execution, and example tools for YouTube transcript downloads and weather reports. Converted deep research functionality to user-defined tool using direct Firecrawl API requests instead of external dependencies. Converted image generation functionality to user-defined tool using direct OpenAI API requests instead of external dependencies.
+- **Create your own tools**: You can now create custom tools by tagging notes with `ln-tool`. The AI will ask for permission before running any custom tools you create.
 
-- **Security Approval System**: Added security approval system for user-defined tools with code verification and persistent approvals.
-
-- **Shift-Click Tool Block Expansion**: Tool blocks with navigation targets can now be expanded/folded using shift-click without triggering navigation, providing better control over content visibility while preserving normal click-to-navigate behavior.
+- **Shift-click to expand**: Hold Shift and click on tool blocks to expand them without navigating away
 
 ### Changed
-- **Setup Screen Overhaul**: Simplified setup screen CSS by removing excessive styling and introduced key validation
+- **Simpler setup**: Cleaner setup screen that's easier to use
 
 ### Removed
-- **Built-in YouTube Transcript Tool**: Removed the built-in `download_youtube_transcript` tool in favor of the user-defined YouTube transcript tool available in the starter kit. This simplifies the codebase while maintaining functionality through the more flexible user-defined tool system.
-- **Built-in Image Generation Tool**: Removed the built-in `generate_image` tool in favor of the user-defined image generation tool available in the starter kit. The new tool uses direct API requests instead of external dependencies, simplifying the codebase while maintaining full functionality.
-- **Built-in Deep Research Tool**: Removed the built-in `deep_research` tool in favor of the user-defined deep research tool available in the starter kit. The new tool uses direct API requests instead of external dependencies, simplifying the codebase while maintaining full functionality.
-- **Starter Kit System**: Completely removed starter kit creation, generation scripts, and related commands
-- **New Mode Button and Command**: Removed the "New Mode" button from the UI dropdown and its associated command. Mode creation should now be handled through AI tools for a more integrated experience.
+- **Built-in specialized tools**: YouTube transcripts, image generation, and deep research are now available as downloadable tools instead of being built-in. This makes the core plugin simpler while keeping all the functionality.
+- **Manual mode creation**: The "New Mode" button is removed - ask the AI to create modes for you instead
 
 ## [0.9.3] - 2025-06-02
 
 ### Added
-- **Audio Pause/Resume and Caching**: Enhanced audio controls with true pause/resume functionality and intelligent caching. Audio can be paused and resumed from the exact same position, not just stopped and restarted. Generated audio is cached within components for instant playback on repeated requests, improving performance and reducing API calls. Separate play/pause and stop buttons provide better control over audio playback. Cache uses legacy TTS for reliable audio generation and consistent results. Stop button remains active when audio is paused and resets everything back to the initial state (speaker icon ready to start from beginning). Fixed race condition where stopping audio generation would still play audio when generation completed in background. Main input area properly shows stop button when audio is paused instead of send button.
+- **Better audio controls**: You can now pause and resume audio playback instead of having to stop and restart. Audio remembers exactly where you left off. Audio is also cached so replaying the same message is instant.
 
 ### Fixed
-- **Mobile Highlighting & Scroll Positioning**: Enhanced text highlighting system for mobile devices, especially iOS. Replaced unreliable selection-based highlighting with robust CodeMirror decorations, added mobile-specific CSS with hardware acceleration, implemented iOS-specific focus handling, added visual pulse animation for better visibility on touch devices, and **fixed scroll positioning to ensure highlighted text appears properly on screen**. The system now uses proper `EditorView.scrollIntoView()` with device-optimized positioning (top positioning on mobile, center on desktop) and includes fallback visibility checks.
-- **Polish Translation Completeness**: Fixed missing Polish translations for task unchecking and other tool actions. All tool action text (create completed todo, handover mode, read document, abandon todo, add todo) now properly displays in Polish instead of showing English text when Polish is selected as the language.
+- **Mobile text highlighting**: Much better highlighting on phones and tablets, especially iPhones. Text now highlights properly and scrolls to the right position on your screen.
+- **Polish language completeness**: Fixed missing Polish translations for task actions - everything now shows in Polish when you have Polish selected.
 
 ## [0.9.0] - 2025-06-01
 
 ### Added
 
-- **Vault Exploration Tools**: Two new tools help AI browse your vault structure and find tagged files. AI can now navigate directories and locate content by tags more effectively.
-- **Automatic Update Notifications**: Get notified when new plugin versions are available.
-- **Daily Note Range Support**: Use `[[ln-day-note-(start:end)]] 🔎` to reference multiple daily notes at once. Example: `[[ln-day-note-(-6:0)]] 🔎` shows the last 7 days.
-- **Real-Time Progress Updates**: Long-running operations like deep research now show live progress instead of making you wait with no feedback.
-- **Auto-Send During Audio Playback**: When you finish recording while audio is playing, it automatically stops the audio and sends your message.
-- **OpenAI Setup Memory**: Skip OpenAI configuration once and won't be asked again until you reset the tutorial.
-- **Deep Research Tool**: Comprehensive web research using Firecrawl. Searches multiple sources and creates detailed reports with citations. Requires Firecrawl API key.
-- **Enhanced Settings Page**: New action buttons for checking updates, creating starter kits, resetting tutorial, and viewing documentation.
-- **Guided Setup Flow**: Step-by-step onboarding with separate screens for language selection, starter kit creation, and API key configuration.
-- **GPT-4o Image Generation Tool**: Create high-quality images using OpenAI's latest model. Images are saved directly to your vault.
-- **Clickable Tool Calls**: Click on tool call blocks in chat to navigate directly to relevant files and locations.
-- **Model Selection for Modes**: Choose which Anthropic model each mode uses via the `ln_model` attribute.
-- **YouTube Transcript Downloads**: Download transcripts from YouTube videos and save them as Obsidian files. Supports multiple languages and timestamp options.
-- **Improved File Handling**: Automatic unique filename generation prevents overwrite errors (e.g., "research.md", "research 2.md").
-- **Streaming Text-to-Speech**: Smooth, low-latency audio playback with intelligent text chunking and predictive buffering.
-- **Mobile Message Editing**: Edit messages using the main input area instead of cramped inline editing. Much better experience on phones and tablets.
-- **Conversation History**: Save, search, and revisit past conversations. Edit titles, add tags, and continue previous chats seamlessly.
-- **AI Context Optimization**: Improved AI context handling by removing HTML comments from context data to prevent instructional information from skewing AI responses.
+- **Vault exploration**: AI can now browse your vault folders and find files by tags much better
+- **Update notifications**: Get notified when new plugin versions are available
+- **Multiple daily notes**: Reference several daily notes at once using `[[ln-day-note-(-6:0)]] 🔎` to show the last 7 days
+- **Progress updates**: Long operations like research now show live progress instead of leaving you wondering what's happening
+- **Smart audio handling**: When you finish recording while audio is playing, it automatically stops the audio and sends your message
+- **Remember OpenAI setup**: Skip OpenAI configuration once you've done it - won't ask again until you reset
+- **Deep web research**: AI can do comprehensive research across multiple websites and create detailed reports with sources (needs Firecrawl API key)
+- **Better settings page**: New buttons for checking updates, creating starter kits, resetting tutorial, and viewing docs
+- **Step-by-step setup**: Cleaner onboarding with separate screens for language, starter kit, and API keys
+- **Image generation**: Create high-quality images using OpenAI and save them directly to your vault
+- **Clickable tool results**: Click on tool blocks in chat to jump directly to the relevant files
+- **Choose AI model per mode**: Each mode can use a different Anthropic model
+- **YouTube transcripts**: Download transcripts from YouTube videos as notes in your vault
+- **Smarter file naming**: Automatically creates unique names (like "research 2.md") to avoid overwriting files
+- **Smooth audio playback**: Much better text-to-speech with seamless streaming
+- **Better mobile editing**: Edit messages using the full input area instead of tiny inline boxes - much better on phones
+- **Conversation history**: Save, search, and return to past conversations. Edit titles, add tags, and continue where you left off
+- **Cleaner AI context**: Improved how AI processes your notes for better responses
 
 ## [0.7.4] - 2025-05-26
 
