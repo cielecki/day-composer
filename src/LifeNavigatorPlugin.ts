@@ -2,9 +2,9 @@ import { Plugin, Notice, requestUrl } from 'obsidian';
 import { ConfirmReloadModal } from './components/ConfirmReloadModal';
 import { initI18n, t } from './i18n';
 import { LifeNavigatorView, LIFE_NAVIGATOR_VIEW_TYPE } from './life-navigator-view';
-import { checkForAvailableUpdate, checkForUpdatesOnStartup } from './auto-update';
+import { checkForAvailableUpdate, checkForUpdatesOnStartup } from './utils/auto-update/auto-update';
 import { getObsidianTools, resetObsidianTools } from './obsidian-tools';
-import { LifeNavigatorSettingTab } from './settings/LifeNavigatorSettingTab';
+import { LifeNavigatorSettingTab } from './components/LifeNavigatorSettingTab';
 import { UserDefinedToolManager } from './user-tools/UserDefinedToolManager';
 import { initializeStore } from './store/store-initialization';
 

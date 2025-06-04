@@ -1,9 +1,9 @@
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { ToolExecutionContext } from "../utils/chat/types";
-import { t } from "../i18n";
+import { ToolExecutionError } from '../types/tool-execution-error';
+import { ToolExecutionContext } from '../types/chat-types';
+import { t } from 'src/i18n';
 
 const schema = {
   name: "note_create",

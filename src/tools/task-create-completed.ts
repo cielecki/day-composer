@@ -1,15 +1,14 @@
+import { ObsidianTool } from "../obsidian-tools";
+import { ToolExecutionContext } from '../types/chat-types';
+import { t } from 'src/i18n';
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { getCurrentTime } from "../utils/time/get-current-time";
-import { insertTaskAtPosition, Task } from "../utils/task/task-utils";
-
-import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from "../utils/chat/types";
-import { findCurrentSpot, readNote, updateNote } from "../utils/tools/note-utils";
-import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
-import { createNavigationTargetsForTasks } from "../utils/tools/line-number-utils";
-import { t } from "../i18n";
+import { insertTaskAtPosition, Task } from 'src/utils/tasks/task-utils';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
+import { findCurrentSpot, readNote, updateNote } from 'src/utils/tools/note-utils';
+import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';
+import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-utils';
 
 const schema = {
   name: "task_create_completed",

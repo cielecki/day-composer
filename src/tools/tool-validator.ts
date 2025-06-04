@@ -1,9 +1,9 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from "../utils/chat/types";
-import { t } from "../i18n";
-import { ToolExecutionError } from "../utils/tools/tool-execution-error";
+import { ToolExecutionContext } from '../types/chat-types';
+import { t } from 'src/i18n';
+import { ToolExecutionError } from '../types/tool-execution-error';
 import { TFile } from "obsidian";
-import { UserDefinedTool } from "../user-tools/types";
+import { UserDefinedTool } from "../types/user-tools";
 import { UserDefinedToolScanner } from "../user-tools/UserDefinedToolScanner";
 import * as yaml from "js-yaml";
 

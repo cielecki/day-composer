@@ -7,11 +7,11 @@ import {
 	isCommentLine,
 	STATUS_MAP,
 	Task,
-} from "../task/task-utils";
-import { ToolExecutionError } from "./tool-execution-error";
+} from 'src/utils/tasks/task-utils';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { formatMarkdown } from "./format-markdown";
-import { t } from "../../i18n";
-import { normalizeUnicode } from "../text/unicode-normalizer";
+import { t } from 'src/i18n';
+import { normalizeUnicode } from "../../utils/text/unicode-normalizer";
 
 export type NoteNode = Task | TextBlock;
 

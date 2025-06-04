@@ -1,8 +1,8 @@
 import React from 'react';
 import { App, Modal, Setting } from 'obsidian';
-import { UserDefinedTool } from '../user-tools/types';
+import { UserDefinedTool } from '../types/user-tools';
 import { LucideIcon } from './LucideIcon';
-import { t } from '../i18n';
+import { t } from 'src/i18n';
 
 export class ToolApprovalModal extends Modal {
   private tool: UserDefinedTool;

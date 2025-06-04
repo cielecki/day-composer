@@ -1,5 +1,5 @@
 import { App } from "obsidian";
-import { t } from '../../i18n';
+import { t } from 'src/i18n';
 import { formatConversationContent } from './conversation-formatter';
 
 /**

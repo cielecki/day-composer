@@ -1,6 +1,6 @@
-import { initializeSettingsStore } from 'src/settings/settings-initialization';
-import { initializeChatFeatures } from '../chat/chat-initialization';
-import { initializeModesStore } from 'src/modes/modes-initialization';
+import { initializeSettingsStore } from './settings-initialization';
+import { initializeChatFeatures } from './chat-initialization';
+import { initializeModesStore } from './modes-initialization';
 
 let initialized = false;
 

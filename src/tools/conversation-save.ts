@@ -1,11 +1,11 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from "../utils/chat/types";
-import { ToolExecutionError } from "../utils/tools/tool-execution-error";
+import { ToolExecutionContext } from '../types/chat-types';
+import { ToolExecutionError } from '../types/tool-execution-error';
 import { getStore } from "../store/plugin-store";
 import { formatConversationContent } from "../utils/chat/conversation-formatter";
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
-import { t } from "../i18n";
+import { t } from 'src/i18n';
 
 const schema = {
   name: "conversation_save",

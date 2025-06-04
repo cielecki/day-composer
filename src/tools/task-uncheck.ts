@@ -1,12 +1,12 @@
-import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
-import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from "../utils/chat/types";
-import { findTaskByDescription } from "../utils/tools/note-utils";
-import { updateNote } from '../utils/tools/note-utils';
-import { readNote } from '../utils/tools/note-utils';
-import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { createNavigationTargetsForTasks } from "../utils/tools/line-number-utils";
-import { t } from "../i18n";
+import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';
+import { ObsidianTool } from 'src/obsidian-tools';
+import { ToolExecutionContext } from 'src/types/chat-types';
+import { updateNote } from 'src/utils/tools/note-utils';
+import { readNote } from 'src/utils/tools/note-utils';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
+import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-utils';
+import { t } from 'src/i18n';
+import { findTaskByDescription } from "src/utils/tools/note-utils";
 
 const schema = {
   name: "task_uncheck",

@@ -1,4 +1,4 @@
-import { Message, ContentBlock } from "./types";
+import { Message, ContentBlock } from "../../types/chat-types";
 
 export function getFirstUserMessage(messages: Message[]): string | null {
     const firstUserMsg = messages.find(msg => msg.role === "user");

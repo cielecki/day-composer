@@ -1,6 +1,6 @@
 import React from 'react';
-import { LNMode } from '../utils/mode/LNMode';
-import { LucideIcon } from './LucideIcon';
+import { LNMode } from 'src/types/LNMode';
+import { LucideIcon } from 'src/components/LucideIcon';
 
 interface LNModePillProps {
   id: string;

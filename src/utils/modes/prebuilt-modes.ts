@@ -1,6 +1,6 @@
-import { LNMode } from '../utils/mode/LNMode';
-import { t } from '../i18n';
-import { mergeWithDefaultMode } from '../utils/mode/ln-mode-defaults';
+import { LNMode } from 'src/types/LNMode';
+import { t } from 'src/i18n';
+import { mergeWithDefaultMode } from './ln-mode-defaults';
 
 /**
  * Get all pre-built modes that are always available in the system

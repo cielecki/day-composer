@@ -1,6 +1,6 @@
-import { UserDefinedTool, ToolApproval } from './types';
-import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
-import { ToolApprovalModal } from '../components/ToolApprovalModal';
+import { UserDefinedTool, ToolApproval } from 'src/types/user-tools';
+import { LifeNavigatorPlugin } from 'src/LifeNavigatorPlugin';
+import { ToolApprovalModal } from 'src/components/ToolApprovalModal';
 
 export class UserToolApprovalManager {
   private plugin: LifeNavigatorPlugin;

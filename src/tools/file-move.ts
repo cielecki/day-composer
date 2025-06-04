@@ -2,10 +2,10 @@ import { TFile, normalizePath } from "obsidian";
 import { fileExists } from "../utils/fs/file-exists";
 import { getFile } from "../utils/fs/get-file";
 import { ensureDirectoryExists } from "../utils/fs/ensure-directory-exists";
-import { ToolExecutionError } from "../utils/tools/tool-execution-error";
+import { ToolExecutionError } from '../types/tool-execution-error';
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from "../utils/chat/types";
-import { t } from "../i18n";
+import { ToolExecutionContext } from '../types/chat-types';
+import { t } from 'src/i18n';
 
 const schema = {
   name: "file_move",

@@ -1,14 +1,15 @@
 import { getCurrentTime } from "../utils/time/get-current-time";
 import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
-import { appendComment, Task } from "../utils/task/task-utils";
-import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from "../utils/chat/types";
-import { findTaskByDescription, readNote, updateNote } from '../utils/tools/note-utils';
-import { moveTaskToPosition } from "../utils/task/move-task-to-position";
-import { validateTasks } from "../utils/task/task-validation";
-import { createNavigationTargetsForTasks } from "../utils/tools/line-number-utils";
-import { t } from "../i18n";
+import { appendComment, Task } from 'src/utils/tasks/task-utils';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
+import { ObsidianTool } from 'src/obsidian-tools';
+import { ToolExecutionContext } from 'src/types/chat-types';
+import { readNote, updateNote } from 'src/utils/tools/note-utils';
+import { moveTaskToPosition } from 'src/utils/tasks/move-task-to-position';
+import { validateTasks } from 'src/utils/tasks/task-validation';
+import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-utils';
+import { t } from 'src/i18n';
+import { findTaskByDescription } from "src/utils/tools/note-utils";
 
 
 const schema = {

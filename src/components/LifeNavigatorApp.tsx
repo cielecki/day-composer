@@ -10,18 +10,17 @@ import { ThinkingMessage } from "./ThinkingMessage";
 import {
 	ToolResultBlock,
 	ContentBlock,
-} from "../utils/chat/types";
-import { NavigationTarget } from "../obsidian-tools";
+} from '../types/chat-types';
 import { LucideIcon } from "./LucideIcon";
-import { LNModePill } from "./LNModePills";
+import { LNModePill } from '../components/LNModePills';
 import { TFile } from "obsidian";
 import { Modal } from "obsidian";
-import { t } from '../i18n';
+import { t } from 'src/i18n';
 import { UnifiedInputArea } from "./UnifiedInputArea";
 import { SetupFlow } from "./setup/SetupFlow";
 import { ConversationHistoryDropdown } from './ConversationHistoryDropdown';
 import { MarkdownRenderer } from './MarkdownRenderer';
-import { MessageWithId } from "../chat/chat-store";
+import { MessageWithId } from '../store/chat-store';
 
 // Add Zustand store imports
 import {

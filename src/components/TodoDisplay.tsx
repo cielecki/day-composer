@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { LucideIcon } from './LucideIcon';
-import { t } from '../i18n';
+import { LucideIcon } from 'src/components/LucideIcon';
+import { t } from 'src/i18n';
 
 // Simplified types for todo items
 export interface TodoItem {

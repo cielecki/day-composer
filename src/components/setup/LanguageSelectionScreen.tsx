@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { t } from '../../i18n';
+import { t } from 'src/i18n';
 import { getStore } from '../../store/plugin-store';
 import { LucideIcon } from '../LucideIcon';
 

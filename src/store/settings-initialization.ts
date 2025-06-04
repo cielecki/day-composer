@@ -1,4 +1,4 @@
-import { getStore } from '../store/plugin-store';
+import { getStore } from './plugin-store';
 
 /**
  * Initialize settings store from plugin data

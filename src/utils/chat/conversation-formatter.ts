@@ -1,4 +1,4 @@
-import { t } from '../../i18n';
+import { t } from 'src/i18n';
 
 /**
  * Format the conversation into a readable markdown string

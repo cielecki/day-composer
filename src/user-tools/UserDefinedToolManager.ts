@@ -1,13 +1,13 @@
-import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
-import { UserDefinedTool } from './types';
+import { LifeNavigatorPlugin } from 'src/LifeNavigatorPlugin';
+import { UserDefinedTool } from 'src/types/user-tools';
 import { UserDefinedToolScanner } from './UserDefinedToolScanner';
 import { UserToolApprovalManager } from './ToolApprovalManager';
 import { SecureExecutionContext } from './SecureExecutionContext';
 import { ObsidianTool } from '../obsidian-tools';
-import { ToolExecutionContext } from '../utils/chat/types';
-import { ToolExecutionError } from '../utils/tools/tool-execution-error';
+import { ToolExecutionContext } from '../types/chat-types';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { getObsidianTools } from '../obsidian-tools';
-import { sanitizeToolName } from '../utils/text/string-sanitizer';
+import { sanitizeToolName } from 'src/utils/text/string-sanitizer';
 import { TFile } from 'obsidian';
 
 export class UserDefinedToolManager {

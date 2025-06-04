@@ -1,7 +1,7 @@
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { App, PluginSettingTab, Setting, Notice, Modal, getIcon } from 'obsidian';
 import { getStore } from '../store/plugin-store';
-import { t } from '../i18n';
+import { t } from 'src/i18n';
 
 export class LifeNavigatorSettingTab extends PluginSettingTab {
 	plugin: LifeNavigatorPlugin;

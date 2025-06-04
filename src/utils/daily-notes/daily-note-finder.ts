@@ -1,5 +1,5 @@
 import { App, TFile } from "obsidian";
-import { t } from '../../i18n';
+import { t } from 'src/i18n';
 
 export interface DailyNoteContent {
 	date: Date;

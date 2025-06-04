@@ -1,7 +1,7 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from "../utils/chat/types";
-import { modeManagerService } from "../services/ModeManagerService";
-import { t } from "../i18n";
+import { ToolExecutionContext } from '../types/chat-types';
+import { t } from 'src/i18n';
+import { getStore } from "src/store/plugin-store";
 
 type HandoverModeToolInput = {
 	mode_id: string;
@@ -13,21 +13,15 @@ export const modeHandoverTool: ObsidianTool<HandoverModeToolInput> = {
 		let availableModes: string[] = [];
 		let modeDescriptions = "";
 		
-		try {
-			if (modeManagerService.isContextAvailable()) {
-				const modes = modeManagerService.getAvailableModes();
-                const currentModeId = modeManagerService.getActiveModeId();
-				availableModes = modes.filter(mode => mode.id !== currentModeId).map(mode => mode.id);
-				
-				// Build a description that includes all available modes and their purposes
-				if (modes.length > 0) {
-					modeDescriptions = "\n\nAvailable modes:\n" + modes.map(mode => 
-						`• ${mode.id}: ${mode.name} - ${mode.description || 'No description available'}`
-					).join('\n');
-				}
-			}
-		} catch (error) {
-			// Context not available yet, return empty array
+		const modes = Object.values(getStore().modes.available);
+		const currentModeId = getStore().modes.activeId
+		availableModes = modes.filter(mode => mode.ln_path !== currentModeId).map(mode => mode.ln_path);
+		
+		// Build a description that includes all available modes and their purposes
+		if (modes.length > 0) {
+			modeDescriptions = "\n\nAvailable modes:\n" + modes.map(mode => 
+				`• ${mode.ln_path}: ${mode.ln_name} - ${mode.ln_description || 'No description available'}`
+			).join('\n');
 		}
 
 		return {
@@ -56,7 +50,7 @@ export const modeHandoverTool: ObsidianTool<HandoverModeToolInput> = {
 
 		try {
 			// Use the mode manager service to switch modes
-			await modeManagerService.changeModeById(mode_id);
+			await getStore().setActiveModeWithPersistence(mode_id);
 			
 			// Add a message about the handover
 			const handoverMessage = t('tools.handover.noReason', { mode: mode_id });

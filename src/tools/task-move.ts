@@ -1,13 +1,14 @@
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
-import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from "../utils/chat/types";
-import { readNote, updateNote, findTaskByDescription, determineInsertionPosition } from "../utils/tools/note-utils";
-import { insertTaskAtPosition, Task, removeTaskFromDocument } from "../utils/task/task-utils";
-import { validateTasks } from "../utils/task/task-validation";
-import { createNavigationTargetsForTasks, createNavigationTarget, findTaskLineNumbers } from "../utils/tools/line-number-utils";
-import { t } from "../i18n";
+import { ToolExecutionError } from 'src/types/tool-execution-error';
+import { ObsidianTool } from 'src/obsidian-tools';
+import { ToolExecutionContext } from 'src/types/chat-types';
+import { readNote, updateNote, determineInsertionPosition } from 'src/utils/tools/note-utils';
+import { insertTaskAtPosition, Task, removeTaskFromDocument } from 'src/utils/tasks/task-utils';
+import { validateTasks } from 'src/utils/tasks/task-validation';
+import { createNavigationTargetsForTasks, createNavigationTarget, findTaskLineNumbers } from 'src/utils/tools/line-number-utils';
+import { t } from 'src/i18n';
+import { findTaskByDescription } from "src/utils/tools/note-utils";
 
 const schema = {
   name: "task_move",

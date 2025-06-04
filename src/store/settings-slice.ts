@@ -1,4 +1,4 @@
-import { ImmerStateCreator } from '../store/plugin-store';
+import { ImmerStateCreator } from './plugin-store';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import * as CryptoJS from 'crypto-js';
 

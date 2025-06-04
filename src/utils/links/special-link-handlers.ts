@@ -1,8 +1,8 @@
 import { App, TFile } from "obsidian";
-import { t } from '../../i18n';
+import { t } from 'src/i18n';
 import { convertToValidTagName } from '../text/xml-tag-converter';
 import { getCurrentChatContent } from '../chat/chat-content-extractor';
-import { findDailyNotesByDate } from '../fs/daily-note-finder';
+import { findDailyNotesByDate } from 'src/utils/daily-notes/daily-note-finder';
 
 declare global {
 	interface Window {

@@ -1,14 +1,14 @@
 import type { ImmerStateCreator } from '../store/plugin-store';
-import { Message, ToolResultBlock } from '../utils/chat/types';
-import { Chat } from '../utils/chat/conversation';
-import { generateChatId } from '../utils/chat/generate-conversation-id';
-import { createUserMessage, extractUserMessageContent } from '../utils/chat/message-builder';
-import { runConversationTurn } from '../utils/chat/conversation-turn';
-import { handleTTS } from '../utils/chat/tts-integration';
+import { Message, ToolResultBlock } from '../types/chat-types';
+import { Chat } from 'src/utils/chat/conversation';
+import { generateChatId } from 'src/utils/chat/generate-conversation-id';
+import { createUserMessage, extractUserMessageContent } from 'src/utils/chat/message-builder';
+import { runConversationTurn } from 'src/utils/chat/conversation-turn';
+import { handleTTS } from 'src/utils/chat/tts-integration';
 import { getObsidianTools } from '../obsidian-tools';
-import { expandLinks } from '../utils/links/expand-links';
+import { expandLinks } from 'src/utils/links/expand-links';
 import { Notice } from 'obsidian';
-import { t } from '../i18n';
+import { t } from 'src/i18n';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 
 // Extend Message type to include unique ID for React keys

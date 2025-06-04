@@ -1,6 +1,6 @@
 import { App } from "obsidian";
-import { resolveLinkToFile } from "../fs/link-resolver";
-import { convertToValidTagName } from "../text/xml-tag-converter";
+import { resolveLinkToFile } from 'src/utils/fs/link-resolver';
+import { convertToValidTagName } from 'src/utils/text/xml-tag-converter';
 import { expandLinks } from "./expand-links";
 
 /**

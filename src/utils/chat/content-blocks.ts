@@ -5,7 +5,7 @@ import {
 	RedactedThinkingBlock,
 	ToolUseBlock,
 	ToolResultBlock,
-} from "./types";
+} from "../../types/chat-types";
 
 /**
  * Ensures content is always in ContentBlock[] format

@@ -1,13 +1,13 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from "../utils/chat/types";
-import { t } from "../i18n";
-import { ToolExecutionError } from "../utils/tools/tool-execution-error";
+import { ToolExecutionContext } from '../types/chat-types';
+import { t } from 'src/i18n';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { TFile } from "obsidian";
-import { LNMode } from "../utils/mode/LNMode";
-import { mergeWithDefaultMode, validateModeSettings, ANTHROPIC_MODELS } from "../utils/mode/ln-mode-defaults";
+import { LNMode } from '../types/LNMode';
+import { mergeWithDefaultMode, validateModeSettings, ANTHROPIC_MODELS } from 'src/utils/modes/ln-mode-defaults';
 import { expandLinks } from "../utils/links/expand-links";
 import * as yaml from "js-yaml";
-import { TTS_VOICES } from "src/tts/tts-slice";
+import { TTS_VOICES } from "src/store/tts-slice";
 
 const schema = {
   name: "mode_validator",

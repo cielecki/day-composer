@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ConversationMeta } from '../utils/chat/conversation';
+import { ConversationMeta } from 'src/utils/chat/conversation';
 import { LucideIcon } from './LucideIcon';
 import { usePluginStore } from '../store/plugin-store';
 

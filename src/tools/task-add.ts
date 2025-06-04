@@ -1,18 +1,18 @@
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
-import { Task } from "../utils/task/task-utils";
-import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from "../utils/chat/types";
+import { Task } from 'src/utils/tasks/task-utils';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
+import { ObsidianTool } from 'src/obsidian-tools';
+import { ToolExecutionContext } from 'src/types/chat-types';
 import {
 	readNote,
 	updateNote,
-	determineInsertionPosition
-} from "../utils/tools/note-utils";
-import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
-import { insertTaskAtPosition } from "../utils/task/task-utils";
-import { calculateLineNumberForNode, createNavigationTarget } from "../utils/tools/line-number-utils";
-import { t } from "../i18n";
+	determineInsertionPosition,
+} from 'src/utils/tools/note-utils';
+import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';
+import { insertTaskAtPosition } from 'src/utils/tasks/task-utils';
+import { calculateLineNumberForNode, createNavigationTarget } from 'src/utils/tools/line-number-utils';
+import { t } from 'src/i18n';
 
 const schema = {
 	name: "task_add",

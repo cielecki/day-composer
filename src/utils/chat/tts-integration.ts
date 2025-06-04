@@ -1,7 +1,7 @@
-import { Message } from "./types";
+import { Message } from 'src/types/chat-types';
 import { extractTextForTTS, ensureContentBlocks } from "./content-blocks";
-import { getDefaultLNMode } from "../mode/ln-mode-defaults";
-import { getStore } from "../../store/plugin-store";
+import { getDefaultLNMode } from 'src/utils/modes/ln-mode-defaults';
+import { getStore } from 'src/store/plugin-store';
 
 /**
  * Handles TTS for assistant messages based on mode settings

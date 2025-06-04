@@ -1,5 +1,5 @@
 import { App, Notice } from "obsidian";
-import { removeTopLevelHtmlComments } from '../text/html-comment-remover';
+import { removeTopLevelHtmlComments } from 'src/utils/text/html-comment-remover';
 import { 
 	handleCurrentDateTimeLink, 
 	handleCurrentlyOpenFileLink, 
@@ -8,8 +8,8 @@ import {
 	handleDayNoteRangeLink
 } from './special-link-handlers';
 import { processFileLink } from "./process-file-link";
-import { resolveLinkToFile } from '../fs/link-resolver';
-import { t } from '../../i18n';
+import { resolveLinkToFile } from 'src/utils/fs/link-resolver';
+import { t } from 'src/i18n';
 
 /**
  * Recursively expands [[wikilinks]] in content

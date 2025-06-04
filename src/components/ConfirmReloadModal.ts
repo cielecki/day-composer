@@ -1,5 +1,5 @@
 import { App, Modal, Setting } from 'obsidian';
-import { t } from '../i18n';
+import { t } from 'src/i18n';
 
 export class ConfirmReloadModal extends Modal {
   constructor(app: App, private onConfirm: () => void, private currentVersion: string, private latestVersion: string) {

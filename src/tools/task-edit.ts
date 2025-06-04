@@ -1,12 +1,13 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from "../utils/chat/types";
-import { findTaskByDescription, readNote, updateNote, NoteNode } from "../utils/tools/note-utils";
-import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
-import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { validateTasks } from "../utils/task/task-validation";
-import { removeTaskFromDocument, insertTaskAtPosition, appendComment, Task } from "../utils/task/task-utils";
-import { createNavigationTargetsForTasks } from "../utils/tools/line-number-utils";
-import { t } from "../i18n";
+import { ToolExecutionContext } from '../types/chat-types';
+import { t } from 'src/i18n';
+import { readNote, updateNote, NoteNode } from 'src/utils/tools/note-utils';
+import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
+import { validateTasks } from 'src/utils/tasks/task-validation';
+import { removeTaskFromDocument, insertTaskAtPosition, appendComment } from 'src/utils/tasks/task-utils';
+import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-utils';
+import { findTaskByDescription } from "src/utils/tools/note-utils";
 
 const schema = {
   name: "task_edit",

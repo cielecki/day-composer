@@ -1,5 +1,5 @@
 import { ObsidianTool } from "../../obsidian-tools";
-import { ToolUseBlock, ToolResultBlock } from "./types";
+import { ToolUseBlock, ToolResultBlock } from "../../types/chat-types";
 
 export interface ToolProcessingResult {
 	toolResults: ToolResultBlock[];

@@ -1,5 +1,5 @@
-import { formatTask } from "../task/task-utils";
-import { NoteNode } from "./note-utils";
+import { formatTask } from 'src/utils/tasks/task-utils';
+import { NoteNode } from 'src/utils/tools/note-utils';
 
 /**
  * Format a document node to markdown

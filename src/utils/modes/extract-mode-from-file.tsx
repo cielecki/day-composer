@@ -1,8 +1,8 @@
 import * as yaml from "js-yaml";
 import { App, TFile } from "obsidian";
-import { t } from "src/i18n";
-import { mergeWithDefaultMode } from "src/utils/mode/ln-mode-defaults";
-import { LNMode } from "src/utils/mode/LNMode";
+import { t } from 'src/i18n';
+import { mergeWithDefaultMode } from 'src/utils/modes/ln-mode-defaults';
+import { LNMode } from "src/types/LNMode";
 
 // Function to extract an LN mode from a file with the #ln-mode tag
 export const extractLNModeFromFile = async (

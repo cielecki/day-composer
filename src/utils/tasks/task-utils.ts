@@ -1,6 +1,6 @@
-import { ToolExecutionError } from "../tools/tool-execution-error";
-import { Note } from "../tools/note-utils";
-import { t } from "../../i18n";
+import { ToolExecutionError } from 'src/types/tool-execution-error';
+import { Note } from '../../utils/tools/note-utils';
+import { t } from 'src/i18n';
 
 export interface Task {
   type: 'task';

@@ -1,13 +1,13 @@
-import type { ImmerStateCreator } from '../store/plugin-store';
-import { Chat, ConversationMeta, StoredConversation } from '../utils/chat/conversation';
+import type { ImmerStateCreator } from './plugin-store';
+import { Chat, ConversationMeta, StoredConversation } from 'src/utils/chat/conversation';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
-import { generateChatTitle } from '../utils/chat/generate-conversation-title';
+import { generateChatTitle } from 'src/utils/chat/generate-conversation-title';
 import { Notice } from 'obsidian';
-import { t } from '../i18n';
+import { t } from 'src/i18n';
 import { normalizePath } from 'obsidian';
-import { ensureDirectoryExists } from '../utils/fs/ensure-directory-exists';
-import { escapeFilename } from '../utils/fs/escape-filename';
-import { chatFileNameToIdAndTitle } from '../utils/chat/chat-file-name-to-id-and-title';
+import { ensureDirectoryExists } from 'src/utils/fs/ensure-directory-exists';
+import { escapeFilename } from 'src/utils/fs/escape-filename';
+import { chatFileNameToIdAndTitle } from 'src/utils/chat/chat-file-name-to-id-and-title';
 
 // Database slice interface
 export interface ChatsDatabaseSlice {

@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { SetupStep } from '../../setup/setup-slice';
+import { SetupStep } from '../../store/setup-slice';
 import { LanguageSelectionScreen } from './LanguageSelectionScreen';
 import { AnthropicKeyScreen } from './AnthropicKeyScreen';
 import { OpenAIKeyScreen } from './OpenAIKeyScreen';

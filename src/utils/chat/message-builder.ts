@@ -1,4 +1,4 @@
-import { ContentBlock, Message } from "./types";
+import { ContentBlock, Message } from "../../types/chat-types";
 
 export interface AttachedImage {
 	id: string;

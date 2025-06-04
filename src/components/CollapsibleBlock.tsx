@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { LucideIcon } from './LucideIcon';
 import { getObsidianTools, NavigationTarget } from '../obsidian-tools';
-import { t } from '../i18n';
+import { t } from 'src/i18n';
 import { ToolInputDisplay } from './ToolInputDisplay';
 import { getEditorNavigationService } from '../services/EditorNavigationService';
 

@@ -1,5 +1,5 @@
-import { ToolExecutionError } from '../utils/tools/tool-execution-error';
-import { UserToolExecutionContext } from './types';
+import { ToolExecutionError } from 'src/types/tool-execution-error';
+import { UserToolExecutionContext } from 'src/types/user-tools';
 import { createHash } from 'crypto';
 import { requestUrl } from 'obsidian';
 import { getStore } from '../store/plugin-store';

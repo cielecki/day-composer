@@ -1,5 +1,5 @@
 import { App, TFile } from 'obsidian';
-import { UserDefinedTool } from './types';
+import { UserDefinedTool } from 'src/types/user-tools';
 import { createHash } from 'crypto';
 
 export class UserDefinedToolScanner {

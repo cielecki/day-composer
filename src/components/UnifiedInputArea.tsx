@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, KeyboardEvent, useCallback } from "react";
 import { usePluginStore } from "../store/plugin-store";
-import { t } from '../i18n';
-import { LucideIcon } from './LucideIcon';
+import { t } from 'src/i18n';
+import { LucideIcon } from '../components/LucideIcon';
 
 // Define an interface for attached images (keeping compatibility with TextInputArea)
 interface AttachedImage {

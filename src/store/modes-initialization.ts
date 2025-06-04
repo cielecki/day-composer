@@ -1,10 +1,10 @@
 import { TFile, EventRef } from 'obsidian';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
-import { getStore } from '../store/plugin-store';
-import { getPrebuiltModes } from "./prebuilt-modes";
-import { extractLNModeFromFile } from "../utils/mode/extract-mode-from-file";
-import { hasModeTag } from "../utils/mode/has-mode-tag";
-import { LNMode } from '../utils/mode/LNMode';
+import { getStore } from './plugin-store';
+import { getPrebuiltModes } from 'src/utils/modes/prebuilt-modes';
+import { extractLNModeFromFile } from 'src/utils/modes/extract-mode-from-file';
+import { hasModeTag } from 'src/utils/modes/has-mode-tag';
+import { LNMode } from '../types/LNMode';
 
 // Store event references for cleanup
 let fileEventRefs: EventRef[] = [];

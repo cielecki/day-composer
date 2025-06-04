@@ -6,13 +6,13 @@ import { enableMapSet } from 'immer';
 // Enable MapSet plugin for Immer to support Map and Set in state
 enableMapSet();
 
-import { ChatSlice, createChatSlice } from '../chat/chat-store';
-import { ChatsDatabaseSlice, createChatsDatabaseSlice } from '../chat/chats-database-slice';
-import { ModesSlice, createModesSlice } from '../modes/modes-slice';
-import { TTSSlice, createTTSSlice } from '../tts/tts-slice';
-import { STTSlice, createSTTSlice } from '../stt/stt-store';
-import { SettingsSlice, createSettingsSlice } from '../settings/settings-slice';
-import { SetupSlice, createSetupSlice } from '../setup/setup-slice';
+import { ChatSlice, createChatSlice } from './chat-store';
+import { ChatsDatabaseSlice, createChatsDatabaseSlice } from './chats-database-slice';
+import { ModesSlice, createModesSlice } from './modes-slice';
+import { TTSSlice, createTTSSlice } from './tts-slice';
+import { STTSlice, createSTTSlice } from './stt-store';
+import { SettingsSlice, createSettingsSlice } from './settings-slice';
+import { SetupSlice, createSetupSlice } from './setup-slice';
 
 export type PluginStore = ChatSlice & ChatsDatabaseSlice & ModesSlice & TTSSlice & STTSlice & SettingsSlice & SetupSlice;
 

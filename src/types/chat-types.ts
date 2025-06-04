@@ -1,5 +1,5 @@
-import { NavigationTarget } from '../../obsidian-tools';
-import { LifeNavigatorPlugin } from '../../LifeNavigatorPlugin';
+import { NavigationTarget } from '../obsidian-tools';
+import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 
 export interface Message {
 	role: "user" | "assistant";

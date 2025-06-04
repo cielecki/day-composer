@@ -1,7 +1,7 @@
-import { findTaskByDescription } from "../tools/note-utils";
-import { ToolExecutionError } from "../tools/tool-execution-error";
-import { Note } from "../tools/note-utils";
-import { Task } from "../task/task-utils";
+import { ToolExecutionError } from 'src/types/tool-execution-error';
+import { Note } from 'src/utils/tools/note-utils';
+import { Task } from "./task-utils";
+import { findTaskByDescription } from 'src/utils/tools/note-utils';
 
 // Define a standard todo item structure
 export type TaskToValidate = {

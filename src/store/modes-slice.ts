@@ -1,5 +1,5 @@
-import { LNMode } from '../utils/mode/LNMode';
-import type { ImmerStateCreator } from '../store/plugin-store';
+import { LNMode } from '../types/LNMode';
+import type { ImmerStateCreator } from './plugin-store';
 
 // Modes slice interface
 export interface ModesSlice {

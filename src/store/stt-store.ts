@@ -1,8 +1,8 @@
-import type { ImmerStateCreator } from '../store/plugin-store';
+import type { ImmerStateCreator } from './plugin-store';
 import { Notice, moment } from 'obsidian';
-import { t } from '../i18n';
+import { t } from 'src/i18n';
 import OpenAI from 'openai';
-import { expandLinks } from '../utils/links/expand-links';
+import { expandLinks } from 'src/utils/links/expand-links';
 
 const MAX_AUDIO_PROMPT_LENGTH = 5000;
 

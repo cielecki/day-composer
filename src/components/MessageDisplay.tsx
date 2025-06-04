@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ContentBlock } from '../utils/chat/types';
+import { ContentBlock } from '../types/chat-types';
 import { NavigationTarget } from '../obsidian-tools';
-import { ThinkingCollapsibleBlock, RedactedThinkingBlock as RedactedThinking, ToolBlock } from './CollapsibleBlock';
+import { ThinkingCollapsibleBlock, RedactedThinkingBlock as RedactedThinking, ToolBlock } from 'src/components/CollapsibleBlock';
 import { getObsidianTools } from '../obsidian-tools';
 import { usePluginStore } from '../store/plugin-store';
-import { t } from '../i18n';
+import { t } from 'src/i18n';
 import { LucideIcon } from './LucideIcon';
-import { ToolResultBlock } from '../utils/chat/types';
+import { ToolResultBlock } from '../types/chat-types';
 import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface MessageDisplayProps {

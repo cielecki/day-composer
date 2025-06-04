@@ -1,8 +1,8 @@
-import type { ImmerStateCreator } from '../store/plugin-store';
-import { TTSStreamingService } from '../services/TTSStreamingService';
-import { getDefaultLNMode } from '../utils/mode/ln-mode-defaults';
+import type { ImmerStateCreator } from './plugin-store';
+import { TTSStreamingService } from './TTSStreamingService';
+import { getDefaultLNMode } from 'src/utils/modes/ln-mode-defaults';
 import { Notice } from 'obsidian';
-import { t } from '../i18n';
+import { t } from 'src/i18n';
 
 export type TTSVoice = "alloy" | "ash" | "coral" | "echo" | "fable" | "onyx" | "nova" | "sage" | "shimmer";
 export const TTS_VOICES: TTSVoice[] = ['alloy', 'ash', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer'];

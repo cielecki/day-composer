@@ -1,5 +1,5 @@
-import { formatNode } from "./format-node";
-import { Note } from "./note-utils";
+import { formatNode } from '../../utils/tools/format-node';
+import { Note } from 'src/utils/tools/note-utils';
 
 /**
  * Format a structured document back to markdown

@@ -1,5 +1,5 @@
 import { App,  Notice, Plugin } from 'obsidian';
-import { t } from "./i18n";
+import { t } from 'src/i18n';
 
 // Compare versions helper
 function compareVersions(a: string, b: string): number {

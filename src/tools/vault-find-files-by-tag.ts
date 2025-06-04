@@ -1,7 +1,7 @@
 import { TFile } from "obsidian";
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from "../utils/chat/types";
-import { t } from "../i18n";
+import { ToolExecutionContext } from '../types/chat-types';
+import { t } from 'src/i18n';
 
 const schema = {
   name: "vault_find_files_by_tag",

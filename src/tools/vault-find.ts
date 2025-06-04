@@ -1,8 +1,8 @@
 import { TFile, TFolder, normalizePath } from "obsidian";
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from "../utils/chat/types";
-import { ToolExecutionError } from "../utils/tools/tool-execution-error";
-import { t } from "../i18n";
+import { ToolExecutionContext } from '../types/chat-types';
+import { ToolExecutionError } from '../types/tool-execution-error';
+import { t } from 'src/i18n';
 
 const schema = {
   name: "vault_find",

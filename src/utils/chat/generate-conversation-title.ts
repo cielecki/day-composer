@@ -1,9 +1,9 @@
 import { getStore } from "../../store/plugin-store";
-import { Message } from "./types";
-import { LNMode } from '../mode/LNMode';
+import { Message } from 'src/types/chat-types';
+import { LNMode } from 'src/types/LNMode';
 import { getFirstUserMessage } from "./get-first-user-message";
 import { getFirstAssistantMessage } from "./get-first-assistant-message";
-import { generateAITitle } from "./generate-aititle";
+import { generateAITitle } from '../../utils/chat/generate-aititle';
 
 function generateFallbackTitle(userMessage: string, mode?: LNMode): string {
     const modePrefix = mode?.ln_name || "Chat";
