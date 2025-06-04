@@ -1,8 +1,8 @@
 # TODO
 
-- [ ] Is audio working?
-- [ ] Encrypted secrets storage?
 - [ ] **Interactive Creator Mode:** How to create guidance for users when creating their materials? Some nice mode? or docs? Maybe a tutorial agent? Create a creator mode that generates sections/files based on dialogue with the user instead of using standard starter kits. This would provide a more personalized and interactive setup experience. Maybe this should allow for downloading files from github based on needs of the user.
+- [ ] Handover should have an option for handover for one specific query from the user and then going back to the second mode  or a permenanent switch to a given mode.
+
 - [ ] Jak robiłem kolejną transkrypcje podczas generacji coś się walneło, chyba ostatnie zmiany popsuły w tym zakresie coś.
 - [ ] Wrap up and prepare the user tools feature for release
 
@@ -33,6 +33,7 @@
 - [ ] Article about wiki paradigm as markdown database (creating/using input output not chats and rag, AI helping with this)
 
 ## Nice to haves
+- [ ] When there is no api key or there is a x-api error, instead of Notification a special error message should be added to the chat.
 - [ ] Any other tools should be user tools?
 - [ ] Proper mature user defined calendar tool
 - [ ] Do I want to be able to download any file from the repository?
