@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+...
+
+## [0.10.1] - 2025-06-04
+
 ### Fixed
 - **Task Positioning Logic**: Fixed completed tasks being placed after headings instead of grouping with existing completed tasks. Completed tasks now insert immediately after the last completed task in the document, maintaining chronological order and ignoring markdown structure.
 - **Tool Name Display**: Fixed issue where technical tool names (like "task_add") were displayed instead of user-friendly names due to i18next not being initialized when tools are loaded at module load time.
@@ -18,8 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Mode Selection Persistence**: Fixed issue where selected mode would revert to Life Navigator after app restart. Mode selection is now properly saved to settings and restored on app startup.
 - **Prebuilt Mode Path Typo**: Fixed typo in prebuilt Life Navigator mode path from `:prebuilt:live-navigator` to `:prebuilt:life-navigator`.
 - **Task Check Tool Localization**: Fixed hardcoded "failed to check" error messages to be properly translated to Polish when interface language is set to Polish. All task check tool status messages (failed, in progress, success) now respect language settings.
-
-...
 
 ## [0.10.0] - 2025-06-04
 
