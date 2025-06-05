@@ -45,15 +45,12 @@ function setupAutoSave(): void {
         autoSaveTimeout = setTimeout(async () => {
           const state = getStore();
           
-          // Only auto-save if not generating and has messages
-          if (!state.chats.isGenerating && state.chats.current.storedConversation.messages.length > 0) {
-            try {
-              // Use the store's auto-save action
-              await state.autoSaveConversation(state.chats.isGenerating);
-              console.log('Auto-saved conversation after 2s delay');
-            } catch (error) {
-              console.error('Failed to auto-save conversation:', error);
-            }
+          try {
+            // Use the store's auto-save action
+            await state.autoSaveConversation();
+            console.log('Auto-saved conversation after 2s delay');
+          } catch (error) {
+            console.error('Failed to auto-save conversation:', error);
           }
         }, 2000);
       }

@@ -215,16 +215,13 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
     },
 
     autoSaveConversation: async () => {
-      const state = get();
-      
       // Only auto-save if there are messages and not currently generating
-      if (state.chats.current.storedConversation.messages.length === 0 || 
-          state.chats.isGenerating) {
+      if (get().chats.current.storedConversation.messages.length === 0 || get().chats.isGenerating) {
         return;
       }
-
+      
       try {
-        const conversationId = await state.saveConversation();
+        const conversationId = await get().saveConversation();
         if (conversationId) {
           console.log(`Auto-saved conversation: ${conversationId}`);
         }
@@ -235,10 +232,8 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
 
     loadConversation: async (conversationId) => {
       try {
-        const state = get();
-
         // Load the stored conversation data
-        const storedConversation = await state.loadConversationData(conversationId);
+        const storedConversation = await get().loadConversationData(conversationId);
         
         if (!storedConversation) {
           new Notice(t('ui.chat.conversationNotFound'));
@@ -246,7 +241,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         }
 
         // Get metadata for the conversation
-        const meta = await state.getConversationMeta(conversationId);
+        const meta = await get().getConversationMeta(conversationId);
         
         if (!meta) {
           new Notice(t('ui.chat.conversationMetadataNotFound'));
@@ -254,13 +249,13 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         }
 
         // Reconstruct the full conversation object and load it
-        const conversation: Chat = {
+        const chat: Chat = {
           meta: meta,
           storedConversation: storedConversation
         };
 
         // Load the conversation into the current state using existing action
-        state.setCurrentChat(conversation);
+        get().setCurrentChat(chat);
         
         return true;
       } catch (error) {

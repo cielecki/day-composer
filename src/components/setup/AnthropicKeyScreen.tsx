@@ -3,13 +3,8 @@ import { t } from 'src/i18n';
 import { getStore } from '../../store/plugin-store';
 import { LucideIcon } from '../LucideIcon';
 
-interface AnthropicKeyScreenProps {
-	onKeyConfigured: () => void;
-}
 
-export const AnthropicKeyScreen: React.FC<AnthropicKeyScreenProps> = ({
-	onKeyConfigured
-}) => {
+export const AnthropicKeyScreen: React.FC = () => {
 	const [apiKey, setApiKey] = useState('');
 	const [isConfiguring, setIsConfiguring] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string>('');
@@ -27,7 +22,6 @@ export const AnthropicKeyScreen: React.FC<AnthropicKeyScreenProps> = ({
 			if (result.valid) {
 				// If valid, save and continue
 				await getStore().setSecret('ANTHROPIC_API_KEY', apiKey.trim());
-				onKeyConfigured();
 			} else {
 				// If invalid, show error
 				setErrorMessage(result.reason || t('ui.setup.validation.invalid'));

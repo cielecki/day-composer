@@ -69,15 +69,12 @@ function openSimpleObsidianModal(app: import('obsidian').App, title: string, tex
 }
 
 export const LifeNavigatorApp: React.FC = () => {
-	const [abortController, setAbortController] =
-		useState<AbortController | null>(null);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const modeIndicatorRef = useRef<HTMLDivElement>(null);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const menuButtonRef = useRef<HTMLButtonElement>(null);
 	const menuRef = useRef<HTMLDivElement>(null);
-	const [, setForceUpdate] = useState(0);
 	const [conversationHistoryOpen, setConversationHistoryOpen] = useState(false);
 	const conversationHistoryContainerRef = useRef<HTMLDivElement>(null);
 
@@ -93,8 +90,10 @@ export const LifeNavigatorApp: React.FC = () => {
 	const availableModes = usePluginStore(state => state.modes.available);
 	const activeModeId = usePluginStore(state => state.modes.activeId);
 	const isModesLoading = usePluginStore(state => state.modes.isLoading);
-	const isSpeaking = usePluginStore(state => state.tts.isSpeaking);
-	
+	const isSpeaking = usePluginStore(state => state.audio.isSpeaking);
+	const audioStop = usePluginStore(state => state.audioStop);
+	const chatStop = usePluginStore(state => state.chatStop);
+
 	// Create a stable reference to the conversation to prevent proxy issues
 	// Only recreate when the conversation version changes (indicating actual content changes)
 	const stableConversation = useMemo(() => {
@@ -105,7 +104,6 @@ export const LifeNavigatorApp: React.FC = () => {
 	// Actions
 	const clearChat = usePluginStore(state => state.clearChat);
 	const setActiveModeWithPersistence = usePluginStore(state => state.setActiveModeWithPersistence);
-	const resetTTS = usePluginStore(state => state.resetTTS);
 
 	// Use actual store methods instead of placeholder functions
 	const addUserMessage = usePluginStore(state => state.addUserMessage);
@@ -249,49 +247,6 @@ export const LifeNavigatorApp: React.FC = () => {
 	// Check if the active mode is actually available
 	const isModeLoading = activeModeId && !availableModes[activeModeId];
 
-	const newAbortController = useCallback(() => {
-		const abortController = new AbortController();
-		setAbortController(abortController);
-		return abortController;
-	}, [setAbortController]);
-
-	const abort = useCallback(() => {
-		if (abortController) {
-			console.log("Aborting in-progress operations while preserving conversation history");
-			// Abort the controller but do NOT clear the conversation
-			abortController.abort();
-			setAbortController(null);
-			
-			// After a short delay, clean up any incomplete tool calls that may have been left
-			// We delay this to allow the abort to propagate through the async operations
-			setTimeout(() => {
-				const currentConversation = stableConversation;
-				if (currentConversation.length > 0) {
-					const lastMessage = currentConversation[currentConversation.length - 1];
-					
-					if (lastMessage.role === "assistant") {
-						const contentBlocks = Array.isArray(lastMessage.content) 
-							? lastMessage.content 
-							: typeof lastMessage.content === "string" 
-								? [{ type: "text", text: lastMessage.content }] 
-								: [];
-								
-						const toolUseBlocks = contentBlocks.filter(block => 
-							typeof block === "object" && block !== null && "type" in block && block.type === "tool_use"
-						);
-						
-						if (toolUseBlocks.length > 0) {
-							console.log("Detected incomplete tool calls after abort, these will be cleaned up on next API call");
-						}
-					}
-				}
-			}, 500);
-		}
-		// Also stop any playing audio
-		resetTTS();
-	}, [abortController, setAbortController, resetTTS, stableConversation]);
-
-
 	const toggleDropdown = useCallback(() => {
 		setDropdownOpen(!dropdownOpen);
 	}, [dropdownOpen]);
@@ -353,15 +308,11 @@ export const LifeNavigatorApp: React.FC = () => {
 
 	const handleConversationSelect = async (conversationId: string) => {
 		try {
-			const success = await loadConversation(conversationId);
-			if (success) {
-				// Clear any current abort controller
-				if (abortController) {
-					abortController.abort();
-					setAbortController(null);
-				}
-				setForceUpdate((prev) => prev + 1);
+			if (isSpeaking || isGeneratingResponse) {
+				audioStop();
 			}
+			chatStop();
+			await loadConversation(conversationId);
 		} catch (error) {
 			console.error('Failed to load conversation:', error);
 		}
@@ -400,14 +351,10 @@ export const LifeNavigatorApp: React.FC = () => {
 													`Auto-triggering message for mode ${activeMode.ln_name}: "${usage}"`,
 												);
 
-												// Need to create a new abort controller here
-												const abortController = newAbortController();
-
 												// Wait a short moment before sending to ensure state updates have propagated
 												setTimeout(() => {
 													addUserMessage(
 														usage,
-														abortController.signal,
 													);
 												}, 100);
 											}
@@ -432,32 +379,6 @@ export const LifeNavigatorApp: React.FC = () => {
 	// Check if setup is complete
 	const isSetupCompleted = usePluginStore(state => state.isSetupComplete());
 	
-
-	// Refresh setup state check when component becomes visible or mounts
-	useEffect(() => {
-		const checkSetupState = () => {
-			setForceUpdate((prev: number) => prev + 1);
-		};
-
-		const handleTutorialStateChange = () => {
-			checkSetupState();
-		};
-
-		// Check immediately when component mounts
-		checkSetupState();
-
-		// Also check when window gains focus (user returns to Obsidian)
-		window.addEventListener('focus', checkSetupState);
-		
-		// Listen for tutorial state changes from settings
-		window.addEventListener('life-navigator-tutorial-state-changed', handleTutorialStateChange);
-		
-		return () => {
-			window.removeEventListener('focus', checkSetupState);
-			window.removeEventListener('life-navigator-tutorial-state-changed', handleTutorialStateChange);
-		};
-	}, []);
-
 	// If setup is not complete, show setup flow
 	if (!isSetupCompleted) {
 		return (
@@ -817,8 +738,6 @@ export const LifeNavigatorApp: React.FC = () => {
 						messageIndex={messageIndexMap[index].originalIndex}
 						isLastMessage={index === filteredConversation.length - 1}
 						isGeneratingResponse={isGeneratingResponse}
-						newAbortController={newAbortController}
-						abort={abort}
 					/>
 				))}
 
@@ -828,8 +747,6 @@ export const LifeNavigatorApp: React.FC = () => {
 			{activeMode && <div className="controls-container">
 				<div className="button-container">
 					<UnifiedInputArea
-						newAbortController={newAbortController}
-						abort={abort}
 						editingMessage={editingMessage}
 					/>
 				</div>

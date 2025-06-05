@@ -1084,49 +1084,56 @@ If your plugin does not need CSS, delete this file.
   cursor: not-allowed;
 }
 
-.life-navigator-view .text-input-button {
-  background: none;
+/* Button styles */
+.life-navigator-view .input-control-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   border: none;
-  padding: 6px;
-  margin: 0 2px;
   color: var(--text-muted);
-  border-radius: 4px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
 }
 
-.life-navigator-view .text-input-button:hover {
-  color: var(--text-normal);
+.life-navigator-view .input-control-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.life-navigator-view .input-control-button.primary {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.life-navigator-view .input-control-button.spinner {
+  animation: spin 1.5s linear infinite;
+}
+
+.life-navigator-view .input-control-button:hover:not(:disabled) {
   background-color: var(--background-modifier-hover);
 }
 
-.life-navigator-view .text-input-button:disabled {
+.life-navigator-view .input-control-button.primary:hover:not(:disabled) {
+  background-color: var(--interactive-accent-hover);
+}
+
+.life-navigator-view .input-control-button:hover {
+  background-color: var(--interactive-hover);
+  color: var(--text-normal);
+}
+
+.life-navigator-view .input-control-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.life-navigator-view .text-input-button.send-button {
-  color: var(--interactive-accent);
-}
-
-.life-navigator-view .text-input-button.send-button:hover {
-  color: var(--text-on-accent);
-  background-color: var(--interactive-accent);
-}
-
-/* Send button in working state */
-.life-navigator-view .text-input-button.send-button.working {
-  background-color: var(--background-modifier-error);
-  box-shadow: 0 2px 4px var(--background-modifier-border);
-  border: 1px solid var(--background-modifier-error-hover);
-}
-
-.life-navigator-view .text-input-button.send-button.working:hover {
-  background-color: var(--text-error);
-  opacity: 0.9;
+.life-navigator-view .input-control-button:hover {
+  transform: scale(1.05);
 }
 
 /* Responsive styles for text input */
@@ -1136,9 +1143,6 @@ If your plugin does not need CSS, delete this file.
   }
   .life-navigator-view .text-input-area {
     padding: 6px 10px;
-  }
-  .life-navigator-view .text-input-button {
-    padding: 4px;
   }
   .life-navigator-view .input-mode-container.voice-mode .input-mode-toggle-button {
     right: 40px;
@@ -1363,35 +1367,6 @@ If your plugin does not need CSS, delete this file.
   background-color: var(--background-modifier-hover);
 }
 
-.life-navigator-view .mic-button.recording {
-  background-color: var(--background-modifier-error);
-  color: var(--text-on-accent);
-}
-
-
-.life-navigator-view .mic-button .spinner {
-  animation: spin 1.5s linear infinite;
-}
-
-.life-navigator-view .input-control-button.mic-button {
-  background-color: var(--interactive-accent);
-  color: var(--text-on-accent);
-}
-
-
-.life-navigator-view .send-button {
-  background-color: var(--interactive-accent);
-  color: var(--text-on-accent);
-}
-
-.life-navigator-view .send-button:hover:not(:disabled) {
-  background-color: var(--interactive-accent-hover);
-}
-
-.life-navigator-view .send-button.working {
-  background-color: var(--background-modifier-error);
-}
-
 
 
 /* Message action buttons */
@@ -1420,39 +1395,6 @@ If your plugin does not need CSS, delete this file.
 /* Always show message actions for the last message, unless generating */
 .life-navigator-view .message.is-last-message:not(.is-generating) .message-actions {
   opacity: 1;
-}
-
-
-/* Message editing styles */
-.life-navigator-view .message.user.editing {
-  padding: 0;
-  width: 100%;
-}
-
-.life-navigator-view .message.user.editing .unified-input-area {
-  background-color: var(--background-secondary-alt);
-  border-radius: 16px;
-  width: 100%;
-}
-
-.life-navigator-view .message.user.editing .unified-input-textarea {
-  width: 100%;
-  min-height: 40px;
-  color: var(--text-normal);
-  font-size: 15px;
-  background-color: transparent;
-}
-
-.life-navigator-view .message.user.editing .input-control-button {
-  border-radius: 8px !important;
-  height: 36px;
-  width: auto;
-  padding: 0 16px;
-}
-
-.life-navigator-view .message.user.editing .send-button {
-  background-color: var(--interactive-accent) !important;
-  color: var(--text-on-accent);
 }
 
 /* Add position relative to messages to anchor the actions */
@@ -1706,31 +1648,6 @@ If your plugin does not need CSS, delete this file.
   padding: 0;
 }
 
-/* Button styles */
-.life-navigator-view .input-control-button {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  padding: 0;
-}
-
-.life-navigator-view .input-control-button:hover:not(:disabled) {
-  background-color: var(--background-modifier-hover);
-}
-
-.life-navigator-view .input-control-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
 /* Input Controls */
 .life-navigator-view .input-controls-right {
   display: flex;
@@ -1738,51 +1655,6 @@ If your plugin does not need CSS, delete this file.
   align-items: center;
 }
 
-.life-navigator-view .input-control-button:hover {
-  background-color: var(--interactive-hover);
-  color: var(--text-normal);
-}
-
-.life-navigator-view .input-control-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.life-navigator-view .input-control-button.mic-button.recording {
-  background-color: var(--background-modifier-error);
-  color: var(--text-on-accent);
-}
-
-.life-navigator-view .input-control-button.mic-button.confirm {
-  background-color: var(--interactive-accent);
-  color: var(--text-on-accent);
-}
-
-.life-navigator-view .input-control-button.send-button {
-  background-color: var(--interactive-accent);
-  color: var(--text-on-accent);
-}
-
-.life-navigator-view .input-control-button.stop-button {
-  background-color: var(--background-modifier-error);
-  color: var(--text-on-accent);
-}
-
-.life-navigator-view .input-control-button.cancel-button {
-  background-color: var(--background-secondary-alt);
-  color: var(--text-normal);
-}
-
-.life-navigator-view .input-control-button.send-button:hover,
-.life-navigator-view .input-control-button.mic-button.recording:hover,
-.life-navigator-view .input-control-button.mic-button.confirm:hover {
-  transform: scale(1.05);
-}
-
-.life-navigator-view .input-control-button.send-button.working {
-  background-color: var(--background-modifier-error);
-  color: var(--text-on-accent);
-}
 
 /* Tool Input Display Styles */
 .life-navigator-view .ln-tool-input {

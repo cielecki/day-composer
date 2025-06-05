@@ -6,7 +6,7 @@ import { checkForAvailableUpdate, checkForUpdatesOnStartup } from './utils/auto-
 import { getObsidianTools, resetObsidianTools } from './obsidian-tools';
 import { LifeNavigatorSettingTab } from './components/LifeNavigatorSettingTab';
 import { UserDefinedToolManager } from './user-tools/UserDefinedToolManager';
-import { initializeStore } from './store/store-initialization';
+import { cleanupStore, initializeStore } from './store/store-initialization';
 
 export class LifeNavigatorPlugin extends Plugin {
 	private static _instance: LifeNavigatorPlugin | null = null;
@@ -42,7 +42,7 @@ export class LifeNavigatorPlugin extends Plugin {
 		await initializeStore();
 
 		// Initialize the obsidian tools with this plugin instance
-		getObsidianTools(this);
+		getObsidianTools();
 
 		// Initialize user-defined tools manager
 		this.userToolManager = new UserDefinedToolManager(this);
@@ -212,6 +212,8 @@ export class LifeNavigatorPlugin extends Plugin {
 
 	onunload() {
 		console.log("Unloading Life Navigator plugin");
+		
+		cleanupStore();
 		
 		// Clear the static instance reference
 		if (LifeNavigatorPlugin._instance) {

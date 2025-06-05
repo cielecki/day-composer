@@ -3,15 +3,7 @@ import { t } from 'src/i18n';
 import { getStore } from '../../store/plugin-store';
 import { LucideIcon } from '../LucideIcon';
 
-interface OpenAIKeyScreenProps {
-	onKeyConfigured: () => void;
-	onSkip: () => void;
-}
-
-export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
-	onKeyConfigured,
-	onSkip
-}) => {
+export const OpenAIKeyScreen: React.FC = () => {
 	const [apiKey, setApiKey] = useState('');
 	const [isConfiguring, setIsConfiguring] = useState(false);
 	const [isSkipping, setIsSkipping] = useState(false);
@@ -31,7 +23,6 @@ export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 				// If valid, save and continue
 				await getStore().setSecret('OPENAI_API_KEY', apiKey.trim());
 				await getStore().saveSettings();
-				onKeyConfigured();
 			} else {
 				// If invalid, show error
 				setErrorMessage(result.reason || t('ui.setup.validation.invalid'));
@@ -65,10 +56,8 @@ export const OpenAIKeyScreen: React.FC<OpenAIKeyScreenProps> = ({
 				}
 			});
 			await getStore().saveSettings();
-			onSkip();
 		} catch (error) {
 			console.error('Error saving skip state:', error);
-			onSkip(); // Still skip even if save fails
 		} finally {
 			setIsSkipping(false);
 		}

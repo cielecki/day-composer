@@ -1,5 +1,5 @@
 import { LNMode } from 'src/types/LNMode';
-import { TTS_VOICES, TTSVoice } from "src/store/tts-slice";
+import { TTS_VOICES, TTSVoice } from "src/store/audio-slice";
 
 // Available Anthropic models
 export const ANTHROPIC_MODELS = [

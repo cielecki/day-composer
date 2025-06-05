@@ -7,7 +7,7 @@ import { LNMode } from '../types/LNMode';
 import { mergeWithDefaultMode, validateModeSettings, ANTHROPIC_MODELS } from 'src/utils/modes/ln-mode-defaults';
 import { expandLinks } from "../utils/links/expand-links";
 import * as yaml from "js-yaml";
-import { TTS_VOICES } from "src/store/tts-slice";
+import { TTS_VOICES } from "src/store/audio-slice";
 
 const schema = {
   name: "mode_validator",

@@ -9,12 +9,11 @@ enableMapSet();
 import { ChatSlice, createChatSlice } from './chat-store';
 import { ChatsDatabaseSlice, createChatsDatabaseSlice } from './chats-database-slice';
 import { ModesSlice, createModesSlice } from './modes-slice';
-import { TTSSlice, createTTSSlice } from './tts-slice';
-import { STTSlice, createSTTSlice } from './stt-store';
+import { AudioSlice, createAudioSlice } from './audio-slice';
 import { SettingsSlice, createSettingsSlice } from './settings-slice';
 import { SetupSlice, createSetupSlice } from './setup-slice';
 
-export type PluginStore = ChatSlice & ChatsDatabaseSlice & ModesSlice & TTSSlice & STTSlice & SettingsSlice & SetupSlice;
+export type PluginStore = ChatSlice & ChatsDatabaseSlice & ModesSlice & AudioSlice & SettingsSlice & SetupSlice;
 
 export type ImmerStateCreator<T> = StateCreator<
   PluginStore,
@@ -31,8 +30,7 @@ export const usePluginStore = create<PluginStore>()(
         ...createChatSlice(...args),
         ...createChatsDatabaseSlice(...args),
         ...createModesSlice(...args),
-        ...createTTSSlice(...args),
-        ...createSTTSlice(...args),
+        ...createAudioSlice(...args),
         ...createSettingsSlice(...args),
         ...createSetupSlice(...args),
       }))

@@ -111,7 +111,7 @@ export const runConversationTurn = async (
 							return;
 						}
 						assistantMessage = finalMessage;
-						usePluginStore.getState().saveConversationImmediately();
+						usePluginStore.getState().saveConversation();
 					},
 					onAbort: () => {
 						currentTurnAborted = true;
@@ -141,7 +141,7 @@ export const runConversationTurn = async (
 							throw new Error('Plugin instance not available');
 						}
 						
-						const obsidianTools = getObsidianTools(plugin);
+						const obsidianTools = getObsidianTools();
 						
 						// Clear any previous live tool results when starting new tool execution
 						usePluginStore.getState().clearLiveToolResults();

@@ -35,9 +35,34 @@ npm run build
 
 the past entries there are not good
 
-Keep the new ones short,understandable by non-technical people. So a psychologist, a non technical bussiness or marketing person - all of they must be able to easily understand those changelogs.
+# Changelog Writing Guidelines
 
-Furthermore this changelog is for users of the plugin so they only care about the things that affect them, describe the changes with, the potentially non technical, user as a reader in mind.
+## Core Principles
+- Write for non-technical users (psychologists, business people, marketers)
+- Focus on user benefits and value, not technical details
+- Use clear, simple language that anyone can understand
+- Keep entries concise and scannable
+
+## Content Guidelines
+- Focus on what users can now do that they couldn't before
+- Explain benefits in user-friendly terms
+- Use active voice and present tense
+- Include concrete examples of new features
+- Only mention significant bug fixes that impact user experience
+
+## Format Examples
+Good:
+- "Life Navigator mode is now available to help guide you through your daily tasks"
+- "Menu items are now at the top for easier access"
+- "Notes save automatically so you never lose your work"
+
+Bad:
+- "Fixed bug in note saving mechanism"
+- "Implemented new UI component for menu positioning"
+- "Added error handling for edge cases"
+
+## Purpose
+The changelog should help users understand how new features and improvements benefit them personally. Focus on the "what's in it for me" aspect to engage and excite the community.
 
 ## Rembember
 

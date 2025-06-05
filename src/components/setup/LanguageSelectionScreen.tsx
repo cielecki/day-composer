@@ -3,13 +3,7 @@ import { t } from 'src/i18n';
 import { getStore } from '../../store/plugin-store';
 import { LucideIcon } from '../LucideIcon';
 
-interface LanguageSelectionScreenProps {
-	onLanguageConfigured: () => void;
-}
-
-export const LanguageSelectionScreen: React.FC<LanguageSelectionScreenProps> = ({
-	onLanguageConfigured
-}) => {
+export const LanguageSelectionScreen: React.FC = () => {
 	const [currentLanguage, setCurrentLanguage] = useState<string>('');
 	const [isConfiguring, setIsConfiguring] = useState(false);
 
@@ -42,8 +36,6 @@ export const LanguageSelectionScreen: React.FC<LanguageSelectionScreenProps> = (
 					alert(t('ui.setup.language.manualRestart'));
 				}
 			}
-			
-			onLanguageConfigured();
 		} catch (error) {
 			console.error('Error configuring language:', error);
 		} finally {

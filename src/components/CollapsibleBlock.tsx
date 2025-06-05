@@ -136,7 +136,7 @@ export const ToolBlock: React.FC<ToolBlockProps> = ({
   navigationTargets = [],
   currentLabel
 }) => {
-  const obsidianTools = getObsidianTools(undefined!);
+  const obsidianTools = getObsidianTools();
   const [currentTargetIndex, setCurrentTargetIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [tool, setTool] = useState<any>(null);

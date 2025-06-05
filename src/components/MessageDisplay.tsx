@@ -16,8 +16,6 @@ interface MessageDisplayProps {
   messageIndex?: number;
   isLastMessage?: boolean;
   isGeneratingResponse?: boolean;
-  newAbortController?: () => AbortController;
-  abort?: () => void;
 }
 
 // Helper to ensure content is always ContentBlock[]
@@ -38,22 +36,20 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   messageIndex,
   isLastMessage = false,
   isGeneratingResponse = false,
-  newAbortController,
-  abort,
 }) => {
   // Get specific state slices from Zustand store with granular subscriptions
-  const isRecording = usePluginStore(state => state.stt.isRecording);
+  const isRecording = usePluginStore(state => state.audio.isRecording);
   
   // Extract individual values from TTS state - updated property names
-  const isSpeaking = usePluginStore(state => state.tts.isSpeaking);
-  const isGeneratingSpeech = usePluginStore(state => state.tts.isGeneratingSpeech);
-  const isPaused = usePluginStore(state => state.tts.isPaused);
-  const stopAudio = usePluginStore(state => state.stopAudio);
-  const pauseAudio = usePluginStore(state => state.pauseAudio);
-  const resumeAudio = usePluginStore(state => state.resumeAudio);
+  const isSpeaking = usePluginStore(state => state.audio.isSpeaking);
+  const isGeneratingSpeech = usePluginStore(state => state.audio.isGeneratingSpeech);
+  const isPaused = usePluginStore(state => state.audio.isSpeakingPaused);
+  const stopAudio = usePluginStore(state => state.audioStop);
+  const pauseAudio = usePluginStore(state => state.speakingPause);
+  const resumeAudio = usePluginStore(state => state.speakingResume);
 
   // Use actual TTS store method
-  const speakText = usePluginStore(state => state.speakText);
+  const speakText = usePluginStore(state => state.speakingStart);
 
   const [copyIcon, setCopyIcon] = useState<'copy' | 'check'>('copy');
   const [toolsCache, setToolsCache] = useState<Map<string, any>>(new Map());
@@ -83,7 +79,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
     const loadToolsForBlocks = async () => {
       const contentBlocks = ensureContentBlocksForDisplay(content);
       const toolBlocks = contentBlocks.filter(block => block.type === 'tool_use');
-      const obsidianTools = getObsidianTools(undefined!);
+      const obsidianTools = getObsidianTools();
       
       for (const block of toolBlocks) {
         const toolName = (block as any).name;
@@ -142,9 +138,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
         // Otherwise start playing the text
         const textToSpeak = getPlainTextContent(contentBlocksToRender);
         if (textToSpeak) {
-          // Pass a dummy abort signal since TTS context creates its own controller internally
-          const dummyController = new AbortController();
-          speakText(textToSpeak, dummyController.signal, true);
+          speakText(textToSpeak);
         }
       }
     }

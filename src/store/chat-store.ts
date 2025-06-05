@@ -4,12 +4,13 @@ import { Chat } from 'src/utils/chat/conversation';
 import { generateChatId } from 'src/utils/chat/generate-conversation-id';
 import { createUserMessage, extractUserMessageContent } from 'src/utils/chat/message-builder';
 import { runConversationTurn } from 'src/utils/chat/conversation-turn';
-import { handleTTS } from 'src/utils/chat/tts-integration';
 import { getObsidianTools } from '../obsidian-tools';
 import { expandLinks } from 'src/utils/links/expand-links';
 import { Notice } from 'obsidian';
 import { t } from 'src/i18n';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
+import { ensureContentBlocks, extractTextForTTS } from 'src/utils/chat/content-blocks';
+import { getDefaultLNMode } from 'src/utils/modes/ln-mode-defaults';
 
 // Extend Message type to include unique ID for React keys
 export interface MessageWithId extends Message {
@@ -55,297 +56,305 @@ export interface ChatSlice {
   setCurrentChat: (chat: Chat) => void;
   
   // Business Logic Actions
-  addUserMessage: (userMessage: string, signal: AbortSignal, images?: any[]) => Promise<void>;
-  editUserMessage: (messageIndex: number, newContent: string, signal: AbortSignal, images?: any[]) => Promise<void>;
+  addUserMessage: (userMessage: string, images?: any[]) => Promise<void>;
+  editUserMessage: (messageIndex: number, newContent: string, images?: any[]) => Promise<void>;
   getCurrentConversationId: () => string | null;
   getContext: () => Promise<string>;
   startEditingMessage: (messageIndex: number) => void;
   cancelEditingMessage: () => void;
-  runConversationTurnWithContext: (signal: AbortSignal) => Promise<void>;
-
-  // Conversation Persistence Actions
-  autoSaveConversation: (isGeneratingResponse: boolean) => Promise<void>;
-  saveConversationImmediately: () => Promise<void>;
-  saveCurrentConversation: (title?: string, tags?: string[]) => Promise<string | null>;
-  loadConversation: (conversationId: string) => Promise<boolean>;
+  runConversationTurnWithContext: () => Promise<void>;
+  chatStop: () => void;
 }
 
 // Create conversation slice - now get() returns full PluginStore type
-export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => ({
-  chats: {
-    current: {
-      meta: {
-        id: generateChatId(),
-        title: '',
-        filePath: '',
-        updatedAt: 0
+export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
+  let abortController: AbortController | null = null;
+  
+  return {
+    chats: {
+      current: {
+        meta: {
+          id: generateChatId(),
+          title: '',
+          filePath: '',
+          updatedAt: 0
+        },
+        storedConversation: {
+          version: 0,
+          modeId: '',
+          titleGenerated: false,
+          messages: []
+        }
       },
-      storedConversation: {
-        version: 0,
-        modeId: '',
-        titleGenerated: false,
-        messages: []
-      }
+      isGenerating: false,
+      editingMessage: null,
+      liveToolResults: new Map(),
+      conversationVersion: 0
     },
-    isGenerating: false,
-    editingMessage: null,
-    liveToolResults: new Map(),
-    conversationVersion: 0
-  },
-  
-  addMessage: (message) => set((state) => {
-    // Ensure message has a unique ID for React reconciliation
-    const messageWithId = ensureMessageId(message);
     
-    // Create a new messages array to avoid proxy issues
-    const newMessages = [...state.chats.current.storedConversation.messages, messageWithId];
-    state.chats.current.storedConversation.messages = newMessages;
-    state.chats.conversationVersion += 1;
-  }),
-  
-  updateMessage: (index, message) => set((state) => {
-    const messages = state.chats.current.storedConversation.messages;
-    if (index >= 0 && index < messages.length) {
-      // Ensure message has ID (preserve existing ID if available)
-      const existingMessage = messages[index] as MessageWithId;
+    addMessage: (message) => set((state) => {
+      // Ensure message has a unique ID for React reconciliation
       const messageWithId = ensureMessageId(message);
-      if (existingMessage.messageId) {
-        messageWithId.messageId = existingMessage.messageId;
-      }
       
-      // Create new messages array to avoid proxy issues
-      const newMessages = [...messages];
-      newMessages[index] = messageWithId;
+      // Create a new messages array to avoid proxy issues
+      const newMessages = [...state.chats.current.storedConversation.messages, messageWithId];
       state.chats.current.storedConversation.messages = newMessages;
       state.chats.conversationVersion += 1;
-    }
-  }),
-  
-  clearChat: () => set((state) => {
-    state.chats.current = {
-      meta: {
-        id: generateChatId(),
-        title: '',
-        filePath: '',
-        updatedAt: 0
-      },
-      storedConversation: {
-        version: 0,
-        modeId: '',
-        titleGenerated: false,
-        messages: []
+    }),
+    
+    updateMessage: (index, message) => set((state) => {
+      const messages = state.chats.current.storedConversation.messages;
+      if (index >= 0 && index < messages.length) {
+        // Ensure message has ID (preserve existing ID if available)
+        const existingMessage = messages[index] as MessageWithId;
+        const messageWithId = ensureMessageId(message);
+        if (existingMessage.messageId) {
+          messageWithId.messageId = existingMessage.messageId;
+        }
+        
+        // Create new messages array to avoid proxy issues
+        const newMessages = [...messages];
+        newMessages[index] = messageWithId;
+        state.chats.current.storedConversation.messages = newMessages;
+        state.chats.conversationVersion += 1;
       }
-    };
-    state.chats.liveToolResults.clear();
-    state.chats.editingMessage = null;
-    state.chats.conversationVersion += 1;
-  }),
-  
-  reset: () => {
-    const state = get();
-    state.clearChat();
-  },
-  
-  setIsGenerating: (generating) => set((state) => {
-    state.chats.isGenerating = generating;
-  }),
-  
-  setEditingMessage: (editing) => set((state) => {
-    state.chats.editingMessage = editing;
-  }),
-  
-  updateLiveToolResult: (toolId, result) => set((state) => {
-    state.chats.liveToolResults.set(toolId, result);
-  }),
-  
-  clearLiveToolResults: () => set((state) => {
-    state.chats.liveToolResults.clear();
-  }),
-  
-  incrementChatVersion: () => set((state) => {
-    state.chats.conversationVersion += 1;
-  }),
-  
-  setCurrentChat: (conversation) => set((state) => {
-    // Ensure all messages have IDs when loading conversation
-    const messagesWithIds = conversation.storedConversation.messages.map(msg => ensureMessageId(msg));
-    const conversationWithIds = {
-      ...conversation,
-      storedConversation: {
-        ...conversation.storedConversation,
-        messages: messagesWithIds
+    }),
+    
+    clearChat: () => {
+      get().chatStop();
+
+      if (get().audio.isSpeaking || get().audio.isGeneratingSpeech) {
+        get().audioStop();
       }
-    };
-    
-    state.chats.current = conversationWithIds;
-    state.chats.conversationVersion += 1;
-  }),
-  
-  // Business Logic Implementation
-  getContext: async () => {
-    const state = get();
-    
-    const currentActiveMode = state.modes.available[state.modes.activeId];
-    const plugin = LifeNavigatorPlugin.getInstance();
-    
-    if (!currentActiveMode || !plugin) {
-      return '';
-    }
-    
-    // Conditionally expand links based on mode setting
-    if (currentActiveMode.ln_expand_links) {
-      return (await expandLinks(plugin.app, currentActiveMode.ln_system_prompt)).trim();
-    } else {
-      return currentActiveMode.ln_system_prompt.trim();
-    }
-  },
-  
-  getCurrentConversationId: () => {
-    const state = get();
-    return state.chats.current?.meta.id || null;
-  },
-  
-  addUserMessage: async (userMessage, signal, images) => {
-    const state = get();
-    try {
-      // Create and add user message
-      const newMessage = createUserMessage(userMessage, images);
-      if (newMessage.content.length > 0) {
-        state.addMessage(newMessage);
-        state.setIsGenerating(true);
-        await state.runConversationTurnWithContext(signal);
-      }
-    } catch (error) {
-      console.error("Error preparing conversation turn:", error);
-      new Notice(t('errors.setup', { error: error instanceof Error ? error.message : "Unknown error" }));
-      state.setIsGenerating(false);
-    }
-  },
-  
-  editUserMessage: async (messageIndex, newContent, signal, images) => {
-    const state = get();
-    
-    // Validate message index
-    if (messageIndex < 0 || messageIndex >= state.chats.current.storedConversation.messages.length) {
-      console.error(`Invalid message index for editing: ${messageIndex}`);
-      return;
-    }
 
-    const targetMessage = state.chats.current.storedConversation.messages[messageIndex];
-    if (targetMessage.role !== "user") {
-      console.error(`Can only edit user messages. Message at index ${messageIndex} has role: ${targetMessage.role}`);
-      return;
-    }
-
-    // Abort current generation if any
-    if (state.chats.isGenerating) {
-      state.setIsGenerating(false);
-    }
-
-    // Truncate conversation and update the edited message
-    const conversationUpToEdit = state.chats.current.storedConversation.messages.slice(0, messageIndex + 1);
-    const newMessage = createUserMessage(newContent, images);
-    conversationUpToEdit[messageIndex] = newMessage;
+      set((state) => {
+        state.chats.current = {
+          meta: {
+            id: generateChatId(),
+            title: '',
+            filePath: '',
+            updatedAt: 0
+          },
+          storedConversation: {
+            version: 0,
+            modeId: '',
+            titleGenerated: false,
+            messages: []
+          }
+        };
+        state.chats.liveToolResults.clear();
+        state.chats.editingMessage = null;
+        state.chats.conversationVersion += 1;
+      })
+    },
     
-    set((state) => {
-      state.chats.current.storedConversation.messages = conversationUpToEdit;
-      state.chats.editingMessage = null;
+    reset: () => {
+      const state = get();
+      state.clearChat();
+    },
+    
+    setIsGenerating: (generating) => set((state) => {
+      state.chats.isGenerating = generating;
+    }),
+    
+    setEditingMessage: (editing) => set((state) => {
+      state.chats.editingMessage = editing;
+    }),
+    
+    updateLiveToolResult: (toolId, result) => set((state) => {
+      state.chats.liveToolResults.set(toolId, result);
+    }),
+    
+    clearLiveToolResults: () => set((state) => {
+      state.chats.liveToolResults.clear();
+    }),
+    
+    incrementChatVersion: () => set((state) => {
       state.chats.conversationVersion += 1;
-    });
-
-    // Trigger new AI response if there's content
-    if (newMessage.content.length > 0) {
-      state.setIsGenerating(true);
-      await state.runConversationTurnWithContext(signal);
-    }
-  },
-  
-  startEditingMessage: (messageIndex) => {
-    const state = get();
-    if (messageIndex < 0 || messageIndex >= state.chats.current.storedConversation.messages.length) {
-      console.error(`Invalid message index for editing: ${messageIndex}`);
-      return;
-    }
-
-    const targetMessage = state.chats.current.storedConversation.messages[messageIndex];
-    if (targetMessage.role !== "user") {
-      console.error(`Can only edit user messages. Message at index ${messageIndex} has role: ${targetMessage.role}`);
-      return;
-    }
-
-    const { text, images } = extractUserMessageContent(targetMessage);
-    state.setEditingMessage({
-      index: messageIndex,
-      content: text,
-      images: images
-    });
-  },
-  
-  cancelEditingMessage: () => {
-    const state = get();
-    state.setEditingMessage(null);
-  },
-  
-  // Conversation Persistence Actions
-  autoSaveConversation: async (isGeneratingResponse: boolean) => {
-    const state = get();
+    }),
     
-    if (state.chats.current.storedConversation.messages.length > 0 && !isGeneratingResponse) {
-      await state.autoSaveConversation();
-    }
-  },
-
-  saveConversationImmediately: async () => {
-    const state = get();
-    await state.saveConversation();
-  },
-
-  saveCurrentConversation: async (title?: string, tags?: string[]) => {
-    const state = get();
-    return await state.saveConversation(undefined, title, tags);
-  },
-
-  loadConversation: async (conversationId: string) => {
-    const state = get();
-    return await state.loadConversation(conversationId);
-  },
-  
-  // Helper method for conversation turn logic
-  runConversationTurnWithContext: async (signal: AbortSignal) => {
-    const state = get();
-    try {
-      // Prepare context and tools
-      const systemPrompt = await state.getContext();
-      const plugin = LifeNavigatorPlugin.getInstance();
+    setCurrentChat: (chat) => set((state) => {
+      // Ensure all messages have IDs when loading conversation
+      const messagesWithIds = chat.storedConversation.messages.map(msg => ensureMessageId(msg));
+      const conversationWithIds = {
+        ...chat,
+        storedConversation: {
+          ...chat.storedConversation,
+          messages: messagesWithIds
+        }
+      };
       
-      if (!plugin) {
-        throw new Error('Plugin instance not available');
-      }
-      
-      const obsidianTools = getObsidianTools(plugin);
+      state.chats.current = conversationWithIds;
+      state.chats.conversationVersion += 1;
+    }),
+    
+    // Business Logic Implementation
+    getContext: async () => {
+      const state = get();
       
       const currentActiveMode = state.modes.available[state.modes.activeId];
+      const plugin = LifeNavigatorPlugin.getInstance();
       
-      // Get tools asynchronously
-      const tools = currentActiveMode 
-        ? await obsidianTools.getToolsForMode(currentActiveMode)
-        : await obsidianTools.getTools();
+      if (!currentActiveMode || !plugin) {
+        return '';
+      }
+      
+      // Conditionally expand links based on mode setting
+      if (currentActiveMode.ln_expand_links) {
+        return (await expandLinks(plugin.app, currentActiveMode.ln_system_prompt)).trim();
+      } else {
+        return currentActiveMode.ln_system_prompt.trim();
+      }
+    },
+    
+    getCurrentConversationId: () => {
+      const state = get();
+      return state.chats.current?.meta.id || null;
+    },
+    
+    addUserMessage: async (userMessage, images) => {
+      if (get().audio.isSpeaking || get().audio.isGeneratingSpeech) {
+        get().audioStop();
+      }
+      
+      try {
+        // Create and add user message
+        const newMessage = createUserMessage(userMessage, images);
+        if (newMessage.content.length > 0) {
+          get().addMessage(newMessage);
+          get().setIsGenerating(true);
+          await get().runConversationTurnWithContext();
+        }
+      } catch (error) {
+        console.error("Error preparing conversation turn:", error);
+        new Notice(t('errors.setup', { error: error instanceof Error ? error.message : "Unknown error" }));
+        get().setIsGenerating(false);
+      }
+    },
+    
+    editUserMessage: async (messageIndex, newContent, images) => {
+      if (get().audio.isSpeaking || get().audio.isGeneratingSpeech) {
+        get().audioStop();
+      }
+      
+      // Validate message index
+      if (messageIndex < 0 || messageIndex >= get().chats.current.storedConversation.messages.length) {
+        console.error(`Invalid message index for editing: ${messageIndex}`);
+        return;
+      }
 
-      // Run conversation turn with direct store access
-      const finalAssistantMessage = await runConversationTurn(
-        systemPrompt,
-        tools,
-        signal
-      );
+      const targetMessage = get().chats.current.storedConversation.messages[messageIndex];
+      if (targetMessage.role !== "user") {
+        console.error(`Can only edit user messages. Message at index ${messageIndex} has role: ${targetMessage.role}`);
+        return;
+      }
 
-      // Handle TTS
-      await handleTTS(finalAssistantMessage, signal);
-    } catch (error) {
-      console.error("Error in conversation turn:", error);
-      new Notice(t('errors.setup', { error: error instanceof Error ? error.message : "Unknown error" }));
-      // Ensure generating state is cleared even on error
-      const currentState = get();
-      currentState.setIsGenerating(false);
+      // Abort current generation if any
+      if (get().chats.isGenerating) {
+        get().setIsGenerating(false);
+      }
+
+      // Truncate conversation and update the edited message
+      const conversationUpToEdit = get().chats.current.storedConversation.messages.slice(0, messageIndex + 1);
+      const newMessage = createUserMessage(newContent, images);
+      conversationUpToEdit[messageIndex] = newMessage;
+      
+      set((state) => {
+        state.chats.current.storedConversation.messages = conversationUpToEdit;
+        state.chats.editingMessage = null;
+        state.chats.conversationVersion += 1;
+      });
+
+      // Trigger new AI response if there's content
+      if (newMessage.content.length > 0) {
+        get().setIsGenerating(true);
+        await get().runConversationTurnWithContext();
+      }
+    },
+    
+    startEditingMessage: (messageIndex) => {
+      const state = get();
+      if (messageIndex < 0 || messageIndex >= state.chats.current.storedConversation.messages.length) {
+        console.error(`Invalid message index for editing: ${messageIndex}`);
+        return;
+      }
+
+      const targetMessage = state.chats.current.storedConversation.messages[messageIndex];
+      if (targetMessage.role !== "user") {
+        console.error(`Can only edit user messages. Message at index ${messageIndex} has role: ${targetMessage.role}`);
+        return;
+      }
+
+      const { text, images } = extractUserMessageContent(targetMessage);
+      state.setEditingMessage({
+        index: messageIndex,
+        content: text,
+        images: images
+      });
+    },
+    
+    cancelEditingMessage: () => {
+      const state = get();
+      state.setEditingMessage(null);
+    },
+    
+    // Helper method for conversation turn logic
+    runConversationTurnWithContext: async () => {
+      abortController = new AbortController();
+      const signal = abortController.signal;
+      try {
+        // Prepare context and tools
+        const systemPrompt = await get().getContext();
+        const plugin = LifeNavigatorPlugin.getInstance();
+        
+        if (!plugin) {
+          throw new Error('Plugin instance not available');
+        }
+        
+        const obsidianTools = getObsidianTools();
+        
+        const currentActiveMode = get().modes.available[get().modes.activeId];
+        
+        // Get tools asynchronously
+        const tools = currentActiveMode 
+          ? await obsidianTools.getToolsForMode(currentActiveMode)
+          : await obsidianTools.getTools();
+
+        // Run conversation turn with direct store access
+        const finalAssistantMessage = await runConversationTurn(
+          systemPrompt,
+          tools,
+          signal
+        );
+
+        if (!finalAssistantMessage) return;
+        if (signal.aborted) return;
+	
+        const contentBlocks = ensureContentBlocks(finalAssistantMessage.content);
+        const textForTTS = extractTextForTTS(contentBlocks);
+        
+        // Get current mode and check autoplay setting
+        const defaultMode = getDefaultLNMode();
+        const autoplayEnabled = currentActiveMode?.ln_voice_autoplay || defaultMode.ln_voice_autoplay;
+        
+        // Only auto-play if both the global setting and the mode-specific autoplay are enabled
+        if (autoplayEnabled && textForTTS.trim().length > 0) {
+          await get().speakingStart(textForTTS);
+        }
+      } catch (error) {
+        console.error("Error in conversation turn:", error);
+        new Notice(t('errors.setup', { error: error instanceof Error ? error.message : "Unknown error" }));
+        // Ensure generating state is cleared even on error
+        const currentState = get();
+        currentState.setIsGenerating(false);
+      }
+    },
+
+    chatStop: () => {
+      if (abortController) {
+        abortController.abort();
+        abortController = null;
+      }
     }
   }
-}); 
+}; 

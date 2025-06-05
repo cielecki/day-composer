@@ -14,34 +14,25 @@ interface AttachedImage {
 const WAVEFORM_HISTORY_LENGTH = 120; // 4 seconds at 30 samples per second
 
 export const UnifiedInputArea: React.FC<{
-  newAbortController: () => AbortController;
-  abort: () => void;
   editingMessage?: { index: number; content: string; images?: any[] } | null;
-}> = ({ newAbortController, abort, editingMessage }) => {
-  // Get specific state slices from Zustand store with granular subscriptions
+}> = ({ editingMessage }) => {
   const isGeneratingResponse = usePluginStore(state => state.chats.isGenerating);
-  const setEditingMessage = usePluginStore(state => state.setEditingMessage);
-  const resetTTS = usePluginStore(state => state.resetTTS);
+  const isGeneratingSpeech = usePluginStore(state => state.audio.isGeneratingSpeech);
+  const isSpeaking = usePluginStore(state => state.audio.isSpeaking);
+  const isSpeakingPaused = usePluginStore(state => state.audio.isSpeakingPaused);
+  const isRecording = usePluginStore(state => state.audio.isRecording);
+  const isTranscribing = usePluginStore(state => state.audio.isTranscribing);
+  const lastTranscription = usePluginStore(state => state.audio.lastTranscription);
 
-  // Extract individual values from audio state - updated property names
-  const isSpeaking = usePluginStore(state => state.tts.isSpeaking);
-  const isGeneratingSpeech = usePluginStore(state => state.tts.isGeneratingSpeech);
-  const isRecording = usePluginStore(state => state.stt.isRecording);
-  const isTranscribing = usePluginStore(state => state.stt.isTranscribing);
-  const lastTranscription = usePluginStore(state => state.stt.lastTranscription);
-  const isPaused = usePluginStore(state => state.tts.isPaused);
+  const prevIsTranscribingRef = useRef(isTranscribing);
 
-  // Use actual store methods instead of placeholder functions
   const addUserMessage = usePluginStore(state => state.addUserMessage);
   const editUserMessage = usePluginStore(state => state.editUserMessage);
   const cancelEditingMessage = usePluginStore(state => state.cancelEditingMessage);
-  const startRecording = usePluginStore(state => state.startRecording);
-  const finalizeRecording = usePluginStore(state => state.finalizeRecording);
-  const cancelTranscription = usePluginStore(state => state.cancelTranscription);
-
-  const stopAudio = useCallback(() => {
-    resetTTS();
-  }, [resetTTS]);
+  const startRecording = usePluginStore(state => state.recordingStart);
+  const finalizeRecording = usePluginStore(state => state.recordingToTranscribing);
+  const audioStop = usePluginStore(state => state.audioStop);
+  const chatStop = usePluginStore(state => state.chatStop);
 
   // Input state
   const [message, setMessage] = useState("");
@@ -58,10 +49,6 @@ export const UnifiedInputArea: React.FC<{
   const animationFrameRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const waveformIntervalRef = useRef<number | null>(null);
-
-  // Previous state tracking for transcription handling
-  const prevIsTranscribingRef = useRef(isTranscribing);
-  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Volume level state
   const [volumeLevel, setVolumeLevel] = useState(0);
@@ -97,13 +84,7 @@ export const UnifiedInputArea: React.FC<{
       const newMessage = message.trim()
         ? `${message} ${lastTranscription}`
         : lastTranscription;
-      
-      // Always auto-send after transcription completes, whether editing or new message
-      if (isSpeaking || isGeneratingSpeech) {
-        console.log("Transcription completed during audio playback - stopping audio and auto-sending");
-        stopAudio();
-      }
-      
+            
       // Immediately clear images to prevent flash before auto-send
       const imagesToSend = [...attachedImages];
       setAttachedImages([]);
@@ -113,6 +94,10 @@ export const UnifiedInputArea: React.FC<{
       setTimeout(() => {
         // Send/save the message with proper handling of both text and images
         const messageToSend = newMessage;
+
+        if (usePluginStore.getState().chats.isGenerating) {
+          return;
+        }
         
         if (messageToSend.trim() === "" && imagesToSend.length === 0) {
           return;
@@ -135,15 +120,14 @@ export const UnifiedInputArea: React.FC<{
         if (editingMessage) {
           // For editing mode, save the edit
           console.log("Auto-saving edit after transcription");
-          const controller = newAbortController();
-          editUserMessage(editingMessage.index, messageToSend, controller.signal, finalImageData);
+          editUserMessage(editingMessage.index, messageToSend, finalImageData);
         } else {
           // For new message mode, send as new message
           console.log("Auto-sending new message after transcription");
           if (finalImageData.length > 0) {
-            addUserMessage(messageToSend, newAbortController().signal, finalImageData);
+            addUserMessage(messageToSend, finalImageData);
           } else {
-            addUserMessage(messageToSend, newAbortController().signal);
+            addUserMessage(messageToSend);
           }
         }
 
@@ -153,7 +137,7 @@ export const UnifiedInputArea: React.FC<{
     }
     // Update ref with current value for next comparison
     prevIsTranscribingRef.current = isTranscribing;
-  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, isSpeaking, isGeneratingSpeech, message, addUserMessage, editUserMessage, newAbortController, attachedImages, stopAudio, editingMessage]);
+  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, isSpeaking, isGeneratingSpeech, message, addUserMessage, editUserMessage, attachedImages, editingMessage]);
 
   // Add ResizeObserver to ensure textarea is properly sized
   useEffect(() => {
@@ -316,12 +300,10 @@ export const UnifiedInputArea: React.FC<{
         }));
 
         // For editing, pass both text and images
-        const controller = newAbortController();
-        editUserMessage(editingMessage.index, finalMessage, controller.signal, imageData);
+        editUserMessage(editingMessage.index, finalMessage, imageData);
       } else {
         // Just save text message
-        const controller = newAbortController();
-        editUserMessage(editingMessage.index, finalMessage, controller.signal);
+        editUserMessage(editingMessage.index, finalMessage);
       }
 
       // Reset state after editing
@@ -347,12 +329,11 @@ export const UnifiedInputArea: React.FC<{
       // Add the images to the message
       addUserMessage(
         finalMessage,
-        newAbortController().signal,
         imageData,
       );
     } else {
       // Just send text message
-      addUserMessage(finalMessage, newAbortController().signal);
+      addUserMessage(finalMessage);
     }
 
     setMessage("");
@@ -378,7 +359,6 @@ export const UnifiedInputArea: React.FC<{
 
       // If a response is being generated, abort it first before sending new message
       if (isGeneratingResponse || isSpeaking || isGeneratingSpeech) {
-        abort();
         // Use setTimeout to ensure abort is processed before sending the new message
         setTimeout(() => {
           handleSendMessage();
@@ -476,51 +456,19 @@ export const UnifiedInputArea: React.FC<{
 
   // Handle microphone button click
   const handleMicrophoneClick = () => {
-    if (isTranscribing) {
-      // If transcribing, cancel the transcription
-      handleCancelRecording();
-    } else if (isRecording) {
-      finalizeRecording();
-    } else {
-      // Stop any playing audio when starting to record
-      if (isSpeaking || isGeneratingSpeech) {
-        console.log("Stopping audio playback before starting recording");
-        stopAudio();
-      }
-      
-      const controller = newAbortController();
-      abortControllerRef.current = controller;
-      startRecording(controller.signal);
-    }
-  };
-
-  // Handle cancel recording or transcription
-  const handleCancelRecording = () => {
-    // Cancel recording if active
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
+    // Stop any playing audio when starting to record
+    if (isSpeaking || isGeneratingSpeech) {
+      console.log("Stopping audio playback before starting recording");
+      audioStop();
     }
     
-    // Cancel transcription if active
-    if (isTranscribing) {
-      cancelTranscription();
-    }
-    
-    // Don't call the main abort() here as it handles different operations
-    // The recording/transcription cancellation should be handled separately
-    // from generation/audio playback cancellation
+    startRecording();
   };
 
   // Unified stop handler for all operations
   const handleStopAll = () => {
-    // Stop recording/transcription first
-    if (isRecording || isTranscribing) {
-      handleCancelRecording();
-    }
-    
-    // Then stop generation/audio playback
-    abort();
+    audioStop();
+    chatStop();
   };
 
   // Reset the volume after a short duration of silence
@@ -658,7 +606,7 @@ export const UnifiedInputArea: React.FC<{
             {/* Image attach button - hidden during recording */}
             {!isRecording && (
               <button
-                className="input-control-button image-button"
+                className="input-control-button"
                 aria-label={t("ui.input.attachImage")}
                 onClick={() => {
                   if (fileInputRef.current) {
@@ -695,8 +643,8 @@ export const UnifiedInputArea: React.FC<{
             {/* Cancel recording button - visible only during recording (not transcription) */}
             {isRecording && !isTranscribing && (
               <button
-                className="input-control-button cancel-button"
-                onClick={handleCancelRecording}
+                className="input-control-button"
+                onClick={audioStop}
                 aria-label={t("ui.recording.cancel")}
               >
                 <svg
@@ -724,7 +672,7 @@ export const UnifiedInputArea: React.FC<{
               {/* Microphone button to START recording - visible when not currently recording */}
               {!isRecording && !isTranscribing && (
                 <button
-                  className="input-control-button mic-button"
+                  className="input-control-button primary"
                   onClick={handleMicrophoneClick}
                   disabled={false}
                   aria-label={t("ui.recording.start")}
@@ -754,8 +702,8 @@ export const UnifiedInputArea: React.FC<{
 
               {isTranscribing && (
                 <button
-                  className="input-control-button mic-button confirm transcribing"
-                  onClick={handleCancelRecording}
+                  className="input-control-button"
+                  onClick={audioStop}
                   disabled={false}
                   aria-label={t("ui.recording.cancel")}
                 >
@@ -771,7 +719,7 @@ export const UnifiedInputArea: React.FC<{
               {isRecording && !isTranscribing && (
                 <>
                   <button // This is the "Finish Recording" button
-                    className="input-control-button mic-button confirm"
+                    className="input-control-button primary"
                     onClick={finalizeRecording}
                     disabled={false}
                     aria-label={t("ui.recording.confirm")}
@@ -794,9 +742,9 @@ export const UnifiedInputArea: React.FC<{
               )}
 
               {/* Stop button - visible for generation, audio playback, and transcription (but NOT basic recording) */}
-              {(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isPaused) && !isRecording && (
+              {(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isSpeakingPaused) && !isRecording && (
                 <button
-                  className="input-control-button stop-button"
+                  className="input-control-button primary"
                   onClick={handleStopAll}
                   aria-label={t("ui.recording.stop")}
                 >
@@ -814,9 +762,9 @@ export const UnifiedInputArea: React.FC<{
               )}
 
               {/* Send button - visible when not recording, AND nothing is being generated */}
-              {!isTranscribing && !isRecording && !(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isPaused) && (
+              {!isTranscribing && !isRecording && !(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isSpeakingPaused) && (
                 <button
-                  className="input-control-button send-button"
+                  className="input-control-button primary"
                   onClick={handleSendMessage}
                   aria-label={editingMessage ? t("ui.input.save") : t("ui.input.send")}
                   disabled={message.trim() === "" && attachedImages.length === 0}

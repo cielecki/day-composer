@@ -1,5 +1,6 @@
 import { StateCreator } from 'zustand';
 import type { PluginStore } from '../store/plugin-store';
+import { usePluginStore } from '../store/plugin-store';
 
 export enum SetupStep {
 	CONFIGURE_LANGUAGE = "configure_language",
@@ -18,9 +19,9 @@ export interface SetupSlice {
   setup: SetupState;
   
   // Actions
-  refreshSetupState: () => void;
   resetTutorialState: () => Promise<void>;
   isSetupComplete: () => boolean;
+  subscribeToSetupChanges: () => () => void; // Returns unsubscribe function
 }
 
 // Type for StateCreator with immer middleware
@@ -33,17 +34,8 @@ type ImmerStateCreator<T> = StateCreator<
 
 
 // Create setup slice
-export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => ({
-  setup: {
-    currentStep: SetupStep.CONFIGURE_LANGUAGE,
-    hasLanguageConfigured: false,
-    hasAnthropicKey: false,
-    hasOpenAIKey: false,
-    hasOpenAIConfigured: false,
-    isRefreshing: false
-  },
-  
-  refreshSetupState: () => set((state) => {
+export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => {
+  const refreshSetupState = () => set((state) => {
     try {
       const hasLanguageConfigured = get().getObsidianLanguageConfigured();
       const hasAnthropicKey = Boolean(get().getSecret('ANTHROPIC_API_KEY') && get().getSecret('ANTHROPIC_API_KEY')!.trim().length > 0);
@@ -72,17 +64,119 @@ export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => ({
       console.log('Setup slice: Settings not initialized yet, using default state');
       state.setup.currentStep = SetupStep.CONFIGURE_LANGUAGE;
     }
-  }),
+  });
   
-  resetTutorialState: async () => {
-    await get().resetTutorial();
+  return {
+    setup: {
+      currentStep: SetupStep.CONFIGURE_LANGUAGE,
+      hasLanguageConfigured: false,
+      hasAnthropicKey: false,
+      hasOpenAIKey: false,
+      hasOpenAIConfigured: false,
+      isRefreshing: false
+    },
     
-    // Refresh state after resetting
-    get().refreshSetupState();
-  },
-  
-  isSetupComplete: () => {
-    const state = get();
-    return state.setup.currentStep === SetupStep.COMPLETE;
+    resetTutorialState: async () => {
+      await get().resetTutorial();
+    },
+    
+    isSetupComplete: () => {
+      const state = get();
+      return state.setup.currentStep === SetupStep.COMPLETE;
+    },
+
+    subscribeToSetupChanges: () => {
+      const unsubscribeFunctions: (() => void)[] = [];
+
+      refreshSetupState();
+
+      console.log('Setting up setup state change subscriptions...');
+
+      // Subscribe to language configuration changes
+      const unsubLang = usePluginStore.subscribe(
+        (state) => {
+          try {
+            return state.getObsidianLanguageConfigured();
+          } catch {
+            return false;
+          }
+        },
+        (hasLanguageConfigured: boolean, prevHasLanguageConfigured: boolean) => {
+          if (hasLanguageConfigured !== prevHasLanguageConfigured) {
+            console.log(`Language configuration changed: ${prevHasLanguageConfigured} → ${hasLanguageConfigured}`);
+            refreshSetupState();
+          }
+        },
+        { fireImmediately: false }
+      );
+      unsubscribeFunctions.push(unsubLang);
+
+      // Subscribe to Anthropic API key changes
+      const unsubAnthropic = usePluginStore.subscribe(
+        (state) => {
+          try {
+            const key = state.getSecret('ANTHROPIC_API_KEY');
+            return Boolean(key && key.trim().length > 0);
+          } catch {
+            return false;
+          }
+        },
+        (hasAnthropicKey: boolean, prevHasAnthropicKey: boolean) => {
+          if (hasAnthropicKey !== prevHasAnthropicKey) {
+            console.log(`Anthropic API key changed: ${prevHasAnthropicKey} → ${hasAnthropicKey}`);
+            refreshSetupState();
+          }
+        },
+        { fireImmediately: false }
+      );
+      unsubscribeFunctions.push(unsubAnthropic);
+
+      // Subscribe to OpenAI API key changes
+      const unsubOpenAI = usePluginStore.subscribe(
+        (state) => {
+          try {
+            const key = state.getSecret('OPENAI_API_KEY');
+            return Boolean(key && key.trim().length > 0);
+          } catch {
+            return false;
+          }
+        },
+        (hasOpenAIKey: boolean, prevHasOpenAIKey: boolean) => {
+          if (hasOpenAIKey !== prevHasOpenAIKey) {
+            console.log(`OpenAI API key changed: ${prevHasOpenAIKey} → ${hasOpenAIKey}`);
+            refreshSetupState();
+          }
+        },
+        { fireImmediately: false }
+      );
+      unsubscribeFunctions.push(unsubOpenAI);
+
+      // Subscribe to OpenAI skip setting changes
+      const unsubOpenAISkip = usePluginStore.subscribe(
+        (state) => {
+          try {
+            return Boolean(state.settings.tutorial.openaiKeySkipped);
+          } catch {
+            return false;
+          }
+        },
+        (openaiKeySkipped: boolean, prevOpenaiKeySkipped: boolean) => {
+          if (openaiKeySkipped !== prevOpenaiKeySkipped) {
+            console.log(`OpenAI skip setting changed: ${prevOpenaiKeySkipped} → ${openaiKeySkipped}`);
+            refreshSetupState();
+          }
+        },
+        { fireImmediately: false }
+      );
+      unsubscribeFunctions.push(unsubOpenAISkip);
+
+      console.log('Setup state change subscriptions established');
+
+      // Return a cleanup function that unsubscribes all
+      return () => {
+        console.log('Cleaning up setup state change subscriptions...');
+        unsubscribeFunctions.forEach(unsub => unsub());
+      };
+    }
   }
-}); 
+}; 

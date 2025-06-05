@@ -1,4 +1,4 @@
-import type { LifeNavigatorPlugin } from './LifeNavigatorPlugin';
+import { LifeNavigatorPlugin } from './LifeNavigatorPlugin';
 import { noteCreateTool } from './tools/note-create';
 import { vaultSearchTool } from './tools/vault-search';
 import { noteReadTool } from './tools/note-read';
@@ -75,7 +75,6 @@ export interface ObsidianTool<TInput> {
  * Class that handles all Obsidian-specific tool operations
  */
 export class ObsidianTools {
-	private plugin: LifeNavigatorPlugin;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private tools: ObsidianTool<any>[] = [
 		noteCreateTool,
@@ -104,18 +103,15 @@ export class ObsidianTools {
 		fileMoveTool,
 	];
 
-	constructor(plugin: LifeNavigatorPlugin) {
-		this.plugin = plugin;
-	}
-
 	/**
 	 * Ensure user-defined tools are initialized
 	 */
 	private async ensureUserDefinedToolsInitialized(): Promise<void> {
 		// Check if user tools manager is available
-		if (this.plugin.userToolManager) {
+		const userToolManager = LifeNavigatorPlugin.getInstance().userToolManager;
+		if (userToolManager) {
 			// Check if tools need to be refreshed
-			const userTools = this.plugin.userToolManager.getTools();
+			const userTools = userToolManager.getTools();
 			const hasUserDefinedToolsInRegistry = this.tools.some(tool => 
 				tool.specification.name.startsWith('user_')
 			);
@@ -123,11 +119,11 @@ export class ObsidianTools {
 			// If no user-defined tools in registry but tools exist in manager, refresh
 			if (userTools.length > 0 && !hasUserDefinedToolsInRegistry) {
 				console.log('[USER-TOOLS] Lazy initialization: refreshing user-defined tools');
-				await this.plugin.userToolManager.refreshTools();
+				await userToolManager.refreshTools();
 			} else if (!hasUserDefinedToolsInRegistry) {
 				// No tools in manager either, do initial scan
 				console.log('[USER-TOOLS] Lazy initialization: performing initial tool scan');
-				await this.plugin.userToolManager.refreshTools();
+				await userToolManager.refreshTools();
 			}
 		} else {
 			// User tools manager not available
@@ -202,7 +198,7 @@ export class ObsidianTools {
 
 			// Create the execution context
 			const context: ToolExecutionContext = {
-				plugin: this.plugin,
+				plugin: LifeNavigatorPlugin.getInstance(),
 				params: input,
 				signal,
 				progress: (message: string) => {
@@ -262,14 +258,14 @@ export class ObsidianTools {
 // Module-level instance management
 let instance: ObsidianTools | null = null;
 
-export function getObsidianTools(plugin: LifeNavigatorPlugin): ObsidianTools {
+export function getObsidianTools(): ObsidianTools {
 	// If instance exists, return it
 	if (instance) {
 		return instance;
 	}
 
 	console.log("Initializing ObsidianTools with provided plugin");
-	instance = new ObsidianTools(plugin);
+	instance = new ObsidianTools();
 
 	return instance;
 }

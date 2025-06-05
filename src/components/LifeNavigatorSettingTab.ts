@@ -232,9 +232,6 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 				await store.saveSettings();
 					await this.refreshSecretsDisplay();
 					new Notice(t('settings.secrets.list.deleted', { key }));
-					
-					// Dispatch event to notify setup flow of tutorial state change
-					window.dispatchEvent(new CustomEvent('life-navigator-tutorial-state-changed'));
 				}
 			});
 		}
@@ -245,13 +242,8 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			const store = getStore();
 			await store.setSecret(key, value);
 			
-
-			
 			await store.saveSettings();
 			await this.refreshSecretsDisplay();
-			
-			// Dispatch event to notify setup flow of tutorial state change
-			window.dispatchEvent(new CustomEvent('life-navigator-tutorial-state-changed'));
 		});
 		modal.open();
 	}
@@ -260,14 +252,8 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 		const modal = new EditSecretModal(this.app, key, currentValue, async (value) => {
 			const store = getStore();
 			await store.setSecret(key, value);
-			
-
-			
 			await store.saveSettings();
 			await this.refreshSecretsDisplay();
-			
-			// Dispatch event to notify setup flow of tutorial state change
-			window.dispatchEvent(new CustomEvent('life-navigator-tutorial-state-changed'));
 		});
 		modal.open();
 	}

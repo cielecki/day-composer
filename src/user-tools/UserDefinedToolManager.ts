@@ -125,7 +125,7 @@ export class UserDefinedToolManager {
   }
 
   private updateObsidianToolsRegistry(): void {
-    const obsidianTools = getObsidianTools(this.plugin);
+    const obsidianTools = getObsidianTools();
     
     // Get current tools and remove old user-defined tools
     // Note: We can't use async here, so we access the tools array directly

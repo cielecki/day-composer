@@ -12,31 +12,20 @@ interface SetupFlowProps {
 export const SetupFlow: React.FC<SetupFlowProps> = ({ lnModes }) => {
 	const currentStep = usePluginStore(state => state.setup.currentStep);
 
-	const handleStepComplete = useCallback(() => {
-		usePluginStore.getState().refreshSetupState();
-	}, []);
-
 	switch (currentStep) {
 		case SetupStep.CONFIGURE_LANGUAGE:
 			return (
-				<LanguageSelectionScreen
-					onLanguageConfigured={handleStepComplete}
-				/>
+				<LanguageSelectionScreen />
 			);
 
 		case SetupStep.CONFIGURE_ANTHROPIC_KEY:
 			return (
-				<AnthropicKeyScreen
-					onKeyConfigured={handleStepComplete}
-				/>
+				<AnthropicKeyScreen />
 			);
 
 		case SetupStep.CONFIGURE_OPENAI_KEY:
 			return (
-				<OpenAIKeyScreen
-					onKeyConfigured={handleStepComplete}
-					onSkip={handleStepComplete}
-				/>
+				<OpenAIKeyScreen />
 			);
 
 		default:
