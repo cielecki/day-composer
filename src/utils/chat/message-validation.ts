@@ -17,10 +17,10 @@ export const validateAndCleanMessages = (messages: Message[]): Message[] => {
 			// Filter out empty content blocks first
 			const filteredBlocks = filterEmptyContentBlocks(contentBlocks);
 			
-			// If after filtering there are no valid content blocks, skip this message
+			// If after filtering there are no valid content blocks, skip this message but continue processing
 			if (filteredBlocks.length === 0) {
 				console.warn("Skipping assistant message with no valid content blocks");
-				break; // Stop processing here to avoid empty conversation
+				continue; // Skip this message but continue processing others
 			}
 			
 			const toolUseBlocks = filteredBlocks.filter(block => block.type === "tool_use");
@@ -33,7 +33,8 @@ export const validateAndCleanMessages = (messages: Message[]): Message[] => {
 			);
 			
 			if (incompleteThinkingBlocks.length > 0) {
-				break; // Stop processing here to avoid incomplete conversation
+				console.warn("Skipping assistant message with incomplete thinking blocks");
+				continue; // Skip this message but continue processing others
 			}
 			
 			if (toolUseBlocks.length > 0) {
@@ -70,7 +71,7 @@ export const validateAndCleanMessages = (messages: Message[]): Message[] => {
 			const contentBlocks = ensureContentBlocks(currentMessage.content);
 			const filteredBlocks = filterEmptyContentBlocks(contentBlocks);
 			
-			// If after filtering there are no valid content blocks, skip this message
+			// If after filtering there are no valid content blocks, skip this message but continue processing
 			if (filteredBlocks.length === 0) {
 				console.warn("Skipping user message with no valid content blocks");
 				continue; // Skip this message but continue processing others
