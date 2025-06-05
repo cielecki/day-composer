@@ -119,11 +119,11 @@ export const UnifiedInputArea: React.FC<{
         // Handle editing vs new message
         if (editingMessage) {
           // For editing mode, save the edit
-          console.log("Auto-saving edit after transcription");
+          console.debug("Auto-saving edit after transcription");
           editUserMessage(editingMessage.index, messageToSend, finalImageData);
         } else {
           // For new message mode, send as new message
-          console.log("Auto-sending new message after transcription");
+          console.debug("Auto-sending new message after transcription");
           if (finalImageData.length > 0) {
             addUserMessage(messageToSend, finalImageData);
           } else {
@@ -212,12 +212,12 @@ export const UnifiedInputArea: React.FC<{
         audioContextRef.current &&
         audioContextRef.current.state !== "closed"
       ) {
-        console.log("Closing existing AudioContext");
+        console.debug("Closing existing AudioContext");
         audioContextRef.current.close();
       }
 
       if (streamRef.current) {
-        console.log("Stopping existing stream tracks");
+        console.debug("Stopping existing stream tracks");
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
 
@@ -461,7 +461,7 @@ export const UnifiedInputArea: React.FC<{
   const handleMicrophoneClick = () => {
     // Stop any playing audio when starting to record
     if (isSpeaking || isGeneratingSpeech) {
-      console.log("Stopping audio playback before starting recording");
+      console.debug("Stopping audio playback before starting recording");
       audioStop();
     }
     

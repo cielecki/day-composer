@@ -81,7 +81,7 @@ export const runConversationTurn = async (
 					},
 				};
 
-				console.log("🔥 API Params:", params);
+				console.debug("🔥 API Params:", params);
 
 				const stream = await anthropicClient.messages.create(params, { signal: signal });
 

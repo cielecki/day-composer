@@ -121,7 +121,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
     if (role === 'assistant') {
       // Don't allow TTS if recording is active
       if (isRecording) {
-        console.log("🚫 Cannot start TTS because recording is active");
+        console.debug("🚫 Cannot start TTS because recording is active");
         return;
       }
       

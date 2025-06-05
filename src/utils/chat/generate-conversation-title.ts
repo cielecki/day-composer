@@ -24,7 +24,7 @@ export async function generateChatTitle(
             if (aiTitle) return aiTitle;
         }
     } catch (error) {
-        console.log("AI title generation failed, using fallback:", error);
+        console.debug("AI title generation failed, using fallback:", error);
     }
 
     // Fallback to rule-based naming

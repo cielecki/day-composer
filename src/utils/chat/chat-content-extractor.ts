@@ -14,7 +14,7 @@ export function getCurrentChatContent(app: App): string {
 		
 		// If no leaves found, return error message
 		if (!lifeNavigatorViewLeaves || lifeNavigatorViewLeaves.length === 0) {
-			console.log("No Life Navigator view leaves found");
+			console.debug("No Life Navigator view leaves found");
 			return t('errors.chat.noContent');
 		}
 		
@@ -27,12 +27,12 @@ export function getCurrentChatContent(app: App): string {
 		// @ts-ignore - Accessing plugins this way requires ignoring TypeScript
 		const plugin = app.plugins?.plugins?.["life-navigator"];
 		if (plugin) {
-			console.log("Found Life Navigator plugin:", plugin);
+			console.debug("Found Life Navigator plugin:", plugin);
 			
 			// Look for conversation in AIAgentProvider's conversationRef
 			// @ts-ignore - Using internal plugin structure
 			if (plugin.aiAgent && plugin.aiAgent.conversation) {
-				console.log("Found conversation in plugin.aiAgent");
+				console.debug("Found conversation in plugin.aiAgent");
 				return formatConversationContent(plugin.aiAgent.conversation);
 			}
 		}
@@ -42,10 +42,10 @@ export function getCurrentChatContent(app: App): string {
 			// Find the conversation container in the DOM
 			const lifeNavigatorView = app.workspace.containerEl.querySelector('.life-navigator-view');
 			if (lifeNavigatorView) {
-				console.log("Found Life Navigator view in DOM");
+				console.debug("Found Life Navigator view in DOM");
 				
 				// Debug: Log the HTML structure
-				console.log("Life Navigator view HTML:", lifeNavigatorView.innerHTML);
+				console.debug("Life Navigator view HTML:", lifeNavigatorView.innerHTML);
 				
 				// Try different selectors for messages
 				const selectors = [
@@ -62,7 +62,7 @@ export function getCurrentChatContent(app: App): string {
 				// Try each selector until we find elements
 				for (const selector of selectors) {
 					const elements = lifeNavigatorView.querySelectorAll(selector);
-					console.log(`Selector "${selector}" found ${elements.length} elements`);
+					console.debug(`Selector "${selector}" found ${elements.length} elements`);
 					
 					if (elements && elements.length > 0) {
 						messageElements = elements;
@@ -72,14 +72,14 @@ export function getCurrentChatContent(app: App): string {
 				}
 				
 				if (messageElements && messageElements.length > 0) {
-					console.log(`Found message elements with selector "${successfulSelector}"`);
+					console.debug(`Found message elements with selector "${successfulSelector}"`);
 					
 					// Extract user and assistant messages
 					const conversation: any[] = [];
 					
 					messageElements.forEach((el, index) => {
-						console.log(`Message element ${index} classes:`, el.className);
-						console.log(`Message element ${index} innerHTML:`, el.innerHTML);
+						console.debug(`Message element ${index} classes:`, el.className);
+						console.debug(`Message element ${index} innerHTML:`, el.innerHTML);
 						
 						// Try to determine if this is a user or assistant message
 						const isUser = 
@@ -129,7 +129,7 @@ export function getCurrentChatContent(app: App): string {
 					});
 					
 					if (conversation.length > 0) {
-						console.log("Successfully extracted conversation from DOM:", conversation);
+						console.debug("Successfully extracted conversation from DOM:", conversation);
 						return formatConversationContent(conversation);
 					}
 				}
@@ -137,7 +137,7 @@ export function getCurrentChatContent(app: App): string {
 				// If we couldn't find messages but the chat is not empty
 				// Return a placeholder conversation
 				if (lifeNavigatorView.textContent && !lifeNavigatorView.textContent.includes('No chat content')) {
-					console.log("Found chat content but couldn't parse messages, returning empty chat message");
+					console.debug("Found chat content but couldn't parse messages, returning empty chat message");
 					// Return a clear "chat is empty" message instead of the raw text
 					return t('chat.empty');
 				}
@@ -153,7 +153,7 @@ export function getCurrentChatContent(app: App): string {
 				// @ts-ignore
 				const conversation = window.lifeNavigator.aiAgent.conversation;
 				if (Array.isArray(conversation) && conversation.length > 0) {
-					console.log("Found conversation in global window.lifeNavigator");
+					console.debug("Found conversation in global window.lifeNavigator");
 					return formatConversationContent(conversation);
 				}
 			}
@@ -169,18 +169,18 @@ export function getCurrentChatContent(app: App): string {
 			const conversation = lifeNavigatorView.conversation;
 			
 			if (Array.isArray(conversation) && conversation.length > 0) {
-				console.log("Successfully retrieved conversation using getter");
+				console.debug("Successfully retrieved conversation using getter");
 				return formatConversationContent(conversation);
 			}
 		}
 		
 		// Fallback to accessing the private _conversation property directly
 		if (lifeNavigatorView && Array.isArray(lifeNavigatorView._conversation) && lifeNavigatorView._conversation.length > 0) {
-			console.log("Found conversation in _conversation property");
+			console.debug("Found conversation in _conversation property");
 			return formatConversationContent(lifeNavigatorView._conversation);
 		}
 		
-		console.log("No conversation found in LifeNavigatorView");
+		console.debug("No conversation found in LifeNavigatorView");
 		return t('errors.chat.noContent');
 	} catch (error) {
 		console.error("Error getting chat content:", error);

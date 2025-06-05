@@ -8,7 +8,7 @@ import { App } from 'obsidian';
 export const initI18n = async (app: App) => {
   // Get Obsidian's language setting from localStorage
   const obsidianLang = window.localStorage.getItem('language') || 'en';
-  console.log('Obsidian language setting from localStorage:', obsidianLang);
+  console.debug('Obsidian language setting from localStorage:', obsidianLang);
   
   // Map Obsidian's language codes to our supported languages
   const langMap: Record<string, string> = {
@@ -19,7 +19,7 @@ export const initI18n = async (app: App) => {
     // Add more mappings as needed
   };
   const initialLang = langMap[obsidianLang] || 'en';
-  console.log('Mapped to plugin language:', initialLang);
+  console.debug('Mapped to plugin language:', initialLang);
 
   // Merge translations with long texts from dedicated files
   const enTranslations = {
@@ -65,7 +65,7 @@ export const initI18n = async (app: App) => {
   window.addEventListener('storage', (event) => {
     if (event.key === 'language' && event.newValue) {
       const newLang = event.newValue;
-      console.log('Language changed in Obsidian:', newLang);
+      console.debug('Language changed in Obsidian:', newLang);
       const mappedLang = langMap[newLang] || 'en';
       i18next.changeLanguage(mappedLang);
     }

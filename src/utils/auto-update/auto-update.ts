@@ -56,7 +56,7 @@ export const checkForAvailableUpdate = async (app: App): Promise<{
 			releaseInfo: release
 		};
 	} catch (error) {
-		console.log('Version check failed:', error);
+		console.debug('Version check failed:', error);
 		return null;
 	}
 };
@@ -72,7 +72,7 @@ export const checkForUpdatesOnStartup = async (plugin: Plugin) => {
 			}), 10000);
 		}
 	} catch (error) {
-		console.log('Startup update check failed silently:', error);
+		console.debug('Startup update check failed silently:', error);
 		// Fail silently to avoid interrupting user experience
 	}
 };

@@ -16,7 +16,7 @@ export class SecureExecutionContext {
       'app.vault.delete',
       'app.workspace.getActiveFile',
       'app.workspace.openLinkText',
-      'console.log',
+      'console.debug',
       'console.warn',
       'console.error',
       'requestUrl',
@@ -33,7 +33,7 @@ export class SecureExecutionContext {
 
     this.sanitizedGlobals = {
       console: {
-        log: (...args: any[]) => console.log('[USER-TOOL]', ...args),
+        log: (...args: any[]) => console.debug('[USER-TOOL]', ...args),
         warn: (...args: any[]) => console.warn('[USER-TOOL]', ...args),
         error: (...args: any[]) => console.error('[USER-TOOL]', ...args)
       },

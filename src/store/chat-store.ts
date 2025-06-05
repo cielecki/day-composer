@@ -86,7 +86,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
           !state.chats.isGenerating) {
         try {
           await state.autoSaveConversation();
-          console.log('Auto-saved conversation after 2s debounce');
+          console.debug('Auto-saved conversation after 2s debounce');
         } catch (error) {
           console.error('Failed to auto-save conversation:', error);
         }

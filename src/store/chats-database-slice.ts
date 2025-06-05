@@ -108,7 +108,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         });
 
         // Handle title generation if needed (async operation)
-        console.log("Generating title", get().chats.current.storedConversation.titleGenerated, get().chats.current.storedConversation.messages.length);
+        console.debug("Generating title", get().chats.current.storedConversation.titleGenerated, get().chats.current.storedConversation.messages.length);
         if (!get().chats.current.storedConversation.titleGenerated && 
           get().chats.current.storedConversation.messages.length >= 2) {
             const generatedTitle = await generateChatTitle(
@@ -152,7 +152,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
             if (oldFilepath !== fileName) { // Don't delete the new file
               try {
                 await app.vault.adapter.remove(oldFilepath);
-                console.log(`Removed old conversation file: ${oldFile}`);
+                console.debug(`Removed old conversation file: ${oldFile}`);
               } catch (error) {
                 console.warn(`Failed to remove old conversation file ${oldFile}:`, error);
               }
@@ -162,9 +162,9 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
 
         // Save the conversation
         const conversationData = JSON.stringify(conversation.storedConversation, null, 2);
-        console.log(`Attempting to save conversation to: ${fileName}`);
+        console.debug(`Attempting to save conversation to: ${fileName}`);
         await app.vault.adapter.write(fileName, conversationData);
-        console.log(`Successfully saved conversation: ${fileName}`);
+        console.debug(`Successfully saved conversation: ${fileName}`);
         
         return conversation.meta.id;
       } catch (error) {
@@ -208,7 +208,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
       try {
         const conversationId = await get().saveConversation();
         if (conversationId) {
-          console.log(`Auto-saved conversation: ${conversationId}`);
+          console.debug(`Auto-saved conversation: ${conversationId}`);
         }
       } catch (error) {
         console.error('Failed to auto-save conversation:', error);

@@ -44,7 +44,7 @@ export const OpenAIKeyScreen: React.FC = () => {
 	};
 
 	const handleSkip = async () => {
-		console.log('Skip button clicked');
+		console.debug('Skip button clicked');
 		setIsSkipping(true);
 		
 		try {

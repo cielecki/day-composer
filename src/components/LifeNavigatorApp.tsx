@@ -346,7 +346,7 @@ export const LifeNavigatorApp: React.FC = () => {
 										onClick={() => {
 											// If the mode has an auto-trigger message, send it
 											if (usage) {
-												console.log(
+												console.debug(
 													`Auto-triggering message for mode ${activeMode.ln_name}: "${usage}"`,
 												);
 

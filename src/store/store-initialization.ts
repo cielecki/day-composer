@@ -32,7 +32,7 @@ export async function initializeStore(): Promise<void> {
     await initializeChatFeatures()
     
     initialized = true;
-    console.log('Store initialization complete');
+    console.debug('Store initialization complete');
   } catch (error) {
     console.error('Failed to initialize store:', error);
     throw error;
@@ -56,7 +56,7 @@ export function cleanupStore(): void {
     // Note: settings don't need cleanup as they have no persistent resources
     
     initialized = false;
-    console.log('Store cleanup complete');
+    console.debug('Store cleanup complete');
   } catch (error) {
     console.error('Error during store cleanup:', error);
   }

@@ -118,16 +118,16 @@ export class ObsidianTools {
 			
 			// If no user-defined tools in registry but tools exist in manager, refresh
 			if (userTools.length > 0 && !hasUserDefinedToolsInRegistry) {
-				console.log('[USER-TOOLS] Lazy initialization: refreshing user-defined tools');
+				console.debug('[USER-TOOLS] Lazy initialization: refreshing user-defined tools');
 				await userToolManager.refreshTools();
 			} else if (!hasUserDefinedToolsInRegistry) {
 				// No tools in manager either, do initial scan
-				console.log('[USER-TOOLS] Lazy initialization: performing initial tool scan');
+				console.debug('[USER-TOOLS] Lazy initialization: performing initial tool scan');
 				await userToolManager.refreshTools();
 			}
 		} else {
 			// User tools manager not available
-			console.log('[USER-TOOLS] User tool manager not available');
+			console.debug('[USER-TOOLS] User tool manager not available');
 		}
 	}
 
@@ -170,7 +170,7 @@ export class ObsidianTools {
 		onLabelUpdate?: (label: string) => void
 	): Promise<{ result: string; isError: boolean; navigationTargets: NavigationTarget[]; finalLabel?: string }> {
 		console.group(`🔄 Processing Tool Call: ${toolName}`);
-		console.log("Tool Input:", toolInput);
+		console.debug("Tool Input:", toolInput);
 
 		const navigationTargets: NavigationTarget[] = [];
 		const progressMessages: string[] = [];
@@ -223,9 +223,9 @@ export class ObsidianTools {
 			// Combine all progress messages into the final result
 			const finalResult = progressMessages.join('\n');
 			
-			console.log("Tool Execution Completed. Final Result:", finalResult);
-			console.log("Navigation Targets:", navigationTargets);
-			console.log("Final Label:", currentLabel);
+			console.debug("Tool Execution Completed. Final Result:", finalResult);
+			console.debug("Navigation Targets:", navigationTargets);
+			console.debug("Final Label:", currentLabel);
 			
 			return { 
 				result: finalResult || `${toolName} completed successfully`, 
@@ -264,13 +264,13 @@ export function getObsidianTools(): ObsidianTools {
 		return instance;
 	}
 
-	console.log("Initializing ObsidianTools with provided plugin");
+	console.debug("Initializing ObsidianTools with provided plugin");
 	instance = new ObsidianTools();
 
 	return instance;
 }
 
 export function resetObsidianTools(): void {
-	console.log("Resetting ObsidianTools instance");
+	console.debug("Resetting ObsidianTools instance");
 	instance = null;
 }

@@ -70,7 +70,7 @@ export class EditorNavigationService {
 	 */
 	async navigateToTarget(target: NavigationTarget): Promise<void> {
 		try {
-			console.log('Navigating to target:', target);
+			console.debug('Navigating to target:', target);
 			
 			// Get the file
 			const file = this.app.vault.getAbstractFileByPath(target.filePath);
@@ -125,7 +125,7 @@ export class EditorNavigationService {
 			const from = startLineInfo.from;
 			const to = endLineInfo.to;
 
-			console.log(`Highlighting lines ${startLine}-${endLine} (positions ${from}-${to})`);
+			console.debug(`Highlighting lines ${startLine}-${endLine} (positions ${from}-${to})`);
 
 			// Clear any existing highlights first
 			editorView.dispatch({
@@ -223,7 +223,7 @@ export class EditorNavigationService {
 								coords.bottom <= editorRect.bottom;
 
 				if (!isVisible) {
-					console.log('Highlighted text not visible, attempting additional scroll');
+					console.debug('Highlighted text not visible, attempting additional scroll');
 					
 					// If still not visible, try a more aggressive scroll
 					editorView.dispatch({

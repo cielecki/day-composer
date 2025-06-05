@@ -46,7 +46,7 @@ ${t('chat.titleGeneration.examples')}`;
 
         return null;
     } catch (error) {
-        console.log("Error generating AI title:", error);
+        console.debug("Error generating AI title:", error);
         return null;
     }
 }

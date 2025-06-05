@@ -62,7 +62,7 @@ export const processToolUseBlocks = async (
 					onToolResultUpdate?.(toolUseBlock.id, currentResult);
 				},
 				(label: string) => {
-					console.log("label", label);
+					console.debug("label", label);
 					// Create new result object with updated label (immutable)
 					currentResult = {
 						...currentResult,

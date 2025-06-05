@@ -11,7 +11,7 @@ export async function initializeSettingsStore(): Promise<void> {
     // Load settings from plugin data using the new slice-based approach
     await getStore().loadSettings();
     
-    console.log('Settings store initialized');
+    console.debug('Settings store initialized');
   } finally {
     getStore().setSettingsLoading(false);
   }

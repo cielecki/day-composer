@@ -239,7 +239,7 @@ export const processAnthropicStream = async (
 		
 		// If stream was aborted or ended with incomplete thinking blocks, clean them up
 		if ((aborted || signal.aborted) && localMessage && Object.keys(thinkingBlocksInProgress).length > 0) {
-			console.log("Cleaning up incomplete thinking blocks after stream abort");
+			console.debug("Cleaning up incomplete thinking blocks after stream abort");
 			const finalContentCopy = ensureContentBlocks(localMessage.content);
 			let hasChanges = false;
 

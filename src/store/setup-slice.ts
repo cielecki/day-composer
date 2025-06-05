@@ -46,22 +46,22 @@ export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => {
       
       if (!hasLanguageConfigured) {
         currentStep = SetupStep.CONFIGURE_LANGUAGE;
-        console.log('→ Step: CONFIGURE_LANGUAGE (language not configured)');
+        console.debug('→ Step: CONFIGURE_LANGUAGE (language not configured)');
       } else if (!hasAnthropicKey) {
         currentStep = SetupStep.CONFIGURE_ANTHROPIC_KEY;
-        console.log('→ Step: CONFIGURE_ANTHROPIC_KEY (no Anthropic key)');
+        console.debug('→ Step: CONFIGURE_ANTHROPIC_KEY (no Anthropic key)');
       } else if (!hasOpenAIKey && !hasOpenAISkipped) {
         currentStep = SetupStep.CONFIGURE_OPENAI_KEY;
-        console.log('→ Step: CONFIGURE_OPENAI_KEY (no OpenAI key and not skipped)');
+        console.debug('→ Step: CONFIGURE_OPENAI_KEY (no OpenAI key and not skipped)');
       } else {
         currentStep = SetupStep.COMPLETE;
-        console.log('→ Step: COMPLETE (all requirements met)');
+        console.debug('→ Step: COMPLETE (all requirements met)');
       }
       
       state.setup.currentStep = currentStep;
     } catch (error) {
       // If settings are not initialized yet, return default state
-      console.log('Setup slice: Settings not initialized yet, using default state');
+      console.debug('Setup slice: Settings not initialized yet, using default state');
       state.setup.currentStep = SetupStep.CONFIGURE_LANGUAGE;
     }
   });
@@ -90,7 +90,7 @@ export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => {
 
       refreshSetupState();
 
-      console.log('Setting up setup state change subscriptions...');
+      console.debug('Setting up setup state change subscriptions...');
 
       // Subscribe to language configuration changes
       const unsubLang = usePluginStore.subscribe(
@@ -103,7 +103,7 @@ export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => {
         },
         (hasLanguageConfigured: boolean, prevHasLanguageConfigured: boolean) => {
           if (hasLanguageConfigured !== prevHasLanguageConfigured) {
-            console.log(`Language configuration changed: ${prevHasLanguageConfigured} → ${hasLanguageConfigured}`);
+            console.debug(`Language configuration changed: ${prevHasLanguageConfigured} → ${hasLanguageConfigured}`);
             refreshSetupState();
           }
         },
@@ -123,7 +123,7 @@ export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => {
         },
         (hasAnthropicKey: boolean, prevHasAnthropicKey: boolean) => {
           if (hasAnthropicKey !== prevHasAnthropicKey) {
-            console.log(`Anthropic API key changed: ${prevHasAnthropicKey} → ${hasAnthropicKey}`);
+            console.debug(`Anthropic API key changed: ${prevHasAnthropicKey} → ${hasAnthropicKey}`);
             refreshSetupState();
           }
         },
@@ -143,7 +143,7 @@ export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => {
         },
         (hasOpenAIKey: boolean, prevHasOpenAIKey: boolean) => {
           if (hasOpenAIKey !== prevHasOpenAIKey) {
-            console.log(`OpenAI API key changed: ${prevHasOpenAIKey} → ${hasOpenAIKey}`);
+            console.debug(`OpenAI API key changed: ${prevHasOpenAIKey} → ${hasOpenAIKey}`);
             refreshSetupState();
           }
         },
@@ -162,7 +162,7 @@ export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => {
         },
         (openaiKeySkipped: boolean, prevOpenaiKeySkipped: boolean) => {
           if (openaiKeySkipped !== prevOpenaiKeySkipped) {
-            console.log(`OpenAI skip setting changed: ${prevOpenaiKeySkipped} → ${openaiKeySkipped}`);
+            console.debug(`OpenAI skip setting changed: ${prevOpenaiKeySkipped} → ${openaiKeySkipped}`);
             refreshSetupState();
           }
         },
@@ -170,11 +170,11 @@ export const createSetupSlice: ImmerStateCreator<SetupSlice> = (set, get) => {
       );
       unsubscribeFunctions.push(unsubOpenAISkip);
 
-      console.log('Setup state change subscriptions established');
+      console.debug('Setup state change subscriptions established');
 
       // Return a cleanup function that unsubscribes all
       return () => {
-        console.log('Cleaning up setup state change subscriptions...');
+        console.debug('Cleaning up setup state change subscriptions...');
         unsubscribeFunctions.forEach(unsub => unsub());
       };
     }

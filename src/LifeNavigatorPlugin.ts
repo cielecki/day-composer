@@ -24,7 +24,7 @@ export class LifeNavigatorPlugin extends Plugin {
 	}
 
 	async onload() {
-		console.log("Loading Life Navigator plugin");
+		console.debug("Loading Life Navigator plugin");
 
 		// Set the static instance reference
 		if (!LifeNavigatorPlugin._instance) {
@@ -84,7 +84,7 @@ export class LifeNavigatorPlugin extends Plugin {
 
 		// Add a ribbon icon for the Life Navigator
 		this.addRibbonIcon("compass", t("tools.openLifeNavigator"), async (evt: MouseEvent) => {
-			console.log("Starting Life Navigator session");
+			console.debug("Starting Life Navigator session");
 
 			try {
 				// Check if the view is already open in a leaf
@@ -151,15 +151,15 @@ export class LifeNavigatorPlugin extends Plugin {
 					const saveAsset = async (assetName: string) => {
 						const asset = assets.find((a: { name: string; }) => a.name === assetName);
 						if (!asset) {
-							console.log(`Asset ${assetName} not found in release`);
+							console.debug(`Asset ${assetName} not found in release`);
 							return;
 						}
 
-						console.log(`Downloading asset ${assetName}`);
+						console.debug(`Downloading asset ${assetName}`);
 
 						try {
 							// Direct download with requestUrl - this method is working successfully
-							console.log(`Using requestUrl with ${asset.browser_download_url}`);
+							console.debug(`Using requestUrl with ${asset.browser_download_url}`);
 							const response = await requestUrl({
 								url: asset.browser_download_url,
 								method: 'GET',
@@ -171,11 +171,11 @@ export class LifeNavigatorPlugin extends Plugin {
 
 							if (response.status >= 200 && response.status < 300 && response.arrayBuffer) {
 								const targetPath = this.app.vault.configDir + `/plugins/life-navigator/${assetName}`;
-								console.log(`Saving asset to ${targetPath}`);
+								console.debug(`Saving asset to ${targetPath}`);
 
 								// @ts-ignore
 								await this.app.vault.adapter.writeBinary(targetPath, response.arrayBuffer);
-								console.log(`Successfully saved ${assetName}`);
+								console.debug(`Successfully saved ${assetName}`);
 							} else {
 								throw new Error(`Failed to download ${assetName}: HTTP ${response.status}`);
 							}
@@ -186,11 +186,11 @@ export class LifeNavigatorPlugin extends Plugin {
 					};
 
 					// Download and save each asset
-					console.log("Starting asset downloads...");
+					console.debug("Starting asset downloads...");
 					await saveAsset("main.js");
 					await saveAsset("manifest.json");
 					await saveAsset("styles.css"); // If it exists
-					console.log("All assets downloaded successfully");
+					console.debug("All assets downloaded successfully");
 
 					// Show a modal to ask the user if they want to reload Obsidian.
 					new ConfirmReloadModal(this.app, () => {
@@ -212,7 +212,7 @@ export class LifeNavigatorPlugin extends Plugin {
 	}
 
 	async onunload() {
-		console.log("Unloading Life Navigator plugin");
+		console.debug("Unloading Life Navigator plugin");
 		
 		// Save any pending changes immediately before unloading
 		await usePluginStore.getState().saveImmediatelyIfNeeded(false);

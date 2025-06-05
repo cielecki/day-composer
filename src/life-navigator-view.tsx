@@ -56,7 +56,7 @@ export class LifeNavigatorView extends ItemView {
 	renderComponent(): void {
 		if (!this.reactRoot) return;
 
-		console.log(`Rendering LifeNavigatorView component with conversation: ${this._conversation.length} messages`);
+		console.debug(`Rendering LifeNavigatorView component with conversation: ${this._conversation.length} messages`);
 
 		// Render directly without context providers since we're using Zustand
 		this.reactRoot.render(<LifeNavigatorApp />);

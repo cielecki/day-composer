@@ -251,7 +251,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         ? expandedPrompt.substring(0, Math.floor(MAX_AUDIO_PROMPT_LENGTH / 2)) + "..." + expandedPrompt.substring(expandedPrompt.length - Math.floor(MAX_AUDIO_PROMPT_LENGTH / 2))
         : expandedPrompt;
 
-      console.log(`Transcribing audio. Language for API: ${targetLanguageForApi}. Using prompt:`, trimmedPrompt);
+      console.debug(`Transcribing audio. Language for API: ${targetLanguageForApi}. Using prompt:`, trimmedPrompt);
       
       const transcription = await openai.audio.transcriptions.create({
         file: file,
@@ -260,7 +260,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         language: targetLanguageForApi,
       }, { signal });
 
-      console.log('Transcribed text:', transcription.text);
+      console.debug('Transcribed text:', transcription.text);
       set((state) => {
         state.audio.lastTranscription = transcription.text;
       });
@@ -322,7 +322,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         }
         
         const recorder = new MediaRecorder(stream, options);
-        console.log('Using audio format:', recorder.mimeType);
+        console.debug('Using audio format:', recorder.mimeType);
 
         recorder.addEventListener('dataavailable', (event) => {
           if (event.data.size > 0) {
@@ -365,7 +365,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
     },
 
     recordingToTranscribing: async (): Promise<void> => {
-      console.log("Stopping speech-to-text operations");
+      console.debug("Stopping speech-to-text operations");
       
       const state = get();
       if (mediaRecorder && state.audio.isRecording) {
@@ -421,12 +421,12 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
       // Check cache first
       const cachedAudio = getCachedAudio(textHash);
       if (cachedAudio) {
-        console.log('Using cached audio for text');
+        console.debug('Using cached audio for text');
         return playCachedAudio(cachedAudio, signal);
       }
 
       // No cached audio found, generate new audio
-      console.log('No cached audio found, generating new audio');
+      console.debug('No cached audio found, generating new audio');
       
       try {
         set((state) => {
@@ -447,14 +447,14 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         
         // Skip empty text
         if (!text || text.trim().length === 0) {
-          console.log('Skipping empty text in speakText');
+          console.debug('Skipping empty text in speakText');
           return;
         }
         
         const maxLength = 4096;
         const textToConvert = text.length > maxLength ? text.substring(0, maxLength) : text;
         
-        console.log('Creating OpenAI client and sending TTS request');
+        console.debug('Creating OpenAI client and sending TTS request');
         
         let voice: TTSVoice = 'alloy';
         if (ttsSettings.voice) {
@@ -562,7 +562,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         });
       } else if (state.audio.isSpeakingPaused && !currentAudioElementRef) {
         // Audio element is null (audio finished naturally), clear paused state
-        console.log('Audio finished naturally, clearing paused state');
+        console.debug('Audio finished naturally, clearing paused state');
         set((state) => {
           state.audio.isSpeakingPaused = false;
         });

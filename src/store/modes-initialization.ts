@@ -26,7 +26,7 @@ export async function initializeModesStore(): Promise<void> {
     // Setup file watchers for mode files
     setupModeFileWatchers();
     
-    console.log('Modes store initialized');
+    console.debug('Modes store initialized');
   } finally {
     state.setModesLoading(false);
   }
@@ -66,7 +66,7 @@ async function loadLNModes(): Promise<void> {
     const fileModeKeys = Object.keys(modesMap).filter((path) => path !== "" && !path.startsWith(':prebuilt:'));
     modeFilePathsSet = new Set(fileModeKeys);
     
-    console.log(
+    console.debug(
       `Loaded ${Object.keys(modesMap).length} modes (${prebuiltModes.length} pre-built, ${Object.keys(modesMap).length - prebuiltModes.length} from files)`
     );
     
@@ -147,10 +147,10 @@ function setupModeFileWatchers(): void {
     if (file instanceof TFile && file.extension === "md") {
       // Check if this was a mode file
       const wasMode = modeFilePathsSet.has(file.path);
-      console.log(`File deleted: ${file.path}, was mode: ${wasMode}`);
+      console.debug(`File deleted: ${file.path}, was mode: ${wasMode}`);
       
       if (wasMode) {
-        console.log("Reloading modes after mode file deletion");
+        console.debug("Reloading modes after mode file deletion");
         debouncedLoadLNModes();
       }
     }
@@ -193,7 +193,7 @@ function setupModeFileWatchers(): void {
   fileEventRefs.push(metadataRef);
   
   state.setFileWatcherActive(true);
-  console.log('Mode file watchers set up');
+  console.debug('Mode file watchers set up');
 }
 
 /**
@@ -250,5 +250,5 @@ export function cleanupModesStore(): void {
   modeFilePathsSet.clear();
   
   state.setFileWatcherActive(false);
-  console.log('Modes store cleanup completed');
+  console.debug('Modes store cleanup completed');
 } 
