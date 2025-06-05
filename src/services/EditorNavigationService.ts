@@ -122,8 +122,16 @@ export class EditorNavigationService {
 			const endLineInfo = doc.line(Math.max(1, Math.min(endLine, doc.lines)));
 
 			// Create selection range
-			const from = startLineInfo.from;
-			const to = endLineInfo.to;
+			let from = startLineInfo.from;
+			let to = endLineInfo.to;
+
+			// Ensure we have a valid range (not empty)
+			if (from >= to) {
+				// If the range is empty or invalid, expand it to include at least one character
+				// This can happen with empty lines or single-character lines
+				to = Math.max(from + 1, doc.length);
+				console.debug(`Adjusted empty range: from=${from}, to=${to}`);
+			}
 
 			console.debug(`Highlighting lines ${startLine}-${endLine} (positions ${from}-${to})`);
 

@@ -354,6 +354,7 @@
       "openNote": "Open document"
     },
     "noteEdit": {
+      "changesMade": "Changes Made",
       "completed": "Edited document {{path}}",
       "failed": "Failed to edit document {{path}}",
       "inProgress": "Editing document {{path}}...",

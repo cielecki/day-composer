@@ -354,6 +354,7 @@
       "openNote": "Otwórz dokument"
     },
     "noteEdit": {
+      "changesMade": "Wprowadzone zmiany",
       "completed": "Edytowano dokument {{path}}",
       "failed": "Nie udało się edytować dokumentu {{path}}",
       "inProgress": "Edytowanie dokumentu {{path}}...",
