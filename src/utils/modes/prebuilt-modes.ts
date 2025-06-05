@@ -9,7 +9,7 @@ import { mergeWithDefaultMode } from './ln-mode-defaults';
 export function getPrebuiltModes(): LNMode[] {
 	const lifeNavigatorMode: Partial<LNMode> = {
 		ln_name: t('prebuiltModes.lifeNavigator.title'),
-		ln_path: ':prebuilt:life-navigator',
+		ln_path: ':prebuilt:guide',
 		ln_description: t('prebuiltModes.lifeNavigator.mainDescription'),
 		ln_system_prompt: t('prebuiltModes.lifeNavigator.systemPrompt'),
 		ln_voice_instructions: t('prebuiltModes.lifeNavigator.voiceInstructions'),
