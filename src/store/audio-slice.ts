@@ -398,22 +398,19 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
     
     // Business Logic Implementation
     speakingStart: async (text: string): Promise<void> => {
-      // Skip TTS if recording is active      // Skip TTS if recording is active
       if (get().audio.isRecording || get().audio.isTranscribing) {
         return;
       }
 
-      if (currentAudioController) {
-        currentAudioController.abort();
-        currentAudioController = null;
-      }
+      // Stop any existing audio FIRST, before creating new controller
+      await get().audioStop();
       
+      // Now create a new controller for this audio generation
       currentAudioController = new AbortController();
       const signal = currentAudioController.signal;
       const ttsSettings = getCurrentTTSSettings();
 
       const store = get();
-      await get().audioStop();
 
       // Generate cache key
       const textHash = generateTextHash(text, ttsSettings.voice || 'alloy', ttsSettings.speed || 1.0);
@@ -439,7 +436,8 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         }
         
         // Verify we have a valid API key
-        if (!store.getSecret('OPENAI_API_KEY')) {
+        const apiKey = store.getSecret('OPENAI_API_KEY');
+        if (!apiKey) {
           console.error('No OpenAI API key available for TTS');
           new Notice(t('errors.audio.noApiKey'));
           return;
@@ -469,7 +467,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         const response = await fetch('https://api.openai.com/v1/audio/speech', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${store.getSecret('OPENAI_API_KEY')}`,
+            'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
