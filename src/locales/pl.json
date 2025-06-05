@@ -335,11 +335,11 @@
         "inProgress": "Przeglądanie biblioteki Life Navigator...",
         "label": "Przeglądam bibliotekę Life Navigator ..."
       },
-      "view": {
-        "completed": "Zawartość biblioteki wyświetlona",
-        "failed": "Nie udało się wyświetlić zawartości",
-        "inProgress": "Pobieranie zawartości biblioteki...",
-        "label": "Wyświetlam zawartość biblioteki ..."
+      "read": {
+        "completed": "Odczytano zawartość biblioteki {{path}}",
+        "failed": "Nie udało się odczytać zawartości biblioteki {{path}}",
+        "inProgress": "Odczytywanie zawartości biblioteki {{path}}...",
+        "label": "Odczytuję zawartość biblioteki ..."
       }
     },
     "move": {

@@ -5,8 +5,8 @@ import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { requestUrl } from "obsidian";
 
 const schema = {
-  name: "library_view",
-  description: "Download and preview Life Navigator library content using relative paths from library_list",
+  name: "library_read",
+  description: "Download and read Life Navigator library content using relative paths from library_list",
   input_schema: {
     type: "object",
     properties: {
@@ -19,7 +19,7 @@ const schema = {
   }
 };
 
-type LibraryViewInput = {
+type LibraryReadInput = {
   path: string;
 };
 
@@ -27,17 +27,17 @@ type LibraryViewInput = {
 const LIFE_NAVIGATOR_REPO = 'cielecki/life-navigator';
 const LIBRARY_PATH = 'library';
 
-export const libraryViewTool: ObsidianTool<LibraryViewInput> = {
+export const libraryReadTool: ObsidianTool<LibraryReadInput> = {
   specification: schema,
-  icon: "eye",
+  icon: "file-text",
   get initialLabel() {
-    return t('tools.library.view.label');
+    return t('tools.library.read.label');
   },
-  execute: async (context: ToolExecutionContext<LibraryViewInput>): Promise<void> => {
+  execute: async (context: ToolExecutionContext<LibraryReadInput>): Promise<void> => {
     const { params } = context;
     const { path } = params;
 
-    context.setLabel(t('tools.library.view.inProgress'));
+    context.setLabel(t('tools.library.read.inProgress', { path }));
 
     try {
       // Clean up the path
@@ -61,7 +61,7 @@ export const libraryViewTool: ObsidianTool<LibraryViewInput> = {
 
       // Check if request was successful
       if (response.status !== 200) {
-        context.setLabel(t('tools.library.view.failed'));
+        context.setLabel(t('tools.library.read.failed', { path: cleanPath }));
         throw new ToolExecutionError(`Failed to download ${cleanPath}. Status: ${response.status} (file may not exist)`);
       }
 
@@ -78,11 +78,11 @@ export const libraryViewTool: ObsidianTool<LibraryViewInput> = {
       formattedContent += content;
 
       // Display the formatted content
-      context.setLabel(t('tools.library.view.completed'));
+      context.setLabel(t('tools.library.read.completed', { path: cleanPath }));
       context.progress(formattedContent);
 
     } catch (error) {
-      context.setLabel(t('tools.library.view.failed'));
+      context.setLabel(t('tools.library.read.failed', { path }));
       if (error instanceof ToolExecutionError) {
         throw error;
       }

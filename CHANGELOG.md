@@ -195,5 +195,8 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ## [Unreleased]
 
+### Changed
+- **Library tool renamed**: The library content viewing tool is now called "library_read" instead of "library_view" and shows specific file paths in completion messages, making it consistent with the document reading tool
+
 ### Fixed
 - **Improved comment indentation**: Task tools now consistently use proper comment indentation.

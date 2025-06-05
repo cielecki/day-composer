@@ -4,7 +4,7 @@ import { vaultSearchTool } from './tools/vault-search';
 import { noteReadTool } from './tools/note-read';
 import { noteEditTool } from './tools/note-edit';
 import { libraryListTool } from './tools/library-list';
-import { libraryViewTool } from './tools/library-view';
+import { libraryReadTool } from './tools/library-read';
 import { taskCheckTool } from './tools/task-check';
 import { taskAddTool } from './tools/task-add';
 import { taskUncheckTool } from './tools/task-uncheck';
@@ -84,7 +84,7 @@ export class ObsidianTools {
 		noteReadTool,
 		noteEditTool,
 		libraryListTool,
-		libraryViewTool,
+		  libraryReadTool,
 		taskCheckTool,
 		taskAddTool,
 		taskUncheckTool,
