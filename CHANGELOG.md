@@ -2,35 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
+## [0.10.2] - 2025-06-05
 
 ### Added
-- **Advanced chat flow management**: Completely redesigned how the app handles multiple processes (chat generation, voice recording, audio playback) running at the same time. Now everything works smoothly together without conflicts or interruptions.
-- **Streaming audio during chat**: Audio now starts playing while the AI is still writing its response, instead of waiting for the complete message. This makes conversations feel much more natural and responsive.
-- **Selected text context**: New `[[ln-currently-selected-text]] 🔎` special link that includes currently selected text from the active editor in AI context. Shows the selected text with file path and line numbers.
-- **Robust Process Management**: Completely redesigned chat flow management with SimpleProcessManager
-  - Smart transcription logic: adds to input during generation, sends immediately when no generation active  
-  - Recording now immediately stops all audio playback and generation
-  - Chat switching and new messages properly stop existing generation and audio processes
-  - Fixed concurrent message processing bugs that occurred when transcription completed during generation
-  - Reliable hard stop functionality with actual process completion waiting (no more race conditions)
-- **Better tool parameter display**: Multi-line strings in tool parameters now display with proper line breaks instead of being shown as one long line
+- **Smart text selection**: Easily share any text you've highlighted with the AI using the new `[[ln-currently-selected-text]] 🔎` link. Perfect for editing specific parts of text.
+- **Rapid voice recording**: You can now record your next message even if ai is responding to your previous message.
+- **Cleaner tool displays**: Multi-line text in AI tools now shows with proper formatting instead of cramped single lines, making everything easier to read.
 
 ### Fixed
-- **Chat history viewing**: Opening a chat from history no longer triggers autosave or moves it to the front of the history unless you actually edit something
-- **Chat scrolling**: Chat now stays put when you scroll up to read old messages, instead of jumping to the bottom every time new text appears
-- **Mode memory**: Your selected mode is now remembered when you restart the app
-- **Process coordination**: Fixed issues where starting recording wouldn't stop audio playback, or switching conversations wouldn't cancel ongoing operations
-- **Concurrent operations**: Eliminated race conditions between transcription completion and message generation that could cause duplicate processing
-- **Recording stability**: Fixed recording immediately stopping issue by properly separating recording and transcription processes in the flow manager
-- **Waveform display**: Fixed waveform continuing to display after recording stops by improving state synchronization between flow manager and recording components
-- **Cancel recording**: Fixed cancel/stop buttons not working by updating them to use the new flow manager instead of outdated abort controllers
-- **Recording flow completion**: Fixed transcription not completing properly by removing complex dual-state management and creating a simple, self-contained voice recording system that reliably goes from Record → Transcribe → Send Message
-- **Cancel transcription notifications**: Fixed incorrect "Transcription failed" error notifications appearing when users intentionally cancel transcription operations
-- **Transcription during generation**: Fixed chat message conflicts when transcription completes during ongoing chat generation by properly stopping existing processes before starting new ones
+- **Smarter chat history**: Opening old conversations no longer automatically saves them or moves them to the top unless you actually make changes. Your history stays organized exactly how you left it.
+- **Better reading experience**: When you scroll up to read previous messages, the chat stays put instead of annoyingly jumping to the bottom every few seconds.
+- **Remembers your preferences**: Your selected mode now stays active when you restart the app - no more having to reselect your favorite mode every time.
+- **Perfect conversation flow**: Switching between conversations or starting new messages now works smoothly without any conflicts or interruptions.
 
 ## [0.10.1] - 2025-06-04
 
@@ -210,3 +193,4 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ## [0.6.6] - 2025-05-22
 
+## [Unreleased]
