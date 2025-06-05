@@ -5,6 +5,7 @@ import { initializeSetupStore } from './setup-initialization';
 import { cleanupModesStore } from './modes-initialization';
 import { cleanupChatFeatures } from './chat-initialization';
 import { cleanupSetupStore } from './setup-initialization';
+import { getStore } from './plugin-store';
 
 let initialized = false;
 
@@ -30,6 +31,9 @@ export async function initializeStore(): Promise<void> {
     
     // Finally initialize chat features
     await initializeChatFeatures()
+
+    // Initialize database
+    await getStore().initializeDatabase()
     
     initialized = true;
     console.debug('Store initialization complete');
