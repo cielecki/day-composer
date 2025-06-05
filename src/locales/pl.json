@@ -324,10 +324,10 @@
     },
     "handover": {
       "completed": "Przekazano kontrolę do {{mode}}",
+      "completedFull": "Jesteś teraz w trybie {{mode}}. Wykonaj powierzone zadanie, natychmiast po jego zakończeniu, przełącz się z powrotem do trybu \"{{fromMode}}\" używając narzędzia handover_mode.",
       "failed": "Nie udało się przekazać kontroli do {{mode}}",
       "inProgress": "Przekazywanie kontroli do {{mode}}...",
-      "label": "Przekazywanie kontroli ...",
-      "noReason": "Przekazywanie kontroli do {{mode}}"
+      "label": "Przekazywanie kontroli ..."
     },
     "library": {
       "list": {

@@ -108,7 +108,7 @@ export const LifeNavigatorApp: React.FC = () => {
 	const addUserMessage = usePluginStore(state => state.addUserMessage);
 	const loadConversation = usePluginStore(state => state.loadConversation);
 	const getCurrentConversationId = usePluginStore(state => state.getCurrentConversationId);
-	const getContext = usePluginStore(state => state.getContext);
+	const getSystemPrompt = usePluginStore(state => state.getSystemPrompt);
 
 	// Get active mode
 	const activeMode = availableModes[activeModeId];
@@ -600,7 +600,7 @@ export const LifeNavigatorApp: React.FC = () => {
 											wordBreak: "break-word",
 										}}
 										onClick={async () => {
-											const systemPrompt = await getContext();
+											const systemPrompt = await getSystemPrompt();
 											openSimpleObsidianModal(
 												window.app,
 												t('ui.modal.systemPrompt').replace('{{modeName}}', activeMode.ln_name),

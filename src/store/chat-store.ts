@@ -57,7 +57,7 @@ export interface ChatSlice {
   addUserMessage: (userMessage: string, images?: any[]) => Promise<void>;
   editUserMessage: (messageIndex: number, newContent: string, images?: any[]) => Promise<void>;
   getCurrentConversationId: () => string | null;
-  getContext: () => Promise<string>;
+  getSystemPrompt: () => Promise<string>;
   startEditingMessage: (messageIndex: number) => void;
   cancelEditingMessage: () => void;
   runConversationTurnWithContext: () => Promise<void>;
@@ -222,7 +222,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
     }),
     
     // Business Logic Implementation
-    getContext: async () => {
+    getSystemPrompt: async () => {
       const state = get();
       
       const currentActiveMode = state.modes.available[state.modes.activeId];
@@ -339,7 +339,6 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       const signal = abortController.signal;
       try {
         // Prepare context and tools
-        const systemPrompt = await get().getContext();
         const plugin = LifeNavigatorPlugin.getInstance();
         
         if (!plugin) {
@@ -357,7 +356,6 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
 
         // Run conversation turn with direct store access
         const finalAssistantMessage = await runConversationTurn(
-          systemPrompt,
           tools,
           signal
         );
@@ -374,7 +372,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         
         // Only auto-play if both the global setting and the mode-specific autoplay are enabled
         if (autoplayEnabled && textForTTS.trim().length > 0) {
-          await get().speakingStart(textForTTS);
+          get().speakingStart(textForTTS);
         }
       } catch (error) {
         console.error("Error in conversation turn:", error);

@@ -324,10 +324,10 @@
     },
     "handover": {
       "completed": "Switched to {{mode}} mode",
+      "completedFull": "You are now in {{mode}} mode. Perform a given task, immediately after you are done, switch back to \"{{fromMode}}\" using the handover_mode tool.",
       "failed": "Failed to switch to {{mode}} mode",
       "inProgress": "Switching to {{mode}} mode...",
-      "label": "Handing over control ...",
-      "noReason": "Switching to {{mode}} mode"
+      "label": "Handing over control ..."
     },
     "library": {
       "list": {

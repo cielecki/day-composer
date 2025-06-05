@@ -17,7 +17,6 @@ import { usePluginStore } from "../../store/plugin-store";
  * Runs a complete conversation turn with the AI, handling tool calls and streaming
  */
 export const runConversationTurn = async (
-	systemPrompt: string,
 	tools: ObsidianTool<any>[],
 	signal: AbortSignal
 ): Promise<Message | null> => {
@@ -30,6 +29,11 @@ export const runConversationTurn = async (
 
 	// Clear any previous aborted tool results when starting a new turn
 	store.clearLiveToolResults();
+
+	// Track current mode for system prompt optimization
+	let currentModeId: string = store.modes.activeId;
+	let systemPrompt: string = '';
+	let systemPromptCalculated = false;
 
 	try {
 		// Get current messages array
@@ -58,6 +62,20 @@ export const runConversationTurn = async (
 				// Get API parameters from active mode or defaults
 				const currentStore = usePluginStore.getState();
 				const currentActiveMode = currentStore.modes.available[currentStore.modes.activeId];
+				
+				// Only recalculate system prompt if mode changed or not yet calculated
+				if (!systemPromptCalculated || currentModeId !== currentStore.modes.activeId) {
+					currentModeId = currentStore.modes.activeId;
+					
+					// Generate system prompt
+					systemPrompt = await currentStore.getSystemPrompt();
+					
+					systemPromptCalculated = true;
+					console.debug('[CONVERSATION-TURN] Recalculated system prompt for mode:', currentModeId);
+				} else {
+					console.debug('[CONVERSATION-TURN] Reusing system prompt for mode:', currentModeId);
+				}
+				
 				const rawModel = currentActiveMode?.ln_model ?? defaultMode.ln_model;
 				
 				// Resolve "auto" model to actual model based on mode characteristics

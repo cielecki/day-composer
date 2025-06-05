@@ -45,22 +45,28 @@ export const modeHandoverTool: ObsidianTool<HandoverModeToolInput> = {
 		return t('tools.handover.label');
 	},
 	execute: async (context: ToolExecutionContext<HandoverModeToolInput>): Promise<void> => {
-		const { plugin, params } = context;
+		const { params } = context;
 		const { mode_id } = params;
+		const originalModeId = getStore().modes.activeId;
 
-		context.setLabel(t('tools.handover.inProgress', { mode: mode_id }));
+		// Get mode names for display
+		const modes = Object.values(getStore().modes.available);
+		const targetMode = modes.find(mode => mode.ln_path === mode_id);
+		const originalMode = modes.find(mode => mode.ln_path === originalModeId);
+		
+		const targetModeName = targetMode?.ln_name || mode_id;
+		const originalModeName = originalMode?.ln_name || originalModeId;
+
+		context.setLabel(t('tools.handover.inProgress', { mode: targetModeName }));
 
 		try {
 			// Use the mode manager service to switch modes
 			await getStore().setActiveModeWithPersistence(mode_id);
 			
-			// Add a message about the handover
-			const handoverMessage = t('tools.handover.noReason', { mode: mode_id });
-
-			context.setLabel(t('tools.handover.completed', { mode: mode_id }));
-			context.progress(handoverMessage);
+			context.setLabel(t('tools.handover.completed', { mode: targetModeName }));
+			context.progress(t('tools.handover.completedFull', { mode: targetModeName, fromMode: originalModeName }));
 		} catch (error) {
-			context.setLabel(t('tools.handover.failed', { mode: mode_id }));
+			context.setLabel(t('tools.handover.failed', { mode: targetModeName }));
 			throw error;
 		}
 	}
