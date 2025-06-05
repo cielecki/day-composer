@@ -28,6 +28,10 @@ export const UnifiedInputArea: React.FC<{
   const audioStop = usePluginStore(state => state.audioStop);
   const chatStop = usePluginStore(state => state.chatStop);
 
+  // Watch for chat ID changes to reset input state
+  const currentChatId = usePluginStore(state => state.chats.current.meta.id);
+  const prevChatIdRef = useRef(currentChatId);
+
   // Input state
   const [message, setMessage] = useState("");
   const [attachedImages, setAttachedImages] = useState<AttachedImage[]>([]);
@@ -65,6 +69,28 @@ export const UnifiedInputArea: React.FC<{
       setAttachedImages([]);
     }
   }, [editingMessage]);
+
+  // Reset input state when chat ID changes (new chat or loaded conversation)
+  useEffect(() => {
+    if (prevChatIdRef.current !== currentChatId) {
+      // Don't reset state if we're currently editing a message
+      if (!editingMessage) {
+        setMessage("");
+        setAttachedImages([]);
+        setWaveformData(Array(WAVEFORM_HISTORY_LENGTH).fill(0));
+        setVolumeLevel(0);
+        
+        // Reset textarea height
+        if (textareaRef.current) {
+          textareaRef.current.style.height = "auto";
+          textareaRef.current.classList.add("ln-textarea-auto");
+        }
+      }
+      
+      // Update the ref with the new chat ID
+      prevChatIdRef.current = currentChatId;
+    }
+  }, [currentChatId, editingMessage]);
 
   // Effect to handle transcription completion and insert text into input
   useEffect(() => {
