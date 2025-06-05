@@ -7,6 +7,7 @@ import { getObsidianTools, resetObsidianTools } from './obsidian-tools';
 import { LifeNavigatorSettingTab } from './components/LifeNavigatorSettingTab';
 import { UserDefinedToolManager } from './user-tools/UserDefinedToolManager';
 import { cleanupStore, initializeStore } from './store/store-initialization';
+import { usePluginStore } from './store/plugin-store';
 
 export class LifeNavigatorPlugin extends Plugin {
 	private static _instance: LifeNavigatorPlugin | null = null;
@@ -210,8 +211,11 @@ export class LifeNavigatorPlugin extends Plugin {
 		await checkForUpdatesOnStartup(this);
 	}
 
-	onunload() {
+	async onunload() {
 		console.log("Unloading Life Navigator plugin");
+		
+		// Save any pending changes immediately before unloading
+		await usePluginStore.getState().saveImmediatelyIfNeeded(false);
 		
 		cleanupStore();
 		

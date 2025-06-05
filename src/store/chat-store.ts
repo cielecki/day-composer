@@ -40,7 +40,6 @@ export interface ChatSlice {
     isGenerating: boolean;
     editingMessage: { index: number; content: string; images?: any[] } | null;
     liveToolResults: Map<string, ToolResultBlock>;
-    conversationVersion: number;
   };
   
   // Basic Actions
@@ -52,7 +51,6 @@ export interface ChatSlice {
   setEditingMessage: (editing: { index: number; content: string; images?: any[] } | null) => void;
   updateLiveToolResult: (toolId: string, result: ToolResultBlock) => void;
   clearLiveToolResults: () => void;
-  incrementChatVersion: () => void;
   setCurrentChat: (chat: Chat) => void;
   
   // Business Logic Actions
@@ -64,11 +62,39 @@ export interface ChatSlice {
   cancelEditingMessage: () => void;
   runConversationTurnWithContext: () => Promise<void>;
   chatStop: () => void;
+  saveImmediatelyIfNeeded: (force?: boolean) => Promise<void>;
 }
 
 // Create conversation slice - now get() returns full PluginStore type
 export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
   let abortController: AbortController | null = null;
+  let saveTimeout: NodeJS.Timeout | null = null;
+  
+  // Debounced save function - cancels previous save and schedules new one
+  const debouncedSave = () => {
+    // Clear any existing timeout
+    if (saveTimeout) {
+      clearTimeout(saveTimeout);
+    }
+    
+    // Schedule new save after 2 seconds
+    saveTimeout = setTimeout(async () => {
+      const state = get();
+      
+      // Only save if there are messages and not currently generating
+      if (state.chats.current.storedConversation.messages.length > 0 && 
+          !state.chats.isGenerating) {
+        try {
+          await state.autoSaveConversation();
+          console.log('Auto-saved conversation after 2s debounce');
+        } catch (error) {
+          console.error('Failed to auto-save conversation:', error);
+        }
+      }
+      
+      saveTimeout = null;
+    }, 2000);
+  };
   
   return {
     chats: {
@@ -89,42 +115,55 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       isGenerating: false,
       editingMessage: null,
       liveToolResults: new Map(),
-      conversationVersion: 0
     },
     
-    addMessage: (message) => set((state) => {
-      // Ensure message has a unique ID for React reconciliation
-      const messageWithId = ensureMessageId(message);
-      
-      // Create a new messages array to avoid proxy issues
-      const newMessages = [...state.chats.current.storedConversation.messages, messageWithId];
-      state.chats.current.storedConversation.messages = newMessages;
-      state.chats.conversationVersion += 1;
-    }),
-    
-    updateMessage: (index, message) => set((state) => {
-      const messages = state.chats.current.storedConversation.messages;
-      if (index >= 0 && index < messages.length) {
-        // Ensure message has ID (preserve existing ID if available)
-        const existingMessage = messages[index] as MessageWithId;
+    addMessage: (message) => {
+      set((state) => {
+        // Ensure message has a unique ID for React reconciliation
         const messageWithId = ensureMessageId(message);
-        if (existingMessage.messageId) {
-          messageWithId.messageId = existingMessage.messageId;
-        }
         
-        // Create new messages array to avoid proxy issues
-        const newMessages = [...messages];
-        newMessages[index] = messageWithId;
+        // Create a new messages array to avoid proxy issues
+        const newMessages = [...state.chats.current.storedConversation.messages, messageWithId];
         state.chats.current.storedConversation.messages = newMessages;
-        state.chats.conversationVersion += 1;
-      }
-    }),
+      });
+      
+      // Trigger debounced autosave after content change
+      get().saveImmediatelyIfNeeded(true);
+    },
+    
+    updateMessage: (index, message) => {
+      set((state) => {
+        const messages = state.chats.current.storedConversation.messages;
+        if (index >= 0 && index < messages.length) {
+          // Ensure message has ID (preserve existing ID if available)
+          const existingMessage = messages[index] as MessageWithId;
+          const messageWithId = ensureMessageId(message);
+          if (existingMessage.messageId) {
+            messageWithId.messageId = existingMessage.messageId;
+          }
+          
+          // Create new messages array to avoid proxy issues
+          const newMessages = [...messages];
+          newMessages[index] = messageWithId;
+          state.chats.current.storedConversation.messages = newMessages;
+        }
+      });
+      
+      // Trigger debounced autosave after content change
+      debouncedSave();
+    },
     
     clearChat: () => {
       get().chatStop();
 
       if (get().audio.isSpeaking || get().audio.isGeneratingSpeech) {
         get().audioStop();
+      }
+
+      // Cancel any pending autosave
+      if (saveTimeout) {
+        clearTimeout(saveTimeout);
+        saveTimeout = null;
       }
 
       set((state) => {
@@ -144,7 +183,6 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         };
         state.chats.liveToolResults.clear();
         state.chats.editingMessage = null;
-        state.chats.conversationVersion += 1;
       })
     },
     
@@ -169,10 +207,6 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       state.chats.liveToolResults.clear();
     }),
     
-    incrementChatVersion: () => set((state) => {
-      state.chats.conversationVersion += 1;
-    }),
-    
     setCurrentChat: (chat) => set((state) => {
       // Ensure all messages have IDs when loading conversation
       const messagesWithIds = chat.storedConversation.messages.map(msg => ensureMessageId(msg));
@@ -185,7 +219,6 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       };
       
       state.chats.current = conversationWithIds;
-      state.chats.conversationVersion += 1;
     }),
     
     // Business Logic Implementation
@@ -262,8 +295,10 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       set((state) => {
         state.chats.current.storedConversation.messages = conversationUpToEdit;
         state.chats.editingMessage = null;
-        state.chats.conversationVersion += 1;
       });
+
+      // Trigger debounced autosave after content change
+      get().saveImmediatelyIfNeeded(true);
 
       // Trigger new AI response if there's content
       if (newMessage.content.length > 0) {
@@ -354,6 +389,19 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       if (abortController) {
         abortController.abort();
         abortController = null;
+      }
+    },
+
+    saveImmediatelyIfNeeded: async (force?: boolean) => {
+      const needsToBeSaved = saveTimeout || force;
+      
+      if (saveTimeout) {
+        clearTimeout(saveTimeout);
+        saveTimeout = null;
+      }
+
+      if (needsToBeSaved) {
+        await get().autoSaveConversation();
       }
     }
   }

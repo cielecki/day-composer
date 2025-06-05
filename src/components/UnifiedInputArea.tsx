@@ -358,7 +358,10 @@ export const UnifiedInputArea: React.FC<{
       e.preventDefault();
 
       // If a response is being generated, abort it first before sending new message
-      if (isGeneratingResponse || isSpeaking || isGeneratingSpeech) {
+      if (isGeneratingResponse || isGeneratingSpeech) {
+        chatStop();
+        audioStop();
+        
         // Use setTimeout to ensure abort is processed before sending the new message
         setTimeout(() => {
           handleSendMessage();

@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Better tool parameter display**: Multi-line strings in tool parameters now display with proper line breaks instead of being shown as one long line
 
 ### Fixed
+- **Chat history viewing**: Opening a chat from history no longer triggers autosave or moves it to the front of the history unless you actually edit something
 - **Chat scrolling**: Chat now stays put when you scroll up to read old messages, instead of jumping to the bottom every time new text appears
 - **Mode memory**: Your selected mode is now remembered when you restart the app
 - **Process coordination**: Fixed issues where starting recording wouldn't stop audio playback, or switching conversations wouldn't cancel ongoing operations

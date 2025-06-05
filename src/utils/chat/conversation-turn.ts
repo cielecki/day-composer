@@ -204,6 +204,10 @@ export const runConversationTurn = async (
 		return finalAssistantMessageForTTS;
 	} finally {
 		usePluginStore.getState().setIsGenerating(false);
+		
+		// Save immediately after generation completes (successful or aborted)
+		usePluginStore.getState().saveImmediatelyIfNeeded(false);
+		
 		// Only clear live tool results if the turn completed successfully
 		// If there were aborted tool calls, keep the live results to show their aborted status
 		if (!currentTurnAborted && !signal.aborted) {

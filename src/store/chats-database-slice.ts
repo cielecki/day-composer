@@ -18,7 +18,7 @@ export interface ChatsDatabaseSlice {
   
   // Database Actions (migrated from ConversationDatabase)
   initializeDatabase: () => Promise<void>;
-  saveConversation: (conversationId?: string, title?: string, tags?: string[]) => Promise<string | null>;
+  saveConversation: () => Promise<string | null>;
   loadConversation: (conversationId: string) => Promise<boolean>;
   loadConversationData: (conversationId: string) => Promise<StoredConversation | null>;
   deleteConversation: (conversationId: string) => Promise<boolean>;
@@ -96,9 +96,8 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
       }
     },
 
-    saveConversation: async (conversationId, title, tags) => {
+    saveConversation: async () => {
       try {
-        const state = get();
         const app = getApp();
         const conversationsDir = getConversationsDir();
 
@@ -106,28 +105,21 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         set((state) => {
           // Set the mode ID
           state.chats.current.storedConversation.modeId = state.modes.activeId;
-          
-          // Apply custom title if provided
-          if (title) {
-            state.chats.current.meta.title = title;
-          } else if (!state.chats.current.meta.title) {
-            state.chats.current.meta.title = "New Chat";
-          }
         });
 
         // Handle title generation if needed (async operation)
-        const currentState = get();
-        if (!currentState.chats.current.storedConversation.titleGenerated && 
-            currentState.chats.current.storedConversation.messages.length >= 2) {
-          const generatedTitle = await generateChatTitle(
-            currentState.chats.current.storedConversation.messages
-          );
-          
-          set((state) => {
-            state.chats.current.meta.title = generatedTitle;
-            state.chats.current.storedConversation.titleGenerated = true;
-          });
-        }
+        console.log("Generating title", get().chats.current.storedConversation.titleGenerated, get().chats.current.storedConversation.messages.length);
+        if (!get().chats.current.storedConversation.titleGenerated && 
+          get().chats.current.storedConversation.messages.length >= 2) {
+            const generatedTitle = await generateChatTitle(
+              get().chats.current.storedConversation.messages
+            );
+            
+            set((state) => {
+              state.chats.current.meta.title = generatedTitle;
+              state.chats.current.storedConversation.titleGenerated = true;
+            });
+          }
 
         // Get the prepared conversation and save it
         const finalState = get();
@@ -174,16 +166,9 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         await app.vault.adapter.write(fileName, conversationData);
         console.log(`Successfully saved conversation: ${fileName}`);
         
-        if (title || tags) {
-          new Notice(t('ui.chat.conversationSaved'));
-        }
-        
         return conversation.meta.id;
       } catch (error) {
         console.error('Failed to save conversation:', error);
-        if (title || tags) {
-          new Notice(t('ui.chat.conversationSaveFailed'));
-        }
         return null;
       }
     },

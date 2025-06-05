@@ -80,7 +80,6 @@ export const LifeNavigatorApp: React.FC = () => {
 
 	// Access specific state slices from the store with granular subscriptions
 	// Use stable selectors to prevent infinite loops
-	const conversationVersion = usePluginStore(state => state.chats.conversationVersion);
 	const rawConversation = usePluginStore(
 		useCallback((state) => state.chats.current.storedConversation.messages, [])
 	);
@@ -95,11 +94,11 @@ export const LifeNavigatorApp: React.FC = () => {
 	const chatStop = usePluginStore(state => state.chatStop);
 
 	// Create a stable reference to the conversation to prevent proxy issues
-	// Only recreate when the conversation version changes (indicating actual content changes)
+	// Only recreate when the conversation content actually changes
 	const stableConversation = useMemo(() => {
-		// Create a new array reference to avoid proxy issues, but only when content actually changes
+		// Create a new array reference to avoid proxy issues
 		return rawConversation ? [...rawConversation] : [];
-	}, [rawConversation, conversationVersion]);
+	}, [rawConversation]);
 
 	// Actions
 	const clearChat = usePluginStore(state => state.clearChat);
@@ -351,12 +350,10 @@ export const LifeNavigatorApp: React.FC = () => {
 													`Auto-triggering message for mode ${activeMode.ln_name}: "${usage}"`,
 												);
 
-												// Wait a short moment before sending to ensure state updates have propagated
-												setTimeout(() => {
-													addUserMessage(
-														usage,
-													);
-												}, 100);
+																							// Wait a short moment before sending to ensure state updates have propagated
+											setTimeout(() => {
+												addUserMessage(usage);
+											}, 100);
 											}
 										}}
 									/>
@@ -694,7 +691,11 @@ export const LifeNavigatorApp: React.FC = () => {
 					<button
 						className="clickable-icon"
 						aria-label={t('ui.chat.new')}
-						onClick={clearChat}
+						onClick={async () => {
+							// Save current conversation immediately before starting new chat
+							await usePluginStore.getState().saveImmediatelyIfNeeded(false);
+							clearChat();
+						}}
 					>
 						<LucideIcon name="square-pen" size={18} />
 					</button>
