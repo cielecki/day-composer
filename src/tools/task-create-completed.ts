@@ -4,7 +4,7 @@ import { t } from 'src/i18n';
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { getCurrentTime } from "../utils/time/get-current-time";
-import { insertTaskAtPosition, Task } from 'src/utils/tasks/task-utils';
+import { addCommentToTask, insertTaskAtPosition, Task } from 'src/utils/tasks/task-utils';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { findCurrentSpot, readNote, updateNote } from 'src/utils/tools/note-utils';
 import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';
@@ -82,13 +82,17 @@ export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput>
       // Format the completion time if provided
       const currentTime = getCurrentTime(completion_time);
       
-      const task: Task = {
+      let task: Task = {
         type: "task",
         status: "completed",
         todoText: todo_text + (currentTime ? t('tasks.format.completedAt', { time: currentTime }) : ''),
-        comment: comment || "",
+        comment: "",
         lineIndex: -1, // Will be updated when the note is saved
       };
+
+      if (comment) {
+        task = addCommentToTask(task, comment);
+      }
 
       // Insert at the current spot
       updatedNote = insertTaskAtPosition(
