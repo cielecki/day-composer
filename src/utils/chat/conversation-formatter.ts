@@ -5,7 +5,9 @@ import { t } from 'src/i18n';
  * @param conversation The conversation to format
  * @returns A formatted markdown representation of the conversation
  */
-export function formatConversationContent(conversation: any[]): string {
+import { Message, ContentBlock } from '../../types/chat-types';
+
+export function formatConversationContent(conversation: Message[]): string {
 	if (!conversation || conversation.length === 0) {
 		return t('errors.chat.noContent');
 	}
@@ -20,7 +22,7 @@ export function formatConversationContent(conversation: any[]): string {
 			// Skip tool result messages
 			if (message.role === "user" && Array.isArray(message.content)) {
 				const isOnlyToolResults = message.content.every(
-					(item: any) =>
+					(item: ContentBlock) =>
 						typeof item === "object" &&
 						item !== null &&
 						"type" in item &&
@@ -38,8 +40,8 @@ export function formatConversationContent(conversation: any[]): string {
 			} else if (Array.isArray(message.content)) {
 				// Extract text from content blocks
 				textContent = message.content
-					.filter((block: any) => block.type === "text")
-					.map((block: any) => block.text)
+								.filter((block: ContentBlock) => block.type === "text")
+			.map((block: ContentBlock) => (block as any).text)
 					.join("\n");
 			}
 

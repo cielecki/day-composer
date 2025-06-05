@@ -1,6 +1,21 @@
 import { NavigationTarget } from '../obsidian-tools';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 
+// Image data interface for UI components (based on existing AttachedImage)
+export interface AttachedImage {
+	id: string;
+	name: string;
+	src: string; // base64 data URL (data:image/png;base64,...)
+}
+
+// Image data interface for API/storage
+export interface ImageData {
+	data: string; // base64 encoded data
+	type: string; // MIME type like 'image/jpeg', 'image/png'
+	name?: string; // original filename
+	size?: number; // file size in bytes
+}
+
 export interface Message {
 	role: "user" | "assistant";
 	content: string | ToolResult[] | ContentBlock[];
@@ -19,7 +34,7 @@ export interface MessageWithToolResults {
 }
 
 // Tool Execution Context for the new context-based tool system
-export interface ToolExecutionContext<TInput = any> {
+export interface ToolExecutionContext<TInput = Record<string, unknown>> {
 	// Execution environment
 	plugin: LifeNavigatorPlugin;
 	params: TInput;
@@ -45,7 +60,7 @@ export interface ImageBlock {
 	type: "image";
 	source: {
 		type: "base64";
-		media_type: string; // e.g., "image/jpeg"
+		media_type: "image/png" | "image/jpeg" | "image/gif" | "image/webp"; // Anthropic API supported types
 		data: string; // Base64 encoded image data
 	};
 }
@@ -67,6 +82,7 @@ export interface ToolUseBlock {
 	id: string;
 	name: string;
 	input: Record<string, string | boolean | number | undefined>;
+	isProcessing?: boolean; // UI flag to track processing state
 }
 
 export interface ToolResultBlock {

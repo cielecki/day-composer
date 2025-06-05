@@ -158,16 +158,16 @@ export class UserDefinedToolManager {
 
   private generateToolSpecification(tool: UserDefinedTool): any {
     // Use the schema from the tool, or create a basic one
-    const schema = tool.schema || {};
+    const schema = tool.schema || {
+      type: "object",
+      properties: {},
+      required: []
+    };
     
     return {
       name: `user_${sanitizeToolName(tool.name)}`,
       description: tool.description || `User-defined tool: ${tool.name}`,
-      input_schema: schema.input_schema || {
-        type: "object",
-        properties: {},
-        required: []
-      }
+      input_schema: schema
     };
   }
 

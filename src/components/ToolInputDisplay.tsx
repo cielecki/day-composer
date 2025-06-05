@@ -5,14 +5,14 @@ import React from 'react';
  */
 export const ToolInputDisplay: React.FC<{ 
   toolName: string;
-  toolInput: any;
+  toolInput: Record<string, unknown>;
 }> = ({ toolName, toolInput }) => {
   // Guard against null/undefined inputs
   if (!toolInput || typeof toolInput !== 'object') {
     return <pre className="tool-input-content"><code>{JSON.stringify(toolInput, null, 2)}</code></pre>;
   }
 
-  const renderValue = (value: any): React.ReactNode => {
+  const renderValue = (value: unknown): React.ReactNode => {
     if (value === null || value === undefined) {
       return <span className="ln-tool-input__value ln-tool-input__value--null">not specified</span>;
     }

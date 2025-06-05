@@ -17,7 +17,7 @@ import { usePluginStore } from "../../store/plugin-store";
  * Runs a complete conversation turn with the AI, handling tool calls and streaming
  */
 export const runConversationTurn = async (
-	tools: ObsidianTool<any>[],
+	tools: ObsidianTool<Record<string, unknown>>[],
 	signal: AbortSignal
 ): Promise<Message | null> => {
 	const store = usePluginStore.getState();

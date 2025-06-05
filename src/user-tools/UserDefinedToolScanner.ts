@@ -1,5 +1,5 @@
 import { App, TFile } from 'obsidian';
-import { UserDefinedTool } from 'src/types/user-tools';
+import { UserDefinedTool, UserToolSchema } from 'src/types/user-tools';
 import { createHash } from 'crypto';
 
 export class UserDefinedToolScanner {
@@ -43,10 +43,18 @@ export class UserDefinedToolScanner {
     
     // Extract JSON schema blocks
     const jsonCodeBlocks = this.extractJSONBlocks(content);
-    let schema = {};
+    let schema: UserToolSchema = {
+      type: 'object',
+      properties: {},
+      required: []
+    };
     if (jsonCodeBlocks.length > 0) {
       try {
-        schema = JSON.parse(jsonCodeBlocks[0]);
+        const parsedSchema = JSON.parse(jsonCodeBlocks[0]);
+        // Validate that it's a proper schema object
+        if (parsedSchema && typeof parsedSchema === 'object' && parsedSchema.type === 'object') {
+          schema = parsedSchema as UserToolSchema;
+        }
       } catch (error) {
         console.warn(`Failed to parse JSON schema in ${file.path}:`, error);
         throw new Error(`Invalid JSON schema: ${error.message}`);

@@ -69,9 +69,9 @@ function isToolAllowed(
  * @returns Filtered array of tools
  */
 export function filterToolsByMode(
-  tools: ObsidianTool<any>[],
+  	tools: ObsidianTool<Record<string, unknown>>[],
   mode: LNMode
-): ObsidianTool<any>[] {
+): ObsidianTool<Record<string, unknown>>[] {
   // Get patterns from mode, fallback to defaults
   const allowedPatterns = mode.ln_tools_allowed || ["*"];
   const disallowedPatterns = mode.ln_tools_disallowed || [];

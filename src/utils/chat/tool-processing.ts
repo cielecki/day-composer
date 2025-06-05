@@ -87,11 +87,12 @@ export const processToolUseBlocks = async (
 			toolResults.push(finalResult);
 			// Final update to mark as complete
 			onToolResultUpdate?.(toolUseBlock.id, finalResult);
-		} catch (error: any) {
+		} catch (error: unknown) {
+			const errorMessage = error instanceof Error ? error.message : "Unknown error";
 			const errorResult: ToolResultBlock = {
 				type: "tool_result",
 				tool_use_id: toolUseBlock.id,
-				content: `Error: ${error.message || "Unknown error"}`,
+				content: `Error: ${errorMessage}`,
 				is_error: true,
 				is_complete: true,
 				current_label: currentResult.current_label // Keep last known label

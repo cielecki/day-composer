@@ -1,5 +1,5 @@
 import type { ImmerStateCreator } from '../store/plugin-store';
-import { Message, ToolResultBlock } from '../types/chat-types';
+import { Message, ToolResultBlock, AttachedImage } from '../types/chat-types';
 import { Chat } from 'src/utils/chat/conversation';
 import { generateChatId } from 'src/utils/chat/generate-conversation-id';
 import { createUserMessage, extractUserMessageContent } from 'src/utils/chat/message-builder';
@@ -38,7 +38,7 @@ export interface ChatSlice {
   chats: {
     current: Chat;
     isGenerating: boolean;
-    editingMessage: { index: number; content: string; images?: any[] } | null;
+    editingMessage: { index: number; content: string; images?: AttachedImage[] } | null;
     liveToolResults: Map<string, ToolResultBlock>;
   };
   
@@ -48,14 +48,14 @@ export interface ChatSlice {
   clearChat: () => void;
   reset: () => void; // Alias for clearChat to match AIAgentContext
   setIsGenerating: (generating: boolean) => void;
-  setEditingMessage: (editing: { index: number; content: string; images?: any[] } | null) => void;
+  setEditingMessage: (editing: { index: number; content: string; images?: AttachedImage[] } | null) => void;
   updateLiveToolResult: (toolId: string, result: ToolResultBlock) => void;
   clearLiveToolResults: () => void;
   setCurrentChat: (chat: Chat) => void;
   
   // Business Logic Actions
-  addUserMessage: (userMessage: string, images?: any[]) => Promise<void>;
-  editUserMessage: (messageIndex: number, newContent: string, images?: any[]) => Promise<void>;
+  addUserMessage: (userMessage: string, images?: AttachedImage[]) => Promise<void>;
+  editUserMessage: (messageIndex: number, newContent: string, images?: AttachedImage[]) => Promise<void>;
   getCurrentConversationId: () => string | null;
   getSystemPrompt: () => Promise<string>;
   startEditingMessage: (messageIndex: number) => void;

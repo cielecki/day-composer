@@ -2,19 +2,13 @@ import React, { useState, useRef, useEffect, KeyboardEvent, useCallback } from "
 import { usePluginStore } from "../store/plugin-store";
 import { t } from 'src/i18n';
 import { LucideIcon } from '../components/LucideIcon';
-
-// Define an interface for attached images (keeping compatibility with TextInputArea)
-interface AttachedImage {
-  id: string;
-  name: string;
-  src: string;
-}
+import { AttachedImage } from '../types/chat-types';
 
 // Define the number of samples to keep for the waveform (5 seconds at 10 samples per second)
 const WAVEFORM_HISTORY_LENGTH = 120; // 4 seconds at 30 samples per second
 
 export const UnifiedInputArea: React.FC<{
-  editingMessage?: { index: number; content: string; images?: any[] } | null;
+  editingMessage?: { index: number; content: string; images?: AttachedImage[] } | null;
 }> = ({ editingMessage }) => {
   const isGeneratingResponse = usePluginStore(state => state.chats.isGenerating);
   const isGeneratingSpeech = usePluginStore(state => state.audio.isGeneratingSpeech);
@@ -103,29 +97,16 @@ export const UnifiedInputArea: React.FC<{
           return;
         }
 
-        // Process any attached images for the final message
-        let finalImageData: any[] = [];
-        if (imagesToSend.length > 0) {
-          finalImageData = imagesToSend.map((img) => ({
-            type: "image",
-            source: {
-              type: "base64",
-              media_type: img.src.split(";")[0].split(":")[1], // Extract MIME type
-              data: img.src.split(",")[1], // Extract base64 data without the prefix
-            },
-          }));
-        }
-
         // Handle editing vs new message
         if (editingMessage) {
           // For editing mode, save the edit
           console.debug("Auto-saving edit after transcription");
-          editUserMessage(editingMessage.index, messageToSend, finalImageData);
+          editUserMessage(editingMessage.index, messageToSend, imagesToSend);
         } else {
           // For new message mode, send as new message
           console.debug("Auto-sending new message after transcription");
-          if (finalImageData.length > 0) {
-            addUserMessage(messageToSend, finalImageData);
+          if (imagesToSend.length > 0) {
+            addUserMessage(messageToSend, imagesToSend);
           } else {
             addUserMessage(messageToSend);
           }
@@ -289,18 +270,8 @@ export const UnifiedInputArea: React.FC<{
       const finalMessage = message;
 
       if (attachedImages.length > 0) {
-        // Create image data for editing
-        const imageData = attachedImages.map((img) => ({
-          type: "image",
-          source: {
-            type: "base64",
-            media_type: img.src.split(";")[0].split(":")[1], // Extract MIME type
-            data: img.src.split(",")[1], // Extract base64 data without the prefix
-          },
-        }));
-
         // For editing, pass both text and images
-        editUserMessage(editingMessage.index, finalMessage, imageData);
+        editUserMessage(editingMessage.index, finalMessage, attachedImages);
       } else {
         // Just save text message
         editUserMessage(editingMessage.index, finalMessage);
@@ -316,20 +287,10 @@ export const UnifiedInputArea: React.FC<{
     const finalMessage = message;
 
     if (attachedImages.length > 0) {
-      // Create a new message with text and attached images
-      const imageData = attachedImages.map((img) => ({
-        type: "image",
-        source: {
-          type: "base64",
-          media_type: img.src.split(";")[0].split(":")[1], // Extract MIME type
-          data: img.src.split(",")[1], // Extract base64 data without the prefix
-        },
-      }));
-
       // Add the images to the message
       addUserMessage(
         finalMessage,
-        imageData,
+        attachedImages,
       );
     } else {
       // Just send text message

@@ -75,8 +75,7 @@ export interface ObsidianTool<TInput> {
  * Class that handles all Obsidian-specific tool operations
  */
 export class ObsidianTools {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	private tools: ObsidianTool<any>[] = [
+	private tools: ObsidianTool<Record<string, unknown>>[] = [
 		noteCreateTool,
 		vaultSearchTool,
 		vaultFindTool,
@@ -84,7 +83,7 @@ export class ObsidianTools {
 		noteReadTool,
 		noteEditTool,
 		libraryListTool,
-		  libraryReadTool,
+		libraryReadTool,
 		taskCheckTool,
 		taskAddTool,
 		taskUncheckTool,
@@ -134,7 +133,7 @@ export class ObsidianTools {
 	/**
 	 * Get all available tools in JSON schema format required by Anthropic
 	 */
-	async getTools(): Promise<ObsidianTool<any>[]> {
+	async getTools(): Promise<ObsidianTool<Record<string, unknown>>[]> {
 		// Ensure user-defined tools are initialized if needed
 		await this.ensureUserDefinedToolsInitialized();
 		return this.tools;
@@ -145,7 +144,7 @@ export class ObsidianTools {
 	 * @param mode The mode configuration to use for filtering
 	 * @returns Filtered array of tools based on mode settings
 	 */
-	async getToolsForMode(mode: LNMode): Promise<ObsidianTool<any>[]> {
+	async getToolsForMode(mode: LNMode): Promise<ObsidianTool<Record<string, unknown>>[]> {
 		const tools = await this.getTools();
 		return filterToolsByMode(tools, mode);
 	}
@@ -153,7 +152,7 @@ export class ObsidianTools {
 	/**
 	 * Get tool definition by name
 	 */
-	async getToolByName(name: string): Promise<ObsidianTool<any> | undefined> {
+	async getToolByName(name: string): Promise<ObsidianTool<Record<string, unknown>> | undefined> {
 		const tools = await this.getTools();
 		return tools.find((tool) => tool.specification.name === name);
 	}
@@ -163,7 +162,7 @@ export class ObsidianTools {
 	 */
 	async processToolCall(
 		toolName: string,
-		toolInput: any,
+		toolInput: Record<string, unknown>,
 		signal: AbortSignal,
 		onProgress: (message: string) => void,
 		onNavigationTarget: (target: NavigationTarget) => void,
