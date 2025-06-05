@@ -6,7 +6,37 @@ This document outlines potential future features and improvements for the Life N
 
 See [TODO.md](../TODO.md) for accepted ideas.
 
+
+
+
 ## Floating Ideas
+
+
+**Feedback System:**
+Implement an in-app feedback system that allows users to:
+- Submit feedback directly from the plugin interface
+- Access documentation and community resources
+- Report bugs or suggest features
+- View the project's GitHub repository and documentation links
+
+This will improve user experience by providing clear channels for feedback and support while making it easier for users to find help and resources.
+
+**Documentation and Resources:**
+Add a dedicated section in the plugin interface that provides:
+- Links to official documentation
+- GitHub repository access
+- Community forums/discussions
+- Quick start guides
+- Video tutorials
+- FAQ section
+
+**Parallel Conversations:**
+Implement support for multiple concurrent conversation windows, allowing users to maintain separate contexts and modes simultaneously. Each window would maintain its own state , enabling more efficient multitasking and context switching.
+
+
+**Mode Switch Button Relocation:**
+Move the mode switching button closer to the text input area for improved accessibility and faster mode changes during conversations. This will enhance the user experience by reducing the distance users need to move their cursor to switch modes.
+
 
 **Mode Settings Editor:**
 Create a comprehensive mode settings editor that allows users to configure all mode parameters through a user-friendly interface.
