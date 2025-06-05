@@ -70,4 +70,5 @@ Your goal is to positively influence me.
 [[ln-day-note-(-1)]] 🔎
 [[ln-day-note-(0)]] 🔎 
 [[ln-currently-open-file]] 🔎
+[[ln-currently-selected-text]] 🔎
 [[ln-current-date-and-time]] 🔎 

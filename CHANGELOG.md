@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Advanced chat flow management**: Completely redesigned how the app handles multiple processes (chat generation, voice recording, audio playback) running at the same time. Now everything works smoothly together without conflicts or interruptions.
 - **Streaming audio during chat**: Audio now starts playing while the AI is still writing its response, instead of waiting for the complete message. This makes conversations feel much more natural and responsive.
+- **Selected text context**: New `[[ln-currently-selected-text]] 🔎` special link that includes currently selected text from the active editor in AI context. Shows the selected text with file path and line numbers.
 - **Robust Process Management**: Completely redesigned chat flow management with SimpleProcessManager
   - Smart transcription logic: adds to input during generation, sends immediately when no generation active  
   - Recording now immediately stops all audio playback and generation

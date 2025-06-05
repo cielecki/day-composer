@@ -30,7 +30,11 @@ Expands to the current date and time in ISO format.
 
 ### Currently Open File
 Format: `[[ln-currently-open-file]] 🔎`
-Expands to the path of the currently open file.
+Expands to the full content of the currently open file.
+
+### Currently Selected Text
+Format: `[[ln-currently-selected-text]] 🔎`
+Expands to the text currently selected in the active editor. Includes file path and line number information.
 
 ### Current Chat
 Format: `[[ln-current-chat]] 🔎`
@@ -62,6 +66,7 @@ Expands to the current chat session.
 ```markdown
 Current time: [[ln-current-date-and-time]] 🔎
 Current file: [[ln-currently-open-file]] 🔎
+Selected text: [[ln-currently-selected-text]] 🔎
 Current chat: [[ln-current-chat]] 🔎
 ```
 

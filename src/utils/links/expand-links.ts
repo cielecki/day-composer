@@ -3,6 +3,7 @@ import { removeTopLevelHtmlComments } from 'src/utils/text/html-comment-remover'
 import { 
 	handleCurrentDateTimeLink, 
 	handleCurrentlyOpenFileLink, 
+	handleCurrentlySelectedTextLink,
 	handleCurrentChatLink, 
 	handleDayNoteLink,
 	handleDayNoteRangeLink
@@ -133,6 +134,13 @@ export async function expandLinks(
 		if (linkPath === 'ln-currently-open-file') {
 			const fileContent = await handleCurrentlyOpenFileLink(app);
 			result = result.replace(match[0], fileContent);
+			continue;
+		}
+
+		// Handle ln-currently-selected-text format
+		if (linkPath === 'ln-currently-selected-text') {
+			const selectedTextContent = handleCurrentlySelectedTextLink(app);
+			result = result.replace(match[0], selectedTextContent);
 			continue;
 		}
 

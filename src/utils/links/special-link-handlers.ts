@@ -1,4 +1,4 @@
-import { App, TFile } from "obsidian";
+import { App, TFile, MarkdownView } from "obsidian";
 import { t } from 'src/i18n';
 import { convertToValidTagName } from '../text/xml-tag-converter';
 import { getCurrentChatContent } from '../chat/chat-content-extractor';
@@ -64,6 +64,102 @@ export async function handleCurrentlyOpenFileLink(app: App): Promise<string> {
 	} else {
 		// No file is currently open
 		return `[No file currently open] 🔎`;
+	}
+}
+
+/**
+ * Handle ln-currently-selected-text special link
+ * @param app The Obsidian App instance
+ * @returns XML formatted currently selected text or status message
+ */
+export function handleCurrentlySelectedTextLink(app: App): string {
+	try {
+		// First check if there's any active file at all
+		const activeFile = app.workspace.getActiveFile();
+		if (!activeFile) {
+			console.debug('No active file found');
+			const translatedTagName = convertToValidTagName(t('text.currentlySelected'));
+			return `<${translatedTagName} status="no_active_editor" />\n`;
+		}
+
+		// Find the MarkdownView that contains the active file
+		// (The active view might be Life Navigator, so we need to find the markdown editor)
+		let activeView: MarkdownView | null = null;
+		
+		// First try to get the active view if it's a MarkdownView
+		const currentActiveView = app.workspace.getActiveViewOfType(MarkdownView);
+		if (currentActiveView && currentActiveView.file?.path === activeFile.path) {
+			activeView = currentActiveView;
+		} else {
+			// Look through all leaves to find the MarkdownView with the active file
+			const leaves = app.workspace.getLeavesOfType('markdown');
+			for (const leaf of leaves) {
+				const view = leaf.view as MarkdownView;
+				if (view.file?.path === activeFile.path) {
+					activeView = view;
+					break;
+				}
+			}
+		}
+		
+		if (!activeView) {
+			console.debug('No MarkdownView found for activeFile:', activeFile?.path);
+			const translatedTagName = convertToValidTagName(t('text.currentlySelected'));
+			return `<${translatedTagName} status="no_active_editor" />\n`;
+		}
+
+		// Make sure this is a markdown file
+		if (activeFile.extension !== 'md') {
+			console.debug(`Active file is not markdown: ${activeFile.path}`);
+			const translatedTagName = convertToValidTagName(t('text.currentlySelected'));
+			return `<${translatedTagName} file="${activeFile.path}" status="no_active_editor" />\n`;
+		}
+
+		// Get the CodeMirror 6 editor instance
+		const editorView = (activeView.editor as any).cm;
+		if (!editorView) {
+			console.debug('Could not access CodeMirror editor for file:', activeFile.path);
+			const translatedTagName = convertToValidTagName(t('text.currentlySelected'));
+			return `<${translatedTagName} file="${activeFile.path}" status="no_active_editor" />\n`;
+		}
+
+		// Get the current selection
+		const selection = editorView.state.selection.main;
+		const from = selection.from;
+		const to = selection.to;
+
+		console.debug(`Selection range: ${from} to ${to} in file: ${activeFile.path}`);
+
+		// Check if there's actually text selected
+		if (from === to) {
+			// No text selected
+			const translatedTagName = convertToValidTagName(t('text.currentlySelected'));
+			return `<${translatedTagName} file="${activeFile.path}" status="no_text_selected" />\n`;
+		}
+
+		// Get the selected text
+		const selectedText = editorView.state.doc.sliceString(from, to);
+
+		// Calculate line numbers for the selection
+		const doc = editorView.state.doc;
+		const startLine = doc.lineAt(from).number;
+		const endLine = doc.lineAt(to).number;
+
+		console.debug(`Selected text (${selectedText.length} chars) from line ${startLine} to ${endLine}`);
+
+		// Get the translated tag name and convert it to a valid XML tag name
+		const translatedTagName = convertToValidTagName(t('text.currentlySelected'));
+
+		// Format the content with proper indentation
+		const tabbedContent = selectedText.split('\n').map((line: string) => '  ' + line).join('\n');
+
+		// Return the selected text in XML format
+		return `<${translatedTagName} file="${activeFile.path}" start_line="${startLine}" end_line="${endLine}" status="selected">\n\n${tabbedContent}\n\n</${translatedTagName}>\n`;
+
+	} catch (error) {
+		console.error('Error retrieving currently selected text:', error);
+		const translatedTagName = convertToValidTagName(t('text.currentlySelected'));
+		return `<${translatedTagName} status="no_active_editor" />\n`;
 	}
 }
 

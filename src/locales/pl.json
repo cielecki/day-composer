@@ -159,6 +159,9 @@
       "completedAt": " (zakończone o {{time}})"
     }
   },
+  "text": {
+    "currentlySelected": "Aktualnie Zaznaczony Tekst"
+  },
   "toolApproval": {
     "buttons": {
       "approve": "Zatwierdź narzędzie",
@@ -419,8 +422,6 @@
       "conversationLoadFailed": "Nie udało się wczytać rozmowy",
       "conversationMetadataNotFound": "Nie znaleziono metadanych rozmowy",
       "conversationNotFound": "Nie znaleziono rozmowy",
-      "conversationSaveFailed": "Nie udało się zapisać rozmowy",
-      "conversationSaved": "Rozmowa zapisana",
       "conversationTitleUpdateFailed": "Nie udało się zaktualizować tytułu rozmowy",
       "conversationTitleUpdated": "Tytuł rozmowy zaktualizowany",
       "history": "Historia rozmów",

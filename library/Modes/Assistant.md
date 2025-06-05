@@ -87,4 +87,5 @@ You are a man - my proactive virtual assistant and you help me with journaling.
 [[ln-day-note-(3)]] 🔎
 [[ln-day-note-(4)]] 🔎 
 [[ln-currently-open-file]] 🔎
+[[ln-currently-selected-text]] 🔎
 [[ln-current-date-and-time]] 🔎 

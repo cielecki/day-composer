@@ -159,6 +159,9 @@
       "completedAt": " (completed at {{time}})"
     }
   },
+  "text": {
+    "currentlySelected": "Currently Selected Text"
+  },
   "toolApproval": {
     "buttons": {
       "approve": "Approve Tool",
@@ -419,8 +422,6 @@
       "conversationLoadFailed": "Failed to load conversation",
       "conversationMetadataNotFound": "Conversation metadata not found",
       "conversationNotFound": "Conversation not found",
-      "conversationSaveFailed": "Failed to save conversation",
-      "conversationSaved": "Conversation saved",
       "conversationTitleUpdateFailed": "Failed to update conversation title",
       "conversationTitleUpdated": "Conversation title updated",
       "history": "Chat History",
