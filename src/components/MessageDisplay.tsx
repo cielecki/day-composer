@@ -171,8 +171,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
             <img 
               src={imageUrl} 
               alt={t('ui.message.attachedImage')}
-              className="attached-image-preview"
-              style={{ maxWidth: '300px', maxHeight: '200px', objectFit: 'contain' }}
+              className="attached-image-preview ln-image-preview"
             />
           </div>
         );

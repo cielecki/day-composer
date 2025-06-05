@@ -145,8 +145,8 @@ export const UnifiedInputArea: React.FC<{
       const resizeObserver = new ResizeObserver(() => {
         const textarea = textareaRef.current;
         if (textarea && message) {
-          textarea.style.height = "auto";
-          textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
+              textarea.classList.add("ln-textarea-auto");
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
         }
       });
 
@@ -341,7 +341,7 @@ export const UnifiedInputArea: React.FC<{
 
     // Reset textarea height
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
+      textareaRef.current.classList.add("ln-textarea-auto");
     }
   };
 
@@ -380,7 +380,7 @@ export const UnifiedInputArea: React.FC<{
 
     // Auto-resize
     const textarea = e.target;
-    textarea.style.height = "auto";
+    textarea.classList.add("ln-textarea-auto");
     textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
   };
 
@@ -500,7 +500,7 @@ export const UnifiedInputArea: React.FC<{
       <input
         type="file"
         ref={fileInputRef}
-        style={{ display: "none" }}
+        className="ln-hidden"
         accept="image/*"
         onChange={handleFileChange}
         multiple
@@ -587,13 +587,13 @@ export const UnifiedInputArea: React.FC<{
                 {waveformData.map((level, index) => (
                   <div
                     key={index}
-                    className="waveform-bar"
+                    className="waveform-bar ln-waveform-bar-dynamic"
                     style={{
                       height: `${level}%`,
                       opacity: Math.max(
                         0.3,
                         index / WAVEFORM_HISTORY_LENGTH,
-                      ), // Fade out older samples
+                      ), // Fade out older samples - dynamic values that can't be in CSS
                     }}
                   />
                 ))}

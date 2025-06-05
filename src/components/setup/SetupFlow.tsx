@@ -31,11 +31,7 @@ export const SetupFlow: React.FC<SetupFlowProps> = ({ lnModes }) => {
 		default:
 			// This shouldn't happen if setup is working correctly
 			return (
-				<div style={{ 
-					textAlign: 'center', 
-					color: 'var(--text-muted)',
-					padding: '20px'
-				}}>
+				<div className="ln-text-center ln-text-muted ln-p-4">
 					Setup complete! Welcome to Life Navigator.
 				</div>
 			);

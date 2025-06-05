@@ -50,9 +50,6 @@ export const LucideIcon: React.FC<LucideIconProps> = ({
 				width: size,
 				height: size,
 				color: color || "inherit",
-				display: 'inline-flex',
-				alignItems: 'center',
-				justifyContent: 'center',
 			}}
 		/>
 	);

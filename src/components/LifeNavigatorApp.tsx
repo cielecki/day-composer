@@ -42,19 +42,22 @@ function openSimpleObsidianModal(app: import('obsidian').App, title: string, tex
 		onOpen() {
 			const { contentEl } = this;
 			contentEl.empty();
-			contentEl.createEl("h2", { text: title });
-			const pre = contentEl.createEl("pre");
-			pre.style.background = "var(--background-secondary)";
-			pre.style.borderRadius = "4px";
-			pre.style.padding = "12px";
-			pre.style.fontFamily = "var(--font-monospace)";
-			pre.style.fontSize = "14px";
-			pre.style.maxHeight = "600px";
-			pre.style.overflow = "auto";
-			pre.style.whiteSpace = "pre-wrap";
+			
+			// Create main container with flexbox layout
+			const container = contentEl.createEl("div", { cls: "ln-simple-modal-container" });
+			
+			// Header section (always visible)
+			const header = container.createEl("div", { cls: "ln-simple-modal-header" });
+			header.createEl("h2", { text: title });
+			
+			// Content section (scrollable)
+			const content = container.createEl("div", { cls: "ln-simple-modal-content" });
+			const pre = content.createEl("pre", { cls: "ln-pre-code" });
 			pre.innerText = text;
-			const button = contentEl.createEl("button", { text: t('ui.modal.copyToClipboard'), cls: "mod-cta", attr: { style: "margin-top: 20px;" } });
-			button.style.marginTop = "16px";
+			
+			// Footer section (always visible)
+			const footer = container.createEl("div", { cls: "ln-simple-modal-footer" });
+			const button = footer.createEl("button", { text: t('ui.modal.copyToClipboard'), cls: "mod-cta" });
 			button.onclick = () => {
 				navigator.clipboard.writeText(text);
 				button.textContent = t('ui.modal.copied');
@@ -389,39 +392,19 @@ export const LifeNavigatorApp: React.FC = () => {
 		<div className="life-navigator-view-content">
 			<div className="chat-bar">
 				<div
-					className="chat-bar-title"
-					style={{ position: "relative", overflow: "visible" }}
+					className="chat-bar-title ln-relative ln-overflow-visible"
 				>
 					{/* Flex row for dropdown and menu button */}
-					<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+					<div className="ln-flex ln-items-center ln-gap-1">
 						<div
-							className="active-mode-indicator"
+							className={`ln-mode-indicator ${dropdownOpen ? 'open' : ''}`}
 							onClick={toggleDropdown}
-							style={{
-								cursor: "pointer",
-								display: "flex",
-								alignItems: "center",
-								gap: "8px",
-								padding: "4px",
-								borderRadius: "4px",
-								transition: "background-color 0.2s ease",
-								position: "relative",
-								backgroundColor: dropdownOpen
-									? "var(--background-modifier-hover)"
-									: "transparent",
-							}}
 							ref={modeIndicatorRef}
 						>
 							{isModeLoading ? (
 								// Loading state - show generic loading with appropriate icon
 								<>
-									<span
-										style={{
-											display: "flex",
-											alignItems: "center",
-											justifyContent: "center",
-										}}
-									>
+									<span className="ln-icon-center">
 										<LucideIcon
 											name={isModesLoading ? "loader-2" : "clock"}
 											size={18}
@@ -429,7 +412,7 @@ export const LifeNavigatorApp: React.FC = () => {
 											className={isModesLoading ? "animate-spin" : ""}
 										/>
 									</span>
-									<span style={{ fontWeight: 500, color: "var(--text-muted)" }}>
+									<span className="ln-font-medium ln-text-muted">
 										{t('ui.mode.loading')}
 									</span>
 								</>
@@ -437,13 +420,7 @@ export const LifeNavigatorApp: React.FC = () => {
 								// Normal state - show loaded mode
 								<>
 									{activeMode.ln_icon && (
-										<span
-											style={{
-												display: "flex",
-												alignItems: "center",
-												justifyContent: "center",
-											}}
-										>
+										<span className="ln-icon-center">
 											<LucideIcon
 												name={activeMode.ln_icon}
 												size={18}
@@ -454,42 +431,26 @@ export const LifeNavigatorApp: React.FC = () => {
 											/>
 										</span>
 									)}
-									<span style={{ fontWeight: 500 }}>
+									<span className="ln-font-medium">
 										{activeMode.ln_name}
 									</span>
 								</>
 							) : (
 								// No mode selected state
 								<>
-									<span
-										style={{
-											display: "flex",
-											alignItems: "center",
-											justifyContent: "center",
-										}}
-									>
+									<span className="ln-icon-center">
 										<LucideIcon
 											name="help-circle"
 											size={18}
 											color="var(--text-muted)"
 										/>
 									</span>
-									<span style={{ fontWeight: 500, color: "var(--text-muted)" }}>
+									<span className="ln-font-medium ln-text-muted">
 										Select a mode
 									</span>
 								</>
 							)}
-							<span
-								style={{
-									display: "flex",
-									alignItems: "center",
-									marginLeft: "4px",
-									transform: dropdownOpen
-										? "rotate(180deg)"
-										: "rotate(0)",
-									transition: "transform 0.2s ease",
-								}}
-							>
+							<span className={`ln-chevron ln-ml-1 ${dropdownOpen ? 'open' : ''}`}>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									width="16"
@@ -511,40 +472,14 @@ export const LifeNavigatorApp: React.FC = () => {
 					{dropdownOpen && (
 						<div
 							ref={dropdownRef}
-							style={{
-								position: "absolute",
-								top: "38px",
-								left: "0",
-								zIndex: 99999,
-								minWidth: "240px",
-								maxWidth: "360px",
-								maxHeight: "600px",
-								overflowY: "auto",
-								backgroundColor: "var(--background-primary)",
-								border: "1px solid var(--background-modifier-border)",
-								borderRadius: "6px",
-								boxShadow: "0 4px 14px rgba(0, 0, 0, 0.25)",
-								padding: "4px 0",
-								display: "flex",
-								flexDirection: "column"
-							}}
+							className="ln-mode-dropdown"
 						>
 							{/* Actions - only show when activeMode is loaded */}
 							{activeMode && (
 								<>
 									{!activeMode.ln_path.startsWith(':prebuilt:') && (
 										<div
-											style={{
-												padding: "8px 12px",
-												cursor: "pointer",
-												display: "flex",
-												alignItems: "center",
-												gap: "8px",
-												fontSize: "14px",
-												color: "var(--text-normal)",
-												whiteSpace: "normal",
-												wordBreak: "break-word",
-											}}
+											className="ln-mode-action-item"
 											onClick={() => {
 												if (window.app && activeMode.ln_path) {
 													const file = window.app.vault.getAbstractFileByPath(activeMode.ln_path);
@@ -554,25 +489,13 @@ export const LifeNavigatorApp: React.FC = () => {
 												}
 												setDropdownOpen(false);
 											}}
-											onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
-											onMouseOut={e => (e.currentTarget.style.backgroundColor = "transparent")}
 										>
 											<LucideIcon name="external-link" size={16} color="var(--text-normal)" />
 											{t('ui.mode.openInEditor')}
 										</div>
 									)}
 									<div
-										style={{
-											padding: "8px 12px",
-											cursor: "pointer",
-											display: "flex",
-											alignItems: "center",
-											gap: "8px",
-											fontSize: "14px",
-											color: "var(--text-normal)",
-											whiteSpace: "normal",
-											wordBreak: "break-word",
-										}}
+										className="ln-mode-action-item"
 										onClick={() => {
 											openSimpleObsidianModal(
 												window.app,
@@ -581,24 +504,12 @@ export const LifeNavigatorApp: React.FC = () => {
 											);
 											setDropdownOpen(false);
 										}}
-										onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
-										onMouseOut={e => (e.currentTarget.style.backgroundColor = "transparent")}
 									>
 										<LucideIcon name="settings" size={16} color="var(--text-normal)" /> 
 										{t('ui.mode.viewSettings')}
 									</div>
 									<div
-										style={{
-											padding: "8px 12px",
-											cursor: "pointer",
-											display: "flex",
-											alignItems: "center",
-											gap: "8px",
-											fontSize: "14px",
-											color: "var(--text-normal)",
-											whiteSpace: "normal",
-											wordBreak: "break-word",
-										}}
+										className="ln-mode-action-item"
 										onClick={async () => {
 											const systemPrompt = await getSystemPrompt();
 											openSimpleObsidianModal(
@@ -608,20 +519,18 @@ export const LifeNavigatorApp: React.FC = () => {
 											);
 											setDropdownOpen(false);
 										}}
-										onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
-										onMouseOut={e => (e.currentTarget.style.backgroundColor = "transparent")}
 									>
 										<LucideIcon name="terminal" size={16} color="var(--text-normal)" />
 										{t('ui.mode.viewSystemPrompt')}
 									</div>
 
 									{/* Separator */}
-									<div style={{ borderTop: "1px solid var(--background-modifier-border)", margin: "4px 0" }} />
+									<div className="ln-separator" />
 								</>
 							)}
 
 							{/* "switch to" label */}
-							<div style={{ padding: "8px 12px", fontSize: "14px", color: "var(--text-muted)", whiteSpace: "normal", wordBreak: "break-word" }}>
+							<div className="ln-section-label">
 								{t('ui.mode.switchTo')}
 							</div>
 
@@ -631,36 +540,14 @@ export const LifeNavigatorApp: React.FC = () => {
 									{Object.values(availableModes).map((mode, index) => (
 										<div
 											key={index}
-											style={{
-												display: "flex",
-												alignItems: "center",
-												gap: "8px",
-												padding: "8px 12px",
-												cursor: "pointer",
-												backgroundColor:
-													mode.ln_path === activeMode?.ln_path
-														? "var(--background-modifier-hover)"
-														: "transparent",
-												position: "relative",
-												fontWeight: mode.ln_path === activeMode?.ln_path ? 500 : "normal",
-												whiteSpace: "normal",
-												wordBreak: "break-word",
-											}}
+											className={`ln-mode-list-item ${mode.ln_path === activeMode?.ln_path ? 'active' : ''}`}
 											onClick={async () => {
 												await setActiveModeWithPersistence(mode.ln_path);
 												setDropdownOpen(false);
 											}}
-											onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--background-modifier-hover)")}
-											onMouseOut={e => (e.currentTarget.style.backgroundColor = mode.ln_path === activeMode?.ln_path ? "var(--background-modifier-hover)" : "transparent")}
 										>
 											{mode.ln_icon && (
-												<span
-													style={{
-														display: "flex",
-														alignItems: "center",
-														justifyContent: "center",
-													}}
-												>
+												<span className="ln-icon-center">
 													<LucideIcon
 														name={mode.ln_icon}
 														size={16}
@@ -668,15 +555,7 @@ export const LifeNavigatorApp: React.FC = () => {
 													/>
 												</span>
 											)}
-											<span
-												style={{
-													fontSize: "14px",
-													whiteSpace: "nowrap",
-													overflow: "hidden",
-													textOverflow: "ellipsis",
-													fontWeight: mode.ln_path === activeMode?.ln_path ? 500 : "normal",
-												}}
-											>
+											<span className="ln-text-sm ln-whitespace-nowrap ln-text-ellipsis">
 												{mode.ln_name}
 											</span>
 										</div>
@@ -701,7 +580,7 @@ export const LifeNavigatorApp: React.FC = () => {
 					</button>
 
 					<div 
-						style={{ position: "relative" }}
+						className="ln-relative"
 						ref={conversationHistoryContainerRef}
 					>
 						<button

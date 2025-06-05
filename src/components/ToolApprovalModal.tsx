@@ -20,18 +20,11 @@ export class ToolApprovalModal extends Modal {
     
     // Add modal styling - set up the container structure
     contentEl.addClass('tool-approval-modal');
-    contentEl.style.maxWidth = '600px';
-    contentEl.style.maxHeight = '80vh';
-    contentEl.style.overflow = 'hidden'; // Prevent the whole modal from scrolling
-    contentEl.style.display = 'flex';
-    contentEl.style.flexDirection = 'column';
+    contentEl.addClass('ln-modal-container');
 
     // Fixed Header with warning icon
     const headerEl = contentEl.createEl('div', { 
-      cls: 'tool-approval-header',
-      attr: { 
-        style: 'display: flex; align-items: center; gap: 8px; padding: 16px; border-bottom: 1px solid var(--background-modifier-border); flex-shrink: 0;' 
-      }
+      cls: 'tool-approval-header ln-modal-header'
     });
     
     const warningIcon = headerEl.createEl('span', {
@@ -41,19 +34,18 @@ export class ToolApprovalModal extends Modal {
     
     headerEl.createEl('h2', { 
       text: t('toolApproval.header.title'),
-      attr: { style: 'margin: 0; color: var(--color-red);' }
+      cls: 'ln-m-0',
+      attr: { style: 'color: var(--color-red);' }
     });
 
     // Scrollable content container
     const scrollableContent = contentEl.createEl('div', {
-      attr: { 
-        style: 'flex: 1; overflow-y: auto; padding: 16px;' 
-      }
+      cls: 'ln-modal-scrollable'
     });
 
     // Tool information section
     const toolInfoEl = scrollableContent.createEl('div', {
-      attr: { style: 'background: var(--background-secondary); padding: 12px; border-radius: 6px; margin-bottom: 16px;' }
+      cls: 'ln-modal-info-section'
     });
     
     const toolParagraph = toolInfoEl.createEl('p');
@@ -70,9 +62,7 @@ export class ToolApprovalModal extends Modal {
 
     // Security warning section - fix the red-on-red text issue
     const warningSection = scrollableContent.createEl('div', {
-      attr: { 
-        style: 'background: var(--background-secondary); border-left: 4px solid var(--color-red); padding: 16px; border-radius: 6px; margin-bottom: 16px; border: 1px solid var(--background-modifier-border);'
-      }
+      cls: 'ln-modal-warning-section'
     });
 
     warningSection.createEl('h3', { 
@@ -96,23 +86,23 @@ export class ToolApprovalModal extends Modal {
     
     warningSection.createEl('p', { 
       text: t('toolApproval.security.warning'),
-      attr: { style: 'font-weight: bold; margin: 8px 0 0 0; color: var(--color-red);' }
+      cls: 'ln-font-bold',
+      attr: { style: 'margin: 8px 0 0 0; color: var(--color-red);' }
     });
 
     // Tool schema section
     const schemaSection = scrollableContent.createEl('div', {
-      attr: { style: 'margin-bottom: 16px;' }
+      cls: 'ln-mb-4'
     });
     
     schemaSection.createEl('h3', { 
       text: t('toolApproval.schema.title'),
-      attr: { style: 'margin: 0 0 8px 0;' }
+      cls: 'ln-m-0',
+      attr: { style: 'margin-bottom: 8px;' }
     });
     
     const schemaEl = schemaSection.createEl('pre', {
-      attr: { 
-        style: 'background: var(--background-secondary); padding: 12px; border-radius: 6px; white-space: pre-wrap; font-family: var(--font-monospace); font-size: 12px; word-wrap: break-word;'
-      }
+      cls: 'ln-modal-code-block'
     });
     schemaEl.textContent = JSON.stringify(this.tool.schema, null, 2);
 
@@ -123,29 +113,24 @@ export class ToolApprovalModal extends Modal {
     
     codeSection.createEl('h3', { 
       text: t('toolApproval.code.title'),
-      attr: { style: 'margin: 0 0 8px 0;' }
+      cls: 'ln-m-0',
+      attr: { style: 'margin-bottom: 8px;' }
     });
     
     const codeEl = codeSection.createEl('pre', {
-      attr: { 
-        style: 'background: var(--background-secondary); padding: 12px; border-radius: 6px; white-space: pre-wrap; font-family: var(--font-monospace); font-size: 12px; word-wrap: break-word;'
-      }
+      cls: 'ln-modal-code-block'
     });
     codeEl.textContent = this.tool.executeCode;
 
     // Fixed buttons at the bottom
     const buttonsEl = contentEl.createEl('div', {
-      attr: { 
-        style: 'display: flex; gap: 10px; justify-content: flex-end; padding: 16px; border-top: 1px solid var(--background-modifier-border); flex-shrink: 0;'
-      }
+      cls: 'ln-modal-buttons'
     });
 
     // Cancel button
     const cancelBtn = buttonsEl.createEl('button', {
       text: t('toolApproval.buttons.cancel'),
-      attr: { 
-        style: 'padding: 8px 16px; border: 1px solid var(--background-modifier-border); background: var(--background-primary); color: var(--text-normal); border-radius: 4px; cursor: pointer;'
-      }
+      cls: 'ln-modal-button cancel'
     });
     
     cancelBtn.addEventListener('click', () => {
@@ -156,9 +141,7 @@ export class ToolApprovalModal extends Modal {
     // Approve button
     const approveBtn = buttonsEl.createEl('button', {
       text: t('toolApproval.buttons.approve'),
-      attr: { 
-        style: 'padding: 8px 16px; background: var(--interactive-accent); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;'
-      }
+      cls: 'ln-modal-button approve'
     });
     
     approveBtn.addEventListener('click', () => {
@@ -171,22 +154,7 @@ export class ToolApprovalModal extends Modal {
       approveBtn.focus();
     }, 100);
 
-    // Hover effects
-    cancelBtn.addEventListener('mouseenter', () => {
-      cancelBtn.style.background = 'var(--background-modifier-hover)';
-    });
-    
-    cancelBtn.addEventListener('mouseleave', () => {
-      cancelBtn.style.background = 'var(--background-primary)';
-    });
-    
-    approveBtn.addEventListener('mouseenter', () => {
-      approveBtn.style.opacity = '0.9';
-    });
-    
-    approveBtn.addEventListener('mouseleave', () => {
-      approveBtn.style.opacity = '1';
-    });
+    // Hover effects are now handled by CSS classes
   }
 
   onClose() {

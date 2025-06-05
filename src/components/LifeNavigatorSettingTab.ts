@@ -440,27 +440,27 @@ class AddSecretModal extends Modal {
 		contentEl.addClass('secret-modal');
 
 		const title = contentEl.createEl('h3', { text: t('settings.secrets.dialog.addTitle') });
-		title.style.marginBottom = '16px';
+		title.className = 'ln-form-title';
 
 		// Key input
 		const keyLabel = contentEl.createEl('label', { text: t('settings.secrets.dialog.keyLabel') });
-		keyLabel.style.cssText = 'display: block; margin-bottom: 4px; font-weight: bold;';
+		keyLabel.className = 'ln-form-label';
 
 		const keyInput = contentEl.createEl('input', { type: 'text' });
 		keyInput.placeholder = t('settings.secrets.dialog.keyPlaceholder');
-		keyInput.style.cssText = 'width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid var(--background-modifier-border); border-radius: 4px; background: var(--background-primary); color: var(--text-normal); box-sizing: border-box;';
+		keyInput.className = 'ln-form-input';
 
 		// Value input
 		const valueLabel = contentEl.createEl('label', { text: t('settings.secrets.dialog.valueLabel') });
-		valueLabel.style.cssText = 'display: block; margin-bottom: 4px; font-weight: bold;';
+		valueLabel.className = 'ln-form-label';
 
 		const valueInput = contentEl.createEl('input', { type: 'text' });
 		valueInput.placeholder = t('settings.secrets.dialog.valuePlaceholder');
-		valueInput.style.cssText = 'width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid var(--background-modifier-border); border-radius: 4px; background: var(--background-primary); color: var(--text-normal); box-sizing: border-box;';
+		valueInput.className = 'ln-form-input';
 
 		// Buttons
 		const buttonsEl = contentEl.createEl('div');
-		buttonsEl.style.cssText = 'display: flex; gap: 8px; justify-content: flex-end;';
+		buttonsEl.className = 'ln-form-buttons';
 
 		const cancelBtn = buttonsEl.createEl('button', { text: t('settings.secrets.dialog.cancel') });
 		cancelBtn.onclick = () => this.close();
@@ -528,20 +528,20 @@ class EditSecretModal extends Modal {
 		contentEl.addClass('secret-modal');
 
 		const title = contentEl.createEl('h3', { text: t('settings.secrets.dialog.editTitle', { key: this.key }) });
-		title.style.marginBottom = '16px';
+		title.className = 'ln-form-title';
 
 		// Value input
 		const valueLabel = contentEl.createEl('label', { text: t('settings.secrets.dialog.valueLabel') });
-		valueLabel.style.cssText = 'display: block; margin-bottom: 4px; font-weight: bold;';
+		valueLabel.className = 'ln-form-label';
 
 		const valueInput = contentEl.createEl('input', { type: 'text' });
 		valueInput.value = this.currentValue;
 		valueInput.placeholder = t('settings.secrets.dialog.valuePlaceholder');
-		valueInput.style.cssText = 'width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid var(--background-modifier-border); border-radius: 4px; background: var(--background-primary); color: var(--text-normal); box-sizing: border-box;';
+		valueInput.className = 'ln-form-input';
 
 		// Buttons
 		const buttonsEl = contentEl.createEl('div');
-		buttonsEl.style.cssText = 'display: flex; gap: 8px; justify-content: flex-end;';
+		buttonsEl.className = 'ln-form-buttons';
 
 		const cancelBtn = buttonsEl.createEl('button', { text: t('settings.secrets.dialog.cancel') });
 		cancelBtn.onclick = () => this.close();

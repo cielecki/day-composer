@@ -2302,3 +2302,558 @@ If your plugin does not need CSS, delete this file.
   overflow-wrap: break-word;
 }
 
+/* ===============================================
+   REUSABLE UTILITY CLASSES
+   =============================================== */
+
+/* Layout Utilities */
+.ln-flex {
+  display: flex;
+}
+
+.ln-flex-col {
+  flex-direction: column;
+}
+
+.ln-flex-row {
+  flex-direction: row;
+}
+
+.ln-items-center {
+  align-items: center;
+}
+
+.ln-justify-center {
+  justify-content: center;
+}
+
+.ln-justify-between {
+  justify-content: space-between;
+}
+
+.ln-justify-end {
+  justify-content: flex-end;
+}
+
+.ln-gap-1 {
+  gap: 4px;
+}
+
+.ln-gap-2 {
+  gap: 8px;
+}
+
+.ln-gap-3 {
+  gap: 12px;
+}
+
+.ln-gap-4 {
+  gap: 16px;
+}
+
+/* Positioning */
+.ln-relative {
+  position: relative;
+}
+
+.ln-absolute {
+  position: absolute;
+}
+
+.ln-overflow-visible {
+  overflow: visible;
+}
+
+.ln-overflow-hidden {
+  overflow: hidden;
+}
+
+.ln-overflow-auto {
+  overflow: auto;
+}
+
+/* Typography */
+.ln-font-medium {
+  font-weight: 500;
+}
+
+.ln-font-bold {
+  font-weight: bold;
+}
+
+.ln-text-normal {
+  color: var(--text-normal);
+}
+
+.ln-text-muted {
+  color: var(--text-muted);
+}
+
+.ln-text-sm {
+  font-size: 14px;
+}
+
+.ln-text-xs {
+  font-size: 12px;
+}
+
+.ln-whitespace-normal {
+  white-space: normal;
+}
+
+.ln-whitespace-nowrap {
+  white-space: nowrap;
+}
+
+.ln-break-words {
+  word-break: break-word;
+}
+
+.ln-text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ln-text-center {
+  text-align: center;
+}
+
+/* Spacing */
+.ln-p-1 {
+  padding: 4px;
+}
+
+.ln-p-2 {
+  padding: 8px;
+}
+
+.ln-p-3 {
+  padding: 12px;
+}
+
+.ln-p-4 {
+  padding: 16px;
+}
+
+.ln-px-3 {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.ln-py-2 {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.ln-m-0 {
+  margin: 0;
+}
+
+.ln-mt-4 {
+  margin-top: 16px;
+}
+
+.ln-mb-4 {
+  margin-bottom: 16px;
+}
+
+.ln-ml-1 {
+  margin-left: 4px;
+}
+
+/* Borders */
+.ln-border-t {
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.ln-border-rounded {
+  border-radius: 4px;
+}
+
+.ln-border-rounded-lg {
+  border-radius: 6px;
+}
+
+/* Background Colors */
+.ln-bg-transparent {
+  background-color: transparent;
+}
+
+.ln-bg-secondary {
+  background-color: var(--background-secondary);
+}
+
+.ln-bg-hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.ln-bg-primary {
+  background-color: var(--background-primary);
+}
+
+/* Interactive States */
+.ln-cursor-pointer {
+  cursor: pointer;
+}
+
+.ln-transition {
+  transition: all 0.2s ease;
+}
+
+.ln-hover-bg-hover:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.ln-hover-bg-transparent:hover {
+  background-color: transparent;
+}
+
+/* Size & Display */
+.ln-w-full {
+  width: 100%;
+}
+
+.ln-h-auto {
+  height: auto;
+}
+
+.ln-min-h-150 {
+  min-height: 150px;
+}
+
+.ln-max-w-300 {
+  max-width: 300px;
+}
+
+.ln-max-h-200 {
+  max-height: 200px;
+}
+
+.ln-object-contain {
+  object-fit: contain;
+}
+
+.ln-hidden {
+  display: none;
+}
+
+.ln-flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+.ln-flex-grow {
+  flex-grow: 1;
+}
+
+/* Z-Index */
+.ln-z-max {
+  z-index: 99999;
+}
+
+/* Transform */
+.ln-rotate-0 {
+  transform: rotate(0deg);
+}
+
+.ln-rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* Box Shadow */
+.ln-shadow-dropdown {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* Specialized Component Classes */
+.ln-mode-dropdown {
+  position: absolute;
+  top: 38px;
+  left: 0;
+  z-index: 99999;
+  min-width: 240px;
+  max-width: 360px;
+  max-height: 600px;
+  overflow-y: auto;
+  background-color: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ln-mode-indicator {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.ln-mode-indicator.open {
+  background-color: var(--background-modifier-hover);
+}
+
+.ln-mode-action-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-normal);
+  white-space: normal;
+  word-break: break-word;
+}
+
+.ln-mode-action-item:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.ln-mode-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  position: relative;
+  white-space: normal;
+  word-break: break-word;
+  background-color: transparent;
+}
+
+.ln-mode-list-item:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.ln-mode-list-item.active {
+  background-color: var(--background-modifier-hover);
+  font-weight: 500;
+}
+
+.ln-chevron {
+  display: flex;
+  align-items: center;
+  margin-left: 4px;
+  transition: transform 0.2s ease;
+}
+
+.ln-chevron.open {
+  transform: rotate(180deg);
+}
+
+.ln-icon-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ln-separator {
+  border-top: 1px solid var(--background-modifier-border);
+  margin: 4px 0;
+}
+
+.ln-section-label {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Modal Styles */
+.ln-modal-container {
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ln-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+}
+
+.ln-modal-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.ln-modal-info-section {
+  background: var(--background-secondary);
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.ln-modal-warning-section {
+  background: var(--background-secondary);
+  border-left: 4px solid var(--color-red);
+  padding: 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  border: 1px solid var(--background-modifier-border);
+}
+
+.ln-modal-code-block {
+  background: var(--background-secondary);
+  padding: 12px;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  word-wrap: break-word;
+}
+
+.ln-modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 16px;
+  border-top: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+}
+
+.ln-modal-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ln-modal-button.cancel {
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-normal);
+}
+
+.ln-modal-button.cancel:hover {
+  background: var(--background-modifier-hover);
+}
+
+.ln-modal-button.approve {
+  background: var(--interactive-accent);
+  color: white;
+  border: none;
+  font-weight: bold;
+}
+
+.ln-modal-button.approve:hover {
+  opacity: 0.9;
+}
+
+/* Settings Tab Form Styles */
+.ln-form-title {
+  margin-bottom: 16px;
+}
+
+.ln-form-label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+
+.ln-form-input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+}
+
+.ln-form-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Waveform Styles */
+.ln-waveform-bar-dynamic {
+  opacity: 0.3; /* Base opacity, will be overridden by style attribute */
+}
+
+/* Image Preview Styles */
+.ln-image-preview {
+  max-width: 300px;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+/* Pre Styles for Code Blocks */
+.ln-pre-code {
+  background: var(--background-secondary);
+  border-radius: 4px;
+  padding: 12px;
+  font-family: var(--font-monospace);
+  font-size: 14px;
+  max-height: 600px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+/* Auto-resize textarea styles */
+.ln-textarea-auto {
+  height: auto;
+  min-height: auto;
+}
+
+.ln-textarea-150 {
+  max-height: 150px;
+}
+
+/* Simple Modal Styles - for system prompt and similar modals */
+.ln-simple-modal-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.ln-simple-modal-header {
+  flex-shrink: 0;
+  padding: 16px 16px 0 16px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: 0;
+}
+
+.ln-simple-modal-header h2 {
+  margin: 0 0 16px 0;
+  font-size: 1.2em;
+  color: var(--text-normal);
+}
+
+.ln-simple-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  min-height: 0; /* Important for flex child to allow shrinking */
+}
+
+.ln-simple-modal-footer {
+  flex-shrink: 0;
+  padding: 16px;
+  border-top: 1px solid var(--background-modifier-border);
+  margin-top: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Override the pre-code styles within simple modal to not have max-height */
+.ln-simple-modal-content .ln-pre-code {
+  max-height: none;
+  overflow: visible;
+}
+
