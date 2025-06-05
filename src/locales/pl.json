@@ -74,7 +74,7 @@
     "lifeNavigator": {
       "mainDescription": "Główny opis",
       "systemPrompt": "Prompt systemowy",
-      "title": "Life Navigator",
+      "title": "Facylitator",
       "voiceInstructions": "Mów pomocnym, konwersacyjnym tonem. Utrzymuj odpowiedzi zwięzłe ale dokładne. Rekomendując treści, krótko wyjaśnij dlaczego są dobrym wyborem. Zadawaj pytania uzupełniające, aby lepiej zrozumieć potrzeby użytkownika."
     }
   },

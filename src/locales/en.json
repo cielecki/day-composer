@@ -74,7 +74,7 @@
     "lifeNavigator": {
       "mainDescription": "Main Description",
       "systemPrompt": "System Prompt",
-      "title": "Life Navigator",
+      "title": "Facilitator",
       "voiceInstructions": "Speak in a helpful, conversational tone. Keep responses concise but thorough. When recommending content, briefly explain why it's a good fit. Ask follow-up questions to better understand user needs."
     }
   },
