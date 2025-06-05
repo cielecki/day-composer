@@ -26,7 +26,18 @@ export const ToolInputDisplay: React.FC<{
     }
     
     if (typeof value === 'string') {
-      return <span className="ln-tool-input__value ln-tool-input__value--string">"{value}"</span>;
+      // Check if the string contains line breaks
+      if (value.includes('\n')) {
+        // Multi-line string - render in a pre element to preserve line breaks
+        return (
+          <pre className="ln-tool-input__value ln-tool-input__value--string ln-tool-input__value--multiline">
+            {value}
+          </pre>
+        );
+      } else {
+        // Single-line string - render normally
+        return <span className="ln-tool-input__value ln-tool-input__value--string">"{value}"</span>;
+      }
     }
     
     if (Array.isArray(value)) {

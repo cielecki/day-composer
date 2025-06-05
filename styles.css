@@ -1726,6 +1726,20 @@ If your plugin does not need CSS, delete this file.
   font-style: italic;
 }
 
+.life-navigator-view .ln-tool-input__value--multiline {
+  white-space: pre-wrap;
+  margin: 0.25rem 0;
+  padding: 0.25rem;
+  background-color: var(--background-secondary);
+  border-radius: 0.25rem;
+  border-left: 2px solid var(--text-accent);
+  font-family: var(--font-monospace);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
 /* Icon container for overlaying chevron and primary icon */
 .life-navigator-view .collapsible-icon-container {
   position: relative;
