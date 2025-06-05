@@ -104,7 +104,7 @@ export const vaultFindTool: ObsidianTool<VaultFindToolInput> = {
       
       if (children.length === 0) {
         const emptyMessage = t('tools.find.empty', { path: targetPath || 'root' });
-        context.setLabel(t('tools.find.completed', { path: targetPath || 'root' }));
+        context.setLabel(t('tools.find.completed', { count: 0, path: targetPath || 'root' }));
         context.progress(emptyMessage);
         return;
       }
@@ -145,7 +145,7 @@ export const vaultFindTool: ObsidianTool<VaultFindToolInput> = {
       
       const resultText = result.join('\n');
       
-      context.setLabel(t('tools.find.completed', { path: targetPath || 'root' }));
+      context.setLabel(t('tools.find.completed', { count: children.length, path: targetPath || 'root' }));
       context.progress(resultText);
     } catch (error) {
       context.setLabel(t('tools.find.failed', { path: directory_path || 'root' }));

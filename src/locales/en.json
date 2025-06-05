@@ -307,7 +307,7 @@
       "success": "Moved file from {{source}} to {{destination}}"
     },
     "find": {
-      "completed": "Found content in {{path}}",
+      "completed": "Found {{count}} items in {{path}}",
       "empty": "Directory {{path}} is empty",
       "failed": "Failed to find content in {{path}}",
       "header": "Contents of {{path}} ({{count}} items):",

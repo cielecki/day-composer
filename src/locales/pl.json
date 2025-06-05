@@ -307,7 +307,7 @@
       "success": "Przeniesiono plik z {{source}} do {{destination}}"
     },
     "find": {
-      "completed": "Znaleziono zawartość w {{path}}",
+      "completed": "Znaleziono {{count}} elementów w {{path}}",
       "empty": "Katalog {{path}} jest pusty",
       "failed": "Nie udało się znaleźć zawartości w {{path}}",
       "header": "Zawartość {{path}} ({{count}} elementów):",
