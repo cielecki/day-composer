@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Chat switching and new messages properly stop existing generation and audio processes
   - Fixed concurrent message processing bugs that occurred when transcription completed during generation
   - Reliable hard stop functionality with actual process completion waiting (no more race conditions)
+- **Better tool parameter display**: Multi-line strings in tool parameters now display with proper line breaks instead of being shown as one long line
 
 ### Fixed
 - **Chat scrolling**: Chat now stays put when you scroll up to read old messages, instead of jumping to the bottom every time new text appears
