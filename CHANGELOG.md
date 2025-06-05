@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.3] - 2025-06-05
+
+### Fixed
+- **Message validation cutting off conversations**: Fixed critical issue where the last assistant and user messages weren't being sent to AI when conversations contained incomplete tool calls or thinking blocks earlier in the conversation. Now properly skips problematic messages while preserving valid messages at the end of conversations.
+- **Chat history saving**: Fixed issue where conversation history wasn't saving on Mac due to missing conversations directory. The plugin now automatically creates the required directory on startup.
+
+### Enhanced
+- **Improved note editing tool**: Fixed multiline text replacement issues by adding smart text normalization that handles different line endings, whitespace, and formatting. Now shows edited content with ±3 lines of context (marking edited lines with ●) and creates precise navigation targets that highlight exactly the edited lines.
+- **Better find tool feedback**: The find tool now shows specific counts like "Found 5 items in root" instead of the generic "Found content in root"
+
+### Changed
+- **Library tool renamed**: The library content viewing tool is now called "library_read" instead of "library_view" and shows specific file paths in completion messages, making it consistent with the document reading tool
+- **Mode name change**: Life Navigator mode is now called "Guide" to better reflect its purpose as a helpful assistant that guides users through their tasks and goals
+
+
+### Fixed
+- **Improved comment indentation**: Task tools now consistently use proper comment indentation.
+
 ## [0.10.2] - 2025-06-05
 
 ### Added
@@ -194,21 +212,3 @@ change: enforce thinking in claude, as it's needed for handover to work
 ## [0.6.6] - 2025-05-22
 
 ## [Unreleased]
-
-### Changed
-- **Theme-friendly styling**: Moved all inline styles and JavaScript style assignments to CSS classes, making the interface more easily customizable by themes and snippets. Created reusable utility classes for common patterns like layouts, spacing, and interactive states.
-- **Improved modal layout**: System prompt and similar modals now use proper flexbox layout with always-visible header and footer, and scrollable content area. No more scrollbars on small screen heights.
-
-### Fixed
-- **Message validation cutting off conversations**: Fixed critical issue where the last assistant and user messages weren't being sent to AI when conversations contained incomplete tool calls or thinking blocks earlier in the conversation. Now properly skips problematic messages while preserving valid messages at the end of conversations.
-- **Chat history saving on macOS**: Fixed issue where conversation history wasn't saving on Mac due to missing conversations directory. The plugin now automatically creates the required directory on startup.
-
-### Enhanced
-- **Improved note editing tool**: Fixed multiline text replacement issues by adding smart text normalization that handles different line endings, whitespace, and formatting. Now shows edited content with ±3 lines of context (marking edited lines with ●) and creates precise navigation targets that highlight exactly the edited lines.
-- **Better find tool feedback**: The find tool now shows specific counts like "Found 5 items in root" instead of the generic "Found content in root"
-
-### Changed
-- **Library tool renamed**: The library content viewing tool is now called "library_read" instead of "library_view" and shows specific file paths in completion messages, making it consistent with the document reading tool
-
-### Fixed
-- **Improved comment indentation**: Task tools now consistently use proper comment indentation.
