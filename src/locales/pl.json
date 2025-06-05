@@ -195,7 +195,7 @@
   },
   "tools": {
     "abandon": {
-      "label": "Porzuć Todo"
+      "label": "Porzucam todo ..."
     },
     "actions": {
       "abandon": {
@@ -258,10 +258,10 @@
       }
     },
     "add": {
-      "label": "Dodaj Todo"
+      "label": "Dodawanie todo ..."
     },
     "check": {
-      "label": "Zaznacz Todo"
+      "label": "Oznaczanie todo ..."
     },
     "checkForUpdates": "Sprawdź aktualizacje",
     "comments": {
@@ -271,7 +271,7 @@
       "completed": "Zapisano rozmowę do {{path}}",
       "failed": "Nie udało się zapisać rozmowy",
       "inProgress": "Zapisywanie rozmowy...",
-      "label": "Zapisz Rozmowę",
+      "label": "Zapisywanie rozmowy ...",
       "navigation": {
         "openSavedConversation": "Otwórz zapisaną rozmowę"
       },
@@ -283,7 +283,7 @@
       }
     },
     "createCompleted": {
-      "label": "Utwórz Ukończone Todo"
+      "label": "Tworzę ukończone todo ..."
     },
     "createDocument": {
       "progress": {
@@ -292,14 +292,14 @@
       }
     },
     "edit": {
-      "label": "Edytuj zadanie"
+      "label": "Edytowanie todo ..."
     },
     "fileMove": {
       "completed": "Przeniesiono plik z {{source}} do {{destination}}",
       "creatingDirectories": "Tworzenie katalogu docelowego: {{dir}}",
       "failed": "Nie udało się przenieść pliku {{source}}",
       "inProgress": "Przenoszenie pliku z {{source}} do {{destination}}...",
-      "label": "Przenieś plik",
+      "label": "Przenoszenie pliku ...",
       "moving": "Przenoszenie {{source}} do {{destination}}",
       "navigation": {
         "openMovedFile": "Otwórz przeniesiony plik"
@@ -312,38 +312,38 @@
       "failed": "Nie udało się znaleźć zawartości w {{path}}",
       "header": "Zawartość {{path}} ({{count}} elementów):",
       "inProgress": "Wyszukiwanie zawartości w {{path}}...",
-      "label": "Znajdź Pliki"
+      "label": "Znajduję pliki ..."
     },
     "findFilesByTag": {
       "completed": "Znaleziono {{count}} plików z tagiem {{tag}}",
       "failed": "Nie udało się znaleźć plików z tagiem {{tag}}",
       "foundFiles": "Znaleziono {{count}} plików z tagiem {{tag}}",
       "inProgress": "Wyszukiwanie plików z tagiem {{tag}}...",
-      "label": "Znajdź Pliki po Tagu",
+      "label": "Znajduję pliki po tagu ...",
       "noResults": "Nie znaleziono plików z tagiem {{tag}}"
     },
     "handover": {
-      "completed": "Przełączono na tryb {{mode}}",
-      "failed": "Nie udało się przełączyć na tryb {{mode}}",
-      "inProgress": "Przełączanie na tryb {{mode}}...",
-      "label": "Przekaż Tryb",
-      "noReason": "Przełączanie na tryb {{mode}}"
+      "completed": "Przekazano kontrolę do {{mode}}",
+      "failed": "Nie udało się przekazać kontroli do {{mode}}",
+      "inProgress": "Przekazywanie kontroli do {{mode}}...",
+      "label": "Przekazywanie kontroli ...",
+      "noReason": "Przekazywanie kontroli do {{mode}}"
     },
     "library": {
       "list": {
         "failed": "Nie udało się przeglądnąć biblioteki",
         "inProgress": "Przeglądanie biblioteki Life Navigator...",
-        "label": "Przeglądaj bibliotekę Life Navigator"
+        "label": "Przeglądam bibliotekę Life Navigator ..."
       },
       "view": {
         "completed": "Zawartość biblioteki wyświetlona",
         "failed": "Nie udało się wyświetlić zawartości",
         "inProgress": "Pobieranie zawartości biblioteki...",
-        "label": "Wyświetl zawartość biblioteki"
+        "label": "Wyświetlam zawartość biblioteki ..."
       }
     },
     "move": {
-      "label": "Przenieś Todo"
+      "label": "Przenoszenie todo ..."
     },
     "navigation": {
       "navigateToCompletedTodo": "Przejdź do ukończonego todo",
@@ -357,24 +357,24 @@
       "completed": "Edytowano dokument {{path}}",
       "failed": "Nie udało się edytować dokumentu {{path}}",
       "inProgress": "Edytowanie dokumentu {{path}}...",
-      "label": "Edytuj Dokument"
+      "label": "Edytowanie dokumentu ..."
     },
     "openLifeNavigator": "Otwórz Life Navigator",
     "read": {
       "completed": "Odczytano dokument {{path}}",
       "failed": "Nie udało się odczytać dokumentu {{path}}",
       "inProgress": "Odczytywanie dokumentu {{path}}...",
-      "label": "Odczytaj Dokument"
+      "label": "Odczytuję dokument ..."
     },
     "remove": {
-      "label": "Usuń Todo"
+      "label": "Usuwam todo ..."
     },
     "resetTutorial": "Resetuj Tutorial",
     "search": {
       "completed": "Wyszukiwanie zakończone dla {{query}}",
       "failed": "Nie udało się wyszukać {{query}}",
       "inProgress": "Wyszukiwanie {{query}}...",
-      "label": "Przeszukaj Vault",
+      "label": "Przeszukuję vault ...",
       "noResults": "Nie znaleziono wyników dla {{query}}"
     },
     "secretList": {
@@ -403,13 +403,13 @@
       "plural": "zadania"
     },
     "uncheck": {
-      "label": "Odznacz Todo"
+      "label": "Odznaczam todo ..."
     },
     "urlDownload": {
-      "completed": "[TRANSLATE] Completed",
-      "failed": "[TRANSLATE] Failed",
-      "inProgress": "[TRANSLATE] In Progress",
-      "label": "[TRANSLATE] Label"
+      "completed": "Pobrano plik z {{url}}",
+      "failed": "Nie udało się pobrać pliku z {{url}}",
+      "inProgress": "Pobieranie pliku z {{url}}...",
+      "label": "Pobieram plik..."
     }
   },
   "ui": {

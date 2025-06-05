@@ -195,7 +195,7 @@
   },
   "tools": {
     "abandon": {
-      "label": "Abandon Todo"
+      "label": "Abandoning todo ..."
     },
     "actions": {
       "abandon": {
@@ -258,10 +258,10 @@
       }
     },
     "add": {
-      "label": "Add Todo"
+      "label": "Adding todo ..."
     },
     "check": {
-      "label": "Check Todo"
+      "label": "Checking todo ..."
     },
     "checkForUpdates": "Check for Updates",
     "comments": {
@@ -271,7 +271,7 @@
       "completed": "Saved conversation to {{path}}",
       "failed": "Failed to save conversation",
       "inProgress": "Saving conversation...",
-      "label": "Save Conversation",
+      "label": "Saving conversation ...",
       "navigation": {
         "openSavedConversation": "Open saved conversation"
       },
@@ -283,7 +283,7 @@
       }
     },
     "createCompleted": {
-      "label": "Create Completed Todo"
+      "label": "Creating completed todo ..."
     },
     "createDocument": {
       "progress": {
@@ -292,7 +292,7 @@
       }
     },
     "edit": {
-      "label": "Edit Todo"
+      "label": "Editing todo ..."
     },
     "fileMove": {
       "completed": "Moved file from {{source}} to {{destination}}",
@@ -326,24 +326,24 @@
       "completed": "Switched to {{mode}} mode",
       "failed": "Failed to switch to {{mode}} mode",
       "inProgress": "Switching to {{mode}} mode...",
-      "label": "Handover Mode",
+      "label": "Handing over control ...",
       "noReason": "Switching to {{mode}} mode"
     },
     "library": {
       "list": {
         "failed": "Failed to browse library",
         "inProgress": "Browsing Life Navigator library...",
-        "label": "Browse Life Navigator library"
+        "label": "Browsing Life Navigator library ..."
       },
       "view": {
         "completed": "Library content viewed",
         "failed": "Failed to view content",
         "inProgress": "Downloading library content...",
-        "label": "View library content"
+        "label": "Viewing library content ..."
       }
     },
     "move": {
-      "label": "Move Todo"
+      "label": "Moving todo ..."
     },
     "navigation": {
       "navigateToCompletedTodo": "Navigate to completed todo",
@@ -357,24 +357,24 @@
       "completed": "Edited document {{path}}",
       "failed": "Failed to edit document {{path}}",
       "inProgress": "Editing document {{path}}...",
-      "label": "Edit Document"
+      "label": "Editing document ..."
     },
     "openLifeNavigator": "Open Life Navigator",
     "read": {
       "completed": "Read document {{path}}",
       "failed": "Failed to read document {{path}}",
       "inProgress": "Reading document {{path}}...",
-      "label": "Read Document"
+      "label": "Reading document ..."
     },
     "remove": {
-      "label": "Remove Todo"
+      "label": "Removing todo ..."
     },
     "resetTutorial": "Reset Tutorial",
     "search": {
       "completed": "Search completed for {{query}}",
       "failed": "Failed to search for {{query}}",
       "inProgress": "Searching for {{query}}...",
-      "label": "Search Vault",
+      "label": "Searching vault ...",
       "noResults": "No results found for {{query}}"
     },
     "secretList": {
@@ -403,13 +403,13 @@
       "plural": "tasks"
     },
     "uncheck": {
-      "label": "Uncheck Todo"
+      "label": "Unchecking todo ..."
     },
     "urlDownload": {
-      "completed": "[TODO] Completed",
-      "failed": "[TODO] Failed",
-      "inProgress": "[TODO] In Progress",
-      "label": "[TODO] Label"
+      "completed": "Downloaded file from {{url}}",
+      "failed": "Failed to download file from {{url}}",
+      "inProgress": "Downloading file from {{url}}...",
+      "label": "Downloading file..."
     }
   },
   "ui": {
