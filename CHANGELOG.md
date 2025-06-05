@@ -195,7 +195,12 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ## [Unreleased]
 
+### Changed
+- **Theme-friendly styling**: Moved all inline styles and JavaScript style assignments to CSS classes, making the interface more easily customizable by themes and snippets. Created reusable utility classes for common patterns like layouts, spacing, and interactive states.
+- **Improved modal layout**: System prompt and similar modals now use proper flexbox layout with always-visible header and footer, and scrollable content area. No more scrollbars on small screen heights.
+
 ### Fixed
+- **Message validation cutting off conversations**: Fixed critical issue where the last assistant and user messages weren't being sent to AI when conversations contained incomplete tool calls or thinking blocks earlier in the conversation. Now properly skips problematic messages while preserving valid messages at the end of conversations.
 - **Chat history saving on macOS**: Fixed issue where conversation history wasn't saving on Mac due to missing conversations directory. The plugin now automatically creates the required directory on startup.
 
 ### Enhanced
