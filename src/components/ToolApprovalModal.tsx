@@ -56,9 +56,17 @@ export class ToolApprovalModal extends Modal {
       attr: { style: 'background: var(--background-secondary); padding: 12px; border-radius: 6px; margin-bottom: 16px;' }
     });
     
-    toolInfoEl.createEl('p').innerHTML = `<strong>${t('toolApproval.info.tool')}:</strong> ${this.escapeHtml(this.tool.name)}`;
-    toolInfoEl.createEl('p').innerHTML = `<strong>${t('toolApproval.info.description')}:</strong> ${this.escapeHtml(this.tool.description)}`;
-    toolInfoEl.createEl('p').innerHTML = `<strong>${t('toolApproval.info.file')}:</strong> ${this.escapeHtml(this.tool.filePath)}`;
+    const toolParagraph = toolInfoEl.createEl('p');
+    toolParagraph.createEl('strong', { text: t('toolApproval.info.tool') + ':' });
+    toolParagraph.appendText(' ' + this.tool.name);
+    
+    const descParagraph = toolInfoEl.createEl('p');
+    descParagraph.createEl('strong', { text: t('toolApproval.info.description') + ':' });
+    descParagraph.appendText(' ' + this.tool.description);
+    
+    const fileParagraph = toolInfoEl.createEl('p');
+    fileParagraph.createEl('strong', { text: t('toolApproval.info.file') + ':' });
+    fileParagraph.appendText(' ' + this.tool.filePath);
 
     // Security warning section - fix the red-on-red text issue
     const warningSection = scrollableContent.createEl('div', {
@@ -184,14 +192,5 @@ export class ToolApprovalModal extends Modal {
   onClose() {
     const { contentEl } = this;
     contentEl.empty();
-  }
-
-  private escapeHtml(unsafe: string): string {
-    return unsafe
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
   }
 } 

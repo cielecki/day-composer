@@ -1,7 +1,7 @@
 import { App, TFile, MarkdownView } from "obsidian";
 import { t } from 'src/i18n';
 import { convertToValidTagName } from '../text/xml-tag-converter';
-import { getCurrentChatContent } from '../chat/chat-content-extractor';
+import { formatConversationContent } from '../chat/conversation-formatter';
 import { findDailyNotesByDate } from 'src/utils/daily-notes/daily-note-finder';
 
 declare global {
@@ -170,20 +170,34 @@ export function handleCurrentlySelectedTextLink(app: App): string {
  */
 export function handleCurrentChatLink(app: App): string {
 	try {
-		// Get the current chat content from the LifeNavigatorView
-		const chatContent = getCurrentChatContent(app);
+		// Import the store dynamically to avoid circular dependencies
+		const { usePluginStore } = require('../../store/plugin-store');
+		const store = usePluginStore.getState();
+		
+		// Get the current conversation messages from Zustand store
+		const messages = store.chats.current.storedConversation.messages;
+		
+		// Check if there are any messages
+		if (!messages || messages.length === 0) {
+			const translatedTagName = convertToValidTagName(t('chat.current'));
+			return `<${translatedTagName} status="empty">\n\n  ${t('chat.empty')}\n\n</${translatedTagName}>\n`;
+		}
+		
+		// Format the conversation content
+		const conversationContent = formatConversationContent(messages);
 		
 		// Get the translated tag name and convert it to a valid XML tag name
 		const translatedTagName = convertToValidTagName(t('chat.current'));
 		
 		// Format the content with proper indentation
-		const tabbedContent = chatContent.split('\n').map((line: string) => '  ' + line).join('\n');
+		const tabbedContent = conversationContent.split('\n').map((line: string) => '  ' + line).join('\n');
 		
 		// Return the chat content in XML format
 		return `<${translatedTagName}>\n\n${tabbedContent}\n\n</${translatedTagName}>\n`;
 	} catch (error) {
-		console.error(`Error retrieving current chat content`, error);
-		return `[Error retrieving chat content] 🔎`;
+		console.error(`Error retrieving current chat content from store:`, error);
+		const translatedTagName = convertToValidTagName(t('chat.current'));
+		return `<${translatedTagName} status="error">\n\n  ${t('errors.chat.noContent')}\n\n</${translatedTagName}>\n`;
 	}
 }
 

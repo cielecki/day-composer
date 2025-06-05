@@ -41,7 +41,7 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			cls: 'setting-item-description',
 			attr: { style: 'margin-bottom: 1em; padding-top: 1em; color: var(--text-muted); border-top: 1px solid var(--background-modifier-border);' }
 		});
-		secretsDescEl.innerHTML = t('settings.secrets.description');
+		secretsDescEl.textContent = t('settings.secrets.description');
 
 		// Container for secrets list
 		this.secretsContainer = containerEl.createEl('div', {cls: 'secrets-container'});
@@ -55,7 +55,10 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			attr: { style: 'margin-top: 1em; padding: 1em; background: var(--background-secondary); border-radius: 6px; color: var(--text-warning);' }
 		});
 
-		securityNoteEl.innerHTML = `<strong>⚠️ ${t('settings.security.title')}</strong><br>${t('settings.secrets.securityNote')}`;
+		const warningTitle = securityNoteEl.createEl('strong');
+		warningTitle.textContent = '⚠️ ' + t('settings.security.title');
+		securityNoteEl.createEl('br');
+		securityNoteEl.appendText(t('settings.secrets.securityNote'));
 
 		// === LIFE NAVIGATOR ACTIONS ===
 		containerEl.createEl('h2', { text: t('settings.actions.title') });
@@ -125,8 +128,8 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 				text.inputEl.cols = 50;
 			});
 		
-		// Set HTML description to enable the link
-		promptDesc.descEl.innerHTML = t('settings.prompts.speechToTextPromptDesc');
+		// Set description text
+		promptDesc.descEl.textContent = t('settings.prompts.speechToTextPromptDesc');
 
 		// User-Defined Tools section (moved to bottom)
 		containerEl.createEl('h2', {text: t('settings.userTools.title'), attr: { style: 'margin: 0; margin-top: 2em; border-bottom: 1px solid var(--background-modifier-border); padding-bottom: 1em;' } });
@@ -142,7 +145,10 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			cls: 'setting-item-description',
 			attr: { style: 'margin-top: 1em; padding: 1em; background: var(--background-secondary); border-radius: 6px; color: var(--text-warning);' }
 		});
-		securityWarningEl.innerHTML = `<strong>⚠️ ${t('settings.userTools.security.title')}</strong><br>${t('settings.userTools.security.warning')}`;
+		const userToolsWarningTitle = securityWarningEl.createEl('strong');
+		userToolsWarningTitle.textContent = '⚠️ ' + t('settings.userTools.security.title');
+		securityWarningEl.createEl('br');
+		securityWarningEl.appendText(t('settings.userTools.security.warning'));
 	}
 
 	async refreshSecretsDisplay(): Promise<void> {
@@ -198,7 +204,10 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 					'title': t('settings.secrets.list.edit')
 				}
 			});
-			editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="m18.5 2.5 3 3L12 15l-4 1 1-4Z"/></svg>`;
+			const editIcon = getIcon('edit');
+			if (editIcon) {
+				editBtn.appendChild(editIcon);
+			}
 			editBtn.addEventListener('click', () => {
 				this.showEditSecretDialog(key, value || '');
 			});
@@ -211,7 +220,10 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 					'title': t('settings.secrets.list.delete')
 				}
 			});
-			deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c0 1 1 2 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`;
+			const deleteIcon = getIcon('trash-2');
+			if (deleteIcon) {
+				deleteBtn.appendChild(deleteIcon);
+			}
 			deleteBtn.addEventListener('click', async () => {
 				const confirmed = confirm(t('settings.secrets.list.confirmDelete', { key }));
 				if (confirmed) {
@@ -280,7 +292,7 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 				cls: 'setting-item-description',
 				attr: { style: 'margin-top: 1em; color: var(--text-muted); font-style: italic;' }
 			});
-			noToolsMsg.innerHTML = t('settings.userTools.list.noTools');
+			noToolsMsg.textContent = t('settings.userTools.list.noTools');
 			return;
 		}
 

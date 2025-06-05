@@ -18,47 +18,41 @@ export const LucideIcon: React.FC<LucideIconProps> = ({
 	className = "",
 	color,
 }) => {
-	const [svg, setSvg] = React.useState<string>("");
+	const containerRef = React.useRef<HTMLDivElement>(null);
 
 	React.useEffect(() => {
-		try {
-			// Get the icon as SVG from Obsidian
-			const iconEl = getIcon(name);
-			if (iconEl) {
-				// Convert to string
-				const svgString = iconEl.outerHTML;
-				setSvg(svgString);
-			} else {
-				console.warn(`Icon "${name}" not found`);
+		if (containerRef.current) {
+			// Clear any existing content by removing all child nodes
+			while (containerRef.current.firstChild) {
+				containerRef.current.removeChild(containerRef.current.firstChild);
 			}
-		} catch (e) {
-			console.error(`Error loading icon "${name}":`, e);
+			
+			try {
+				// Get the icon as SVG from Obsidian
+				const iconEl = getIcon(name);
+				if (iconEl) {
+					// Safely append the icon element directly
+					containerRef.current.appendChild(iconEl);
+				} else {
+					console.warn(`Icon "${name}" not found`);
+				}
+			} catch (e) {
+				console.error(`Error loading icon "${name}":`, e);
+			}
 		}
 	}, [name]);
 
-	// If we have an SVG, render it
-	if (svg) {
-		return (
-			<div
-				className={`lucide-icon ${className}`}
-				style={{
-					width: size,
-					height: size,
-					color: color || "inherit",
-				}}
-				dangerouslySetInnerHTML={{ __html: svg }}
-			/>
-		);
-	}
-
-	// Fallback if icon not found
 	return (
 		<div
-			className={`lucide-icon-fallback ${className}`}
+			ref={containerRef}
+			className={`lucide-icon ${className}`}
 			style={{
 				width: size,
 				height: size,
 				color: color || "inherit",
+				display: 'inline-flex',
+				alignItems: 'center',
+				justifyContent: 'center',
 			}}
 		/>
 	);
