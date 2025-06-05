@@ -23,7 +23,16 @@
   },
   "errors": {
     "audio": {
-      "playbackError": "Błąd odtwarzania audio: {{error}}"
+      "invalidVoice": "[TRANSLATE] Invalid Voice",
+      "microphone": {
+        "accessDenied": "[TRANSLATE] Access Denied",
+        "general": "[TRANSLATE] General",
+        "inUse": "[TRANSLATE] In Use",
+        "notFound": "[TRANSLATE] Not Found"
+      },
+      "noApiKey": "[TRANSLATE] No Api Key",
+      "playbackError": "Błąd odtwarzania audio: {{error}}",
+      "transcriptionFailed": "[TRANSLATE] Transcription Failed"
     },
     "chat": {
       "noContent": "Brak dostępnej zawartości czatu"
@@ -50,17 +59,6 @@
       "execution": "Błąd wykonania narzędzia {{tool}}: {{error}}",
       "noName": "Nie podano nazwy narzędzia",
       "unknown": "Nieznane narzędzie \"{{tool}}\""
-    },
-    "tts": {
-      "invalidVoice": "Nieprawidłowy głos: {{voice}}",
-      "microphone": {
-        "accessDenied": "Odmowa dostępu do mikrofonu. Zezwól na dostęp do mikrofonu w ustawieniach przeglądarki.",
-        "general": "Nie można uzyskać dostępu do mikrofonu",
-        "inUse": "Nie można uzyskać dostępu do mikrofonu. Może być używany przez inną aplikację.",
-        "notFound": "Nie znaleziono mikrofonu. Podłącz mikrofon i spróbuj ponownie."
-      },
-      "noApiKey": "Nie znaleziono klucza API OpenAI dla syntezy mowy. Skonfiguruj go w ustawieniach.",
-      "transcriptionFailed": "Transkrypcja nie powiodła się: {{error}}"
     }
   },
   "file": {

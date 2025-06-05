@@ -23,7 +23,16 @@
   },
   "errors": {
     "audio": {
-      "playbackError": "Error playing audio: {{error}}"
+      "invalidVoice": "[TODO] Invalid Voice",
+      "microphone": {
+        "accessDenied": "[TODO] Access Denied",
+        "general": "[TODO] General",
+        "inUse": "[TODO] In Use",
+        "notFound": "[TODO] Not Found"
+      },
+      "noApiKey": "[TODO] No Api Key",
+      "playbackError": "Error playing audio: {{error}}",
+      "transcriptionFailed": "[TODO] Transcription Failed"
     },
     "chat": {
       "noContent": "No chat content available"
@@ -50,17 +59,6 @@
       "execution": "Error executing tool {{tool}}: {{error}}",
       "noName": "No tool name provided",
       "unknown": "Unknown tool \"{{tool}}\""
-    },
-    "tts": {
-      "invalidVoice": "Invalid voice selected: {{voice}}. Please choose a valid voice.",
-      "microphone": {
-        "accessDenied": "Microphone access denied. Please allow microphone access in your browser settings.",
-        "general": "Cannot access microphone",
-        "inUse": "Cannot access microphone. It might be in use by another application.",
-        "notFound": "No microphone found. Please connect a microphone and try again."
-      },
-      "noApiKey": "OpenAI API Key not set. Please configure it in settings for text-to-speech.",
-      "transcriptionFailed": "Text-to-speech failed: {{error}}"
     }
   },
   "file": {
