@@ -7,9 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Advanced chat flow management**: Completely redesigned how the app handles multiple processes (chat generation, voice recording, audio playback) running at the same time. Now everything works smoothly together without conflicts or interruptions.
+- **Streaming audio during chat**: Audio now starts playing while the AI is still writing its response, instead of waiting for the complete message. This makes conversations feel much more natural and responsive.
+- **Robust Process Management**: Completely redesigned chat flow management with SimpleProcessManager
+  - Smart transcription logic: adds to input during generation, sends immediately when no generation active  
+  - Recording now immediately stops all audio playback and generation
+  - Chat switching and new messages properly stop existing generation and audio processes
+  - Fixed concurrent message processing bugs that occurred when transcription completed during generation
+  - Reliable hard stop functionality with actual process completion waiting (no more race conditions)
+
 ### Fixed
 - **Chat scrolling**: Chat now stays put when you scroll up to read old messages, instead of jumping to the bottom every time new text appears
 - **Mode memory**: Your selected mode is now remembered when you restart the app
+- **Process coordination**: Fixed issues where starting recording wouldn't stop audio playback, or switching conversations wouldn't cancel ongoing operations
+- **Concurrent operations**: Eliminated race conditions between transcription completion and message generation that could cause duplicate processing
+- **Recording stability**: Fixed recording immediately stopping issue by properly separating recording and transcription processes in the flow manager
+- **Waveform display**: Fixed waveform continuing to display after recording stops by improving state synchronization between flow manager and recording components
+- **Cancel recording**: Fixed cancel/stop buttons not working by updating them to use the new flow manager instead of outdated abort controllers
+- **Recording flow completion**: Fixed transcription not completing properly by removing complex dual-state management and creating a simple, self-contained voice recording system that reliably goes from Record → Transcribe → Send Message
+- **Cancel transcription notifications**: Fixed incorrect "Transcription failed" error notifications appearing when users intentionally cancel transcription operations
+- **Transcription during generation**: Fixed chat message conflicts when transcription completes during ongoing chat generation by properly stopping existing processes before starting new ones
 
 ## [0.10.1] - 2025-06-04
 
