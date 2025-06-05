@@ -4,11 +4,11 @@ import { t } from 'src/i18n';
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { getCurrentTime } from "../utils/time/get-current-time";
-import { addCommentToTask, insertTaskAtPosition, Task } from 'src/utils/tasks/task-utils';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { findCurrentSpot, readNote, updateNote } from 'src/utils/tools/note-utils';
 import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';
 import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-utils';
+import { appendComment, insertTaskAtPosition, Task } from "src/utils/tasks/task-utils";
 
 const schema = {
   name: "task_create_completed",
@@ -91,7 +91,7 @@ export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput>
       };
 
       if (comment) {
-        task = addCommentToTask(task, comment);
+        appendComment(task, comment);
       }
 
       // Insert at the current spot

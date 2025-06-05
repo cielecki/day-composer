@@ -32,36 +32,6 @@ export const REVERSE_STATUS_MAP = {
   'moved': '>'
 } as const
 
-/**
- * Add a comment to a task
- * @param task The task to add a comment to
- * @param comment The comment to add
- * @param timestamp Optional timestamp to include with the note
- * @returns The updated task
- */
-export function addCommentToTask(
-  task: Task,
-  comment: string | undefined,
-  timestamp: string | null = null
-): Task {
-  // Create a copy to avoid modifying the original
-  const updatedTask: Task = JSON.parse(JSON.stringify(task));
-  
-  // Skip if no comment provided
-  if (!comment) {
-    return updatedTask;
-  }
-  
-  // Format comment with timestamp if provided
-  const formattedComment = timestamp
-    ? `(${timestamp}) ${comment}`
-    : comment;
-    
-  // Add the comment
-  appendComment(updatedTask, formattedComment);
-  
-  return updatedTask;
-}
 
 /**
  * Format a task to markdown

@@ -7,6 +7,7 @@ import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-utils';
 import { t } from 'src/i18n';
 import { findTaskByDescription } from "src/utils/tools/note-utils";
+import { appendComment } from 'src/utils/tasks/task-utils';
 
 const schema = {
   name: "task_uncheck",
@@ -71,7 +72,7 @@ export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
 
       // Add comment if provided
       if (comment) {
-        task.comment = task.comment ? task.comment + "\n    " + comment : "    " + comment;
+        appendComment(task, comment);
       }
 
       // Update the note with the modified task

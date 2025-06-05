@@ -194,3 +194,6 @@ change: enforce thinking in claude, as it's needed for handover to work
 ## [0.6.6] - 2025-05-22
 
 ## [Unreleased]
+
+### Fixed
+- **Improved comment indentation**: Task tools now consistently use proper comment indentation.
