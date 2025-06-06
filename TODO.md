@@ -27,3 +27,4 @@
     - Encourage sharing the project with others
     - Ability to report bugs and feature requests on GitHub
 - [ ] Review all the materials and docs and update them
+- [ ] Fix the long press callout on mobile devices
