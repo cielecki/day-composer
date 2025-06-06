@@ -1,31 +1,12 @@
 # TODO
 
-- [ ] **Interactive Creator Mode:** How to create guidance for users when creating their materials? Some nice mode? or docs? Maybe a tutorial agent? Create a creator mode that generates sections/files based on dialogue with the user instead of using standard starter kits. This would provide a more personalized and interactive setup experience. Maybe this should allow for downloading files from github based on needs of the user.
-- [ ] Handover should have an option for handover for one specific query from the user and then going back to the second mode  or a permenanent switch to a given mode.
-
-- [ ] Jak robiłem kolejną transkrypcje podczas generacji coś się walneło, chyba ostatnie zmiany popsuły w tym zakresie coś.
-- [ ] Wrap up and prepare the user tools feature for release
-
-> ### Required
-> [[1](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/settings/SettingsTab.ts#L32)][[2](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/settings/SettingsTab.ts#L46)][[3](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/settings/SettingsTab.ts#L63)][[4](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/settings/SettingsTab.ts#L70)][[5](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L405)][[6](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L439)][[7](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L444)][[8](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L449)][[9](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/LucideIcon.tsx#L29)]:Using `innerHTML`, `outerHTML` or similar API's is a security risk. Instead, use the DOM API or the Obsidian helper functions: https://docs.obsidian.md/Plugins/User+interface/HTML+elements
-> 
-> 
-> [[1](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L42)][[2](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L43)][[3](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L44)][[4](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L45)][[5](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L46)][[6](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L47)][[7](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L48)][[8](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L49)][[9](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L52)][[10](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L469)][[11](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L470)][[12](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L495)][[13](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L496)][[14](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L522)][[15](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L523)][[16](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L562)][[17](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L563)][[18](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L617)][[19](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/AICoachApp.tsx#L618)][[20](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/UnifiedInputArea.tsx#L123)][[21](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/UnifiedInputArea.tsx#L124)][[22](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/UnifiedInputArea.tsx#L129)][[23](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/UnifiedInputArea.tsx#L130)][[24](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/UnifiedInputArea.tsx#L150)][[25](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/UnifiedInputArea.tsx#L151)][[26](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/UnifiedInputArea.tsx#L321)][[27](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/UnifiedInputArea.tsx#L351)][[28](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/UnifiedInputArea.tsx#L352)]:You should avoid assigning styles via JavaScript or in HTML and instead move all these styles into CSS so that they are more easily adaptable by themes and snippets.
-> 
-> 
-> [[1](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/i18n.ts#L9)][[2](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/i18n.ts#L20)][[3](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/i18n.ts#L41)][[4](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L41)][[5](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L44)][[6](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L374)][[7](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L387)][[8](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L392)][[9](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L402)][[10](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L405)][[11](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L422)][[12](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L432)][[13](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L438)][[14](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L439)][[15](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L489)][[16](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L497)][[17](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L513)][[18](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L529)][[19](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L536)][[20](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L540)][[21](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/obsidian-tools.ts#L107)][[22](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/obsidian-tools.ts#L127)][[23](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/obsidian-tools.ts#L159)][[24](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/obsidian-tools.ts#L165)][[25](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/defaults/ln-mode-defaults.ts#L86)][[26](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/main.ts#L218)][[27](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/main.ts#L267)][[28](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/main.ts#L341)][[29](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/main.ts#L358)][[30](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/main.ts#L362)] and more :You should consider limiting the number of `console.log`s in your code, to not pollute the dev console.
-> 
-> ### Optional
-> [[1](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context-collector.ts#L522)][[2](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/MessageDisplay.tsx#L57)][[3](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/MessageDisplay.tsx#L223)][[4](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/components/UnifiedInputArea.tsx#L235)][[5](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/context/AIAgentContext.tsx#L146)][[6](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/tools/show-todos.ts#L251)][[7](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/tools/show-todos.ts#L284)][[8](https://github.com/cielecki/life-navigator/blob/c43a0dd7131c099e9daa510002d3443ef77189a8/src/tools/show-todos.ts#L317)]:Casting to `any` should be avoided as much as possible.
-> 
-> Do NOT open a new PR for re-validation. Once you have pushed all of the required changes to your repo, the bot will update the labels on this PR within 6 hours. If you think some of the required changes are incorrect, please comment with `/skip` and the reason why you think the results are incorrect.
-
-
 # Stages
+- [ ] https://github.com/obsidianmd/obsidian-releases/pull/6517
 - [ ] Onboard 5 people to the plugin
 - [ ] Plan for promotion
 - [ ] Create an onboarding video in english
 - [ ] Start promoting the plugin on obsidian channels
+- [ ] Communication: I'm not gathering data therfore I need your engagement and activelly telling me feedback and stories how your onboarding went, how you use it.
 
 # Promo
 - [ ] Write a draft blog post for people to read through and give feedback on
@@ -33,19 +14,39 @@
 - [ ] Article about wiki paradigm as markdown database (creating/using input output not chats and rag, AI helping with this)
 
 ## Nice to haves
+- [ ] Scanning periodically for updates
+- [ ] Basic google search tool would be nice to have - https://docs.firecrawl.dev/features/search
+- [ ] 📎 Dodać obsługę załączników plików (nie tylko obrazków) w czacie Life Navigatora - PDFy automatycznie konwertować na tekst, drag & drop zarówno z systemu plików jak i wewnętrznie z Obsidiana
+- [ ] Scan for useful shit that we can add from general obsidian knowledge base
+    - [ ] Import z notion: https://www.notion.com/help/export-your-content
+- [ ] url-downloader should convert the result to markdown and be highly resilient to various schemes of providing content from url (firecrawl?)
+- [ ] Audio seems to have gotten slower recently
+- [ ] 🤔 Zbadać i zaimplementować włączanie/wyłączanie thinking blocks w Life Navigatorze - sprawdzić czy Anthropic przyjmie usunięcie thinking blocków
 - [ ] When there is no api key or there is a x-api error, instead of Notification a special error message should be added to the chat.
 - [ ] Any other tools should be user tools?
 - [ ] Proper mature user defined calendar tool
 - [ ] Do I want to be able to download any file from the repository?
 - [ ] Prompt caching for anthropic
 - [ ] Introduce support for weekly and monthly summaries via ln-monthly-note and ln-weekly-note.
-- [ ] Creator prototype
-- [ ] Change the link emoji to 🧭?
+- [ ] checking for updates via tool not from settings
 - [ ] Can I have more granular styles.css?
 - [ ] Proper management of available tools for modes.
 - [ ] System prompt injection into TTS prompt via current chat expansion? also refactor the way current chat information is gathered.
-- [ ] Better info dumped to AI when file is not found in expand links- [ ] still there is something wrong with the current spot logic - is it still a problem?
+- [ ] Better info dumped to AI when file is not found in expand links
+- [ ] still there is something wrong with the current spot logic - is it still a problem?
 - [ ] Create tool documentation in README or MODE_GUIDE or smth
-- [ ] 🔧 No action buttons on text messages ending with a tool call?
 - [ ] Do I want the input buttons to be flat?
-- [ ] Import z notion: https://www.notion.com/help/export-your-content lub https://anytype.io
+- [ ] 🔧 Dodać do promptów systemowych Life Navigatora informacje o autorze - social media, możliwość wsparcia, gdzie śledzić
+    Co warto dodać do promptów:
+    - Social media: LinkedIn (@mcielecki), X.com (@mcielecki), GitHub (@cielecki)
+    - Discord Life Navigator community (link do zaproszenia)
+    - Jak wspierać projekt: GitHub stars, contributions, feedback, testing
+    - Kim jestem: CEO 10Clouds → indie open source creator, AI enthusiast
+    - Life Navigator to open source, privacy-first personal AI companion
+    - Link do strony projektu (gdy będzie gotowa)
+    - Zachęta do dzielenia się projektem z innymi
+    - Możliwość zgłaszania bugów i feature requests na GitHub
+- [ ] 🔍 Zaimplementować fuzzy search dla zadań w Life Navigatorze - gdy nie znajdzie dokładnego tekstu zadania, zaproponować podobne opcje
+    **Problem:** Gdy próbujesz odfajczyć zadanie i tekst się nie zgadza 100%, dostajesz błąd "nie znaleziono".
+    **Rozwiązanie:** Fuzzy search który znajdzie podobne zadania i zaproponuje wybór z najbardziej prawdopodobnych.
+    **Algorytm:** Podobieństwo tekstu, dopasowanie słów kluczowych, edycyjna odległość.
