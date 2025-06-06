@@ -494,7 +494,7 @@ export const LifeNavigatorApp: React.FC = () => {
 											{t('ui.mode.openInEditor')}
 										</div>
 									)}
-									<div
+									{/* <div
 										className="ln-mode-action-item"
 										onClick={() => {
 											openSimpleObsidianModal(
@@ -507,7 +507,7 @@ export const LifeNavigatorApp: React.FC = () => {
 									>
 										<LucideIcon name="settings" size={16} color="var(--text-normal)" /> 
 										{t('ui.mode.viewSettings')}
-									</div>
+									</div> */}
 									<div
 										className="ln-mode-action-item"
 										onClick={async () => {
