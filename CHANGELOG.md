@@ -223,3 +223,4 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ### Added
 - **Safe note deletion**: New note_delete tool provides safe deletion by moving files to a Trash/Śmietnik directory instead of permanent deletion. Creates trash directory automatically and handles duplicate filenames by adding numbers.
+- **Guide mode A/B/C choices**: Guide mode now provides clear A/B/C options at the end of responses to eliminate decision fatigue and create guided conversation flow. Users get actionable choices for exploring features, library content, and next steps with simple "Type A, B, or C to continue" prompts.
