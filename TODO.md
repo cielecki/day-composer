@@ -15,6 +15,8 @@
 - [ ] Article about wiki paradigm as markdown database (creating/using input output not chats and rag, AI helping with this)
 
 ## Nice to haves
+- [ ] Maybe daily notes should be a tool call instead of ln-day-note?
+- [ ] Maybe current open file editor content and selected text should also be tool calls? (GOOD IDEA)
 - [ ] What happens if I write a string when there supposed to be an integer etc in modes frontmatter?
 - [ ] Maybe this tool management for modes? based on tags? and a specific ui interface for editing the mode? With prebuild modes having read only ui? Maybe this ui should allow to edit all settings of the mode?
 - [ ] Scanning periodically for updates
