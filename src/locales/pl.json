@@ -353,6 +353,24 @@
       "openEditedDocument": "Otwórz edytowany dokument",
       "openNote": "Otwórz dokument"
     },
+    "noteDelete": {
+      "completed": "Przeniesiono {{source}} do katalogu {{trashDir}}",
+      "creatingTrashDirectory": "Tworzenie katalogu {{dir}}",
+      "errors": {
+        "cannotAccess": "Nie można uzyskać dostępu do pliku: {{path}}",
+        "confirmationRequired": "Usunięcie musi być jawnie potwierdzone przez confirm_deletion: true",
+        "fileNotFound": "Nie znaleziono pliku: {{path}}"
+      },
+      "failed": "Nie udało się usunąć pliku {{path}}",
+      "inProgress": "Przenoszenie {{path}} do śmietnika...",
+      "label": "Usuń notatkę",
+      "movingToTrash": "Przenoszenie {{source}} do {{destination}}",
+      "navigation": {
+        "openDeletedFile": "Otwórz plik w śmietniku"
+      },
+      "requiresConfirmation": "Usunięcie wymaga potwierdzenia",
+      "success": "Przeniesiono {{path}} do katalogu {{trashDir}}"
+    },
     "noteEdit": {
       "changesMade": "Wprowadzone zmiany",
       "completed": "Edytowano dokument {{path}}",

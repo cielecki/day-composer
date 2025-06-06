@@ -220,3 +220,6 @@ change: enforce thinking in claude, as it's needed for handover to work
 ## [0.6.6] - 2025-05-22
 
 ## [Unreleased]
+
+### Added
+- **Safe note deletion**: New note_delete tool provides safe deletion by moving files to a Trash/Śmietnik directory instead of permanent deletion. Creates trash directory automatically and handles duplicate filenames by adding numbers.

@@ -23,6 +23,7 @@ import { secretListTool } from './tools/secret-list';
 import { urlDownloadTool } from './tools/url-download';
 import { conversationSaveTool } from './tools/conversation-save';
 import { fileMoveTool } from './tools/file-move';
+import { noteDeleteTool } from './tools/note-delete';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tools/tool-filter";
@@ -82,6 +83,7 @@ export class ObsidianTools {
 		vaultFindFilesByTagTool,
 		noteReadTool,
 		noteEditTool,
+		noteDeleteTool,
 		libraryListTool,
 		libraryReadTool,
 		taskCheckTool,

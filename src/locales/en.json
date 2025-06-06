@@ -353,6 +353,24 @@
       "openEditedDocument": "Open edited document",
       "openNote": "Open document"
     },
+    "noteDelete": {
+      "completed": "Moved {{source}} to {{trashDir}} directory",
+      "creatingTrashDirectory": "Creating {{dir}} directory",
+      "errors": {
+        "cannotAccess": "Could not access file: {{path}}",
+        "confirmationRequired": "Deletion must be explicitly confirmed with confirm_deletion: true",
+        "fileNotFound": "File not found: {{path}}"
+      },
+      "failed": "Failed to delete file {{path}}",
+      "inProgress": "Moving {{path}} to trash...",
+      "label": "Deleting note ...",
+      "movingToTrash": "Moving {{source}} to {{destination}}",
+      "navigation": {
+        "openDeletedFile": "Open file in trash"
+      },
+      "requiresConfirmation": "Deletion requires confirmation",
+      "success": "Moved {{path}} to {{trashDir}} directory"
+    },
     "noteEdit": {
       "changesMade": "Changes Made",
       "completed": "Edited document {{path}}",
