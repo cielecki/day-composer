@@ -1,5 +1,6 @@
 # TODO
 
+
 # Stages
 - [ ] https://github.com/obsidianmd/obsidian-releases/pull/6517
 - [ ] Onboard 5 people to the plugin
@@ -14,6 +15,8 @@
 - [ ] Article about wiki paradigm as markdown database (creating/using input output not chats and rag, AI helping with this)
 
 ## Nice to haves
+- [ ] What happens if I write a string when there supposed to be an integer etc in modes frontmatter?
+- [ ] Maybe this tool management for modes? based on tags? and a specific ui interface for editing the mode? With prebuild modes having read only ui? Maybe this ui should allow to edit all settings of the mode?
 - [ ] Scanning periodically for updates
 - [ ] Basic google search tool would be nice to have - https://docs.firecrawl.dev/features/search
 - [ ] 📎 Dodać obsługę załączników plików (nie tylko obrazków) w czacie Life Navigatora - PDFy automatycznie konwertować na tekst, drag & drop zarówno z systemu plików jak i wewnętrznie z Obsidiana
