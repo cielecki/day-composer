@@ -1,19 +1,15 @@
 When making changes to the code:
-- After performing fixes also modify CHANGELOG.md (add to unreleased section) and general documentation in docs/. Note that changelog is cumulative so dont replace content there - add stuff.
+- After performing fixes also modify CHANGELOG.md (add to unreleased section) and general documentation in docs/ and library/Docs/. Note that changelog is cumulative so dont replace content there - add stuff.
 - **Before adding to CHANGELOG.md, check if the current changes are already documented there. If they are:**
   - For CHANGELOG.md: Only add if it's a genuinely new feature/fix not already listed in the unreleased section. If the feature/fix is already there, you may update details but don't add duplicate entries
   - Read both files first to understand the current implementation scope before adding new content
 - Plan and investigate the implementation first before writing code, always ask for acceptance before starting to modify anything
 - Remove any entries to the translation files that are no longer needed
-- If you made any changes to the starter kit bump the starter kit version in main.ts
 - Avoid code duplication, create reusable functions and components
 
 If asked to release a new version:
 - node scripts/version.js X.X.X
 - update the CHANGELOG.md (unreleased -> X.X.X + new empty unreleased section)
-
-To regenerate starter kit data:
-node scripts/generate-starter-kit.mjs
 
 To clean up unused translation keys:
 node scripts/translation-cleanup.mjs - it automatically analyzes translation key consistency between EN/PL files, scans TypeScript source files for t() translation calls, and identifies unused translation keys (removes them) and missing translation keys (adds them with placeholders). Also detects inconsistencies between EN/PL translation files, sorts all translation keys alphabetically, and provides detailed reports with suggestions for manual fixes.
