@@ -9,18 +9,8 @@ If your plugin does not need CSS, delete this file.
 
 /* Ensure text selection works on iOS */
 .life-navigator-view * {
-  -webkit-user-select: text !important;
-  user-select: text !important;
-}
-
-.life-navigator-view .message-content,
-.life-navigator-view .thinking-content,
-.life-navigator-view .tool-result-content,
-.life-navigator-view .tool-log-details,
-.life-navigator-view .tool-input-content {
-  -webkit-user-select: text !important;
-  user-select: text !important;
-  -webkit-touch-callout: default !important;
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 /* File selector modal styles */
