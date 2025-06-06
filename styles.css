@@ -397,6 +397,7 @@ If your plugin does not need CSS, delete this file.
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     -webkit-user-select: none;
+    -webkit-touch-callout: none; /* Prevent iOS callout/selection on long press */
     touch-action: manipulation;
   }
 
