@@ -26,7 +26,7 @@ export async function expandLinks(
 	visitedPaths: Set<string> = new Set(),
 ): Promise<string> {
 	// Find all [[wikilinks]] followed by compass or magnifying glass emoji in the content
-	const wikiLinkRegex = /\[\[([^\]]+?)\]\]\s*[🧭🔎]/g;
+	const wikiLinkRegex = /\[\[([^\]]+?)\]\]\s*[🧭🔎]/gu;
 	let match;
 	let result = content;
 
