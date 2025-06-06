@@ -10,7 +10,8 @@ See [TODO.md](../TODO.md) for accepted ideas.
 
 
 ## Floating Ideas
-
+**Boomerang Tasks:**
+Implement a framework for handling tasks that "boomerang" back to the user on a framework like agents 2.0.
 
 **Feedback System:**
 Implement an in-app feedback system that allows users to:
