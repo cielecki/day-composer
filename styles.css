@@ -392,6 +392,23 @@ If your plugin does not need CSS, delete this file.
     -webkit-user-select: none;
   }
 
+  /* Mobile long press feedback for tool blocks */
+  .life-navigator-view .clickable-summary {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+
+  .life-navigator-view .clickable-tool-block .collapsible-summary {
+    position: relative;
+    transition: background-color 0.2s ease;
+  }
+
+  .life-navigator-view .clickable-tool-block .collapsible-summary:active {
+    background-color: var(--background-modifier-hover);
+  }
+
   /* Better focus states for mobile accessibility */
   .life-navigator-view .ln-mode-pill:focus {
     outline: 2px solid var(--interactive-accent);

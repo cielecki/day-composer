@@ -39,6 +39,10 @@ export const CollapsibleBlock: React.FC<CollapsibleBlockProps> = ({
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const detailsRef = useRef<HTMLDetailsElement>(null);
   
+  // Mobile long press handling
+  const longPressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isLongPressing, setIsLongPressing] = useState(false);
+  
   // Use external state if provided, otherwise use internal state
   const isCurrentlyOpen = isOpen !== undefined ? isOpen : internalOpen;
   
@@ -50,14 +54,78 @@ export const CollapsibleBlock: React.FC<CollapsibleBlockProps> = ({
     onToggle?.(newOpen);
   }, [isOpen, onToggle]);
 
+  // Cleanup long press timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (longPressTimeoutRef.current) {
+        clearTimeout(longPressTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Convert data attributes to props format for spread operator
   const dataProps: Record<string, string> = {};
   Object.entries(dataAttributes).forEach(([key, value]) => {
     dataProps[`data-${key}`] = value;
   });
 
+  // Helper function to check if device is mobile
+  const isMobile = () => {
+    return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  };
+
+  // Handle long press start (touch devices)
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (!isClickable) return;
+    
+    setIsLongPressing(false);
+    
+    // Clear any existing timeout
+    if (longPressTimeoutRef.current) {
+      clearTimeout(longPressTimeoutRef.current);
+    }
+    
+    // Start long press timer (500ms)
+    longPressTimeoutRef.current = setTimeout(() => {
+      setIsLongPressing(true);
+      // Haptic feedback if available
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+      // Long press action: toggle expand/fold
+      e.preventDefault();
+      e.stopPropagation();
+      handleToggle(!isCurrentlyOpen);
+    }, 500);
+  }, [isClickable, handleToggle, isCurrentlyOpen]);
+
+  // Handle touch end/cancel - cleanup long press
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (longPressTimeoutRef.current) {
+      clearTimeout(longPressTimeoutRef.current);
+      longPressTimeoutRef.current = null;
+    }
+    
+    // If this was a long press, don't proceed with normal click
+    if (isLongPressing) {
+      setIsLongPressing(false);
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    
+    setIsLongPressing(false);
+  }, [isLongPressing]);
+
   const handleSummaryClick = useCallback((e: React.MouseEvent) => {
-    // Check if shift key is pressed for clickable blocks
+    // If this was triggered after a long press, ignore it
+    if (isLongPressing) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    
+    // Check if shift key is pressed for clickable blocks (desktop)
     if (isClickable && e.shiftKey) {
       // Shift-click on clickable tool blocks should toggle expand/fold
       e.preventDefault();
@@ -72,7 +140,7 @@ export const CollapsibleBlock: React.FC<CollapsibleBlockProps> = ({
       e.stopPropagation();
       onClick();
     }
-  }, [onClick, isClickable, handleToggle, isCurrentlyOpen]);
+  }, [onClick, isClickable, handleToggle, isCurrentlyOpen, isLongPressing]);
 
   // Handle native details toggle event
   const handleDetailsToggle = useCallback((e: React.SyntheticEvent<HTMLDetailsElement>) => {
@@ -94,6 +162,9 @@ export const CollapsibleBlock: React.FC<CollapsibleBlockProps> = ({
       <summary 
         className={`collapsible-summary ${isClickable ? 'clickable-summary' : ''}`}
         onClick={handleSummaryClick}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
       >
         <div className="collapsible-icon-container">
           {/* If we can not click it that means that we will unfold it */}

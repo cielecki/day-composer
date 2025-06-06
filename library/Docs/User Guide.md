@@ -215,6 +215,7 @@ Life Navigator excels at helping you build habits and recognize patterns:
 ### Mobile Workflow Tips
 
 - Use voice input for faster note-taking
+- **Long press on tool blocks** to expand/collapse them (equivalent to shift+click on desktop)
 - Avoid editing the same file simultaneously on desktop and mobile
 - Allow time for sync between devices (especially with iCloud)
 - Consider setting daily notes to open automatically on startup

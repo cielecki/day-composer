@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- **Mobile tool expansion**: Long press on tool blocks now expands/collapses them on mobile devices, providing the mobile equivalent of desktop's shift+click functionality
+
 ### Fixed
 - **Input state persistence**: Input text and attached images now clear automatically when starting a new chat or switching between conversations, preventing confusion and ensuring a clean slate for each conversation.
 
