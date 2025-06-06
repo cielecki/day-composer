@@ -42,7 +42,7 @@ export async function handleCurrentlyOpenFileLink(app: App): Promise<string> {
 		if (file.extension !== 'md') {
 			// Keep the original link for non-markdown files
 			console.debug(`Skipping non-markdown file: ${file.path}`);
-			return `[Non-markdown file currently open: ${file.path}] 🔎`;
+			return `[Non-markdown file currently open: ${file.path}] 🧭`;
 		}
 		
 		try {
@@ -59,11 +59,11 @@ export async function handleCurrentlyOpenFileLink(app: App): Promise<string> {
 			return `<${translatedTagName} file="${file.path}">\n\n${tabbedContent}\n\n</${translatedTagName}>\n`;
 		} catch (error) {
 			console.error(`Error reading currently open file: ${file.path}`, error);
-			return `[Error reading currently open file] 🔎`;
+			return `[Error reading currently open file] 🧭`;
 		}
 	} else {
 		// No file is currently open
-		return `[No file currently open] 🔎`;
+		return `[No file currently open] 🧭`;
 	}
 }
 

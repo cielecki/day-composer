@@ -49,7 +49,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   const resumeAudio = usePluginStore(state => state.speakingResume);
 
   // Use actual TTS store method
-  const speakText = usePluginStore(state => state.speakingStart);
+  const speakingStart = usePluginStore(state => state.speakingStart);
 
   const [copyIcon, setCopyIcon] = useState<'copy' | 'check'>('copy');
   const [toolsCache, setToolsCache] = useState<Map<string, any>>(new Map());
@@ -138,7 +138,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
         // Otherwise start playing the text
         const textToSpeak = getPlainTextContent(contentBlocksToRender);
         if (textToSpeak) {
-          speakText(textToSpeak);
+          speakingStart(textToSpeak);
         }
       }
     }

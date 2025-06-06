@@ -29,15 +29,15 @@ Life Navigator's intelligence comes from three sources:
 Life Navigator uses a special linking system to control what information the AI sees:
 
 - **Regular links** `[[File Name]]` - References the file but doesn't include its content
-- **Inline links** `[[File Name]] 🔎` - Includes the full content of the file in the AI's context
-- **Dynamic links** `[[ln-day-note-(0)]] 🔎` - References daily notes relative to today (0=today, -1=yesterday, etc.). This allows modes to automatically include recent context.
+- **Inline links** `[[File Name]] 🧭` - Includes the full content of the file in the AI's context
+- **Dynamic links** `[[ln-day-note-(0)]] 🧭` - References daily notes relative to today (0=today, -1=yesterday, etc.). This allows modes to automatically include recent context.
 
 
 Learn more about the link system in the [link-expansion](link-expansion.md) document.
 
 ## Getting Started: The Setup Process
 
-Life Navigator features a comprehensive guided setup process that ensures you're properly configured before you start using the plugin. The setup flow consists of four sequential screens that walk you through all necessary configuration steps: language configuration, creation of a starter kit, Anthropic API key configuration and OpenAI API key configuration.
+Life Navigator features a comprehensive guided setup process that ensures you're properly configured before you start using the plugin. The setup flow consists of four sequential screens that walk you through all necessary configuration steps: language configuration, initial content setup, Anthropic API key configuration and OpenAI API key configuration.
 
 ### Information Files (Info Directory)
 
@@ -45,7 +45,7 @@ Life Navigator features a comprehensive guided setup process that ensures you're
 - Start by replacing the example content with your own information
 - Include details like age, occupation, interests, goals, values, daily routines
 - This file also includes links to all information files in `About Me` directory, so any time you link to this file the AI will also have access to all the information in the `About Me` directory.
-- To add new information files, you MUST link them from `About Me.md` using `[[File Name]] 🔎`
+- To add new information files, you MUST link them from `About Me.md` using `[[File Name]] 🧭`
 - The more relevant details you provide, the more personalized the AI's assistance becomes
 
 **About Me/Day Structure.md** - Your ideal daily routine
@@ -177,7 +177,7 @@ Simply ask something like "Help me create a new mode for [your purpose]" and the
 ### Adding Information Files
 
 1. Create a new markdown file with your information
-2. **Critical step:** Add a link to the file in `About Me.md` using the format `[[File Name]] 🔎`
+2. **Critical step:** Add a link to the file in `About Me.md` using the format `[[File Name]] 🧭`
 3. Without this link, the AI cannot access the file's content
 
 ## Advanced Features
@@ -254,7 +254,7 @@ Life Navigator excels at helping you build habits and recognize patterns:
 
 ## Controlling what goes into AI's context
 
-- Only information in files linked from files defining the modes like `Planner.md` with `🔎` symbols
+- Only information in files linked from files defining the modes like `Planner.md` with `🧭` symbols
 - Recent daily notes (if configured in the mode)
 - Current date and time (if configured in the mode)
 - Current conversation context
@@ -273,7 +273,7 @@ Life Navigator excels at helping you build habits and recognize patterns:
 - Begin with basic information in About Me.md
 - Use one or two modes initially
 - Gradually add more detail and complexity as you become comfortable
-- Delete all the example content from the starter kit
+- Delete all the example content and replace with your personal information
 
 ### Be Consistent
 

@@ -35,26 +35,8 @@ You are an AI assistant for planning my days. Here's what I expect from you:
 	- Suggest an unrealized topic from recent days or from the task backlog that's worth addressing and justify why
 	- Appreciate and reinforce areas where you effectively implement assumptions and plans - we're working together so you develop in implementing things you've identified as valuable
 
-[[About Me]] 🔎
-[[Backlog]] 🔎
-[[Note Format]] 🔎
-[[ln-day-note-(-14)]] 🔎
-[[ln-day-note-(-13)]] 🔎
-[[ln-day-note-(-12)]] 🔎
-[[ln-day-note-(-11)]] 🔎
-[[ln-day-note-(-10)]] 🔎
-[[ln-day-note-(-9)]] 🔎
-[[ln-day-note-(-8)]] 🔎
-[[ln-day-note-(-7)]] 🔎
-[[ln-day-note-(-6)]] 🔎
-[[ln-day-note-(-5)]] 🔎
-[[ln-day-note-(-4)]] 🔎
-[[ln-day-note-(-3)]] 🔎
-[[ln-day-note-(-2)]] 🔎
-[[ln-day-note-(-1)]] 🔎
-[[ln-day-note-(0)]] 🔎
-[[ln-day-note-(1)]] 🔎
-[[ln-day-note-(2)]] 🔎
-[[ln-day-note-(3)]] 🔎
-[[ln-day-note-(4)]] 🔎 
-[[ln-current-date-and-time]] 🔎 
+[[About Me]] 🧭
+[[Backlog]] 🧭
+[[Note Format]] 🧭
+[[ln-day-note-(-14:4)]] 🧭 
+[[ln-current-date-and-time]] 🧭 

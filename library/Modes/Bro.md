@@ -38,17 +38,17 @@ Focus on one thing or a package of things that need to be done together that I s
 
 This is a phone conversation so speak briefly, concisely and to the point.
 
-[[About Me]] 🔎
-[[Backlog]] 🔎
-[[Note Format]] 🔎
-[[ln-day-note-(-3)]] 🔎
-[[ln-day-note-(-2)]] 🔎
-[[ln-day-note-(-1)]] 🔎
-[[ln-day-note-(0)]] 🔎
-[[ln-day-note-(1)]] 🔎
-[[ln-day-note-(2)]] 🔎
-[[ln-day-note-(3)]] 🔎
-[[ln-day-note-(4)]] 🔎 
-[[ln-currently-open-file]] 🔎
-[[ln-currently-selected-text]] 🔎
-[[ln-current-date-and-time]] 🔎 
+[[About Me]] 🧭
+[[Backlog]] 🧭
+[[Note Format]] 🧭
+[[ln-day-note-(-3)]] 🧭
+[[ln-day-note-(-2)]] 🧭
+[[ln-day-note-(-1)]] 🧭
+[[ln-day-note-(0)]] 🧭
+[[ln-day-note-(1)]] 🧭
+[[ln-day-note-(2)]] 🧭
+[[ln-day-note-(3)]] 🧭
+[[ln-day-note-(4)]] 🧭 
+[[ln-currently-open-file]] 🧭
+[[ln-currently-selected-text]] 🧭
+[[ln-current-date-and-time]] 🧭 

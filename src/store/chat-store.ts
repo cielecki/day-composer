@@ -368,7 +368,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         
         // Get current mode and check autoplay setting
         const defaultMode = getDefaultLNMode();
-        const autoplayEnabled = currentActiveMode?.ln_voice_autoplay || defaultMode.ln_voice_autoplay;
+        const autoplayEnabled = !!currentActiveMode?.ln_voice_autoplay;
         
         // Only auto-play if both the global setting and the mode-specific autoplay are enabled
         if (autoplayEnabled && textForTTS.trim().length > 0) {

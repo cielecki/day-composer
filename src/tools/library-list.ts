@@ -5,7 +5,7 @@ import { t } from 'src/i18n';
 
 const schema = {
 	name: 'library_list',
-	description: 'Browse and list all available items in the Life Navigator library using the curated index',
+	description: 'Browse the remote Life Navigator library catalog to see available templates, examples, and content that can be downloaded and installed into your vault. This shows what\'s available to install.',
 	input_schema: {
 		type: 'object',
 		properties: {},
@@ -42,6 +42,7 @@ export const libraryListTool: ObsidianTool<LibraryListInput> = {
 			const indexContent = await response.text();
 
 			context.progress(indexContent);
+			context.setLabel(t('tools.library.list.completed'));
 
 		} catch (error) {
 			context.setLabel(t('tools.library.list.failed'));

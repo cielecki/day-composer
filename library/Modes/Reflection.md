@@ -35,40 +35,10 @@ Your goal is to positively influence me.
 * Is what I'm doing in line with my values and priorities?
 * Your gender is female
 
-[[About Me]] 🔎
-[[Backlog]] 🔎
-[[Note Format]] 🔎
-[[ln-day-note-(-30)]] 🔎
-[[ln-day-note-(-29)]] 🔎
-[[ln-day-note-(-28)]] 🔎
-[[ln-day-note-(-27)]] 🔎
-[[ln-day-note-(-26)]] 🔎
-[[ln-day-note-(-25)]] 🔎
-[[ln-day-note-(-24)]] 🔎
-[[ln-day-note-(-23)]] 🔎
-[[ln-day-note-(-22)]] 🔎
-[[ln-day-note-(-21)]] 🔎
-[[ln-day-note-(-20)]] 🔎
-[[ln-day-note-(-19)]] 🔎
-[[ln-day-note-(-18)]] 🔎
-[[ln-day-note-(-17)]] 🔎
-[[ln-day-note-(-16)]] 🔎
-[[ln-day-note-(-15)]] 🔎
-[[ln-day-note-(-14)]] 🔎
-[[ln-day-note-(-13)]] 🔎
-[[ln-day-note-(-12)]] 🔎
-[[ln-day-note-(-11)]] 🔎
-[[ln-day-note-(-10)]] 🔎
-[[ln-day-note-(-9)]] 🔎
-[[ln-day-note-(-8)]] 🔎
-[[ln-day-note-(-7)]] 🔎
-[[ln-day-note-(-6)]] 🔎
-[[ln-day-note-(-5)]] 🔎
-[[ln-day-note-(-4)]] 🔎
-[[ln-day-note-(-3)]] 🔎
-[[ln-day-note-(-2)]] 🔎
-[[ln-day-note-(-1)]] 🔎
-[[ln-day-note-(0)]] 🔎 
-[[ln-currently-open-file]] 🔎
-[[ln-currently-selected-text]] 🔎
-[[ln-current-date-and-time]] 🔎 
+[[About Me]] 🧭
+[[Backlog]] 🧭
+[[Note Format]] 🧭
+[[ln-day-note-(-30:0)]] 🧭
+[[ln-currently-open-file]] 🧭
+[[ln-currently-selected-text]] 🧭
+[[ln-current-date-and-time]] 🧭 

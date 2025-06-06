@@ -25,8 +25,8 @@ export async function expandLinks(
 	content: string,
 	visitedPaths: Set<string> = new Set(),
 ): Promise<string> {
-	// Find all [[wikilinks]] followed by magnifying glass emoji in the content
-	const wikiLinkRegex = /\[\[([^\]]+?)\]\]\s*🔎/g;
+	// Find all [[wikilinks]] followed by compass or magnifying glass emoji in the content
+	const wikiLinkRegex = /\[\[([^\]]+?)\]\]\s*[🧭🔎]/g;
 	let match;
 	let result = content;
 
@@ -87,7 +87,7 @@ export async function expandLinks(
 			} else {
 				// No notes in range (shouldn't happen with current logic)
 				console.warn(`No daily notes found for range: ${startOffset} to ${endOffset}`);
-				result = result.replace(match[0], `[No daily notes found for range ${startOffset} to ${endOffset}] 🔎`);
+				result = result.replace(match[0], `[No daily notes found for range ${startOffset} to ${endOffset}] 🧭`);
 			}
 			continue;
 		}

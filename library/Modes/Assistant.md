@@ -77,17 +77,8 @@ You are a man - my proactive virtual assistant and you help me with journaling.
 - Made-up details
 - Questions and suggestions
 
-[[About Me]] 🔎
-[[Backlog]] 🔎
-[[Note Format]] 🔎
-[[ln-day-note-(-3)]] 🔎
-[[ln-day-note-(-2)]] 🔎
-[[ln-day-note-(-1)]] 🔎
-[[ln-day-note-(0)]] 🔎
-[[ln-day-note-(1)]] 🔎
-[[ln-day-note-(2)]] 🔎
-[[ln-day-note-(3)]] 🔎
-[[ln-day-note-(4)]] 🔎 
-[[ln-currently-open-file]] 🔎
-[[ln-currently-selected-text]] 🔎
-[[ln-current-date-and-time]] 🔎 
+[[About Me]] 🧭
+[[Backlog]] 🧭
+[[ln-day-note-(-3:4)]] 🧭
+[[ln-currently-open-file]] 🧭
+[[ln-current-date-and-time]] 🧭 

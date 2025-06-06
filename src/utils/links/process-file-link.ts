@@ -32,7 +32,7 @@ export async function processFileLink(
 	// Skip if we've already visited this file (circular reference)
 	if (visitedPaths.has(linkFile.path)) {
 		console.warn(`Circular reference detected for: ${linkFile.path}`);
-		return `[Circular: ${linkText}] 🔎`;
+		return `[Circular: ${linkText}] 🧭`;
 	}
 
 	// Skip if this is not a markdown file (e.g., images)

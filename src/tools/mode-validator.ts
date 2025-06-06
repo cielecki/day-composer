@@ -237,10 +237,15 @@ async function validateModeFile(app: any, file: TFile): Promise<ValidationResult
     validateModeFields(completeMode, frontmatter, result);
 
     // Test link expansion if system prompt has links
-    if (systemPrompt.includes('[[') && systemPrompt.includes('🔎')) {
+    if (systemPrompt.includes('[[') && (systemPrompt.includes('🧭') || systemPrompt.includes('🔎'))) {
       await testLinkExpansion(app, systemPrompt, result);
-    } else if (systemPrompt.includes('[[') && !systemPrompt.includes('🔎')) {
-      result.info.push("System prompt contains wiki links but no magnifying glass emoji (🔎) - links will not be expanded");
+      
+      // Check for deprecated magnifying glass emoji and suggest upgrade
+      if (systemPrompt.includes('🔎')) {
+        result.warnings.push("System prompt uses the deprecated magnifying glass emoji (🔎). Consider updating to the new compass emoji (🧭) for better clarity. Both emojis work, but 🧭 is now the preferred symbol for Life Navigator.");
+      }
+    } else if (systemPrompt.includes('[[') && !systemPrompt.includes('🧭') && !systemPrompt.includes('🔎')) {
+      result.info.push("System prompt contains wiki links but no compass emoji (🧭) or magnifying glass emoji (🔎) - links will not be expanded");
     }
 
     // Validate using built-in validation
@@ -354,7 +359,7 @@ async function testLinkExpansion(app: any, systemPrompt: string, result: Validat
     const expandedPrompt = await expandLinks(app, systemPrompt);
     
     if (expandedPrompt === systemPrompt) {
-      result.warnings.push("System prompt contains links with 🔎 but no expansion occurred - check if linked files exist");
+      result.warnings.push("System prompt contains links with 🧭/🔎 but no expansion occurred - check if linked files exist");
     } else {
       const originalLength = systemPrompt.length;
       const expandedLength = expandedPrompt.length;

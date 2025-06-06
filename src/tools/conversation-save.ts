@@ -1,5 +1,5 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from '../types/chat-types';
+import { ToolExecutionContext, ToolResultBlock } from '../types/chat-types';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { getStore } from "../store/plugin-store";
 import { formatConversationContent } from "../utils/chat/conversation-formatter";
@@ -109,8 +109,27 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
         }
       }
 
-      // Format the conversation content
-      const formattedConversation = formatConversationContent(conversation);
+      // Create a conversation with up-to-date tool results by merging live tool results
+      const conversationWithLiveResults = conversation.map(message => {
+        if (Array.isArray(message.content)) {
+          const updatedContent = message.content.map(block => {
+            // If this is a tool_result block, check if we have a newer version in live results
+            if (block.type === 'tool_result') {
+              const liveResult = store.chats.liveToolResults.get(block.tool_use_id);
+              if (liveResult && liveResult.is_complete) {
+                // Use the live result which has the most up-to-date label
+                return liveResult;
+              }
+            }
+            return block;
+          });
+          return { ...message, content: updatedContent };
+        }
+        return message;
+      });
+
+      // Format the conversation content with updated tool results
+      const formattedConversation = formatConversationContent(conversationWithLiveResults);
       
       // Build the complete note content
       let noteContent = '';

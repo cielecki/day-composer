@@ -161,7 +161,7 @@ Always wrap your code in try-catch blocks and provide meaningful error messages 
 
 ## Examples
 
-For more examples and inspiration, check out the other tools included in the starter kit:
+For more examples and inspiration, check out the other tools included in the library:
 - Weather Tool: API integration example
 - Image Generation Tool: File creation and external API usage  
 - YouTube Transcript Tool: Data processing and file manipulation
@@ -169,6 +169,6 @@ For more examples and inspiration, check out the other tools included in the sta
 ## Getting Help
 
 If you need help creating tools:
-1. Check the other tool examples in the starter kit
+1. Check the other tool examples in the library
 2. Use the Tool Creator mode for assistance
 3. Visit the [project documentation](https://github.com/cielecki/life-navigator) for more resources 

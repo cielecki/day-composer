@@ -6,7 +6,7 @@ import { requestUrl } from "obsidian";
 
 const schema = {
   name: "library_read",
-  description: "Download and read Life Navigator library content using relative paths from library_list",
+  description: "Download and read template / example content from the remote Life Navigator library. Use vault tools (like note_read, vault_find) to read user's actual files.",
   input_schema: {
     type: "object",
     properties: {

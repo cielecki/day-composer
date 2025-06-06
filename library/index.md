@@ -9,6 +9,8 @@ This index catalogs all files in the Life Navigator library with descriptions an
 - **Description**: Complete personal profile including demographics, interests, health status, career information, financial situation, and psychological profile for John Smith
 - **Use When**: User asks about personal preferences, needs context about relationships, health goals, career situation, or when personalizing responses and recommendations
 
+
+
 - **Path**: `Info/About Me/Day Structure.md`
 - **Description**: Comprehensive daily planning procedure with 18 specific steps covering morning routines, cornerstone habits, weekly tasks, monthly reviews, and adaptive recommendations based on behavioral patterns
 - **Use When**: User asks to plan any day, needs help with daily routine structure, wants to understand the planning methodology, or requires context about expected daily activities and habits
@@ -67,6 +69,10 @@ This index catalogs all files in the Life Navigator library with descriptions an
 - **Use When**: User asks to plan any specific day, needs help organizing complex schedules, wants strategic thinking about time management, or requires systematic daily planning
 
 ### Specialized Assistants
+- **Path**: `Modes/Analytics.md`
+- **Description**: Personal data analyst and accountability partner with 30-day context for thorough pattern analysis, correlation discovery, and data-driven insights. Meticulously examines daily notes to identify trends in productivity, health, habits, relationships, and goal progress
+- **Use When**: User wants analysis of their patterns, needs accountability conversations, asks about productivity trends, health correlations, habit effectiveness, or wants data-driven insights about their lifestyle
+
 - **Path**: `Modes/Reflection.md`
 - **Description**: Female coaching mode for introspection and personal growth with 30-day context, role model perspectives, and guidance on life alignment with values and priorities
 - **Use When**: User wants to reflect on experiences, needs emotional support, discussing personal growth, processing events, or seeking perspective on life patterns and decisions
@@ -97,7 +103,7 @@ This index catalogs all files in the Life Navigator library with descriptions an
 
 ### Technical Documentation
 - **Path**: `Docs/Link Expansion.md`
-- **Description**: Technical documentation explaining the link expansion system including special link formats (daily notes, date/time, current file), usage of the magnifying glass emoji (🔎), and HTML comment filtering during expansion
+- **Description**: Technical documentation explaining the link expansion system including special link formats (daily notes, date/time, current file), usage of the compass emoji (🧭), and HTML comment filtering during expansion
 - **Use When**: User wants to understand how link expansion works, needs help with dynamic links, troubleshooting link issues, or building complex context structures with nested links
 
 - **Path**: `Docs/Tools.md`
@@ -111,6 +117,14 @@ This index catalogs all files in the Life Navigator library with descriptions an
 - **Path**: `Docs/Validation Tools.md`
 - **Description**: Documentation for built-in validation tools (Mode Validator and Tool Validator) that check configuration completeness, YAML/JSON syntax, link expansion, and provide detailed error/warning reports
 - **Use When**: User is troubleshooting mode or tool issues, wants to validate configurations before sharing, needs to debug problems, or ensure quality in their Life Navigator setup
+
+- **Path**: `Docs/Mode Development Guide.md`
+- **Description**: Comprehensive guide for creating, customizing, and validating Life Navigator modes including templates, best practices, configuration options, system prompt design, voice settings, tool access control, and troubleshooting
+- **Use When**: User wants to create custom AI personalities, modify existing modes, learn mode development best practices, understand configuration options, or troubleshoot mode creation issues
+
+- **Path**: `Docs/Tool Development Guide.md`
+- **Description**: Complete guide for creating custom JavaScript tools including templates, security considerations, API integrations, testing strategies, validation procedures, and advanced patterns for extending Life Navigator functionality
+- **Use When**: User wants to create custom tools, extend AI capabilities, integrate external APIs, automate workflows, troubleshoot tool issues, or learn JavaScript development best practices for Life Navigator
 
 ## File Selection Guidelines
 

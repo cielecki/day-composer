@@ -103,7 +103,7 @@ life-navigator/
 
 The plugin uses a sophisticated context expansion system through `context-collector.ts`:
 
-- **Link Expansion**: Files linked with 🔎 emoji are automatically included in AI context
+- **Link Expansion**: Files linked with 🧭 emoji are automatically included in AI context
 - **Dynamic Context**: Context is collected in real-time based on current conversation
 - **Privacy Control**: Users have explicit control over what data is shared with AI
 
@@ -123,6 +123,44 @@ The tools system enables AI function calling:
 - **Type Safety**: Strongly typed tool parameters and responses
 - **Obsidian Integration**: Direct manipulation of vault files and tasks
 
+### Built-in Tools
+
+Life Navigator includes several built-in tools that provide core functionality:
+
+#### Web Tools
+- **Google Search** (`google_search`): Searches Google and returns results with titles, URLs, and snippets. Supports multiple pages, different languages/regions, and includes anti-detection measures.
+- **URL Download** (`url_download`): Downloads content from any URL and displays it in the chat.
+
+#### Vault Tools
+- **Vault Search** (`vault_search`): Searches content within the vault
+- **Vault Find** (`vault_find`): Finds files and folders by name
+- **Vault Find by Tags** (`vault_find_files_by_tag`): Finds files by their tags
+- **Note Create** (`note_create`): Creates new notes
+- **Note Read** (`note_read`): Reads existing notes
+- **Note Edit** (`note_edit`): Edits note content
+- **Note Delete** (`note_delete`): Moves notes to trash
+
+#### Task Management Tools
+- **Task Add** (`task_add`): Adds new tasks to notes
+- **Task Check** (`task_check`): Marks tasks as complete
+- **Task Uncheck** (`task_uncheck`): Unmarks completed tasks
+- **Task Edit** (`task_edit`): Edits existing tasks
+- **Task Move** (`task_move`): Moves tasks between notes
+- **Task Remove** (`task_remove`): Removes tasks (converts to comments)
+- **Task Abandon** (`task_abandon`): Marks tasks as abandoned
+- **Task Create Completed** (`task_create_completed`): Creates pre-completed tasks
+
+#### System Tools
+- **Mode Handover** (`mode_handover`): Switches between different AI modes
+- **Mode Validator** (`mode_validator`): Validates mode configurations
+- **Tool Validator** (`tool_validator`): Validates tool implementations
+- **Secret Save** (`secret_save`): Securely stores API keys and secrets
+- **Secret List** (`secret_list`): Lists configured secrets
+- **Conversation Save** (`conversation_save`): Saves current chat to a note
+- **File Move** (`file_move`): Moves files between folders
+- **Library List** (`library_list`): Lists available library content
+- **Library Read** (`library_read`): Reads library files
+
 ## Building and Testing
 
 ### Development Build
@@ -140,14 +178,6 @@ npm run build
 ```
 
 Creates an optimized build with minification and no source maps.
-
-### Starter Kit Generation
-
-```bash
-npm run generate-starter
-```
-
-Regenerates the starter kit files from the `src/generated/` directory.
 
 ## Release Process
 

@@ -5,10 +5,33 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **New compass emoji for link expansion**: The compass emoji 🧭 is now the primary symbol for link expansion, replacing the magnifying glass 🔎. The old magnifying glass emoji is still supported for backward compatibility, so your existing setups will continue to work perfectly.
+- **Analytics Mode**: New specialized mode for thorough pattern analysis and accountability conversations that examines 30 days of daily notes to provide data-driven insights about productivity, health, habits, and goal progress
+- **Tool Call History in Saved Conversations**: Saved conversations now include information about which tools were used and their labels, making saved chats more complete and useful for reference without cluttering them with large tool results
+- **Enhanced Guide Mode**: Comprehensive improvements to the Guide prebuilt mode including:
+  - Always browse library index AND check user's actual vault content before making recommendations
+  - Clear distinction between library templates/examples vs user's installed content
+  - Never assumes library content is installed without checking user's vault first
+  - Improved library tool descriptions to clarify they show remote templates, not user content
+  - Better vault assessment using vault_find and note_read tools
+  - Context limitations notice explaining Guide mode is for discovery/development, not personal reflection
+  - Development and prototyping support for creating custom modes and tools
+  - Manual references to comprehensive development documentation
+  - Mode and tool validation capabilities with automatic quality checking
+  - Learning persistence to avoid repeating concepts user already understands
+- **Direct Setup Guidance**: Guide mode now focuses on helping users create their actual Life Navigator setup immediately rather than simulations, providing more authentic and immediately useful onboarding
+- **Development Documentation**: New comprehensive guides for extending Life Navigator:
+  - Mode Development Guide with templates, best practices, and troubleshooting
+  - Tool Development Guide covering JavaScript tools, security, and API integration
+  - Updated library index with development resources and Analytics mode
 - **Mobile tool expansion**: Long press on tool blocks now expands/collapses them on mobile devices, providing the mobile equivalent of desktop's shift+click functionality
 
 ### Fixed
 - **Input state persistence**: Input text and attached images now clear automatically when starting a new chat or switching between conversations, preventing confusion and ensuring a clean slate for each conversation.
+
+### Enhanced
+- **Guide Mode Intelligence**: Now emphasizes library exploration, provides development guidance, and offers clear A/B/C choices for next steps
+- **Library Organization**: Updated index with development documentation and Analytics mode for better discoverability
 
 ## [0.10.4] - 2025-06-05
 

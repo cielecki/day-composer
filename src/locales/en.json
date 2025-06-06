@@ -98,7 +98,7 @@
       "title": "Advanced Settings"
     },
     "prompts": {
-      "defaultPrompt": "# Domain\nA message or voice command issued by the user to the AI assistant.\n\n# Examples\n- Check off task ... umm ... I took out the trash\n- I made dinner\n- Add for tomorrow to remind me to reach out to John.\n\n# Glossary\n[[ln-currently-open-file]] 🔎\n[[ln-current-chat]] 🔎\n\nStart of transcription:",
+      "defaultPrompt": "# Domain\nA message or voice command issued by the user to the AI assistant.\n\n# Examples\n- Check off task ... umm ... I took out the trash\n- I made dinner\n- Add for tomorrow to remind me to reach out to John.\n\n# Glossary\n[[ln-currently-open-file]] 🧭\n[[ln-current-chat]] 🧭\n\nStart of transcription:",
       "speechToTextPrompt": "Speech-to-text Prompt",
       "speechToTextPromptDesc": "The prompt that will be sent to the speech-to-text engine. This provides context to the AI model. You can use <a href='https://github.com/cielecki/life-navigator/blob/main/library/Docs/Link%20Expansion.md'>link expansion</a>."
     },
@@ -268,7 +268,7 @@
       "removedTaskHeader": "REMOVED TASK"
     },
     "conversationSave": {
-      "completed": "Saved conversation to {{path}}",
+      "completed": "Saved conversation to `{{path}}`",
       "failed": "Failed to save conversation",
       "inProgress": "Saving conversation...",
       "label": "Saving conversation ...",
@@ -295,16 +295,16 @@
       "label": "Editing todo ..."
     },
     "fileMove": {
-      "completed": "Moved file from {{source}} to {{destination}}",
+      "completed": "Moved file from `{{source}}` to `{{destination}}`",
       "creatingDirectories": "Creating destination directory: {{dir}}",
-      "failed": "Failed to move file {{source}}",
-      "inProgress": "Moving file from {{source}} to {{destination}}...",
+      "failed": "Failed to move file `{{source}}`",
+      "inProgress": "Moving file from `{{source}}` to `{{destination}}`...",
       "label": "Move File",
-      "moving": "Moving {{source}} to {{destination}}",
+      "moving": "Moving `{{source}}` to `{{destination}}`",
       "navigation": {
         "openMovedFile": "Open moved file"
       },
-      "success": "Moved file from {{source}} to {{destination}}"
+      "success": "Moved file from `{{source}}` to `{{destination}}`"
     },
     "find": {
       "completed": "Found {{count}} items in {{path}}",
@@ -331,14 +331,15 @@
     },
     "library": {
       "list": {
+        "completed": "Browsed Life Navigator library",
         "failed": "Failed to browse library",
         "inProgress": "Browsing Life Navigator library...",
         "label": "Browsing Life Navigator library ..."
       },
       "read": {
-        "completed": "Read library content {{path}}",
-        "failed": "Failed to read library content {{path}}",
-        "inProgress": "Reading library content {{path}}...",
+        "completed": "Read library content `{{path}}`",
+        "failed": "Failed to read library content `{{path}}`",
+        "inProgress": "Reading library content `{{path}}`...",
         "label": "Reading library content ..."
       }
     },
@@ -361,15 +362,15 @@
         "confirmationRequired": "Deletion must be explicitly confirmed with confirm_deletion: true",
         "fileNotFound": "File not found: {{path}}"
       },
-      "failed": "Failed to delete file {{path}}",
-      "inProgress": "Moving {{path}} to trash...",
+      "failed": "Failed to delete file `{{path}}`",
+      "inProgress": "Moving `{{path}}` to trash...",
       "label": "Deleting note ...",
-      "movingToTrash": "Moving {{source}} to {{destination}}",
+      "movingToTrash": "Moving `{{source}}` to `{{destination}}`",
       "navigation": {
         "openDeletedFile": "Open file in trash"
       },
       "requiresConfirmation": "Deletion requires confirmation",
-      "success": "Moved {{path}} to {{trashDir}} directory"
+      "success": "Moved `{{path}}` to `{{trashDir}}` directory"
     },
     "noteEdit": {
       "changesMade": "Changes Made",
