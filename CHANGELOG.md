@@ -2,9 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.10.6] - 2025-06-06
 
 ### Added
+- **Safe note deletion**: New note_delete tool provides safe deletion by moving files to a Trash/Śmietnik directory instead of permanent deletion. Creates trash directory automatically and handles duplicate filenames by adding numbers.
+- **Guide mode A/B/C choices**: Guide mode now provides clear A/B/C options at the end of responses to eliminate decision fatigue and create guided conversation flow. Users get actionable choices for exploring features, library content, and next steps with simple "Type A, B, or C to continue" prompts.
 - **New compass emoji for link expansion**: The compass emoji 🧭 is now the primary symbol for link expansion, replacing the magnifying glass 🔎. The old magnifying glass emoji is still supported for backward compatibility, so your existing setups will continue to work perfectly.
 - **Analytics Mode**: New specialized mode for thorough pattern analysis and accountability conversations that examines 30 days of daily notes to provide data-driven insights about productivity, health, habits, and goal progress
 - **Tool Call History in Saved Conversations**: Saved conversations now include information about which tools were used and their labels, making saved chats more complete and useful for reference without cluttering them with large tool results
@@ -244,6 +246,4 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ## [Unreleased]
 
-### Added
-- **Safe note deletion**: New note_delete tool provides safe deletion by moving files to a Trash/Śmietnik directory instead of permanent deletion. Creates trash directory automatically and handles duplicate filenames by adding numbers.
-- **Guide mode A/B/C choices**: Guide mode now provides clear A/B/C options at the end of responses to eliminate decision fatigue and create guided conversation flow. Users get actionable choices for exploring features, library content, and next steps with simple "Type A, B, or C to continue" prompts.
+...
