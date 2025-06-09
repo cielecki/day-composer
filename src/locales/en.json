@@ -481,7 +481,8 @@
       "reloadButton": "Restart Obsidian",
       "reloadRequiredMessageWithVersions": "Plugin updated from version {{currentVersion}} to {{latestVersion}}.\nWould you like to restart Obsidian to apply changes?",
       "reloadRequiredTitle": "Reload Required",
-      "systemPrompt": "System prompt for \"{{modeName}}\""
+      "systemPrompt": "System prompt for \"{{modeName}}\"",
+      "systemPromptErrorMessage": "Cannot display system prompt: {{error}}. Check your mode file and ensure all linked files exist, or remove the 🧭 emoji from links that should not be expanded."
     },
     "mode": {
       "loading": "Loading...",
@@ -555,9 +556,6 @@
       "message": "Help me fix validation issues with the mode file \"{{filePath}}\". This mode file has validation errors that need to be resolved."
     },
     "results": {
-      "mode": {
-        "completed": "Mode validation completed: {{filePath}} ({{errorCount}} errors, {{warningCount}} warnings)"
-      },
       "tool": {
         "completed": "Tool validation completed: {{filePath}} ({{errorCount}} errors, {{warningCount}} warnings)"
       }

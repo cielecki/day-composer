@@ -481,7 +481,8 @@
       "reloadButton": "Uruchom ponownie Obsidian",
       "reloadRequiredMessageWithVersions": "Wtyczka zaktualizowana z wersji {{currentVersion}} do {{latestVersion}}.\nCzy chcesz ponownie uruchomić Obsidian, aby zastosować zmiany?",
       "reloadRequiredTitle": "Wymagane ponowne uruchomienie",
-      "systemPrompt": "Prompt systemowy: {{modeName}}"
+      "systemPrompt": "Prompt systemowy: {{modeName}}",
+      "systemPromptErrorMessage": "Nie można wyświetlić promptu systemowego: {{error}}. Sprawdź plik trybu i upewnij się, że wszystkie linkowane pliki istnieją, lub usuń emoji 🧭 z linków, które nie powinny być rozwijane."
     },
     "mode": {
       "loading": "Ładowanie...",
@@ -555,9 +556,6 @@
       "message": "Pomóż mi naprawić błędy walidacji w pliku trybu \"{{filePath}}\". Ten plik trybu ma błędy walidacji, które wymagają naprawy."
     },
     "results": {
-      "mode": {
-        "completed": "Walidacja trybu zakończona: {{filePath}} ({{errorCount}} błędów, {{warningCount}} ostrzeżeń)"
-      },
       "tool": {
         "completed": "Walidacja narzędzia zakończona: {{filePath}} ({{errorCount}} błędów, {{warningCount}} ostrzeżeń)"
       }

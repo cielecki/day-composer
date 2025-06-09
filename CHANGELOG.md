@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - **Mobile tool expansion**: Long press on tool blocks now expands/collapses them on mobile devices, providing the mobile equivalent of desktop's shift+click functionality
 
 ### Fixed
+- **System prompt view with unresolved links**: Fixed issue where clicking "View system prompt" would fail silently when the mode contained unresolved links (like `[[Backlog2]] 🧭`). Now shows a clear error message explaining which links couldn't be found and how to fix them.
 - **Input state persistence**: Input text and attached images now clear automatically when starting a new chat or switching between conversations, preventing confusion and ensuring a clean slate for each conversation.
 
 ### Enhanced

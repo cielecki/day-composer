@@ -13,8 +13,7 @@ import {
 } from '../types/chat-types';
 import { LucideIcon } from "./LucideIcon";
 import { LNModePill } from '../components/LNModePills';
-import { TFile } from "obsidian";
-import { Modal } from "obsidian";
+import { TFile, Modal, Notice } from "obsidian";
 import { t } from 'src/i18n';
 import { UnifiedInputArea } from "./UnifiedInputArea";
 import { SetupFlow } from "./setup/SetupFlow";
@@ -527,12 +526,18 @@ export const LifeNavigatorApp: React.FC = () => {
 									<div
 										className="ln-mode-action-item"
 										onClick={async () => {
-											const systemPrompt = await getSystemPrompt();
-											openSimpleObsidianModal(
-												window.app,
-												t('ui.modal.systemPrompt').replace('{{modeName}}', activeMode.name),
-												systemPrompt || ""
-											);
+											try {
+												const systemPrompt = await getSystemPrompt();
+												openSimpleObsidianModal(
+													window.app,
+													t('ui.modal.systemPrompt').replace('{{modeName}}', activeMode.name),
+													systemPrompt || ""
+												);
+											} catch (error) {
+												// Show notice for unresolved links
+												const errorMessage = error instanceof Error ? error.message : String(error);
+												new Notice(t('ui.modal.systemPromptErrorMessage', { error: errorMessage }), 8000);
+											}
 											setDropdownOpen(false);
 										}}
 									>
