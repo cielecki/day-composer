@@ -166,15 +166,11 @@ const schema = {
             },
             content: {
               type: "string",
-              description: "The content to insert, append, prepend, or use as replacement"
+              description: "The content to use for the operation - replacement text for replace operations, or content to insert/append/prepend for other operations"
             },
             search_text: {
               type: "string",
               description: "Text to search for (required for replace, insert_after, insert_before operations)"
-            },
-            replacement_text: {
-              type: "string",
-              description: "Text to replace with (required for replace operations)"
             },
             line_number: {
               type: "integer",
@@ -193,7 +189,6 @@ type EditOperation = {
   type: "replace" | "insert_after" | "insert_before" | "insert_after_line" | "insert_before_line" | "append" | "prepend";
   content: string;
   search_text?: string;
-  replacement_text?: string;
   line_number?: number;
 };
 
@@ -242,8 +237,8 @@ export const noteEditTool: ObsidianTool<NoteEditToolInput> = {
         try {
           switch (edit.type) {
             case "replace":
-              if (!edit.search_text || !edit.replacement_text) {
-                throw new ToolExecutionError(`Edit ${editNumber}: Replace operation requires both search_text and replacement_text`);
+              if (!edit.search_text) {
+                throw new ToolExecutionError(`Edit ${editNumber}: Replace operation requires search_text`);
               }
               const replaceIndex = findTextInContent(currentContent, edit.search_text);
               if (replaceIndex === -1) {
@@ -252,7 +247,7 @@ export const noteEditTool: ObsidianTool<NoteEditToolInput> = {
                 throw new ToolExecutionError(`Edit ${editNumber}: Search text not found in document.\nLooking for: "${preview}"\nTry checking for differences in whitespace, line endings, or formatting.`);
               }
               const originalLineNumber = getLineNumberForPosition(currentContent, replaceIndex);
-              currentContent = replaceTextInContent(currentContent, edit.search_text, edit.replacement_text);
+              currentContent = replaceTextInContent(currentContent, edit.search_text, edit.content);
               editResults.push(`✓ Edit ${editNumber}: Replaced text at line ${originalLineNumber}`);
               break;
 

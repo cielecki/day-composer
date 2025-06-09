@@ -121,6 +121,7 @@ The tools system enables AI function calling:
 
 - **Modular Design**: Each tool is a separate TypeScript file
 - **Type Safety**: Strongly typed tool parameters and responses
+- **Parameter Validation**: Automatic validation of all parameters against JSON schema
 - **Obsidian Integration**: Direct manipulation of vault files and tasks
 
 ### Built-in Tools

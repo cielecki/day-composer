@@ -246,4 +246,10 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ## [Unreleased]
 
+### Added
+- **Tool parameter validation**: Tools now validate all parameters against their JSON schema before execution, providing clear error messages to the AI when parameters are invalid or missing. This prevents tools from running with incorrect data and improves error feedback.
+
+### Enhanced
+- **Schema-based parameter validation**: All tool parameters are now validated for type correctness, required fields, string length constraints, number ranges, array sizes, enum values, and nested object properties. Invalid parameters are caught early with descriptive error messages.
+
 ...

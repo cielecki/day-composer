@@ -29,6 +29,7 @@ import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tools/tool-filter";
 import { LNMode } from './types/LNMode';
 import { ToolExecutionContext } from './types/chat-types';
+import { validateToolParameters, formatValidationErrors } from "./utils/validation/parameter-validator";
 
 // Import React
 import React from "react";
@@ -196,6 +197,14 @@ export class ObsidianTools {
 
 			// Initialize label with tool's initial label
 			currentLabel = tool.initialLabel;
+
+			// Validate parameters against tool schema
+			const validationResult = validateToolParameters(input, tool.specification.input_schema);
+			if (!validationResult.isValid) {
+				const errorMessage = formatValidationErrors(validationResult.errors);
+				console.debug("Parameter validation failed:", validationResult.errors);
+				throw new ToolExecutionError(errorMessage);
+			}
 
 			// Create the execution context
 			const context: ToolExecutionContext = {
