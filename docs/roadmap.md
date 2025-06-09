@@ -10,6 +10,9 @@ See [TODO.md](../TODO.md) for accepted ideas.
 **Prompt Caching for Anthropic:**
 Implement prompt caching to make conversations faster and more cost-effective by storing frequently used context and reducing repetitive processing. This would improve response times and create a smoother conversational experience for users.
 
+**Local AI Model Support (Desktop Only):**
+Add support for locally hosted AI models through LMStudio or Ollama integration as an optional feature for desktop users. This would enable offline functionality and provide enhanced privacy by processing personal and sensitive data locally rather than in the cloud. The plugin will automatically detect if running on mobile and disable this feature. Desktop users would benefit from greater control over their data while maintaining the core functionality of Life Navigator.
+
 **Thinking Blocks Control:**
 Research and implement enabling/disabling thinking blocks in Life Navigator - check if Anthropic will accept removal of thinking blocks.
 
