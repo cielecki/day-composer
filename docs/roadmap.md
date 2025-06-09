@@ -7,6 +7,7 @@ This document outlines potential future features and improvements for the Life N
 See [TODO.md](../TODO.md) for accepted ideas.
 
 ## Floating Ideas
+
 **Prompt Caching for Anthropic:**
 Implement prompt caching to make conversations faster and more cost-effective by storing frequently used context and reducing repetitive processing. This would improve response times and create a smoother conversational experience for users.
 
@@ -128,6 +129,9 @@ Introduce support for weekly and monthly summaries via `ln-monthly-note` and `ln
 
 **System Prompt Context in TTS:**
 Implement system prompt injection into TTS prompt via current chat expansion so that the entire system prompt will be included in the context of text-to-speech generation. This would ensure that the AI's voice responses maintain consistency with the current mode's personality, instructions, and context, providing a more coherent and contextually aware audio experience that aligns with the written conversation flow and system configuration.
+
+**Document Collaboration:**
+Enable document sharing with collaborative editing capabilities, allowing multiple users to check off todos, add notes, and see updates in real-time. This would enhance team productivity and coordination, though technical feasibility within Obsidian's architecture needs to be evaluated.
 
 ## General Notes
 
