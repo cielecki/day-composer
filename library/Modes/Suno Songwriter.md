@@ -1,20 +1,20 @@
 ---
 tags:
   - ln-mode
-ln_icon: music
-ln_icon_color: "#9C27B0"
-ln_description: Assists in creating song descriptions for Suno AI.
-ln_model: auto
-ln_thinking_budget_tokens: 2000
-ln_max_tokens: 4096
-ln_voice_autoplay: false
-ln_voice: nova
-ln_voice_instructions: Speak with enthusiasm and creative energy, as if discussing musical ideas. Vary your tone to convey excitement about the creative process.
-ln_tools_allowed:
+icon: music
+icon_color: "#9C27B0"
+description: Assists in creating song descriptions for Suno AI.
+model: auto
+thinking_budget_tokens: 2000
+max_tokens: 4096
+voice_autoplay: false
+voice: nova
+voice_instructions: Speak with enthusiasm and creative energy, as if discussing musical ideas. Vary your tone to convey excitement about the creative process.
+tools_allowed:
   - "*_document"
   - "search_vault"
-ln_tools_disallowed: []
-ln_example_usages:
+tools_disallowed: []
+example_usages:
   - Create an inspiring song for today's tasks in epic movie soundtrack style
   - Create a deep house song
   - Write lyrics in the style of alternative pop

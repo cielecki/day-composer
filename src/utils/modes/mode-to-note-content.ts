@@ -13,16 +13,16 @@ type Frontmatter = Record<string, FrontmatterValue>;
 
 export function modeToNoteContent(mode: LNMode): string {
   // Extract the system prompt content (not in frontmatter)
-  const systemPrompt = mode.ln_system_prompt || '';
+  const systemPrompt = mode.system_prompt || '';
 
   // Create a clean object for frontmatter, removing undefined values and the system prompt
   const frontmatterObj: Frontmatter = {
     tags: 'ln-mode',
   };
 
-  // Add all properties except system prompt, ln_path, and ln_name (which are determined at load time)
+  // Add all properties except system prompt, path, and name (which are determined at load time)
   Object.entries(mode).forEach(([key, value]) => {
-    if (key !== 'ln_system_prompt' && key !== 'ln_path' && key !== 'ln_name' && value !== undefined) {
+    if (key !== 'system_prompt' && key !== 'path' && key !== 'name' && value !== undefined) {
       frontmatterObj[key] = value;
     }
   });

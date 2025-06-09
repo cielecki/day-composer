@@ -48,10 +48,10 @@ export const LNModePills: React.FC<LNModePillsProps> = ({ lnModes, onModeSelect 
       {Object.values(lnModes).map((mode, index) => (
         <LNModePill
           key={index}
-          id={mode.ln_path}
-          icon={mode.ln_icon}
-          iconColor={mode.ln_icon_color}
-          name={mode.ln_name}
+          id={mode.path}
+          icon={mode.icon}
+          iconColor={mode.icon_color}
+          name={mode.name}
           onClick={onModeSelect}
         />
       ))}

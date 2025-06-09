@@ -1,14 +1,18 @@
 import { TFile, EventRef } from 'obsidian';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { getStore } from './plugin-store';
-import { getPrebuiltModes } from 'src/utils/modes/prebuilt-modes';
-import { extractLNModeFromFile } from 'src/utils/modes/extract-mode-from-file';
+import { getPrebuiltModes } from '../utils/modes/prebuilt-modes';
+import { extractLNModeFromFile } from '../utils/modes/extract-mode-from-file';
 import { hasModeTag } from 'src/utils/modes/has-mode-tag';
 import { LNMode } from '../types/LNMode';
+import { t } from 'src/i18n';
+import { validateModeFile } from '../utils/validation/mode-validation';
 
 // Store event references for cleanup
 let fileEventRefs: EventRef[] = [];
-let modeFilePathsSet = new Set<string>();
+// Track mode file paths to watch for changes
+let modeFilePathsSet: Set<string> = new Set();
+// Timeout for debounced loading
 let loadLNModesTimeout: NodeJS.Timeout | null = null;
 
 /**
@@ -38,29 +42,56 @@ export async function initializeModesStore(): Promise<void> {
 async function loadLNModes(): Promise<void> {
   const state = getStore();
   
+  // Clear previous validation errors
+  state.clearModeValidationErrors();
+  
   try {
     // Get all markdown files in the vault
     const files = LifeNavigatorPlugin.getInstance().app.vault.getMarkdownFiles();
     const modesMap: Record<string, LNMode> = {};
+    const invalidModes: string[] = [];
 
     // First, add all pre-built modes
     const prebuiltModes = getPrebuiltModes();
     for (const mode of prebuiltModes) {
-      if (mode.ln_path) {
-        modesMap[mode.ln_path] = mode;
+      if (mode.path) {
+        modesMap[mode.path] = mode;
       }
     }
 
-    // Then add file-based modes
+    // Then add file-based modes and validate them
     for (const file of files) {
-      const mode = await extractLNModeFromFile(LifeNavigatorPlugin.getInstance().app, file);
-      if (mode && mode.ln_path) {
-        modesMap[mode.ln_path] = mode;
+      // Get metadata for validation
+      const metadata = LifeNavigatorPlugin.getInstance().app.metadataCache.getFileCache(file);
+      
+      // Check if this is a mode file
+      if (metadata?.frontmatter?.tags?.includes('ln-mode') || metadata?.frontmatter?.ln_mode) {
+        // Read content for thorough validation
+        const content = await LifeNavigatorPlugin.getInstance().app.vault.read(file);
+        
+
+        
+        // Validate the mode file
+        const validation = validateModeFile(file, metadata, content);
+        
+        if (!validation.isValid) {
+          // Track invalid mode
+          invalidModes.push(file.path);
+        }
+        
+        // Still try to extract and load the mode (even if invalid)
+        const mode = await extractLNModeFromFile(LifeNavigatorPlugin.getInstance().app, file);
+        if (mode && mode.path) {
+          modesMap[mode.path] = mode;
+        }
       }
     }
 
     // Update modes in store
     state.setAvailableModes(modesMap);
+    
+    // Update validation state
+    state.setInvalidModes(invalidModes);
     
     // Update mode file paths (only include file-based modes)
     const fileModeKeys = Object.keys(modesMap).filter((path) => path !== "" && !path.startsWith(':prebuilt:'));
@@ -69,6 +100,12 @@ async function loadLNModes(): Promise<void> {
     console.debug(
       `Loaded ${Object.keys(modesMap).length} modes (${prebuiltModes.length} pre-built, ${Object.keys(modesMap).length - prebuiltModes.length} from files)`
     );
+    
+    if (invalidModes.length > 0) {
+      console.warn(`Found ${invalidModes.length} invalid modes:`, invalidModes);
+    }
+    
+
     
     // Set the active mode from settings, regardless of whether it exists yet
     // This preserves user's choice and allows UI to show loading state if needed
@@ -83,6 +120,7 @@ async function loadLNModes(): Promise<void> {
       const firstModeId = Object.keys(modesMap)[0] || "";
       state.setActiveMode(firstModeId);
     }
+    
   } catch (error) {
     console.error("Error loading LN modes:", error);
   }
@@ -224,6 +262,8 @@ export function getAllModes(): Record<string, LNMode> {
   const state = getStore();
   return state.modes.available;
 }
+
+
 
 /**
  * Clean up modes-related resources

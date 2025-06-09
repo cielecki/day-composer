@@ -1,9 +1,9 @@
 ---
 tags: ["ln-tool"]
-ln_description: "A basic template for creating your own custom tools"
-ln_version: "1.0.0"
-ln_icon: "wrench"
-ln_enabled: true
+description: "A basic template for creating your own custom tools"
+version: "1.0.0"
+icon: "wrench"
+enabled: true
 ---
 
 # Template Tool
@@ -20,12 +20,12 @@ This is a basic template for creating user-defined tools. Copy this file and mod
 ### 2. Update the Frontmatter
 Required fields in the YAML frontmatter:
 - **`tags`**: Must include `["ln-tool"]` for the tool to be discovered
-- **`ln_description`**: Brief description of what the tool does  
-- **`ln_version`**: Version number (increment when making changes)
-- **`ln_enabled`**: Set to `true` to enable the tool
+- **`description`**: Brief description of what the tool does  
+- **`version`**: Version number (increment when making changes)
+- **`enabled`**: Set to `true` to enable the tool
 
 Optional customization:
-- **`ln_icon`**: Choose from [Lucide icons](https://lucide.dev/)
+- **`icon`**: Choose from [Lucide icons](https://lucide.dev/)
 
 ### 2. Modify the Schema
 - **Add parameters**: Define what inputs your tool needs

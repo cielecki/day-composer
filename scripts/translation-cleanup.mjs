@@ -403,7 +403,8 @@ function analyzeSuspiciousCalls(tCallsWithoutKeys) {
 function analyzeProblematicTCalls(problematicTCalls) {
   if (problematicTCalls.length === 0) return;
   
-  log(colors.red, colors.bold, '\n❌ PROBLEMATIC T() CALLS THAT NEED REFACTORING:');
+  log(colors.red, colors.bold, '\n🚨 CRITICAL: DYNAMIC TRANSLATION KEYS DETECTED!');
+  log(colors.red, colors.bold, 'These calls use dynamic keys and MUST be refactored:');
   console.log();
   
   problematicTCalls.slice(0, 20).forEach((call, index) => {
@@ -411,7 +412,7 @@ function analyzeProblematicTCalls(problematicTCalls) {
     log(colors.dim, `   Call: ${call.call}`);
     log(colors.dim, `   Issue: ${call.reason}`);
     
-    log(colors.cyan, `   💡 Required Action:`);
+    log(colors.yellow, colors.bold, `   ⚠️  IMMEDIATE ACTION REQUIRED:`);
     log(colors.white, `   • Refactor to use static translation keys: t('static.key')`);
     log(colors.white, `   • Avoid dynamic key construction like: t(variable), t(key + '.suffix'), t(\`template\`)`);
     log(colors.white, `   • If you need dynamic content, use interpolation: t('static.key', { param })`);
@@ -419,11 +420,11 @@ function analyzeProblematicTCalls(problematicTCalls) {
     
     // Provide specific suggestions based on the call pattern
     if (call.call.includes('`')) {
-      log(colors.white, `   • Template literals in t() are not supported - use static keys with interpolation`);
+      log(colors.red, `   🔴 Template literals in t() break static analysis!`);
     } else if (call.call.includes('+')) {
-      log(colors.white, `   • String concatenation in t() is not supported - use static keys`);
+      log(colors.red, `   🔴 String concatenation in t() breaks static analysis!`);
     } else if (!call.call.includes('"') && !call.call.includes("'")) {
-      log(colors.white, `   • Variable usage in t() is not supported - use static string literals`);
+      log(colors.red, `   🔴 Variable usage in t() breaks static analysis!`);
     }
     
     console.log();
@@ -434,11 +435,19 @@ function analyzeProblematicTCalls(problematicTCalls) {
     console.log();
   }
   
-  log(colors.cyan, colors.bold, '🔧 WHY THIS MATTERS:');
-  log(colors.cyan, '• Static analysis tools need literal string keys to detect missing translations');
-  log(colors.cyan, '• Dynamic keys make it impossible to verify translation completeness');
-  log(colors.cyan, '• Static keys improve code maintainability and translation management');
-  log(colors.cyan, '• TypeScript and IDE support works better with static keys');
+  log(colors.red, colors.bold, '💥 WHY THIS IS CRITICAL:');
+  log(colors.red, '• Dynamic keys make translation management impossible');
+  log(colors.red, '• Static analysis tools cannot detect missing translations');
+  log(colors.red, '• Translation completeness cannot be verified');
+  log(colors.red, '• Runtime errors will occur if translations are missing');
+  log(colors.red, '• Code becomes unmaintainable and error-prone');
+  
+  log(colors.cyan, colors.bold, '\n🚀 YOUR NEXT STEPS:');
+  log(colors.cyan, '1. Fix ALL dynamic translation calls shown above (this is mandatory)');
+  log(colors.cyan, '2. Use static keys like t("section.key") instead of dynamic construction');
+  log(colors.cyan, '3. For dynamic content, use interpolation: t("key", { value })');
+  log(colors.cyan, '4. Run this script again to verify all dynamic keys are eliminated');
+  log(colors.cyan, '5. Only proceed with development after fixing these critical issues');
   console.log();
 }
 
@@ -504,14 +513,29 @@ function generateSummary(results) {
     operationsPerformed.forEach(op => log(colors.green, op));
     
     console.log();
-    log(colors.cyan, colors.bold, '📝 NEXT STEPS:');
+    log(colors.cyan, colors.bold, '📝 YOUR NEXT STEPS (DO THESE NOW):');
     if (results.addedEntries?.length > 0) {
-      log(colors.cyan, '1. Review the added translations and replace [TRANSLATE] and [TODO] placeholders');
-      log(colors.cyan, '2. Test the application to ensure translations work correctly');
-      log(colors.cyan, '3. Run this script again to verify all issues are resolved');
+      const hasTranslatePlaceholders = results.addedEntries.some(entry => 
+        entry.value && entry.value.includes('[TRANSLATE]'));
+      const hasAddPlaceholders = results.addedEntries.some(entry => 
+        entry.value && entry.value.includes('[ADD TRANSLATION]'));
+        
+      log(colors.yellow, colors.bold, '🔍 IMMEDIATE TRANSLATION WORK REQUIRED:');
+      if (hasTranslatePlaceholders) {
+        log(colors.cyan, '1. Search for "[TRANSLATE]" in src/locales/en.json and src/locales/pl.json');
+        log(colors.cyan, '2. Replace ALL [TRANSLATE] placeholders with proper translations');
+      }
+      if (hasAddPlaceholders) {
+        log(colors.cyan, '3. Search for "[ADD TRANSLATION]" in translation files');
+        log(colors.cyan, '4. Replace ALL [ADD TRANSLATION] placeholders with actual translations');
+      }
+      log(colors.cyan, '5. Test the application to verify translations display correctly');
+      log(colors.cyan, '6. Run this script again to confirm no placeholders remain');
+      log(colors.cyan, '7. Commit the completed translation files to version control');
     } else {
       log(colors.cyan, '1. Test the application to ensure translations work correctly');
       log(colors.cyan, '2. The translation files are now organized and optimized');
+      log(colors.cyan, '3. Commit the changes to version control');
     }
   } else if (results.modificationsApplied) {
     log(colors.green, colors.bold, '🎉 TRANSLATION FILES ORGANIZED!');
@@ -524,11 +548,47 @@ function generateSummary(results) {
     issues.forEach(issue => log(colors.red, '  •', issue));
     
     console.log();
-    log(colors.cyan, colors.bold, '🚀 NEXT STEPS:');
-    log(colors.cyan, '1. Review each error above and apply the suggested fixes');
-    log(colors.cyan, '2. Run this script again to verify all issues are resolved');
-    log(colors.cyan, '3. Test the application to ensure translations work correctly');
-    log(colors.cyan, '4. Consider adding this script to your CI/CD pipeline');
+    
+    // Special handling for critical dynamic key issues
+    if (results.problematicTCalls && results.problematicTCalls.length > 0) {
+      log(colors.red, colors.bold, '🚨 STOP: Critical issues must be fixed first!');
+      log(colors.red, colors.bold, '⚠️  DO NOT PROCEED until dynamic translation keys are eliminated!');
+      console.log();
+    }
+    
+    log(colors.cyan, colors.bold, '🚀 YOUR REQUIRED ACTIONS (DO THESE IN ORDER):');
+    let stepNumber = 1;
+    
+    if (results.problematicTCalls && results.problematicTCalls.length > 0) {
+      log(colors.red, `${stepNumber++}. 🔴 CRITICAL: Fix all ${results.problematicTCalls.length} dynamic translation calls (see details above)`);
+      log(colors.red, `${stepNumber++}. 🔴 CRITICAL: Use only static keys like t("section.key")`);
+    }
+    
+    if (results.missingInPl.length > 0 || results.missingInEn.length > 0) {
+      log(colors.cyan, `${stepNumber++}. Add missing translation keys between EN/PL files`);
+    }
+    
+    if (results.missingKeys.length > 0) {
+      log(colors.cyan, `${stepNumber++}. Add ${results.missingKeys.length} missing translation keys used in code`);
+    }
+    
+    if (results.unusedKeys.length > 0) {
+      log(colors.cyan, `${stepNumber++}. Review and remove ${results.unusedKeys.length} potentially unused translation keys`);
+    }
+    
+    if (results.tCallsWithoutKeys.length > 0) {
+      log(colors.cyan, `${stepNumber++}. Review ${results.tCallsWithoutKeys.length} suspicious t() calls`);
+    }
+    
+    log(colors.cyan, `${stepNumber++}. Run this script again to verify ALL issues are resolved`);
+    log(colors.cyan, `${stepNumber++}. Test the application thoroughly to ensure translations work`);
+    log(colors.cyan, `${stepNumber++}. Commit changes only after all issues are fixed`);
+    
+    if (results.problematicTCalls && results.problematicTCalls.length > 0) {
+      console.log();
+      log(colors.red, colors.bold, '⚠️  Remember: Dynamic translation keys are critical errors!');
+      log(colors.red, 'The codebase is not safe to use until these are fixed.');
+    }
   }
   
   console.log();

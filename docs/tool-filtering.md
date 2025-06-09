@@ -7,12 +7,12 @@ Life Navigator supports configuring which tools are available to each mode throu
 Add these fields to your mode's frontmatter:
 
 ```yaml
-ln_tools_allowed:
+tools_allowed:
   - "*todo*"        # Allow all tools containing "todo"
   - "create_*"      # Allow all tools starting with "create_"
   - "search_vault"  # Allow specific tool by exact name
 
-ln_tools_disallowed:
+tools_disallowed:
   - "handover_mode" # Disallow specific tool
   - "*document*"    # Disallow all tools containing "document"
 ```
@@ -59,19 +59,19 @@ Current tools in Life Navigator:
 
 ### Assistant Mode (Task-focused)
 ```yaml
-ln_tools_allowed:
+tools_allowed:
   - "*todo*"
   - "*document*"
   - "show_todos"
-ln_tools_disallowed:
+tools_disallowed:
   - "handover_mode"
 ```
 
 ### Reflection Mode (Read-only analysis)
 ```yaml
-ln_tools_allowed:
+tools_allowed:
   - "*"
-ln_tools_disallowed:
+tools_disallowed:
   - "*todo*"
   - "create_document"
   - "append_to_document"
@@ -79,11 +79,11 @@ ln_tools_disallowed:
 
 ### Songwriter Mode (Creative writing)
 ```yaml
-ln_tools_allowed:
+tools_allowed:
   - "create_document"
   - "read_document"
   - "search_vault"
-ln_tools_disallowed: []
+tools_disallowed: []
 ```
 
 ## Use Cases

@@ -24,17 +24,35 @@ Every tool is a markdown file with YAML frontmatter containing the tool specific
 ---
 tags:
   - ln-tool
-ln_name: "My Custom Tool"
-ln_description: "Brief description of what this tool does"
-ln_version: "1.0.0"
-ln_enabled: true
-ln_schema:
-  type: "object"
-  properties:
-    parameter_name:
-      type: "string"
-      description: "Description of this parameter"
-  required: ["parameter_name"]
+description: "Brief description of what this tool does"
+version: "1.0.0"
+enabled: true
+---
+
+# Tool Name
+
+```json
+{
+  "name": "my_custom_tool",
+  "description": "Brief description of what this tool does",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "parameter_name": {
+        "type": "string",
+        "description": "Description of this parameter"
+      }
+    },
+    "required": ["parameter_name"]
+  }
+}
+```
+
+```javascript
+async function execute(input, { progress, setLabel, addNavigationTarget, plugin }) {
+  // Tool logic here
+}
+```
 ---
 
 # Tool Implementation
@@ -55,50 +73,60 @@ async function execute(params, context) {
 
 ### Tool Configuration (YAML Frontmatter)
 
-**`ln_name`**: Display name for the tool
-- Should be descriptive and unique
-- Used in AI function calling interface
-- Keep under 50 characters
-
-**`ln_description`**: What the tool does
+**`description`**: What the tool does
 - Brief explanation for the AI
 - Helps AI decide when to use the tool
 - Should be specific about capabilities
 
-**`ln_version`**: Tool version number
+**`version`**: Tool version number
 - Use semantic versioning (1.0.0, 1.1.0, 2.0.0)
 - Update when making changes
 - Helps with troubleshooting
 
-**`ln_enabled`**: Whether tool is active
+**`enabled`**: Whether tool is active
 - `true`: Tool is available for use
 - `false`: Tool is disabled (won't appear in AI tools)
 
-### JSON Schema (ln_schema)
+**`icon`**: Lucide icon name (optional)
+- Choose from [Lucide icons](https://lucide.dev/)
+- Used in UI display
+
+### JSON Schema (input_schema)
 
 Defines the parameters your tool accepts:
 
-```yaml
-ln_schema:
-  type: "object"
-  properties:
-    text:
-      type: "string"
-      description: "Text to process"
-    count:
-      type: "number"
-      description: "Number of items to generate"
-      minimum: 1
-      maximum: 100
-    options:
-      type: "array"
-      items:
-        type: "string"
-      description: "List of available options"
-    enabled:
-      type: "boolean"
-      description: "Whether feature is enabled"
-  required: ["text"]
+```json
+{
+  "name": "example_tool",
+  "description": "Example tool description",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "text": {
+        "type": "string",
+        "description": "Text to process"
+      },
+      "count": {
+        "type": "number",
+        "description": "Number of items to generate",
+        "minimum": 1,
+        "maximum": 100
+      },
+      "options": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "List of available options"
+      },
+      "enabled": {
+        "type": "boolean",
+        "description": "Whether feature is enabled"
+      }
+    },
+    "required": ["text"]
+  }
+}
 ```
 
 ### JavaScript Implementation
@@ -106,66 +134,90 @@ ln_schema:
 The `execute` function is called when the AI uses your tool:
 
 ```javascript
-async function execute(params, context) {
-    // params: Object containing the parameters from ln_schema
-    // context: Life Navigator context (app, vault, etc.)
+async function execute(input, { progress, setLabel, addNavigationTarget, plugin }) {
+    // input: Object containing the parameters from input_schema
+    // progress: Function to show progress messages
+    // setLabel: Function to update tool status
+    // addNavigationTarget: Function to add clickable links
+    // plugin: Life Navigator plugin instance
     
     try {
-        // Your tool logic here
-        const result = processData(params.text);
+        setLabel("Processing...");
+        progress("Starting tool execution...");
         
-        return {
-            success: true,
-            data: result,
-            message: "Tool executed successfully"
-        };
+        // Your tool logic here
+        const result = processData(input.text);
+        
+        progress("✅ Tool completed successfully!");
+        setLabel("Completed");
+        
+        return result;
     } catch (error) {
-        return {
-            success: false,
-            error: error.message
-        };
+        progress(`❌ Error: ${error.message}`);
+        setLabel("Failed");
+        throw error;
     }
 }
 ```
 
 ## Available Context Objects
 
-### App Context (`context.app`)
-Access to Obsidian's app instance:
+### Plugin Context (`plugin`)
+Access to Life Navigator plugin and Obsidian's app instance:
 
 ```javascript
 // Get all markdown files
-const files = context.app.vault.getMarkdownFiles();
+const files = plugin.app.vault.getMarkdownFiles();
 
 // Read file content
-const file = context.app.vault.getAbstractFileByPath("MyNote.md");
-const content = await context.app.vault.read(file);
+const file = plugin.app.vault.getAbstractFileByPath("MyNote.md");
+const content = await plugin.app.vault.read(file);
 
 // Create new file
-await context.app.vault.create("NewNote.md", "Content here");
+await plugin.app.vault.create("NewNote.md", "Content here");
 
 // Show notice to user
 new Notice("Tool completed successfully!");
 ```
 
-### HTTP Requests (`context.app.vault.adapter.app.requestUrl`)
+### Progress and Status Updates
+Keep users informed about tool execution:
+
+```javascript
+async function execute(input, { progress, setLabel, addNavigationTarget, plugin }) {
+    setLabel("Starting...");
+    progress("Initializing tool...");
+    
+    // Do some work
+    progress("Processing data...");
+    
+    // Add clickable link to result
+    addNavigationTarget({
+        type: 'file',
+        path: 'result.md',
+        label: 'Open Result'
+    });
+    
+    setLabel("Completed");
+    progress("✅ Tool finished successfully!");
+}
+```
+
+### HTTP Requests
 Make external API calls:
 
 ```javascript
-async function execute(params, context) {
-    const response = await context.app.vault.adapter.app.requestUrl({
+async function execute(input, { progress, setLabel, addNavigationTarget, plugin }) {
+    const response = await plugin.app.vault.adapter.app.requestUrl({
         url: "https://api.example.com/data",
         method: "GET",
         headers: {
-            "Authorization": "Bearer " + params.apiKey,
+            "Authorization": "Bearer " + input.apiKey,
             "Content-Type": "application/json"
         }
     });
     
-    return {
-        success: true,
-        data: response.json
-    };
+    return response.json;
 }
 ```
 
@@ -177,11 +229,11 @@ async function execute(params, context) {
 ---
 tags:
   - ln-tool
-ln_name: "Text Analyzer"
-ln_description: "Analyzes text for word count, readability, and sentiment"
-ln_version: "1.0.0"
-ln_enabled: true
-ln_schema:
+description: "Analyzes text for word count, readability, and sentiment"
+version: "1.0.0"
+enabled: true
+icon: "type"
+schema:
   type: "object"
   properties:
     text:
@@ -242,11 +294,11 @@ async function execute(params, context) {
 ---
 tags:
   - ln-tool
-ln_name: "Note Organizer"
-ln_description: "Organizes notes by tags, creation date, or custom criteria"
-ln_version: "1.0.0"
-ln_enabled: true
-ln_schema:
+description: "Organizes notes by tags, creation date, or custom criteria"
+version: "1.0.0"
+enabled: true
+icon: "folder-tree"
+schema:
   type: "object"
   properties:
     organization_method:
@@ -343,11 +395,11 @@ async function execute(params, context) {
 ---
 tags:
   - ln-tool
-ln_name: "Weather Forecast"
-ln_description: "Gets current weather and forecast for a specified location"
-ln_version: "1.0.0"
-ln_enabled: true
-ln_schema:
+description: "Gets current weather and forecast for a specified location"
+version: "1.0.0"
+enabled: true
+icon: "cloud"
+schema:
   type: "object"
   properties:
     location:
@@ -697,3 +749,20 @@ async function execute(params, context) {
 ```
 
 This comprehensive guide provides everything needed to create powerful, secure, and reliable tools for Life Navigator. Always validate your tools and test thoroughly before deployment. 
+
+---
+tags:
+  - ln-tool
+version: "1.0.0"
+description: "Brief description of what this tool does"
+icon: "wrench"
+---
+
+## Tool Configuration
+
+### Required Frontmatter Fields
+
+- **`tags`**: Must include `ln-tool` to mark this as a tool file
+- **`version`**: Version number for tracking tool evolution
+- **`description`**: Brief description of what the tool does
+- **`icon`**: Choose from [Lucide icons](https://lucide.dev/) 

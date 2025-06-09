@@ -164,13 +164,13 @@ const schema = {
               enum: ["replace", "insert_after", "insert_before", "insert_after_line", "insert_before_line", "append", "prepend"],
               description: "Type of edit operation"
             },
-            content: {
-              type: "string",
-              description: "The content to use for the operation - replacement text for replace operations, or content to insert/append/prepend for other operations"
-            },
             search_text: {
               type: "string",
               description: "Text to search for (required for replace, insert_after, insert_before operations)"
+            },
+            content: {
+              type: "string",
+              description: "The content to use for the operation - replacement text for replace operations, or content to insert/append/prepend for other operations"
             },
             line_number: {
               type: "integer",

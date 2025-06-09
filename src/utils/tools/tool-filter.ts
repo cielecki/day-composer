@@ -73,8 +73,8 @@ export function filterToolsByMode(
   mode: LNMode
 ): ObsidianTool<Record<string, unknown>>[] {
   // Get patterns from mode, fallback to defaults
-  const allowedPatterns = mode.ln_tools_allowed || ["*"];
-  const disallowedPatterns = mode.ln_tools_disallowed || [];
+  const allowedPatterns = mode.tools_allowed || ["*"];
+  const disallowedPatterns = mode.tools_disallowed || [];
 
   // If no filtering is needed (default state), return all tools
   if (
@@ -99,8 +99,8 @@ export function filterToolsByMode(
  * Get a human-readable description of tool filtering configuration
  */
 export function getToolFilteringDescription(mode: LNMode): string {
-  const allowedPatterns = mode.ln_tools_allowed || ["*"];
-  const disallowedPatterns = mode.ln_tools_disallowed || [];
+  const allowedPatterns = mode.tools_allowed || ["*"];
+  const disallowedPatterns = mode.tools_disallowed || [];
 
   if (
     allowedPatterns.length === 1 &&

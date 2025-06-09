@@ -1,7 +1,7 @@
 ---
 ln_mode: true
-ln_voice: onyx
-ln_voice_instructions: "Speak in a clear, analytical tone with slight enthusiasm when discovering interesting patterns. Use pauses for emphasis when presenting important correlations."
+voice: onyx
+voice_instructions: "Speak in a clear, analytical tone with slight enthusiasm when discovering interesting patterns. Use pauses for emphasis when presenting important correlations."
 icon: "trending-up"
 color: "#2563eb"
 tags: ["mode", "analytics", "productivity", "patterns"]

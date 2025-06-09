@@ -1,9 +1,9 @@
 ---
 tags: ["ln-tool"]
-ln_description: "Generates images using OpenAI's GPT-4o image generation model and saves them to the vault"
-ln_version: "1.0.0"
-ln_icon: "image"
-ln_enabled: true
+description: "Generates images using OpenAI's GPT-4o image generation model and saves them to the vault"
+version: "1.0.0"
+icon: "image"
+enabled: true
 ---
 
 # Image Generation Tool

@@ -233,10 +233,10 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       }
       
       // Conditionally expand links based on mode setting
-      if (currentActiveMode.ln_expand_links) {
-        return (await expandLinks(plugin.app, currentActiveMode.ln_system_prompt)).trim();
+      if (currentActiveMode.expand_links) {
+        return (await expandLinks(plugin.app, currentActiveMode.system_prompt)).trim();
       } else {
-        return currentActiveMode.ln_system_prompt.trim();
+        return currentActiveMode.system_prompt.trim();
       }
     },
     
@@ -368,7 +368,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         
         // Get current mode and check autoplay setting
         const defaultMode = getDefaultLNMode();
-        const autoplayEnabled = !!currentActiveMode?.ln_voice_autoplay;
+        const autoplayEnabled = !!currentActiveMode?.voice_autoplay;
         
         // Only auto-play if both the global setting and the mode-specific autoplay are enabled
         if (autoplayEnabled && textForTTS.trim().length > 0) {

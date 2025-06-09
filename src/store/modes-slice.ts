@@ -11,6 +11,12 @@ export interface ModesSlice {
     fileWatcherActive: boolean;
   };
   
+  // Validation state
+  validation: {
+    invalidModes: string[]; // List of mode paths/IDs with validation issues
+    invalidTools: string[]; // List of tool paths/IDs with validation issues
+  };
+  
   // Actions
   setAvailableModes: (modes: Record<string, LNMode>) => void;
   setActiveMode: (modeId: string) => void;
@@ -19,6 +25,16 @@ export interface ModesSlice {
   removeMode: (modeId: string) => void;
   setModesLoading: (loading: boolean) => void;
   setFileWatcherActive: (active: boolean) => void;
+  
+  // Validation actions
+  setInvalidModes: (modeIds: string[]) => void;
+  setInvalidTools: (toolIds: string[]) => void;
+  addInvalidMode: (modeId: string) => void;
+  addInvalidTool: (toolId: string) => void;
+  removeInvalidMode: (modeId: string) => void;
+  removeInvalidTool: (toolId: string) => void;
+  clearModeValidationErrors: () => void;
+  clearToolValidationErrors: () => void;
 }
 
 export const createModesSlice: ImmerStateCreator<ModesSlice> = (set, get) => ({
@@ -27,6 +43,11 @@ export const createModesSlice: ImmerStateCreator<ModesSlice> = (set, get) => ({
     activeId: '',
     isLoading: false,
     fileWatcherActive: false
+  },
+  
+  validation: {
+    invalidModes: [],
+    invalidTools: []
   },
   
   setAvailableModes: (modes) => set((state) => {
@@ -63,5 +84,42 @@ export const createModesSlice: ImmerStateCreator<ModesSlice> = (set, get) => ({
   
   setFileWatcherActive: (active) => set((state) => {
     state.modes.fileWatcherActive = active;
+  }),
+  
+  // Validation actions
+  setInvalidModes: (modeIds) => set((state) => {
+    state.validation.invalidModes = modeIds;
+  }),
+  
+  setInvalidTools: (toolIds) => set((state) => {
+    state.validation.invalidTools = toolIds;
+  }),
+  
+  addInvalidMode: (modeId) => set((state) => {
+    if (!state.validation.invalidModes.includes(modeId)) {
+      state.validation.invalidModes.push(modeId);
+    }
+  }),
+  
+  addInvalidTool: (toolId) => set((state) => {
+    if (!state.validation.invalidTools.includes(toolId)) {
+      state.validation.invalidTools.push(toolId);
+    }
+  }),
+  
+  removeInvalidMode: (modeId) => set((state) => {
+    state.validation.invalidModes = state.validation.invalidModes.filter(id => id !== modeId);
+  }),
+  
+  removeInvalidTool: (toolId) => set((state) => {
+    state.validation.invalidTools = state.validation.invalidTools.filter(id => id !== toolId);
+  }),
+  
+  clearModeValidationErrors: () => set((state) => {
+    state.validation.invalidModes = [];
+  }),
+
+  clearToolValidationErrors: () => set((state) => {
+    state.validation.invalidTools = [];
   })
 }); 

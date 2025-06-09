@@ -8,21 +8,21 @@ import { mergeWithDefaultMode } from './ln-mode-defaults';
  */
 export function getPrebuiltModes(): LNMode[] {
 	const lifeNavigatorMode: Partial<LNMode> = {
-		ln_name: t('prebuiltModes.lifeNavigator.title'),
-		ln_path: ':prebuilt:guide',
-		ln_description: t('prebuiltModes.lifeNavigator.mainDescription'),
-		ln_system_prompt: t('prebuiltModes.lifeNavigator.systemPrompt'),
-		ln_voice_instructions: t('prebuiltModes.lifeNavigator.voiceInstructions'),
-		ln_icon: 'compass',
-		ln_icon_color: '#4ade80',
-		ln_example_usages: [
+		name: t('prebuiltModes.lifeNavigator.title'),
+		path: ':prebuilt:guide',
+		description: t('prebuiltModes.lifeNavigator.mainDescription'),
+		system_prompt: t('prebuiltModes.lifeNavigator.systemPrompt'),
+		voice_instructions: t('prebuiltModes.lifeNavigator.voiceInstructions'),
+		icon: 'compass',
+		icon_color: '#4ade80',
+		example_usages: [
 			'Start'
 		],
-		ln_tools_allowed: ['*'],
-		ln_tools_disallowed: ['*task_*'],
-		ln_model: 'auto',
-		ln_expand_links: false,
-		ln_voice_autoplay: false,
+		tools_allowed: ['*'],
+		tools_disallowed: ['*task_*'],
+		model: 'auto',
+		expand_links: false,
+		voice_autoplay: false,
 	};
 
 	// Merge with defaults to ensure all required fields are present

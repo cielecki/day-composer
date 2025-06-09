@@ -1,20 +1,20 @@
 ---
 tags:
   - ln-mode
-ln_icon: calendar
-ln_icon_color: "#795548"
-ln_description: Used for planning days, always switch to this mode when I ask to plan any day
-ln_model: auto
-ln_thinking_budget_tokens: 4000
-ln_max_tokens: 8000
-ln_voice_autoplay: true
-ln_voice: echo
-ln_voice_instructions: "Voice Affect: Calm, composed, and reassuring; project quiet authority and confidence.Tone: Sincere, empathetic, and gently authoritative—express genuine apology while conveying competence.Pacing: Steady and moderate; unhurried enough to communicate care, yet efficient enough to demonstrate professionalism.Emotion: Genuine empathy and understanding; speak with warmth, especially during apologies (\"I'm very sorry for any disruption...\").Pronunciation: Clear and precise, emphasizing key reassurances (\"smoothly\", \"quickly\", \"promptly\")"
-ln_voice_speed: 1
-ln_tools_allowed:
+icon: calendar
+icon_color: "#795548"
+description: Used for planning days, always switch to this mode when I ask to plan any day
+model: auto
+thinking_budget_tokens: 4000
+max_tokens: 8000
+voice_autoplay: true
+voice: echo
+voice_instructions: "Voice Affect: Calm, composed, and reassuring; project quiet authority and confidence.Tone: Sincere, empathetic, and gently authoritative—express genuine apology while conveying competence.Pacing: Steady and moderate; unhurried enough to communicate care, yet efficient enough to demonstrate professionalism.Emotion: Genuine empathy and understanding; speak with warmth, especially during apologies (\"I'm very sorry for any disruption...\").Pronunciation: Clear and precise, emphasizing key reassurances (\"smoothly\", \"quickly\", \"promptly\")"
+voice_speed: 1
+tools_allowed:
   - "*"
-ln_tools_disallowed: []
-ln_example_usages:
+tools_disallowed: []
+example_usages:
   - Plan today
   - Plan tomorrow
 ---

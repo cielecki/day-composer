@@ -5,6 +5,7 @@ import { TFile } from "obsidian";
 import { UserDefinedTool } from "../types/user-tools";
 import { UserDefinedToolScanner } from "../user-tools/UserDefinedToolScanner";
 import * as yaml from "js-yaml";
+import { t } from 'src/i18n';
 
 const schema = {
   name: "tool_validator",
@@ -68,7 +69,12 @@ export const toolValidatorTool: ObsidianTool<ToolValidatorInput> = {
         description: "Open tool file"
       });
 
-      context.setLabel(`Tool validation completed: ${tool_path}`);
+      // Set completion label with issue counts
+      context.setLabel(t('validation.results.tool.completed', { 
+        filePath: tool_path,
+        errorCount: result.errors.length,
+        warningCount: result.warnings.length
+      }));
       
       // Format the validation report
       let report = `# Tool Validation Report: ${file.basename}\n\n`;
@@ -222,9 +228,22 @@ async function validateToolFile(app: any, file: TFile): Promise<ValidationResult
 
 function validateRequiredFrontmatterFields(frontmatter: Record<string, any>, result: ValidationResult): void {
   // Check for required fields
-  const requiredFields = ['ln_version', 'ln_description'];
+  	const requiredFields = ['version', 'description']; // New format
+	const oldRequiredFields = ['ln_version', 'ln_description']; // Old format for backward compatibility
   
-  for (const field of requiredFields) {
+  // Check if tool uses new format or old format
+  const hasNewFormat = requiredFields.some(field => frontmatter[field]);
+  const hasOldFormat = oldRequiredFields.some(field => frontmatter[field]);
+  
+  if (!hasNewFormat && !hasOldFormat) {
+    result.errors.push(`Missing required fields. Please add either new format (${requiredFields.join(', ')}) or old format (${oldRequiredFields.join(', ')})`);
+  } else if (hasOldFormat && !hasNewFormat) {
+    result.warnings.push(`Tool uses old ln_ format. Consider updating to new format: ${oldRequiredFields.map((old, i) => `${old} → ${requiredFields[i]}`).join(', ')}`);
+  }
+  
+  // Check for missing fields in the format being used
+  const fieldsToCheck = hasNewFormat ? requiredFields : oldRequiredFields;
+  for (const field of fieldsToCheck) {
     if (!frontmatter[field]) {
       result.errors.push(`Missing required frontmatter field: ${field}`);
     } else if (typeof frontmatter[field] !== 'string' || frontmatter[field].trim() === '') {
@@ -234,32 +253,34 @@ function validateRequiredFrontmatterFields(frontmatter: Record<string, any>, res
     }
   }
 
-  // Check version format
-  if (frontmatter.ln_version) {
-    const version = String(frontmatter.ln_version).trim();
-    if (!/^\d+\.\d+\.\d+/.test(version)) {
-      result.warnings.push(`Tool version '${version}' doesn't follow semantic versioning (e.g., '1.0.0')`);
+  // Check version format - support both old and new formats
+  const version = frontmatter.version || frontmatter.ln_version;
+  if (version) {
+    const versionStr = String(version).trim();
+    if (!/^\d+\.\d+\.\d+/.test(versionStr)) {
+      result.warnings.push(`Tool version '${versionStr}' doesn't follow semantic versioning (e.g., '1.0.0')`);
     } else {
-      result.info.push(`Version follows semantic versioning: ${version}`);
+      result.info.push(`Version follows semantic versioning: ${versionStr}`);
     }
   }
 
-  // Check optional fields
-  if (frontmatter.ln_icon) {
-    result.info.push(`Icon: ${frontmatter.ln_icon}`);
+  // Check optional fields - support both old and new formats
+  const icon = frontmatter.icon || frontmatter.ln_icon;
+  if (icon) {
+    result.info.push(`Icon: ${icon}`);
   } else {
     result.info.push("No custom icon specified - will use default 'wrench' icon");
   }
 
-  if (frontmatter.ln_enabled !== undefined) {
-    const enabled = frontmatter.ln_enabled;
+  const enabled = frontmatter.enabled !== undefined ? frontmatter.enabled : frontmatter.ln_enabled;
+  if (enabled !== undefined) {
     if (typeof enabled === 'boolean') {
       result.info.push(`Tool enabled: ${enabled}`);
     } else {
-      result.warnings.push(`ln_enabled should be a boolean (true/false), got: ${typeof enabled}`);
+      result.warnings.push(`enabled should be a boolean (true/false), got: ${typeof enabled}`);
     }
   } else {
-    result.info.push("Tool enabled by default (no ln_enabled specified)");
+    result.info.push("Tool enabled by default (no enabled specified)");
   }
 }
 

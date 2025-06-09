@@ -24,19 +24,19 @@ Every mode is a markdown file with YAML frontmatter containing configuration and
 ---
 tags:
   - ln-mode
-ln_icon: brain
-ln_icon_color: "#4ade80"
-ln_description: Brief description of what this mode does
-ln_model: auto
-ln_thinking_budget_tokens: 1024
-ln_max_tokens: 4096
-ln_voice_autoplay: true
-ln_voice: alloy
-ln_voice_instructions: How the AI should speak when using voice
-ln_tools_allowed:
+icon: brain
+icon_color: "#4ade80"
+description: Brief description of what this mode does
+model: auto
+thinking_budget_tokens: 1024
+max_tokens: 4096
+voice_autoplay: true
+voice: alloy
+voice_instructions: How the AI should speak when using voice
+tools_allowed:
   - "*"
-ln_tools_disallowed: []
-ln_example_usages:
+tools_disallowed: []
+example_usages:
   - "Example message to trigger this mode"
 ---
 
@@ -58,56 +58,56 @@ Describe what the AI should do in this mode.
 
 ### Required Fields
 
-**`ln_icon`**: Visual icon for the mode
+**`icon`**: Visual icon for the mode
 - Use [Lucide icon names](https://lucide.dev/icons/)
 - Examples: `brain`, `calendar`, `wrench`, `heart`, `zap`
 
-**`ln_icon_color`**: Color for the icon
+**`icon_color`**: Color for the icon
 - Hex colors: `#4ade80`, `#3b82f6`, `#ef4444`
 - Named colors: `blue`, `red`, `green`
 
-**`ln_description`**: One-sentence explanation
+**`description`**: One-sentence explanation
 - Appears in mode selection dropdown
 - Should clearly explain the mode's purpose
 - Keep under 100 characters for UI readability
 
-**`ln_model`**: AI model to use
+**`model`**: AI model to use
 - `auto`: Let Life Navigator choose the best model
 - `claude-sonnet-4`: Latest Claude model
 - `gpt-4`: OpenAI's GPT-4
 
 ### Voice Configuration
 
-**`ln_voice`**: AI voice for text-to-speech
-- Options: `alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer`
-- [Listen to voice samples](https://platform.openai.com/docs/guides/text-to-speech)
+**`voice`**: AI voice for text-to-speech
+- Options: `alloy`, `ash`, `ballad`, `coral`, `echo`, `fable`, `onyx`, `nova`, `sage`, `shimmer`, `verse`
+- [Explore all the voices and see voice instruction samples](https://www.openai.fm)
 
-**`ln_voice_instructions`**: How the AI should speak
+**`voice_instructions`**: How the AI should speak
 ```yaml
-ln_voice_instructions: |-
+voice_instructions: |-
   Speak in a warm, encouraging tone. Use short sentences for clarity.
   Sound like a helpful friend who's genuinely interested in the user's success.
   Moderate pace, pause between thoughts.
 ```
 
-**`ln_voice_autoplay`**: Auto-play voice responses
+**`voice_autoplay`**: Auto-play voice responses
 - `true`: Always play voice responses automatically
 - `false`: User clicks to play voice responses
 
 ### Tool Access Control
 
-**`ln_tools_allowed`**: Tools this mode can use
+**`tools_allowed`**: Tools this mode can use
 ```yaml
-ln_tools_allowed:
+tools_allowed:
   - "*"           # All tools
   - "note_*"      # All note-related tools
   - "task_*"      # All task management tools
   - "vault_*"     # All vault exploration tools
 ```
 
-**`ln_tools_disallowed`**: Tools to exclude
+**`tools_disallowed`**: Tools to exclude
 ```yaml
-ln_tools_disallowed:
+tools_disallowed:
   - "note_delete"     # Prevent deletion
   - "task_delete"     # Prevent task deletion
   - "*financial*"    # No financial tools
@@ -115,13 +115,13 @@ ln_tools_disallowed:
 
 ### Performance Settings
 
-**`ln_thinking_budget_tokens`**: Internal reasoning capacity
+**`thinking_budget_tokens`**: Internal reasoning capacity
 - 1024: Basic reasoning (simple responses)
 - 2048: Moderate reasoning (standard responses)  
 - 4096: Deep reasoning (complex analysis)
 - 8192: Maximum reasoning (very complex tasks)
 
-**`ln_max_tokens`**: Maximum response length
+**`max_tokens`**: Maximum response length
 - 2048: Short responses
 - 4096: Standard responses
 - 8192: Long responses (detailed analysis)
@@ -183,7 +183,7 @@ You are a knowledgeable fitness coach focused on helping users achieve their hea
 
 **Professional Mode:**
 ```yaml
-ln_voice_instructions: |-
+voice_instructions: |-
   Professional and clear tone. Speak at a measured pace.
   Sound knowledgeable but approachable.
   Use standard business communication style.
@@ -191,7 +191,7 @@ ln_voice_instructions: |-
 
 **Motivational Mode:**
 ```yaml
-ln_voice_instructions: |-
+voice_instructions: |-
   Energetic and encouraging! Sound excited about the user's potential.
   Faster pace, emphatic delivery. Like a personal trainer or coach.
   Use motivational phrases and positive energy.
@@ -199,7 +199,7 @@ ln_voice_instructions: |-
 
 **Reflective Mode:**
 ```yaml
-ln_voice_instructions: |-
+voice_instructions: |-
   Calm, thoughtful, and wise tone. Slower pace with meaningful pauses.
   Sound like a counselor or meditation teacher.
   Gentle delivery that invites introspection.
@@ -228,12 +228,12 @@ Create specialized tool access for different modes:
 
 ```yaml
 # Research mode - focus on information gathering
-ln_tools_allowed:
+tools_allowed:
   - "vault_*"
   - "library_*"
   - "note_create"
   - "note_modify"
-ln_tools_disallowed:
+tools_disallowed:
   - "task_*"
   - "note_delete"
 ```
@@ -244,8 +244,8 @@ Create modes in different languages:
 
 ```yaml
 # Spanish mode example
-ln_description: Asistente personal en español para planificación diaria
-ln_voice_instructions: |-
+description: Asistente personal en español para planificación diaria
+voice_instructions: |-
   Habla en español con un tono amigable y profesional.
   Usa vocabulario claro y estructuras gramaticales correctas.
 ```
@@ -266,37 +266,37 @@ Always validate your modes before using them:
 **Invalid YAML Syntax:**
 ```yaml
 # Wrong - missing quotes around colon
-ln_description: This: breaks YAML parsing
+description: This: breaks YAML parsing
 
 # Correct - proper quoting
-ln_description: "This: works correctly"
+description: "This: works correctly"
 ```
 
 **Missing Required Fields:**
 ```yaml
-# Missing ln_description and ln_icon
+# Missing description and icon
 tags:
   - ln-mode
-ln_model: auto
+model: auto
 ```
 
 **Invalid Icon Names:**
 ```yaml
 # Wrong - not a valid Lucide icon
-ln_icon: not-a-real-icon
+icon: not-a-real-icon
 
 # Correct - valid Lucide icon
-ln_icon: brain
+icon: brain
 ```
 
 **Invalid Tool Patterns:**
 ```yaml
 # Wrong - invalid wildcard pattern
-ln_tools_allowed:
+tools_allowed:
   - "task*"
 
 # Correct - proper wildcard syntax
-ln_tools_allowed:
+tools_allowed:
   - "task_*"
 ```
 
@@ -312,36 +312,36 @@ ln_tools_allowed:
 
 ### Task-Focused Mode
 ```yaml
-ln_tools_allowed:
+tools_allowed:
   - "task_*"
   - "note_*"
   - "vault_search"
-ln_tools_disallowed:
+tools_disallowed:
   - "note_delete"
-ln_description: Focused on task management and productivity
+description: Focused on task management and productivity
 ```
 
 ### Creative Mode
 ```yaml
-ln_tools_allowed:
+tools_allowed:
   - "note_*"
   - "library_*"
   - "vault_*"
-ln_tools_disallowed:
+tools_disallowed:
   - "task_*"
   - "*delete*"
-ln_description: Creative writing and ideation assistant
+description: Creative writing and ideation assistant
 ```
 
 ### Analytical Mode
 ```yaml
-ln_thinking_budget_tokens: 4096
-ln_max_tokens: 8192
-ln_tools_allowed:
+thinking_budget_tokens: 4096
+max_tokens: 8192
+tools_allowed:
   - "vault_*"
   - "library_*"
   - "note_create"
-ln_description: Deep analysis and research assistant
+description: Deep analysis and research assistant
 ```
 
 ## Troubleshooting Guide
@@ -352,17 +352,17 @@ ln_description: Deep analysis and research assistant
 - Restart Life Navigator if needed
 
 ### Voice Not Working
-- Confirm voice name is valid (`alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer`)
+- Confirm voice name is valid (`alloy`, `ash`, `ballad`, `coral`, `echo`, `fable`, `onyx`, `nova`, `sage`, `shimmer`, `verse`)
 - Check voice instructions are properly formatted
 - Verify text-to-speech is enabled in settings
 
 ### Tools Not Available
-- Validate tool patterns in `ln_tools_allowed`
-- Check for conflicts in `ln_tools_disallowed`
+- Validate tool patterns in `tools_allowed`
+- Check for conflicts in `tools_disallowed`
 - Verify tool names are correct
 
 ### Poor Response Quality
-- Increase `ln_thinking_budget_tokens` for complex tasks
+- Increase `thinking_budget_tokens` for complex tasks
 - Review system prompt clarity and specificity
 - Test with different model settings
 
@@ -397,23 +397,23 @@ ln_description: Deep analysis and research assistant
 ---
 tags:
   - ln-mode
-ln_icon: graduation-cap
-ln_icon_color: "#3b82f6"
-ln_description: Personalized learning and skill development assistant
-ln_model: auto
-ln_thinking_budget_tokens: 2048
-ln_max_tokens: 4096
-ln_voice: nova
-ln_voice_instructions: |-
+icon: graduation-cap
+icon_color: "#3b82f6"
+description: Personalized learning and skill development assistant
+model: auto
+thinking_budget_tokens: 2048
+max_tokens: 4096
+voice: nova
+voice_instructions: |-
   Encouraging teacher tone. Clear explanations with enthusiasm for learning.
   Sound like someone who loves helping others discover new knowledge.
-ln_tools_allowed:
+tools_allowed:
   - "vault_*"
   - "library_*"
   - "note_*"
-ln_tools_disallowed:
+tools_disallowed:
   - "task_*"
-ln_example_usages:
+example_usages:
   - "Help me learn about quantum computing"
   - "Create a study plan for learning Spanish"
 ---

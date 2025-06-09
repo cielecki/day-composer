@@ -15,12 +15,12 @@ export const modeHandoverTool: ObsidianTool<HandoverModeToolInput> = {
 		
 		const modes = Object.values(getStore().modes.available);
 		const currentModeId = getStore().modes.activeId
-		availableModes = modes.filter(mode => mode.ln_path !== currentModeId).map(mode => mode.ln_path);
+		availableModes = modes.filter(mode => mode.path !== currentModeId).map(mode => mode.path);
 		
 		// Build a description that includes all available modes and their purposes
 		if (modes.length > 0) {
 			modeDescriptions = "\n\nAvailable modes:\n" + modes.map(mode => 
-				`• ${mode.ln_path}: ${mode.ln_name} - ${mode.ln_description || 'No description available'}`
+				`• ${mode.path}: ${mode.name} - ${mode.description || 'No description available'}`
 			).join('\n');
 		}
 
@@ -51,11 +51,11 @@ export const modeHandoverTool: ObsidianTool<HandoverModeToolInput> = {
 
 		// Get mode names for display
 		const modes = Object.values(getStore().modes.available);
-		const targetMode = modes.find(mode => mode.ln_path === mode_id);
-		const originalMode = modes.find(mode => mode.ln_path === originalModeId);
+		const targetMode = modes.find(mode => mode.path === mode_id);
+		const originalMode = modes.find(mode => mode.path === originalModeId);
 		
-		const targetModeName = targetMode?.ln_name || mode_id;
-		const originalModeName = originalMode?.ln_name || originalModeId;
+		const targetModeName = targetMode?.name || mode_id;
+		const originalModeName = originalMode?.name || originalModeId;
 
 		context.setLabel(t('tools.handover.inProgress', { mode: targetModeName }));
 

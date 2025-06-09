@@ -1,15 +1,15 @@
 ---
 tags:
   - ln-mode
-ln_icon: lucide-wrench
-ln_icon_color: "#FFC107"
-ln_description: Specialized assistant for creating, debugging, and improving user-defined tools. Helps with JavaScript code, JSON schemas, and tool optimization.
-ln_model: auto
-ln_thinking_budget_tokens: 4000
-ln_max_tokens: 8000
-ln_voice_autoplay: false
-ln_voice: nova
-ln_voice_instructions: |-
+icon: lucide-wrench
+icon_color: "#FFC107"
+description: Specialized assistant for creating, debugging, and improving user-defined tools. Helps with JavaScript code, JSON schemas, and tool optimization.
+model: auto
+thinking_budget_tokens: 4000
+max_tokens: 8000
+voice_autoplay: false
+voice: nova
+voice_instructions: |-
   Voice: Knowledgeable and encouraging like a skilled programming mentor.
 
   Tone: Technical yet approachable, patient and supportive. Sound like someone who genuinely enjoys helping others learn and build things.
@@ -19,10 +19,10 @@ ln_voice_instructions: |-
   Pacing: Thoughtful and deliberate, allowing time for complex concepts to be understood.
 
   Emotion: Enthusiastic about problem-solving and tool creation. Express satisfaction when helping users achieve their goals.
-ln_tools_allowed:
+tools_allowed:
   - "*"
-ln_tools_disallowed: []
-ln_example_usages:
+tools_disallowed: []
+example_usages:
   - Help me create a tool that organizes my notes by tags
   - Debug this JavaScript error in my custom tool
   - Improve the schema for my task automation tool
@@ -61,9 +61,9 @@ You provide practical, working code examples and guide users through the complet
 ```yaml
 ---
 tags: ["ln-tool"]
-ln_description: "Brief description of what your tool does"
-ln_icon: "icon-name"
-ln_enabled: true
+description: "Brief description of what your tool does"
+icon: "icon-name"
+enabled: true
 ---
 ```
 
@@ -78,10 +78,10 @@ ln_enabled: true
 ```markdown
 ---
 tags: ["ln-tool"]
-ln_description: "Description of what the tool does"
-ln_version: "1.0.0"
-ln_icon: "wrench"
-ln_enabled: true
+description: "Description of what the tool does"
+version: "1.0.0"
+icon: "wrench"
+enabled: true
 ---
 
 # Your Tool Name
@@ -128,10 +128,10 @@ async function execute(input, { progress, setLabel, addNavigationTarget, plugin 
 
 ### 1. Frontmatter Requirements
 - **tags**: Must be `["ln-tool"]` (exactly this format)
-- **ln_description**: Brief, clear description
-- **ln_version**: Version number (required for change tracking)
-- **ln_icon**: Lucide icon name (e.g., "wrench", "search", "file")
-- **ln_enabled**: Set to `true` to enable the tool
+- **description**: Brief, clear description
+- **version**: Version number (required for change tracking)
+- **icon**: Lucide icon name (e.g., "wrench", "search", "file")
+- **enabled**: Set to `true` to enable the tool
 - **Tool name**: Automatically taken from the filename (no frontmatter needed)
 
 ### 2. JSON Schema Design
@@ -192,10 +192,10 @@ const content = await plugin.app.vault.read(file);
 ```markdown
 ---
 tags: ["ln-tool"]
-ln_description: "Creates a new note with specified title and content"
-ln_version: "1.0.0"
-ln_icon: "file-plus"
-ln_enabled: true
+description: "Creates a new note with specified title and content"
+version: "1.0.0"
+icon: "file-plus"
+enabled: true
 ---
 
 # Quick Note Creator
@@ -265,10 +265,10 @@ async function execute(input, { progress, setLabel, addNavigationTarget, plugin 
 ```markdown
 ---
 tags: ["ln-tool"]
-ln_description: "Organizes files into folders based on tags"
-ln_version: "1.0.0"
-ln_icon: "folder-tree"
-ln_enabled: true
+description: "Organizes files into folders based on tags"
+version: "1.0.0"
+icon: "folder-tree"
+enabled: true
 ---
 
 # Tag-based File Organizer

@@ -156,7 +156,7 @@ Each mode can be extensively customized:
 **Voice Settings:**
 - Each mode can have a different AI voice
 - Visit [OpenAI's Voice Demo](https://platform.openai.com/docs/guides/text-to-speech) to hear options
-- Change the `ln_voice` setting to: alloy, echo, fable, onyx, nova, or shimmer
+- Change the `voice` setting to: alloy, ash, ballad, coral, echo, fable, onyx, nova, sage, shimmer, or verse
 - Modify `ln_voice_instructions` to control speaking style (e.g., "speak quickly and energetically")
 
 **Visual Customization:**

@@ -22,6 +22,7 @@ import { ConversationHistoryDropdown } from './ConversationHistoryDropdown';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { MessageWithId } from '../store/chat-store';
 import { useAutoscroll } from '../hooks/useAutoscroll';
+import { ValidationFixButton } from './ValidationFixButton';
 
 // Add Zustand store imports
 import {
@@ -335,13 +336,13 @@ export const LifeNavigatorApp: React.FC = () => {
 					<div className="empty-conversation">
 						<div className="markdown-content">
 							<MarkdownRenderer
-								content={activeMode.ln_description}
+								content={activeMode.description}
 							/>
 						</div>
 
-						{activeMode.ln_example_usages.length > 0 && (
+						{activeMode.example_usages.length > 0 && (
 							<div className="ln-mode-pills-container">
-								{activeMode.ln_example_usages.map((usage, index) => (
+								{activeMode.example_usages.map((usage, index) => (
 									<LNModePill
 										key={index}
 										id={`${index}`}
@@ -350,7 +351,7 @@ export const LifeNavigatorApp: React.FC = () => {
 											// If the mode has an auto-trigger message, send it
 											if (usage) {
 												console.debug(
-													`Auto-triggering message for mode ${activeMode.ln_name}: "${usage}"`,
+													`Auto-triggering message for mode ${activeMode.name}: "${usage}"`,
 												);
 
 																							// Wait a short moment before sending to ensure state updates have propagated
@@ -361,6 +362,21 @@ export const LifeNavigatorApp: React.FC = () => {
 										}}
 									/>
 								))}
+							</div>
+						)}
+
+						{/* Show validation fix button for current mode if it has issues */}
+						<ValidationFixButton 
+							type="specific-mode" 
+							modeId={activeMode.path}
+							displayMode="text-and-button"
+						/>
+
+						{/* Show validation fix buttons if we're in Guide mode and there are issues */}
+						{activeMode.path === ':prebuilt:guide' && (
+							<div className="validation-issues-container">
+								<ValidationFixButton type="modes" />
+								<ValidationFixButton type="tools" />
 							</div>
 						)}
 					</div>
@@ -419,20 +435,20 @@ export const LifeNavigatorApp: React.FC = () => {
 							) : activeMode ? (
 								// Normal state - show loaded mode
 								<>
-									{activeMode.ln_icon && (
+									{activeMode.icon && (
 										<span className="ln-icon-center">
 											<LucideIcon
-												name={activeMode.ln_icon}
+												name={activeMode.icon}
 												size={18}
 												color={
-													activeMode.ln_icon_color ||
+													activeMode.icon_color ||
 													"var(--text-normal)"
 												}
 											/>
 										</span>
 									)}
 									<span className="ln-font-medium">
-										{activeMode.ln_name}
+										{activeMode.name}
 									</span>
 								</>
 							) : (
@@ -477,12 +493,12 @@ export const LifeNavigatorApp: React.FC = () => {
 							{/* Actions - only show when activeMode is loaded */}
 							{activeMode && (
 								<>
-									{!activeMode.ln_path.startsWith(':prebuilt:') && (
+									{!activeMode.path.startsWith(':prebuilt:') && (
 										<div
 											className="ln-mode-action-item"
 											onClick={() => {
-												if (window.app && activeMode.ln_path) {
-													const file = window.app.vault.getAbstractFileByPath(activeMode.ln_path);
+												if (window.app && activeMode.path) {
+													const file = window.app.vault.getAbstractFileByPath(activeMode.path);
 													if (file instanceof TFile) {
 														window.app.workspace.getLeaf().openFile(file);
 													}
@@ -514,7 +530,7 @@ export const LifeNavigatorApp: React.FC = () => {
 											const systemPrompt = await getSystemPrompt();
 											openSimpleObsidianModal(
 												window.app,
-												t('ui.modal.systemPrompt').replace('{{modeName}}', activeMode.ln_name),
+												t('ui.modal.systemPrompt').replace('{{modeName}}', activeMode.name),
 												systemPrompt || ""
 											);
 											setDropdownOpen(false);
@@ -523,6 +539,14 @@ export const LifeNavigatorApp: React.FC = () => {
 										<LucideIcon name="terminal" size={16} color="var(--text-normal)" />
 										{t('ui.mode.viewSystemPrompt')}
 									</div>
+
+									{/* Validation fix button for current mode - positioned as last option */}
+									<ValidationFixButton 
+										type="specific-mode" 
+										modeId={activeMode.path}
+										showIcon={true}
+										displayMode="dropdown-item"
+									/>
 
 									{/* Separator */}
 									<div className="ln-separator" />
@@ -540,23 +564,23 @@ export const LifeNavigatorApp: React.FC = () => {
 									{Object.values(availableModes).map((mode, index) => (
 										<div
 											key={index}
-											className={`ln-mode-list-item ${mode.ln_path === activeMode?.ln_path ? 'active' : ''}`}
+											className={`ln-mode-list-item ${mode.path === activeMode?.path ? 'active' : ''}`}
 											onClick={async () => {
-												await setActiveModeWithPersistence(mode.ln_path);
+												await setActiveModeWithPersistence(mode.path);
 												setDropdownOpen(false);
 											}}
 										>
-											{mode.ln_icon && (
+											{mode.icon && (
 												<span className="ln-icon-center">
 													<LucideIcon
-														name={mode.ln_icon}
+														name={mode.icon}
 														size={16}
-														color={mode.ln_icon_color || "var(--text-normal)"}
+														color={mode.icon_color || "var(--text-normal)"}
 													/>
 												</span>
 											)}
 											<span className="ln-text-sm ln-whitespace-nowrap ln-text-ellipsis">
-												{mode.ln_name}
+												{mode.name}
 											</span>
 										</div>
 									))}

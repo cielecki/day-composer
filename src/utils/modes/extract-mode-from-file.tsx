@@ -1,127 +1,120 @@
-import * as yaml from "js-yaml";
-import { App, TFile } from "obsidian";
-import { t } from 'src/i18n';
-import { mergeWithDefaultMode } from 'src/utils/modes/ln-mode-defaults';
-import { LNMode } from "src/types/LNMode";
+import { App, TFile, CachedMetadata, FrontMatterCache } from "obsidian";
+import { LNMode } from "../../types/LNMode";
+import { mergeWithDefaultMode, getDefaultLNMode } from "./ln-mode-defaults";
 
-// Function to extract an LN mode from a file with the #ln-mode tag
-export const extractLNModeFromFile = async (
+/**
+ * Extract LN mode configuration from a markdown file
+ * Returns null if the file is not a valid LN mode
+ */
+export async function extractLNModeFromFile(
 	app: App,
-	file: TFile
-): Promise<LNMode | null> => {
+	file: TFile,
+	metadata?: CachedMetadata | null
+): Promise<LNMode | null> {
 	try {
+		// Get file metadata if not provided
+		if (!metadata) {
+			metadata = app.metadataCache.getFileCache(file);
+		}
+
+		// Check if this is a mode file
+		if (!metadata?.frontmatter?.tags?.includes('ln-mode') && !metadata?.frontmatter?.ln_mode) {
+			return null;
+		}
+
+		// Read the file content
 		const content = await app.vault.read(file);
 
-		// Check if content is valid
-		if (content.trim().length === 0) {
-			return null;
-		}
-
-		// Check if file has #ln-mode tag
-		const cache = app.metadataCache.getFileCache(file);
-		const tags = cache?.tags?.map((tag) => tag.tag) || [];
-		const frontmatterTags = cache?.frontmatter?.tags || [];
-
-		// Convert frontmatter tags to array if it's a string
-		const normalizedFrontmatterTags = Array.isArray(frontmatterTags)
-			? frontmatterTags
-			: [frontmatterTags];
-
-		// Check if the file has the #ln-mode tag
-		const hasModeTag = tags.includes("#ln-mode") ||
-			normalizedFrontmatterTags.includes("ln-mode");
-
-		if (!hasModeTag) {
-			return null;
-		}
-
 		// Parse frontmatter and content
-		const frontmatterMatch = content.match(
-			/^---\n([\s\S]*?)\n---\n([\s\S]*)$/
-		);
-
-		if (!frontmatterMatch) {
-			console.warn(
-				t('ui.mode.files.noFrontmatter').replace('{{filename}}', file.name)
-			);
-			// Create partial mode with only required fields
-			const partialMode: Partial<LNMode> = {
-				ln_name: file.basename,
-				ln_path: file.path,
-				ln_system_prompt: content.trim(),
-			};
-
-			// Merge with defaults
-			return mergeWithDefaultMode(partialMode);
+		const frontmatterRegex = /^---\n([\s\S]*?)\n---\n?/;
+		const match = content.match(frontmatterRegex);
+		
+		if (!match) {
+			// No frontmatter - create basic mode from content
+			return mergeWithDefaultMode({
+				name: file.basename,
+				path: file.path,
+				system_prompt: content.trim(),
+			});
 		}
 
-		const [, frontmatterStr, contentStr] = frontmatterMatch;
+		// Extract content after frontmatter
+		const contentStr = content.replace(frontmatterRegex, '').trim();
+		const frontmatter = metadata.frontmatter || {};
 
-		// Parse frontmatter using js-yaml
-		let frontmatter: Record<string, any>;
-		try {
-			frontmatter =
-				(yaml.load(frontmatterStr) as Record<string, any>) || {};
-		} catch (yamlError) {
-			console.error(`Error parsing YAML in ${file.path}:`, yamlError);
-			frontmatter = {};
-		}
-		// Create a partial LNMode object
+		// Create partial mode from frontmatter
+		// Handle both old (ln_) and new format attributes
 		const partialMode: Partial<LNMode> = {
-			// Required fields
-			ln_name: file.basename,
-			ln_path: file.path,
+			name: file.basename,
+			path: file.path,
+			
+			// New format attributes
+			icon: frontmatter.icon,
+			icon_color: frontmatter.icon_color,
+			description: frontmatter.description,
+			version: frontmatter.version,
+			model: frontmatter.model,
+			voice: frontmatter.voice,
+			voice_instructions: frontmatter.voice_instructions,
+			
+			// Old format attributes (for backwards compatibility)
+			...(frontmatter.ln_icon && !frontmatter.icon && { icon: frontmatter.ln_icon }),
+			...(frontmatter.ln_icon_color && !frontmatter.icon_color && { icon_color: frontmatter.ln_icon_color }),
+			...(frontmatter.ln_description && !frontmatter.description && { description: frontmatter.ln_description }),
+			...(frontmatter.ln_version && !frontmatter.version && { version: frontmatter.ln_version }),
+			...(frontmatter.ln_model && !frontmatter.model && { model: frontmatter.ln_model }),
+			...(frontmatter.ln_voice && !frontmatter.voice && { voice: frontmatter.ln_voice }),
+			...(frontmatter.ln_voice_instructions && !frontmatter.voice_instructions && { voice_instructions: frontmatter.ln_voice_instructions }),
+			
+			// Boolean fields (check both old and new format)
+			...(frontmatter.enabled !== undefined ? { enabled: String(frontmatter.enabled).toLowerCase() === "true" } : 
+				frontmatter.ln_enabled !== undefined ? { enabled: String(frontmatter.ln_enabled).toLowerCase() === "true" } : {}),
+			...(frontmatter.expand_links !== undefined ? { expand_links: String(frontmatter.expand_links).toLowerCase() === "true"} : 
+				frontmatter.ln_expand_links !== undefined ? { expand_links: String(frontmatter.ln_expand_links).toLowerCase() === "true"} : {}),
+			...(frontmatter.voice_autoplay !== undefined ? { voice_autoplay: String(frontmatter.voice_autoplay).toLowerCase() === "true" } : 
+				frontmatter.ln_voice_autoplay !== undefined ? { voice_autoplay: String(frontmatter.ln_voice_autoplay).toLowerCase() === "true" } : {}),
 
-			// UI elements
-			ln_icon: frontmatter.ln_icon,
-			ln_icon_color: frontmatter.ln_icon_color,
-			ln_description: frontmatter.ln_description,
+			// Handle example_usages (can be string or array, check both formats)
+			example_usages: (() => {
+				const newFormat = frontmatter.example_usages;
+				const oldFormat = frontmatter.ln_example_usages;
+				const usages = newFormat || oldFormat;
+				
+				return Array.isArray(usages) ? usages : usages ? [usages] : [];
+			})(),
 
-			// Common attributes (shared with tools)
-			ln_version: frontmatter.ln_version,
-			...(frontmatter.ln_enabled !== undefined ? { ln_enabled: String(frontmatter.ln_enabled).toLowerCase() === "true" } : {}),
+			// Numeric fields (check both old and new format)
+			...(frontmatter.thinking_budget_tokens !== undefined ? { thinking_budget_tokens: parseInt(String(frontmatter.thinking_budget_tokens)) } : 
+				frontmatter.ln_thinking_budget_tokens !== undefined ? { thinking_budget_tokens: parseInt(String(frontmatter.ln_thinking_budget_tokens)) } : {}),
+			...(frontmatter.max_tokens !== undefined ? { max_tokens: parseInt(String(frontmatter.max_tokens)) } : 
+				frontmatter.ln_max_tokens !== undefined ? { max_tokens: parseInt(String(frontmatter.ln_max_tokens)) } : {}),
+			...(frontmatter.voice_speed !== undefined ? { voice_speed: parseFloat(String(frontmatter.voice_speed)) } : 
+				frontmatter.ln_voice_speed !== undefined ? { voice_speed: parseFloat(String(frontmatter.ln_voice_speed)) } : {}),
 
-			// Behavior
-			ln_example_usages: Array.isArray(
-				frontmatter.ln_example_usages
-			)
-				? frontmatter.ln_example_usages
-				: frontmatter.ln_example_usages
-					? [frontmatter.ln_example_usages]
-					: [],
-
-			...(frontmatter.ln_expand_links !== undefined ? { ln_expand_links: String(frontmatter.ln_expand_links).toLowerCase() === "true"}: {}),
-
-			// API parameters
-			ln_model: frontmatter.ln_model,
-			...(frontmatter.ln_thinking_budget_tokens !== undefined ? { ln_thinking_budget_tokens: parseInt(String(frontmatter.ln_thinking_budget_tokens)) } : {}),
-			...(frontmatter.ln_max_tokens !== undefined ? { ln_max_tokens: parseInt(String(frontmatter.ln_max_tokens)) } : {}),
-
-			// TTS settings
-			...(frontmatter.ln_voice_autoplay !== undefined ? { ln_voice_autoplay: String(frontmatter.ln_voice_autoplay).toLowerCase() === "true" } : {}),
-			ln_voice: frontmatter.ln_voice,
-			ln_voice_instructions: frontmatter.ln_voice_instructions,
-			...(frontmatter.ln_voice_speed !== undefined ? { ln_voice_speed: parseFloat(String(frontmatter.ln_voice_speed)) } : {}),
-
-			// Tool filtering
-			ln_tools_allowed: Array.isArray(frontmatter.ln_tools_allowed)
-				? frontmatter.ln_tools_allowed
-				: frontmatter.ln_tools_allowed
-					? [frontmatter.ln_tools_allowed]
-					: undefined,
-			ln_tools_disallowed: Array.isArray(frontmatter.ln_tools_disallowed)
-				? frontmatter.ln_tools_disallowed
-				: frontmatter.ln_tools_disallowed
-					? [frontmatter.ln_tools_disallowed]
-					: undefined,
+			// Tool filtering (check both formats)
+			tools_allowed: (() => {
+				const newFormat = frontmatter.tools_allowed;
+				const oldFormat = frontmatter.ln_tools_allowed;
+				const allowed = newFormat || oldFormat;
+				
+				return Array.isArray(allowed) ? allowed : allowed ? [allowed] : undefined;
+			})(),
+			tools_disallowed: (() => {
+				const newFormat = frontmatter.tools_disallowed;
+				const oldFormat = frontmatter.ln_tools_disallowed;
+				const disallowed = newFormat || oldFormat;
+				
+				return Array.isArray(disallowed) ? disallowed : disallowed ? [disallowed] : undefined;
+			})(),
 		};
 
-		partialMode.ln_system_prompt = contentStr;
+		// Set system prompt from content
+		partialMode.system_prompt = contentStr;
 
-		// Merge with defaults and return
+		// Merge with defaults
 		return mergeWithDefaultMode(partialMode);
 	} catch (error) {
-		console.error(`Error reading file ${file.path}:`, error);
+		console.error(`Error extracting mode from file ${file.path}:`, error);
 		return null;
 	}
-};
+}

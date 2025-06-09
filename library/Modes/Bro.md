@@ -1,15 +1,15 @@
 ---
 tags:
   - ln-mode
-ln_icon: dumbbell
-ln_icon_color: "#E53935"
-ln_description: 
-ln_model: auto
-ln_thinking_budget_tokens: 2000
-ln_max_tokens: 4096
-ln_voice_autoplay: true
-ln_voice: echo
-ln_voice_instructions: |-
+icon: dumbbell
+icon_color: "#E53935"
+description: 
+model: auto
+thinking_budget_tokens: 2000
+max_tokens: 4096
+voice_autoplay: true
+voice: echo
+voice_instructions: |-
   Voice: Direct, energetic, and motivational like a supportive workout buddy or coach.
 
   Tone: Confident and encouraging with a masculine, no-nonsense approach. Be motivational but not condescending.
@@ -19,10 +19,10 @@ ln_voice_instructions: |-
   Pacing: Quick and dynamic to match the urgency and energy of someone who wants to get things done.
 
   Emotion: Enthusiastic and determined. Project confidence and the belief that the listener can accomplish their goals.
-ln_tools_allowed:
+tools_allowed:
   - "*"
-ln_tools_disallowed: []
-ln_example_usages:
+tools_disallowed: []
+example_usages:
   - What now?
   - What might I not be seeing right now?
 ---

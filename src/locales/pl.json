@@ -23,16 +23,16 @@
   },
   "errors": {
     "audio": {
-      "invalidVoice": "[TRANSLATE] Invalid Voice",
+      "invalidVoice": "Nieprawidłowy Głos",
       "microphone": {
-        "accessDenied": "[TRANSLATE] Access Denied",
-        "general": "[TRANSLATE] General",
-        "inUse": "[TRANSLATE] In Use",
-        "notFound": "[TRANSLATE] Not Found"
+        "accessDenied": "Dostęp Zabroniony",
+        "general": "Ogólny",
+        "inUse": "W Użyciu",
+        "notFound": "Nie Znaleziono"
       },
-      "noApiKey": "[TRANSLATE] No Api Key",
+      "noApiKey": "Brak Klucza API",
       "playbackError": "Błąd odtwarzania audio: {{error}}",
-      "transcriptionFailed": "[TRANSLATE] Transcription Failed"
+      "transcriptionFailed": "Transkrypcja Nieudana"
     },
     "chat": {
       "noContent": "Brak dostępnej zawartości czatu"
@@ -209,9 +209,9 @@
         "success": "Dodano {{task}}"
       },
       "check": {
-        "failed": "Nie udało się oznaczyć {{task}}",
-        "inProgress": "Oznaczanie {{task}}...",
-        "success": "Oznaczono {{task}}"
+        "failed": "Nie udało się oznaczyć `{{task}}`",
+        "inProgress": "Oznaczanie `{{task}}` ...",
+        "success": "Oznaczono `{{task}}`"
       },
       "createCompleted": {
         "failed": "Nie udało się utworzyć ukończonego todo {{task}}",
@@ -472,21 +472,18 @@
     "modal": {
       "copied": "Skopiowano!",
       "copyToClipboard": "Kopiuj do schowka",
-      "modeSettings": "Ustawienia trybu {{modeName}}",
+      "modeSettings": "Ustawienia trybu: {{modeName}}",
       "reloadButton": "Uruchom ponownie Obsidian",
       "reloadRequiredMessageWithVersions": "Wtyczka zaktualizowana z wersji {{currentVersion}} do {{latestVersion}}.\nCzy chcesz ponownie uruchomić Obsidian, aby zastosować zmiany?",
       "reloadRequiredTitle": "Wymagane ponowne uruchomienie",
-      "systemPrompt": "Prompt systemowy dla \"{{modeName}}\""
+      "systemPrompt": "Prompt systemowy: {{modeName}}"
     },
     "mode": {
-      "files": {
-        "noFrontmatter": "Plik {{filename}} nie ma frontmattera, używam wartości domyślnych z treścią pliku jako prompt systemowy"
-      },
       "loading": "Ładowanie...",
       "openInEditor": "Otwórz w edytorze",
-      "switchTo": "Przełącz na:",
+      "switchTo": "Przełącz na",
       "viewSettings": "Pokaż ustawienia trybu",
-      "viewSystemPrompt": "Pokaż prompt systemowy"
+      "viewSystemPrompt": "Zobacz prompt systemowy"
     },
     "recording": {
       "cancel": "Anuluj nagrywanie",
@@ -542,6 +539,52 @@
       "selectedFrom": "Wybrane zadania z {{filename}}",
       "showMore": "Pokaż {{count}} więcej elementów"
     }
+  },
+  "validation": {
+    "fixButton": {
+      "tooltip": "Przełącz na tryb Guide i uzyskaj pomoc w naprawieniu błędów walidacji"
+    },
+          "fixModes": {
+        "button": {
+          "few": "Napraw tryby ({{count}})",
+          "many": "Napraw tryby ({{count}})"
+        },
+        "description": {
+          "few": "{{count}} pliki trybu mają błędy walidacji, które wymagają naprawy.",
+          "many": "{{count}} plików trybu ma błędy walidacji, które wymagają naprawy."
+        },
+        "message": {
+          "few": "Pomóż mi naprawić błędy walidacji w moich trybach. Mam {{count}} pliki trybu z błędami walidacji.",
+          "many": "Pomóż mi naprawić błędy walidacji w moich trybach. Mam {{count}} plików trybu z błędami walidacji."
+        }
+      },
+    "fixSpecificMode": {
+      "button": "Napraw ten tryb",
+      "description": "Obecny tryb \"{{modeName}}\" ma błędy walidacji, które wymagają naprawy.",
+      "message": "Pomóż mi naprawić błędy walidacji w pliku trybu \"{{filePath}}\". Ten plik trybu ma błędy walidacji, które wymagają naprawy."
+    },
+          "fixTools": {
+        "button": {
+          "few": "Napraw narzędzia ({{count}})",
+          "many": "Napraw narzędzia ({{count}})"
+        },
+      "description": {
+        "few": "{{count}} pliki narzędzi mają błędy walidacji, które wymagają naprawy.",
+        "many": "{{count}} plików narzędzi ma błędy walidacji, które wymagają naprawy."
+      },
+      "message": {
+        "few": "Pomóż mi naprawić błędy walidacji w moich narzędziach. Mam {{count}} pliki narzędzi z błędami walidacji.",
+        "many": "Pomóż mi naprawić błędy walidacji w moich narzędziach. Mam {{count}} plików narzędzi z błędami walidacji."
+      }
+    },
+          "results": {
+        "mode": {
+          "completed": "Walidacja trybu zakończona: {{filePath}} ({{errorCount}} błędów, {{warningCount}} ostrzeżeń)"
+        },
+        "tool": {
+          "completed": "Walidacja narzędzia zakończona: {{filePath}} ({{errorCount}} błędów, {{warningCount}} ostrzeżeń)"
+        }
+      }
   },
   "view": {
     "title": "Life Navigator"

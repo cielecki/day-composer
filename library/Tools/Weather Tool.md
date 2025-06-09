@@ -1,9 +1,9 @@
 ---
 tags: ["ln-tool"]
-ln_description: "Fetches current weather information for a specified location"
-ln_version: "1.0.0"
-ln_icon: "cloud"
-ln_enabled: true
+description: "Fetches current weather information for a specified location"
+version: "1.0.0"
+icon: "cloud"
+enabled: true
 ---
 
 # Weather Tool

@@ -1,15 +1,15 @@
 ---
 tags:
   - ln-mode
-ln_icon: coffee
-ln_icon_color: "#77bb41"
-ln_description: Helps with journaling, checking off tasks and creating notes.
-ln_model: auto
-ln_thinking_budget_tokens: 1024
-ln_max_tokens: 4096
-ln_voice_autoplay: false
-ln_voice: ballad
-ln_voice_instructions: |-
+icon: coffee
+icon_color: "#77bb41"
+description: Helps with journaling, checking off tasks and creating notes.
+model: auto
+thinking_budget_tokens: 1024
+max_tokens: 4096
+voice_autoplay: false
+voice: ballad
+voice_instructions: |-
   Voice: Professional, helpful, and efficient like a skilled personal assistant.
 
   Tone: Warm yet businesslike, competent and reliable. Sound organized and detail-oriented.
@@ -19,10 +19,10 @@ ln_voice_instructions: |-
   Pacing: Steady and measured, allowing for clarity while maintaining efficiency.
 
   Emotion: Supportive and proactive. Convey reliability and the ability to handle complex tasks smoothly.
-ln_tools_allowed:
+tools_allowed:
   - "*"
-ln_tools_disallowed: []
-ln_example_usages:
+tools_disallowed: []
+example_usages:
   - Move all unfinished tasks from yesterday to today
   - I completed another task, check it off
   - I feel great after going for a walk

@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- **Comprehensive validation system**: New centralized validation for both mode and tool files that detects various issues including old format, missing fields, invalid values, and security concerns. Validation runs automatically when files are loaded and provides detailed error reports.
+- **Contextual fix buttons**: Smart fix buttons appear throughout the UI when validation issues are detected:
+  - Empty chat shows fix button for the current mode if it has validation issues
+  - Mode dropdown shows fix button for the currently selected mode if it has issues (positioned as last option before mode switching section)  
+  - Guide mode shows fix buttons for modes and tools when issues exist
+  - Settings tool section shows fix button when tool validation errors are found
+  - All buttons automatically switch to Guide mode and send appropriate help messages
+- **Enhanced validation tool**: Updated mode validator tool now supports both modes and tools with comprehensive validation using the centralized system, providing detailed reports with specific error types and severity levels.
+
+### Fixed
+- **Note editing tool parameter consistency**: Unified all note editing operations to use a single 'content' parameter instead of having separate 'content' and 'replacement_text' parameters. This makes the API more consistent and intuitive - all operations now use 'content' for the text they work with.
+
+### Enhanced
+- **Tool attributes now use human-readable names**: Updated all tool parameters from `ln_` prefixes to clear names (`ln_description` → `description`, `ln_icon` → `icon`, `ln_version` → `version`, `ln_enabled` → `enabled`) for consistency with mode format and better readability. All library tools and documentation updated to use new format while maintaining backward compatibility.
+- **Backward compatibility**: Mode and tool files using old `ln_` format continue to work while validation system detects and reports the format issues for user awareness.
+- **Validation tracking**: Store now tracks invalid modes and tools separately, enabling targeted fix suggestions and better user experience.
+- **Improved internationalization**: Validation messages now use separate translation keys for different plural forms instead of handling pluralization in code, providing better language support and maintaining proper grammar rules for each language.
+
 ## [0.10.6] - 2025-06-06
 
 ### Added
@@ -251,5 +272,19 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ### Enhanced
 - **Schema-based parameter validation**: All tool parameters are now validated for type correctness, required fields, string length constraints, number ranges, array sizes, enum values, and nested object properties. Invalid parameters are caught early with descriptive error messages.
+- **Translation cleanup script improvements**: The script now explicitly detects and warns about dynamic translation keys that break static analysis, provides clear step-by-step instructions for fixing issues, and gives specific guidance on what to do after adding new translation keys
 
-...
+### Changed
+- **Mode attributes now use human-readable names**: Changed from `ln_` prefixes to clear names (`ln_description` → `description`, `ln_icon` → `icon`, etc.) for better readability and following Obsidian naming conventions
+- **Static error messages for old format modes**: Replaced dynamic error messages with static ones to improve translation management and prevent runtime issues
+- **Validation messages now properly translated**: Tool and mode validation completion messages show different status based on results (success, warnings, errors) with proper translations instead of hard-coded English text
+
+### Added
+- **Old format detection with guided fix**: When old `ln_` format is detected in mode files, a static error message is displayed with a button that automatically switches to guide mode and asks for help fixing the mode file formatting
+
+### Fixed
+- **Documentation examples updated**: Fixed Tool Development Guide and Tool Creator mode examples that were using outdated `ln_` format attributes, which could mislead AI when creating modes and tools
+
+### Removed
+
+## [0.9.3] - 2025-06-02

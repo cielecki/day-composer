@@ -1,19 +1,19 @@
 ---
 tags:
   - ln-mode
-ln_icon: lucide-sun-moon
-ln_icon_color: "#ff9800"
-ln_description: Assists with daily reflection related to tasks, habits and goals. Contains broad context of the last 30 days.
-ln_model: auto
-ln_thinking_budget_tokens: 4000
-ln_max_tokens: 8096
-ln_voice_autoplay: true
-ln_voice: nova
-ln_voice_instructions: Adopt a calm, reflective tone. Speak slowly and thoughtfully to encourage introspection.
-ln_tools_allowed:
+icon: lucide-sun-moon
+icon_color: "#ff9800"
+description: Assists with daily reflection related to tasks, habits and goals. Contains broad context of the last 30 days.
+model: auto
+thinking_budget_tokens: 4000
+max_tokens: 8096
+voice_autoplay: true
+voice: nova
+voice_instructions: Adopt a calm, reflective tone. Speak slowly and thoughtfully to encourage introspection.
+tools_allowed:
   - "*"
-ln_tools_disallowed: []
-ln_example_usages:
+tools_disallowed: []
+example_usages:
   - Help me with a moment of reflection on the recent period.
   - What can I do better in the upcoming period?
   - Analyze today

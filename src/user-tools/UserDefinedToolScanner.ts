@@ -69,21 +69,21 @@ export class UserDefinedToolScanner {
     
     const executeCode = jsCodeBlocks[0]; // Use first JS block
     
-    // Validate that version is present and not empty
-    const version = metadata?.frontmatter?.ln_version;
+    // Validate that version is present and not empty - support both old and new formats
+    const version = metadata?.frontmatter?.version || metadata?.frontmatter?.ln_version;
     if (!version || typeof version !== 'string' || version.trim() === '') {
-      throw new Error(`Tool version is required. Please add 'ln_version: "1.0.0"' to the frontmatter of ${file.path}`);
+      throw new Error(`Tool version is required. Please add 'version: "1.0.0"' to the frontmatter of ${file.path}`);
     }
     
     const tool: UserDefinedTool = {
       name: file.basename,
-      description: metadata?.frontmatter?.ln_description || '',
-      icon: metadata?.frontmatter?.ln_icon || 'wrench',
+      description: metadata?.frontmatter?.description || metadata?.frontmatter?.ln_description || '',
+      icon: metadata?.frontmatter?.icon || metadata?.frontmatter?.ln_icon || 'wrench',
       filePath: file.path,
       version: version.trim(),
       executeCode,
       schema,
-      enabled: metadata?.frontmatter?.ln_enabled !== false,
+      enabled: (metadata?.frontmatter?.enabled !== false) && (metadata?.frontmatter?.ln_enabled !== false),
       approved: false,
       codeHash: this.calculateHash(executeCode),
       schemaHash: this.calculateHash(JSON.stringify(schema)),

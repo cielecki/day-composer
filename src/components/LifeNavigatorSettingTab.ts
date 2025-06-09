@@ -149,6 +149,8 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 		userToolsWarningTitle.textContent = '⚠️ ' + t('settings.userTools.security.title');
 		securityWarningEl.createEl('br');
 		securityWarningEl.appendText(t('settings.userTools.security.warning'));
+
+
 	}
 
 	async refreshSecretsDisplay(): Promise<void> {
@@ -272,6 +274,75 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 
 	async refreshUserToolsDisplay(): Promise<void> {
 		this.userToolsContainer.empty();
+		
+		// Check for validation issues and show fix button if needed
+		const store = getStore();
+		const invalidTools = store.validation.invalidTools;
+		
+		if (invalidTools.length > 0) {
+			const validationContainer = this.userToolsContainer.createEl('div', {
+				cls: 'setting-item',
+				attr: { style: 'border: 1px solid var(--color-orange); border-radius: 6px; padding: 12px; margin: 8px 0; background: var(--background-modifier-warning);' }
+			});
+			
+			const warningHeader = validationContainer.createEl('div', {
+				attr: { style: 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;' }
+			});
+			
+			// Helper functions for pluralization
+			const getPluralForm = (count: number): 'singular' | 'few' | 'many' => {
+				if (count === 1) return 'singular';
+				if (count >= 2 && count <= 4) return 'few';
+				return 'many';
+			};
+			
+			const getEnglishPluralForm = (count: number): 'singular' | 'plural' => {
+				return count === 1 ? 'singular' : 'plural';
+			};
+			
+			const pluralForm = getPluralForm(invalidTools.length);
+			const englishPluralForm = getEnglishPluralForm(invalidTools.length);
+			
+			warningHeader.createEl('span', { text: '⚠️' });
+			warningHeader.createEl('strong', { 
+				text: t(`validation.toolIssuesFound.${pluralForm}`, {
+					count: invalidTools.length,
+					defaultValue: t(`validation.toolIssuesFound.${englishPluralForm}`, {
+						count: invalidTools.length,
+						defaultValue: `${invalidTools.length} tool file${invalidTools.length > 1 ? 's' : ''} have validation issues`
+					})
+				})
+			});
+			
+			const fixBtn = validationContainer.createEl('button', {
+				text: t(`validation.fixTools.buttonSettings.${pluralForm}`, {
+					defaultValue: t(`validation.fixTools.buttonSettings.${englishPluralForm}`, {
+						defaultValue: 'Fix Tool Issues'
+					})
+				}),
+				attr: { 
+					style: 'padding: 6px 12px; background: var(--interactive-accent); color: white; border: none; border-radius: 4px; cursor: pointer;'
+				}
+			});
+			
+			// Add wrench emoji before text
+			fixBtn.prepend('🔧 ');
+			
+			fixBtn.addEventListener('click', () => {
+				// Close settings by navigating away (Obsidian will close settings tab)
+				store.setActiveModeWithPersistence(':prebuilt:guide');
+				store.addUserMessage(t(`validation.fixTools.message.${pluralForm}`, {
+					count: invalidTools.length,
+					defaultValue: t(`validation.fixTools.message.${englishPluralForm}`, {
+						count: invalidTools.length,
+						defaultValue: `Help me fix validation issues with my tools. I have ${invalidTools.length} tool file${invalidTools.length > 1 ? 's' : ''} with validation errors.`
+					})
+				}));
+				
+				// Close settings tab by navigating to main view
+				this.app.workspace.getLeaf().detach();
+			});
+		}
 		
 		// If no user tools manager, show error
 		if (!this.plugin.userToolManager) {

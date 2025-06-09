@@ -8,6 +8,8 @@ import { ToolExecutionContext } from '../types/chat-types';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { getObsidianTools } from '../obsidian-tools';
 import { sanitizeToolName } from 'src/utils/text/string-sanitizer';
+import { validateToolFile } from '../utils/validation/tool-validation';
+import { getStore } from '../store/plugin-store';
 import { TFile } from 'obsidian';
 
 export class UserDefinedToolManager {
@@ -109,11 +111,43 @@ export class UserDefinedToolManager {
   async refreshTools(): Promise<void> {
     try {
       const discoveredTools = await this.scanner.scanForTools();
+      const invalidTools: string[] = [];
+      
+      // Validate each tool and track invalid ones
+      for (const tool of discoveredTools) {
+        try {
+          // Get the file for validation
+          const file = this.plugin.app.vault.getAbstractFileByPath(tool.filePath);
+          if (file instanceof TFile) {
+            // Get metadata and content for validation
+            const metadata = this.plugin.app.metadataCache.getFileCache(file);
+            const content = await this.plugin.app.vault.read(file);
+            
+            // Validate the tool file
+            const validation = validateToolFile(file, metadata, content);
+            
+            if (!validation.isValid) {
+              invalidTools.push(tool.filePath);
+            }
+          }
+        } catch (error) {
+          console.warn(`[USER-TOOLS] Failed to validate tool ${tool.name}:`, error);
+          invalidTools.push(tool.filePath);
+        }
+      }
       
       // Update tool registry
       this.tools.clear();
       for (const tool of discoveredTools) {
         this.tools.set(tool.name, tool);
+      }
+
+      // Update validation state in store
+      const store = getStore();
+      store.setInvalidTools(invalidTools);
+      
+      if (invalidTools.length > 0) {
+        console.warn(`[USER-TOOLS] Found ${invalidTools.length} invalid tools:`, invalidTools);
       }
 
       // Update obsidian tools registry

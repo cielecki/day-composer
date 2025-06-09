@@ -1,9 +1,9 @@
 ---
 tags: ["ln-tool"]
-ln_description: "Download transcripts from YouTube videos"
-ln_version: "1.0.0"
-ln_icon: "youtube"
-ln_enabled: true
+description: "Download transcripts from YouTube videos"
+version: "1.0.0"
+icon: "youtube"
+enabled: true
 ---
 
 # YouTube Transcript Download Tool

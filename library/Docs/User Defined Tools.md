@@ -164,10 +164,10 @@ const data = await response.json();
 ```markdown
 ---
 tags: ["ln-tool"]
-ln_description: "Creates a note with template and metadata"
-ln_version: "1.0.0"
-ln_icon: "file-plus"
-ln_enabled: true
+description: "Creates a note with template and metadata"
+version: "1.0.0"
+icon: "file-plus"
+enabled: true
 ---
 
 # Smart Note Creator
@@ -288,7 +288,7 @@ Tools are automatically discovered when you:
 - Save the note with valid schema and JavaScript code
 
 ### Disabling Tools
-- Set `ln_enabled: false` in frontmatter
+- Set `enabled: false` in frontmatter
 - Or disable the entire feature in settings
 
 ### Updating Tools

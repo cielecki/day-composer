@@ -137,7 +137,7 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
       if (include_metadata) {
         const currentDate = new Date().toLocaleString();
         const activeMode = store.modes.available[store.modes.activeId];
-        const modeName = activeMode ? activeMode.ln_name : 'Unknown';
+        const modeName = activeMode ? activeMode.name : 'Unknown';
         
         noteContent += `# ${conversationTitle}\n\n`;
         noteContent += `**Date:** ${currentDate}\n`;

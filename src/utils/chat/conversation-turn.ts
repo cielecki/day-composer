@@ -76,15 +76,15 @@ export const runConversationTurn = async (
 					console.debug('[CONVERSATION-TURN] Reusing system prompt for mode:', currentModeId);
 				}
 				
-				const rawModel = currentActiveMode?.ln_model ?? defaultMode.ln_model;
+				const rawModel = currentActiveMode?.model ?? defaultMode.model;
 				
 				// Resolve "auto" model to actual model based on mode characteristics
 				const model = rawModel === "auto" 
 					? resolveAutoModel(currentActiveMode || defaultMode)
 					: rawModel;
 					
-				const maxTokens = currentActiveMode.ln_max_tokens ?? defaultMode.ln_max_tokens;
-				const thinkingBudgetTokens = currentActiveMode.ln_thinking_budget_tokens ?? defaultMode.ln_thinking_budget_tokens;
+				const maxTokens = currentActiveMode.max_tokens ?? defaultMode.max_tokens;
+				const thinkingBudgetTokens = currentActiveMode.thinking_budget_tokens ?? defaultMode.thinking_budget_tokens;
 
 				const params: MessageCreateParamsStreaming = {
 					model: model,

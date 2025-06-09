@@ -7,8 +7,8 @@ import OpenAI from 'openai';
 import moment from 'moment';
 import { expandLinks } from 'src/utils/links/expand-links';
 
-export type TTSVoice = "alloy" | "ash" | "coral" | "echo" | "fable" | "onyx" | "nova" | "sage" | "shimmer";
-export const TTS_VOICES: TTSVoice[] = ['alloy', 'ash', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer'];
+export type TTSVoice = "alloy" | "ash" | "ballad" | "coral" | "echo" | "fable" | "onyx" | "nova" | "sage" | "shimmer" | "verse";
+export const TTS_VOICES: TTSVoice[] = ['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer', 'verse'];
 const MAX_AUDIO_PROMPT_LENGTH = 5000;
 
 // Cache interface for storing generated audio
@@ -61,9 +61,9 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
     const defaultMode = getDefaultLNMode();
     
     return {
-      voice: currentMode?.ln_voice ?? defaultMode.ln_voice,
-      instructions: currentMode?.ln_voice_instructions ?? defaultMode.ln_voice_instructions,
-      speed: currentMode?.ln_voice_speed ?? defaultMode.ln_voice_speed,
+      voice: currentMode?.voice ?? defaultMode.voice,
+      instructions: currentMode?.voice_instructions ?? defaultMode.voice_instructions,
+      speed: currentMode?.voice_speed ?? defaultMode.voice_speed,
     };
   };
 
