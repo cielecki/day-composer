@@ -15,7 +15,6 @@ function normalizeTextForMatching(text: string): string {
     .replace(/\r\n/g, '\n')  // Convert Windows line endings
     .replace(/\r/g, '\n')    // Convert Mac line endings
     .replace(/\t/g, '    ')  // Convert tabs to spaces
-    .trim();
 }
 
 /**
