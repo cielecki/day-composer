@@ -1,4 +1,5 @@
 import { TFile, CachedMetadata, FrontMatterCache } from "obsidian";
+import { validateIconField } from "./lucide-icon-validation";
 
 export interface ToolValidationResult {
 	isValid: boolean;
@@ -82,6 +83,14 @@ export function validateToolFile(
 			message: 'version must be a string',
 			severity: 'error'
 		});
+	}
+	
+	// Validate icon field if present
+	if (frontmatter.icon !== undefined) {
+		const iconValidation = validateIconField(frontmatter.icon, 'icon', false);
+		if (!iconValidation.isValid && iconValidation.issue) {
+			issues.push(iconValidation.issue);
+		}
 	}
 	
 	// Validate tool name format

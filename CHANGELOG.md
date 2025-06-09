@@ -2,27 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-
-### Added
-- **Comprehensive validation system**: New centralized validation for both mode and tool files that detects various issues including old format, missing fields, invalid values, and security concerns. Validation runs automatically when files are loaded and provides detailed error reports.
-- **Contextual fix buttons**: Smart fix buttons appear throughout the UI when validation issues are detected:
-  - Empty chat shows fix button for the current mode if it has validation issues
-  - Mode dropdown shows fix button for the currently selected mode if it has issues (positioned as last option before mode switching section)  
-  - Guide mode shows fix buttons for modes and tools when issues exist
-  - Settings tool section shows fix button when tool validation errors are found
-  - All buttons automatically switch to Guide mode and send appropriate help messages
-- **Enhanced validation tool**: Updated mode validator tool now supports both modes and tools with comprehensive validation using the centralized system, providing detailed reports with specific error types and severity levels.
-
-### Fixed
-- **Note editing tool parameter consistency**: Unified all note editing operations to use a single 'content' parameter instead of having separate 'content' and 'replacement_text' parameters. This makes the API more consistent and intuitive - all operations now use 'content' for the text they work with.
-
-### Enhanced
-- **Tool attributes now use human-readable names**: Updated all tool parameters from `ln_` prefixes to clear names (`ln_description` → `description`, `ln_icon` → `icon`, `ln_version` → `version`, `ln_enabled` → `enabled`) for consistency with mode format and better readability. All library tools and documentation updated to use new format while maintaining backward compatibility.
-- **Backward compatibility**: Mode and tool files using old `ln_` format continue to work while validation system detects and reports the format issues for user awareness.
-- **Validation tracking**: Store now tracks invalid modes and tools separately, enabling targeted fix suggestions and better user experience.
-- **Improved internationalization**: Validation messages now use separate translation keys for different plural forms instead of handling pluralization in code, providing better language support and maintaining proper grammar rules for each language.
-
 ## [0.10.6] - 2025-06-06
 
 ### Added
@@ -285,6 +264,24 @@ change: enforce thinking in claude, as it's needed for handover to work
 ### Fixed
 - **Documentation examples updated**: Fixed Tool Development Guide and Tool Creator mode examples that were using outdated `ln_` format attributes, which could mislead AI when creating modes and tools
 
-### Removed
+### Added
+- **Comprehensive validation system**: New centralized validation for both mode and tool files that detects various issues including old format, missing fields, invalid values, and security concerns. Validation runs automatically when files are loaded and provides detailed error reports.
+- **Contextual fix buttons**: Smart fix buttons appear throughout the UI when validation issues are detected:
+  - Empty chat shows fix button for the current mode if it has validation issues
+  - Mode dropdown shows fix button for the currently selected mode if it has issues (positioned as last option before mode switching section)  
+  - Guide mode shows fix buttons for modes and tools when issues exist
+  - Settings tool section shows fix button when tool validation errors are found
+  - All buttons automatically switch to Guide mode and send appropriate help messages
+- **Enhanced validation tool**: Updated mode validator tool now supports both modes and tools with comprehensive validation using the centralized system, providing detailed reports with specific error types and severity levels.
 
-## [0.9.3] - 2025-06-02
+### Fixed
+- **Note editing tool parameter consistency**: Unified all note editing operations to use a single 'content' parameter instead of having separate 'content' and 'replacement_text' parameters. This makes the API more consistent and intuitive - all operations now use 'content' for the text they work with.
+
+### Enhanced
+- **Icon validation for modes and tools**: All mode and tool icons are now validated to ensure they are valid Lucide icons available in Obsidian. The validation system checks icon names and provides helpful error messages with links to the Lucide icon library when invalid icons are used.
+- **Tool attributes now use human-readable names**: Updated all tool parameters from `ln_` prefixes to clear names (`ln_description` → `description`, `ln_icon` → `icon`, `ln_version` → `version`, `ln_enabled` → `enabled`) for consistency with mode format and better readability. All library tools and documentation updated to use new format while maintaining backward compatibility.
+- **Backward compatibility**: Mode and tool files using old `ln_` format continue to work while validation system detects and reports the format issues for user awareness.
+- **Validation tracking**: Store now tracks invalid modes and tools separately, enabling targeted fix suggestions and better user experience.
+- **Improved internationalization**: Validation messages now use separate translation keys for different plural forms instead of handling pluralization in code, providing better language support and maintaining proper grammar rules for each language.
+- **Detailed validation error messages**: Validation fix buttons now show actual file paths instead of just counts, making it easier to identify which specific files need attention. Messages display up to 5 file paths and indicate when there are more files with issues.
+- **Mode validator tool translations**: Fixed hardcoded English text in the mode validator tool to use proper translation keys, ensuring all tool labels and status messages display correctly in the user's selected language.

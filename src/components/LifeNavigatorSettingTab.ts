@@ -331,11 +331,15 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			fixBtn.addEventListener('click', () => {
 				// Close settings by navigating away (Obsidian will close settings tab)
 				store.setActiveModeWithPersistence(':prebuilt:guide');
+				// Format file paths nicely - show first 5 and indicate if there are more
+				const toolPathsFormatted = invalidTools.length <= 5 
+					? invalidTools.join(', ')
+					: `${invalidTools.slice(0, 5).join(', ')} and ${invalidTools.length - 5} more`;
 				store.addUserMessage(t(`validation.fixTools.message.${pluralForm}`, {
-					count: invalidTools.length,
+					filePaths: toolPathsFormatted,
 					defaultValue: t(`validation.fixTools.message.${englishPluralForm}`, {
-						count: invalidTools.length,
-						defaultValue: `Help me fix validation issues with my tools. I have ${invalidTools.length} tool file${invalidTools.length > 1 ? 's' : ''} with validation errors.`
+						filePaths: toolPathsFormatted,
+						defaultValue: `Help me fix validation issues with my tools. I have the following tool files with validation errors: ${toolPathsFormatted}`
 					})
 				}));
 				

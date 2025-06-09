@@ -1,7 +1,7 @@
 ---
 tags:
   - ln-mode
-icon: lucide-wrench
+icon: wrench
 icon_color: "#FFC107"
 description: Specialized assistant for creating, debugging, and improving user-defined tools. Helps with JavaScript code, JSON schemas, and tool optimization.
 model: auto

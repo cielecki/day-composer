@@ -49,13 +49,13 @@ export async function extractLNModeFromFile(
 			path: file.path,
 			
 			// New format attributes
-			icon: frontmatter.icon,
-			icon_color: frontmatter.icon_color,
-			description: frontmatter.description,
-			version: frontmatter.version,
-			model: frontmatter.model,
-			voice: frontmatter.voice,
-			voice_instructions: frontmatter.voice_instructions,
+			...(frontmatter.icon && { icon: frontmatter.icon }),
+			...(frontmatter.icon_color && { icon_color: frontmatter.icon_color }),
+			...(frontmatter.description && { description: frontmatter.description }),
+			...(frontmatter.version && { version: frontmatter.version }),
+			...(frontmatter.model && { model: frontmatter.model }),
+			...(frontmatter.voice && { voice: frontmatter.voice }),
+			...(frontmatter.voice_instructions && { voice_instructions: frontmatter.voice_instructions }),
 			
 			// Old format attributes (for backwards compatibility)
 			...(frontmatter.ln_icon && !frontmatter.icon && { icon: frontmatter.ln_icon }),

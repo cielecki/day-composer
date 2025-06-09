@@ -11,7 +11,8 @@ The **Mode Validator** tool validates Life Navigator mode files for completeness
 - **File Structure**: Ensures the file has proper frontmatter and the required `ln-mode` tag
 - **YAML Parsing**: Validates that frontmatter YAML is properly formatted
 - **Required Fields**: Checks for essential mode configuration
-- **Field Validation**: Validates specific fields like model names, voice settings, token limits
+- **Field Validation**: Validates specific fields like model names, voice settings, token limits, and icon names
+- **Icon Validation**: Ensures icons are valid Lucide icons available in Obsidian
 - **Link Expansion**: Tests if links in the system prompt expand correctly
 - **System Prompt**: Ensures the system prompt content is present and valid
 
@@ -44,6 +45,7 @@ The **Tool Validator** tool validates user-defined tool files for proper structu
 - **YAML Parsing**: Validates frontmatter YAML formatting
 - **Required Frontmatter**: Checks for `ln-tool-version` and `ln-tool-description`
 - **Version Format**: Validates semantic versioning format (e.g., "1.0.0")
+- **Icon Validation**: Ensures icons are valid Lucide icons available in Obsidian
 - **JSON Schema**: Validates the tool's parameter schema in JSON code blocks
 - **JavaScript Code**: Checks code syntax and common patterns
 - **Tool Integration**: Tests if the tool can be loaded by the tool system

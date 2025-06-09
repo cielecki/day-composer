@@ -1,7 +1,7 @@
 ---
 tags:
   - ln-mode
-icon: lucide-sun-moon
+icon: sun-moon
 icon_color: "#ff9800"
 description: Assists with daily reflection related to tasks, habits and goals. Contains broad context of the last 30 days.
 model: auto

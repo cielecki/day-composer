@@ -49,22 +49,30 @@ export const ValidationFixButton: React.FC<ValidationFixButtonProps> = ({
 			case 'modes':
 				const modesPlural = getPluralForm(invalidModes.length);
 				const modesEnglishPlural = getEnglishPluralForm(invalidModes.length);
+				// Format file paths nicely - show first 5 and indicate if there are more
+				const modePathsFormatted = invalidModes.length <= 5 
+					? invalidModes.join(', ')
+					: `${invalidModes.slice(0, 5).join(', ')} and ${invalidModes.length - 5} more`;
 				message = t(`validation.fixModes.message.${modesPlural}`, {
-					count: invalidModes.length,
+					filePaths: modePathsFormatted,
 					defaultValue: t(`validation.fixModes.message.${modesEnglishPlural}`, {
-						count: invalidModes.length,
-						defaultValue: `Help me fix validation issues with my modes. I have ${invalidModes.length} mode file${invalidModes.length > 1 ? 's' : ''} with validation errors.`
+						filePaths: modePathsFormatted,
+						defaultValue: `Help me fix validation issues with my modes. I have the following mode files with validation errors: ${modePathsFormatted}`
 					})
 				});
 				break;
 			case 'tools':
 				const toolsPlural = getPluralForm(invalidTools.length);
 				const toolsEnglishPlural = getEnglishPluralForm(invalidTools.length);
+				// Format file paths nicely - show first 5 and indicate if there are more
+				const toolPathsFormatted = invalidTools.length <= 5 
+					? invalidTools.join(', ')
+					: `${invalidTools.slice(0, 5).join(', ')} and ${invalidTools.length - 5} more`;
 				message = t(`validation.fixTools.message.${toolsPlural}`, {
-					count: invalidTools.length,
+					filePaths: toolPathsFormatted,
 					defaultValue: t(`validation.fixTools.message.${toolsEnglishPlural}`, {
-						count: invalidTools.length,
-						defaultValue: `Help me fix validation issues with my tools. I have ${invalidTools.length} tool file${invalidTools.length > 1 ? 's' : ''} with validation errors.`
+						filePaths: toolPathsFormatted,
+						defaultValue: `Help me fix validation issues with my tools. I have the following tool files with validation errors: ${toolPathsFormatted}`
 					})
 				});
 				break;

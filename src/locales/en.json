@@ -343,6 +343,11 @@
         "label": "Reading library content ..."
       }
     },
+    "modeValidator": {
+      "failed": "File validation failed: {{filePath}}",
+      "inProgress": "Validating file: {{filePath}}...",
+      "label": "Validating file ..."
+    },
     "move": {
       "label": "Moving todo ..."
     },
@@ -544,47 +549,19 @@
     "fixButton": {
       "tooltip": "Switch to Guide mode and get help fixing validation issues"
     },
-    "fixModes": {
-              "button": {
-          "few": "[TRANSLATE] Napraw tryby ({{count}})",
-          "many": "[TRANSLATE] Napraw tryby ({{count}})"
-        },
-      "description": {
-        "few": "[TRANSLATE] {{count}} pliki trybu mają błędy walidacji, które wymagają naprawy.",
-        "many": "[TRANSLATE] {{count}} plików trybu ma błędy walidacji, które wymagają naprawy."
-      },
-      "message": {
-        "few": "[TRANSLATE] Pomóż mi naprawić błędy walidacji w moich trybach. Mam {{count}} pliki trybu z błędami walidacji.",
-        "many": "[TRANSLATE] Pomóż mi naprawić błędy walidacji w moich trybach. Mam {{count}} plików trybu z błędami walidacji."
-      }
-    },
     "fixSpecificMode": {
       "button": "Fix This Mode",
       "description": "The current mode \"{{modeName}}\" has validation issues that need to be resolved.",
       "message": "Help me fix validation issues with the mode file \"{{filePath}}\". This mode file has validation errors that need to be resolved."
     },
-    "fixTools": {
-              "button": {
-          "few": "[TRANSLATE] Napraw narzędzia ({{count}})",
-          "many": "[TRANSLATE] Napraw narzędzia ({{count}})"
-        },
-      "description": {
-        "few": "[TRANSLATE] {{count}} pliki narzędzi mają błędy walidacji, które wymagają naprawy.",
-        "many": "[TRANSLATE] {{count}} plików narzędzi ma błędy walidacji, które wymagają naprawy."
+    "results": {
+      "mode": {
+        "completed": "Mode validation completed: {{filePath}} ({{errorCount}} errors, {{warningCount}} warnings)"
       },
-      "message": {
-        "few": "[TRANSLATE] Pomóż mi naprawić błędy walidacji w moich narzędziach. Mam {{count}} pliki narzędzi z błędami walidacji.",
-        "many": "[TRANSLATE] Pomóż mi naprawić błędy walidacji w moich narzędziach. Mam {{count}} plików narzędzi z błędami walidacji."
+      "tool": {
+        "completed": "Tool validation completed: {{filePath}} ({{errorCount}} errors, {{warningCount}} warnings)"
       }
-    },
-          "results": {
-        "mode": {
-          "completed": "Mode validation completed: {{filePath}} ({{errorCount}} errors, {{warningCount}} warnings)"
-        },
-        "tool": {
-          "completed": "Tool validation completed: {{filePath}} ({{errorCount}} errors, {{warningCount}} warnings)"
-        }
-      }
+    }
   },
   "view": {
     "title": "Life Navigator"

@@ -6,6 +6,7 @@ import { UserDefinedTool } from "../types/user-tools";
 import { UserDefinedToolScanner } from "../user-tools/UserDefinedToolScanner";
 import * as yaml from "js-yaml";
 import { t } from 'src/i18n';
+import { validateIconField } from '../utils/validation/lucide-icon-validation';
 
 const schema = {
   name: "tool_validator",
@@ -267,7 +268,20 @@ function validateRequiredFrontmatterFields(frontmatter: Record<string, any>, res
   // Check optional fields - support both old and new formats
   const icon = frontmatter.icon || frontmatter.ln_icon;
   if (icon) {
-    result.info.push(`Icon: ${icon}`);
+    // Determine which field format is being used
+    const fieldName = frontmatter.icon ? 'icon' : 'ln_icon';
+    
+    // Validate the icon using Lucide icon validation
+    const iconValidation = validateIconField(icon, fieldName, false);
+    if (iconValidation.isValid) {
+      result.info.push(`Icon: ${icon} (valid Lucide icon)`);
+    } else if (iconValidation.issue) {
+      if (iconValidation.issue.severity === 'error') {
+        result.errors.push(iconValidation.issue.message);
+      } else {
+        result.warnings.push(iconValidation.issue.message);
+      }
+    }
   } else {
     result.info.push("No custom icon specified - will use default 'wrench' icon");
   }

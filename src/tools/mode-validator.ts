@@ -35,28 +35,30 @@ type ModeValidatorInput = {
 export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
   specification: schema,
   icon: "shield-check",
-  initialLabel: "Validate File",
+  get initialLabel() {
+    return t('tools.modeValidator.label');
+  },
   execute: async (context: ToolExecutionContext<ModeValidatorInput>): Promise<void> => {
     const { plugin, params } = context;
     const { file_path, type = "auto" } = params;
 
-    context.setLabel(`Validating file: ${file_path}`);
+    context.setLabel(t('tools.modeValidator.inProgress', { filePath: file_path }));
 
     try {
       const file = plugin.app.vault.getAbstractFileByPath(file_path);
       
       if (!file) {
-        context.setLabel(`Validation failed: ${file_path}`);
+        context.setLabel(t('tools.modeValidator.failed', { filePath: file_path }));
         throw new ToolExecutionError(`File not found: ${file_path}`);
       }
       
       if (!(file instanceof TFile)) {
-        context.setLabel(`Validation failed: ${file_path}`);
+        context.setLabel(t('tools.modeValidator.failed', { filePath: file_path }));
         throw new ToolExecutionError(`Path is not a file: ${file_path}`);
       }
 
       if (file.extension !== 'md') {
-        context.setLabel(`Validation failed: ${file_path}`);
+        context.setLabel(t('tools.modeValidator.failed', { filePath: file_path }));
         throw new ToolExecutionError(`Files must be markdown files (.md extension): ${file_path}`);
       }
 
@@ -75,7 +77,7 @@ export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
         } else if (normalizedTags.includes("ln-tool")) {
           fileType = "tool";
         } else {
-          context.setLabel(`Validation failed: ${file_path}`);
+          context.setLabel(t('tools.modeValidator.failed', { filePath: file_path }));
           throw new ToolExecutionError(`Could not determine file type. File must have 'ln-mode' or 'ln-tool' tag.`);
         }
       }
@@ -170,7 +172,7 @@ export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
 
       context.progress(report);
     } catch (error) {
-      context.setLabel(`Validation failed: ${file_path}`);
+      context.setLabel(t('tools.modeValidator.failed', { filePath: file_path }));
       throw error;
     }
   }

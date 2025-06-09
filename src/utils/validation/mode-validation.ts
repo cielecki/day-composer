@@ -2,6 +2,7 @@ import { TFile, CachedMetadata, FrontMatterCache } from "obsidian";
 import { LNMode } from "../../types/LNMode";
 import { TTS_VOICES, TTSVoice } from "src/store/audio-slice";
 import { ANTHROPIC_MODELS, AnthropicModel } from "../modes/ln-mode-defaults";
+import { validateIconField } from "./lucide-icon-validation";
 
 export interface ModeValidationResult {
 	isValid: boolean;
@@ -89,7 +90,7 @@ export function validateModeFile(
 		const validAttributes = new Set([
 			'tags', 'icon', 'icon_color', 'description', 'model', 'thinking_budget_tokens',
 			'max_tokens', 'voice_autoplay', 'voice', 'voice_instructions', 'tools_allowed',
-			'tools_disallowed', 'example_usages', 'enabled', 'version', 'expand_links', 'name' // Some modes might have explicit name
+			'tools_disallowed', 'example_usages', 'enabled', 'version', 'expand_links'
 		]);
 		
 		const unknownAttributes = Object.keys(frontmatter).filter(key => !validAttributes.has(key));
@@ -177,14 +178,12 @@ export function validateModeFile(
 			});
 		}
 		
-		// Validate icon type
-		if (frontmatter.icon !== undefined && typeof frontmatter.icon !== 'string') {
-			issues.push({
-				type: 'invalid_field_value',
-				field: 'icon',
-				message: 'icon must be a string',
-				severity: 'error'
-			});
+		// Validate icon field (type and validity)
+		if (frontmatter.icon !== undefined) {
+			const iconValidation = validateIconField(frontmatter.icon, 'icon', false);
+			if (!iconValidation.isValid && iconValidation.issue) {
+				issues.push(iconValidation.issue);
+			}
 		}
 		
 		// Validate icon_color type
