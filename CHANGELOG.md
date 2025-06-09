@@ -244,7 +244,12 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ## [0.6.6] - 2025-05-22
 
+
 ## [Unreleased]
+
+### Fixed
+- **Todo editing display**: Fixed issue where todo labels showed the original text instead of the new text after editing, and success messages displayed template placeholders instead of actual values
+
 
 ### Added
 - **Tool parameter validation**: Tools now validate all parameters against their JSON schema before execution, providing clear error messages to the AI when parameters are invalid or missing. This prevents tools from running with incorrect data and improves error feedback.

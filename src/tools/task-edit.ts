@@ -134,14 +134,17 @@ export const taskEditTool: ObsidianTool<TaskEditToolInput> = {
       const statusText = params.replacement_status ? ` (status: ${params.replacement_status})` : '';
       const commentText = params.replacement_comment ? ` with comment` : '';
       
-      const resultMessage = t('tools.success.edit')
-        .replace('{{task}}', original_todo_text)
-        .replace('{{details}}', `${statusText}${commentText}`);
+      const resultMessage = t('tools.success.edit', {
+        originalTask: original_todo_text,
+        newTask: params.replacement_todo_text,
+        path: filePath,
+        details: `${statusText}${commentText}`
+      });
 
       // Add navigation targets
       navigationTargets.forEach(target => context.addNavigationTarget(target));
 
-      context.setLabel(t('tools.actions.editTodo.completed', { task: original_todo_text }));
+      context.setLabel(t('tools.actions.editTodo.completed', { task: params.replacement_todo_text }));
       context.progress(resultMessage);
     } catch (error) {
       context.setLabel(t('tools.actions.editTodo.failed', { task: original_todo_text }));
