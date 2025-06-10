@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.2] - 2025-01-10
+
+### 🚀 Performance & Reliability Improvements
+
+- **Cheaper AI responses**: Life Navigator now uses smart caching for Anthropic API responses to reduce wait times and lower your API costs. Your conversations will feel snappier, especially when working within the same context.
+
+- **More reliable tools**: Fixed an issue where some tools (like accessing daily notes from specific dates) would incorrectly reject perfectly valid numbers. Now `🧭 daily_note(-1)` and similar commands work flawlessly every time.
+
+### 🎯 What This Means for You
+
+These improvements work automatically in the background - you don't need to change anything. You'll simply notice:
+- Faster response times when working with similar content
+- Lower API usage costs over time  
+- More consistent tool behavior
+
+### 🔧 Technical Notes
+
+- Enhanced Anthropic API caching with extended cache control headers and 1-hour TTL
+- Improved parameter validation system for integer values
+- Better data integrity validation for cached responses
 
 ## [0.11.0] - 2025-01-08
 
@@ -104,6 +124,8 @@ Have your ai use `` `🧭 tools_list()` `` to see all available tools for your c
 ---
 
 **Ready to Upgrade?** Life Navigator will guide you through the process. Look for the fix buttons and let the AI help you migrate your content to the new, more powerful format!
+
+
 
 ## [0.10.6] - 2025-06-06
 
@@ -347,12 +369,3 @@ change: enforce thinking in claude, as it's needed for handover to work
 - Standardized naming from "Starter Pack" to "Starter Kit" throughout the codebase for consistency
 
 ## [0.6.6] - 2025-05-22
-
-## [Unreleased]
-
-### Fixed
-- Added basic caching for Anthropic API responses to improve performance and reduce API costs
-- Implemented cache control headers for better response handling
-- Added validation for cached responses to ensure data integrity
-
-- **Tool parameter validation**: Fixed integer parameter validation error where tools expecting integer values (like daily note offset) were incorrectly rejecting valid whole numbers

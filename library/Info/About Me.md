@@ -63,6 +63,6 @@
 * Debt: Minimal, only mortgage
 * Budget: Following 50/30/20 rule
 
-[[Role Models]] 🧭
-[[Relationships]] 🧭
-[[Day Structure]] 🧭 
+`🧭 expand` [[Role Models]]
+`🧭 expand` [[Relationships]]
+`🧭 expand` [[Day Structure]] 
