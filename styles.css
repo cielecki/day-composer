@@ -290,6 +290,7 @@ If your plugin does not need CSS, delete this file.
   align-items: center;
   gap: 4px;
   padding: 4px;
+  opacity: 0.5;
 }
 
 .life-navigator-view .thinking-dot {
