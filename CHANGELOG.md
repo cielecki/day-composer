@@ -291,3 +291,13 @@ change: enforce thinking in claude, as it's needed for handover to work
 - **Improved internationalization**: Validation messages now use separate translation keys for different plural forms instead of handling pluralization in code, providing better language support and maintaining proper grammar rules for each language.
 - **Detailed validation error messages**: Validation fix buttons now show actual file paths instead of just counts, making it easier to identify which specific files need attention. Messages display up to 5 file paths and indicate when there are more files with issues.
 - **Mode validator tool translations**: Fixed hardcoded English text in the mode validator tool to use proper translation keys, ensuring all tool labels and status messages display correctly in the user's selected language.
+- **Enhanced error message interface**: Error messages now display clean icon-based buttons (retry and help) using the same styling as other interface elements, improving visual consistency and user experience
+- **Improved error message styling**: Updated error message buttons to use consistent clickable-icon styling with proper icons (life-buoy for help, rotate-ccw for retry) instead of text-based buttons
+
+### Added
+- **Retry button on all assistant messages**: Every assistant message now has a retry button that allows you to retry from that point in the conversation. The retry removes the selected message and all messages after it, then generates a new response.
+
+### Fixed
+- **API error handling**: Fixed critical error where error messages were being sent to the Anthropic API with an invalid 'error_message' content type. Error messages are now converted to regular text blocks so the AI can be aware of errors and provide better assistance.
+- **Error message context**: Error messages now include the mode name when asking for help, providing better context to the AI about which mode is experiencing the problem.
+- **Error messages with fix buttons**: When link expansion errors occur (like missing `[[Backlog2]] 🧭` links), they now appear as styled error messages in the chat instead of popup notifications. Error messages include a "Fix with Guide" button that automatically switches to Guide mode and sends an appropriate help request.
