@@ -275,19 +275,30 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 	async refreshUserToolsDisplay(): Promise<void> {
 		this.userToolsContainer.empty();
 		
-		// Check for validation issues and show fix button if needed
+		// Check for validation issues and show fix button if needed - MOVED ABOVE TOOLS LIST
 		const store = getStore();
 		const invalidTools = store.validation.invalidTools;
 		
 		if (invalidTools.length > 0) {
-			const validationContainer = this.userToolsContainer.createEl('div', {
-				cls: 'setting-item',
-				attr: { style: 'border: 1px solid var(--color-orange); border-radius: 6px; padding: 12px; margin: 8px 0; background: var(--background-modifier-warning);' }
+			// Create validation section with standard styling - ABOVE the tools list
+			const validationSection = this.userToolsContainer.createEl('div', {
+				cls: 'setting-item-description',
+				attr: { 
+					style: 'margin-bottom: 16px; padding: 12px; background: var(--background-secondary); border-radius: 6px; border-left: 3px solid var(--color-orange);' 
+				}
 			});
 			
-			const warningHeader = validationContainer.createEl('div', {
-				attr: { style: 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;' }
+			// Horizontal layout: message on left, button on right
+			const validationContent = validationSection.createEl('div', {
+				attr: { style: 'display: flex; align-items: center; justify-content: space-between; gap: 12px;' }
 			});
+			
+			// Left side: warning message
+			const messageSection = validationContent.createEl('div', {
+				attr: { style: 'display: flex; align-items: center; gap: 8px; flex: 1;' }
+			});
+			
+			messageSection.createEl('span', { text: '⚠️' });
 			
 			const toolIssuesFound = invalidTools.length === 1 ? t('validation.toolIssuesFound.singular', {
 				count: invalidTools.length,
@@ -296,7 +307,13 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			}) : t('validation.toolIssuesFound.many', {
 				count: invalidTools.length,
 			}));
-
+			
+			messageSection.createEl('span', { 
+				text: toolIssuesFound,
+				attr: { style: 'color: var(--text-normal);' }
+			});
+			
+			// Right side: fix button
 			const fixToolsButton = invalidTools.length === 1 ? t('validation.fixTools.buttonSettings.singular', {
 				count: invalidTools.length,
 			}) : (invalidTools.length >= 2 && invalidTools.length <= 4 ? t('validation.fixTools.buttonSettings.few', {
@@ -305,15 +322,10 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 				count: invalidTools.length,
 			}));
 			
-			warningHeader.createEl('span', { text: '⚠️' });
-			warningHeader.createEl('strong', { 
-				text: toolIssuesFound
-			});
-			
-			const fixBtn = validationContainer.createEl('button', {
+			const fixBtn = validationContent.createEl('button', {
 				text: fixToolsButton,
 				attr: { 
-					style: 'padding: 6px 12px; background: var(--interactive-accent); color: white; border: none; border-radius: 4px; cursor: pointer;'
+					style: 'padding: 6px 12px; background: var(--interactive-accent); color: white; border: none; border-radius: 4px; cursor: pointer; flex-shrink: 0;'
 				}
 			});
 			

@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Enhanced
+- **Improved validation issues display in settings**: Validation issues for tools are now shown in a cleaner, more professional format above the tools list rather than mixed in with individual tools. The fix button is now positioned on the right side for better visual hierarchy, and the styling uses standard Obsidian design patterns instead of the prominent orange border.
+
 ## [0.10.6] - 2025-06-06
 
 ### Added
@@ -244,72 +249,5 @@ change: enforce thinking in claude, as it's needed for handover to work
 - Standardized naming from "Starter Pack" to "Starter Kit" throughout the codebase for consistency
 
 ## [0.6.6] - 2025-05-22
-
-
-## [Unreleased]
-
-### Fixed
-- **Todo editing display**: Fixed issue where todo labels showed the original text instead of the new text after editing, and success messages displayed template placeholders instead of actual values
-
-
-### Added
-- **Tool parameter validation**: Tools now validate all parameters against their JSON schema before execution, providing clear error messages to the AI when parameters are invalid or missing. This prevents tools from running with incorrect data and improves error feedback.
-
-### Enhanced
-- **Schema-based parameter validation**: All tool parameters are now validated for type correctness, required fields, string length constraints, number ranges, array sizes, enum values, and nested object properties. Invalid parameters are caught early with descriptive error messages.
-- **Translation cleanup script improvements**: The script now explicitly detects and warns about dynamic translation keys that break static analysis, provides clear step-by-step instructions for fixing issues, and gives specific guidance on what to do after adding new translation keys
-
-### Changed
-- **Mode attributes now use human-readable names**: Changed from `ln_` prefixes to clear names (`ln_description` → `description`, `ln_icon` → `icon`, etc.) for better readability and following Obsidian naming conventions
-- **Static error messages for old format modes**: Replaced dynamic error messages with static ones to improve translation management and prevent runtime issues
-- **Validation messages now properly translated**: Tool and mode validation completion messages show different status based on results (success, warnings, errors) with proper translations instead of hard-coded English text
-
-### Added
-- **Old format detection with guided fix**: When old `ln_` format is detected in mode files, a static error message is displayed with a button that automatically switches to guide mode and asks for help fixing the mode file formatting
-
-### Fixed
-- **Documentation examples updated**: Fixed Tool Development Guide and Tool Creator mode examples that were using outdated `ln_` format attributes, which could mislead AI when creating modes and tools
-
-### Added
-- **Comprehensive validation system**: New centralized validation for both mode and tool files that detects various issues including old format, missing fields, invalid values, and security concerns. Validation runs automatically when files are loaded and provides detailed error reports.
-- **Contextual fix buttons**: Smart fix buttons appear throughout the UI when validation issues are detected:
-  - Empty chat shows fix button for the current mode if it has validation issues
-  - Mode dropdown shows fix button for the currently selected mode if it has issues (positioned as last option before mode switching section)  
-  - Guide mode shows fix buttons for modes and tools when issues exist
-  - Settings tool section shows fix button when tool validation errors are found
-  - All buttons automatically switch to Guide mode and send appropriate help messages
-- **Enhanced validation tool**: Updated mode validator tool now supports both modes and tools with comprehensive validation using the centralized system, providing detailed reports with specific error types and severity levels.
-
-### Fixed
-- **Note editing tool parameter consistency**: Unified all note editing operations to use a single 'content' parameter instead of having separate 'content' and 'replacement_text' parameters. This makes the API more consistent and intuitive - all operations now use 'content' for the text they work with.
-
-### Enhanced
-- **Icon validation for modes and tools**: All mode and tool icons are now validated to ensure they are valid Lucide icons available in Obsidian. The validation system checks icon names and provides helpful error messages with links to the Lucide icon library when invalid icons are used.
-- **Tool attributes now use human-readable names**: Updated all tool parameters from `ln_` prefixes to clear names (`ln_description` → `description`, `ln_icon` → `icon`, `ln_version` → `version`, `ln_enabled` → `enabled`) for consistency with mode format and better readability. All library tools and documentation updated to use new format while maintaining backward compatibility.
-- **Backward compatibility**: Mode and tool files using old `ln_` format continue to work while validation system detects and reports the format issues for user awareness.
-- **Validation tracking**: Store now tracks invalid modes and tools separately, enabling targeted fix suggestions and better user experience.
-- **Improved internationalization**: Validation messages now use separate translation keys for different plural forms instead of handling pluralization in code, providing better language support and maintaining proper grammar rules for each language.
-- **Detailed validation error messages**: Validation fix buttons now show actual file paths instead of just counts, making it easier to identify which specific files need attention. Messages display up to 5 file paths and indicate when there are more files with issues.
-- **Mode validator tool translations**: Fixed hardcoded English text in the mode validator tool to use proper translation keys, ensuring all tool labels and status messages display correctly in the user's selected language.
-- **Enhanced error message interface**: Error messages now display clean icon-based buttons (retry and help) using the same styling as other interface elements, improving visual consistency and user experience
-- **Improved error message styling**: Updated error message buttons to use consistent clickable-icon styling with proper icons (life-buoy for help, rotate-ccw for retry) instead of text-based buttons
-
-### Added
-- **Retry button on all assistant messages**: Every assistant message now has a retry button that allows you to retry from that point in the conversation. The retry removes the selected message and all messages after it, then generates a new response.
-
-### Fixed
-- **API error handling**: Fixed critical error where error messages were being sent to the Anthropic API with an invalid 'error_message' content type. Error messages are now converted to regular text blocks so the AI can be aware of errors and provide better assistance.
-- **Error message context**: Error messages now include the mode name when asking for help, providing better context to the AI about which mode is experiencing the problem.
-- **Error messages with fix buttons**: When link expansion errors occur (like missing `[[Backlog2]] 🧭` links), they now appear as styled error messages in the chat instead of popup notifications. Error messages include a "Fix with Guide" button that automatically switches to Guide mode and sends an appropriate help request.
-
-### Enhanced
-- **Shared file monitoring**: Improved performance by creating a reusable file watcher utility that both modes and tools systems now use with debouncing to prevent excessive reloading during rapid file changes. The utility uses a clean tag-based approach similar to the existing `hasModeTag` function, reducing code duplication and ensuring consistent behavior across both systems.
-
-### Fixed
-- **Task editing navigation**: Fixed issue where editing a task would cause the entire file to be selected instead of just the modified task. The problem was that navigation targets were calculated using the old document structure instead of the updated one after task modification.
-
-
-### Added
-- **Expand Life Navigator links in note reading**: The note_read tool now supports an optional `expand_links` parameter that expands special Life Navigator links (like `[[ln-day-note-(-1)]] 🧭`, `[[ln-current-date-and-time]] 🧭`) when reading files. This allows AI to access dynamic content when analyzing notes.
 
 
