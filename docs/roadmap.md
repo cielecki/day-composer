@@ -17,9 +17,6 @@ Add support for locally hosted AI models through LMStudio or Ollama integration 
 **Thinking Blocks Control:**
 Research and implement enabling/disabling thinking blocks in Life Navigator - check if Anthropic will accept removal of thinking blocks.
 
-**AI model aliases:**
-Implement aliases for AI models to allow users to use different model names in the mode settings. This would allow users to use different model names in the mode settings. Requires verification that lower-tier models well enough to warrant this feature.
-
 **Boomerang Tasks:**
 Implement a framework for handling tasks that "boomerang" back to the user on a framework like agents 2.0.
 
