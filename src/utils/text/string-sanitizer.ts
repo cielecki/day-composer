@@ -94,4 +94,37 @@ export function sanitizeFilename(filename: string, options: {
     allowSpaces,
     trim: true
   });
+}
+
+/**
+ * Extracts filename from a file path, removing the file extension
+ * @param filePath The full file path
+ * @returns Filename without extension
+ */
+export function extractFilenameWithoutExtension(filePath: string): string {
+  // Get just the filename part (after last slash)
+  const filename = filePath.split('/').pop() || filePath;
+  
+  // Remove the extension (everything after and including the last dot)
+  const lastDotIndex = filename.lastIndexOf('.');
+  if (lastDotIndex > 0) { // Don't remove dot if it's the first character (hidden files)
+    return filename.substring(0, lastDotIndex);
+  }
+  
+  return filename;
+}
+
+/**
+ * Truncates text to a specified length and adds ellipsis
+ * @param text The text to truncate
+ * @param maxLength Maximum length before truncation (default: 50)
+ * @param ellipsis The ellipsis character(s) to append (default: '...')
+ * @returns Truncated text with ellipsis if needed
+ */
+export function truncateText(text: string, maxLength: number = 50, ellipsis: string = '...'): string {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  
+  return text.substring(0, maxLength - ellipsis.length) + ellipsis;
 } 

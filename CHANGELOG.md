@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+
+
 ## [0.11.2] - 2025-01-10
 
 ### 🚀 Performance & Reliability Improvements
@@ -375,3 +377,7 @@ change: enforce thinking in claude, as it's needed for handover to work
 ### 🎯 Improved Language Setup Experience
 
 - **Simplified language selection**: Removed highlighting of currently selected language in setup screen to avoid confusion. Users can now clearly see available language options without wondering whether they need to click a highlighted selection again. The setup process is now more straightforward and intuitive.
+
+### 🎯 User Experience Improvements
+
+- **Improved task addition messages**: Task addition messages now show just the filename (without .md extension) instead of the full path, and long task descriptions are automatically truncated with "..." for better readability. Example: "Added 'Buy groceries' to Daily Note" instead of "Added 'Buy groceries for the family and prepare...' to Daily Notes/2024-01-15.md"

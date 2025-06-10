@@ -206,9 +206,9 @@
         "success": "Abandoned todo {{task}}"
       },
       "add": {
-        "failed": "Failed to add todo {{task}}",
+        "failed": "Failed to add todo {{task}} to `{{filename}}`",
         "inProgress": "Adding todo...",
-        "success": "Added {{task}}"
+        "success": "Added {{task}} to `{{filename}}`"
       },
       "check": {
         "failed": "Failed to check `{{task}}`",

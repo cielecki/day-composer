@@ -12,6 +12,7 @@ import {
 import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';
 import { insertTaskAtPosition } from 'src/utils/tasks/task-utils';
 import { calculateLineNumberForNode, createNavigationTarget } from 'src/utils/tools/line-number-utils';
+import { extractFilenameWithoutExtension, truncateText } from 'src/utils/text/string-sanitizer';
 import { t } from 'src/i18n';
 
 const schema = {
@@ -88,7 +89,7 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 		let actionText = "";
 		
 		if (todoCount === 1) {
-			actionText = `"${todos[0].todo_text}"`;
+			actionText = `\`${truncateText(todos[0].todo_text, 30)}\``;
 		} else {
 			actionText = `${todoCount} todos`;
 		}
@@ -157,18 +158,29 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 
 			context.addNavigationTarget(navigationTarget);
 
-			// Prepare success message
+			// Prepare success message with improved formatting
+			const filename = extractFilenameWithoutExtension(filePath);
 			const tasksDescription = addedTasks.length === 1 
+				? `"${truncateText(addedTasks[0], 20)}"` 
+				: `${addedTasks.length} ${t('tools.tasks.plural')}`;
+			const taskDescriptionFull = addedTasks.length === 1 
 				? `"${addedTasks[0]}"` 
 				: `${addedTasks.length} ${t('tools.tasks.plural')}`;
 				
-			context.setLabel(t('tools.actions.add.success', { task: actionText }));
+			context.setLabel(t('tools.actions.add.success', { 
+				task: actionText, 
+				filename: filename 
+			}));
 			context.progress(t('tools.success.add', {
-				task: tasksDescription,
+				task: taskDescriptionFull,
 				path: filePath
 			}));
 		} catch (error) {
-			context.setLabel(t('tools.actions.add.failed', { task: actionText }));
+			const filename = extractFilenameWithoutExtension(filePath);
+			context.setLabel(t('tools.actions.add.failed', { 
+				task: actionText, 
+				filename: filename 
+			}));
 			throw error;
 		}
 	}
