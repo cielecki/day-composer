@@ -293,6 +293,37 @@
         "versionedPath": "Plik już istnieje. Tworzenie wersjonowanego pliku: {{originalPath}} → {{versionedPath}}"
       }
     },
+    "currentChat": {
+      "completed": "Pobrano zawartość bieżącej rozmowy",
+      "failed": "Nie udało się pobrać bieżącej rozmowy",
+      "inProgress": "Pobieram bieżącą rozmowę...",
+      "label": "Pobieram bieżącą rozmowę ..."
+    },
+    "currentDateTime": {
+      "completed": "Pobrano aktualną datę i czas",
+      "failed": "Nie udało się pobrać aktualnej daty i czasu",
+      "inProgress": "Pobieram aktualną datę i czas...",
+      "label": "Pobieram aktualną datę i czas ..."
+    },
+    "currentFileAndSelection": {
+      "completed": "Pobrano aktualny plik i kontekst zaznaczenia",
+      "failed": "Nie udało się pobrać aktualnego pliku i zaznaczenia",
+      "inProgress": "Pobieram aktualny plik i zaznaczenie...",
+      "label": "Pobieram aktualny plik i zaznaczenie ..."
+    },
+    "dailyNotes": {
+      "completed": "Pobrano {{found}}/{{total}} notatek dziennych z {{range}}",
+      "failed": "Nie udało się pobrać notatek dziennych ({{start}} do {{end}})",
+      "inProgress": "Pobieram notatki dzienne ({{start}} do {{end}})...",
+      "label": "Pobieram zakres notatek dziennych ..."
+    },
+    "dayNote": {
+      "completed": "Pobrano notatkę dzienną dla {{date}}",
+      "failed": "Nie udało się pobrać notatki dziennej (przesunięcie: {{offset}})",
+      "inProgress": "Pobieram notatkę dzienną (przesunięcie: {{offset}})...",
+      "label": "Pobieram notatkę dzienną ...",
+      "notFound": "Nie znaleziono notatki dziennej dla {{date}}"
+    },
     "edit": {
       "label": "Edytowanie todo ..."
     },
@@ -358,6 +389,8 @@
       "navigateToEditedTodo": "Przejdź do edytowanego todo",
       "navigateToUncheckedTodo": "Przejdź do odznaczonego todo",
       "openCreatedDocument": "Otwórz utworzony dokument",
+      "openCurrentFile": "Otwórz aktualny plik",
+      "openDayNote": "Otwórz notatkę dzienną dla {{date}}",
       "openEditedDocument": "Otwórz edytowany dokument",
       "openNote": "Otwórz dokument"
     },
@@ -428,6 +461,12 @@
     },
     "tasks": {
       "plural": "zadania"
+    },
+    "toolsList": {
+      "completed": "Wyświetlono dostępne narzędzia",
+      "failed": "Nie udało się wyświetlić narzędzi",
+      "inProgress": "Wyświetlam dostępne narzędzia...",
+      "label": "Wyświetlam narzędzia ..."
     },
     "uncheck": {
       "label": "Odznaczam todo ..."

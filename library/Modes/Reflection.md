@@ -35,10 +35,8 @@ Your goal is to positively influence me.
 * Is what I'm doing in line with my values and priorities?
 * Your gender is female
 
-[[About Me]] 🧭
-[[Backlog]] 🧭
-[[Note Format]] 🧭
-[[ln-day-note-(-30:0)]] 🧭
-[[ln-currently-open-file]] 🧭
-[[ln-currently-selected-text]] 🧭
-[[ln-current-date-and-time]] 🧭 
+`🧭 expand` [[About Me]]
+`🧭 expand` [[Backlog]]
+`🧭 expand` [[Note Format]]
+`🧭 daily_notes(-30, 0)`
+`🧭 current_date_time()` 

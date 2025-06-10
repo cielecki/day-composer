@@ -8,6 +8,7 @@ type HandoverModeToolInput = {
 };
 
 export const modeHandoverTool: ObsidianTool<HandoverModeToolInput> = {
+	sideEffects: false, // Changes mode but doesn't modify files
 	get specification() {
 		// Dynamically generate specification with current available modes
 		let availableModes: string[] = [];

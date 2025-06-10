@@ -24,6 +24,12 @@ import { urlDownloadTool } from './tools/url-download';
 import { conversationSaveTool } from './tools/conversation-save';
 import { fileMoveTool } from './tools/file-move';
 import { noteDeleteTool } from './tools/note-delete';
+import { toolsListTool } from './tools/tools-list';
+import { currentDateTimeTool } from './tools/current-date-time';
+import { dailyNoteTool } from './tools/day-note';
+import { dailyNotesTool } from './tools/daily-notes';
+import { currentChatTool } from './tools/current-chat';
+import { currentFileAndSelectionTool } from './tools/current-file-and-selection';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tools/tool-filter";
@@ -66,6 +72,8 @@ export interface ObsidianTool<TInput> {
 	};
 	icon: string; // Lucide icon name
 	initialLabel: string; // Initial label displayed in chat (tools can update this via setLabel)
+	// Whether this tool has side effects (true) or is read-only and safe for link expansion (false)
+	sideEffects: boolean;
 	// Context-based execution - no return value
 	execute: (context: ToolExecutionContext<TInput>) => Promise<void>;
 	// Optional method to render the tool result as a React component
@@ -103,6 +111,12 @@ export class ObsidianTools {
 		urlDownloadTool,
 		conversationSaveTool,
 		fileMoveTool,
+		toolsListTool,
+		currentDateTimeTool,
+		dailyNoteTool,
+		dailyNotesTool,
+		currentChatTool,
+		currentFileAndSelectionTool,
 	];
 
 	/**

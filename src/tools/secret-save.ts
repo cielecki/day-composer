@@ -53,6 +53,7 @@ function validateSecretKey(key: string): void {
 export const secretSaveTool: ObsidianTool<SecretSaveToolInput> = {
   specification: schema,
   icon: "key",
+  sideEffects: true, // Modifies stored secrets
   get initialLabel() {
     return t('tools.actions.secretSave.default');
   },

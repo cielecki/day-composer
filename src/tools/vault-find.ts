@@ -62,6 +62,7 @@ interface DirectoryItem {
 export const vaultFindTool: ObsidianTool<VaultFindToolInput> = {
   specification: schema,
   icon: "search",
+  sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
     return t('tools.find.label');
   },

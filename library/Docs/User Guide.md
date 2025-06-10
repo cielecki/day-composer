@@ -30,7 +30,9 @@ Life Navigator uses a special linking system to control what information the AI 
 
 - **Regular links** `[[File Name]]` - References the file but doesn't include its content
 - **Inline links** `[[File Name]] 🧭` - Includes the full content of the file in the AI's context
-- **Dynamic links** `[[ln-day-note-(0)]] 🧭` - References daily notes relative to today (0=today, -1=yesterday, etc.). This allows modes to automatically include recent context.
+- **Expand links** `🧭 expand [[File Name]]` - Modern syntax to include file content in AI context
+- **Tool calls** `🧭 daily_note(0)` - References daily notes relative to today (0=today, -1=yesterday, etc.). This allows modes to automatically include recent context.
+- **Range tools** `🧭 daily_notes(-3, 0)` - Includes multiple daily notes in a range (e.g., last 3 days to today)
 
 
 Learn more about the link system in the [link-expansion](link-expansion.md) document.

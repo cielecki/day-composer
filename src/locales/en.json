@@ -293,6 +293,37 @@
         "versionedPath": "File already exists. Creating versioned file: {{originalPath}} → {{versionedPath}}"
       }
     },
+    "currentChat": {
+      "completed": "Retrieved current chat content",
+      "failed": "Failed to get current chat",
+      "inProgress": "Getting current chat...",
+      "label": "Getting current chat ..."
+    },
+    "currentDateTime": {
+      "completed": "Retrieved current date and time",
+      "failed": "Failed to get current date and time",
+      "inProgress": "Getting current date and time...",
+      "label": "Getting current date and time ..."
+    },
+    "currentFileAndSelection": {
+      "completed": "Retrieved current file and selection context",
+      "failed": "Failed to get current file and selection",
+      "inProgress": "Getting current file and selection...",
+      "label": "Getting current file and selection ..."
+    },
+    "dailyNotes": {
+      "completed": "Retrieved {{found}}/{{total}} daily notes from {{range}}",
+      "failed": "Failed to get daily notes ({{start}} to {{end}})",
+      "inProgress": "Getting daily notes ({{start}} to {{end}})...",
+      "label": "Getting daily notes range ..."
+    },
+    "dayNote": {
+      "completed": "Retrieved daily note for {{date}}",
+      "failed": "Failed to get daily note (offset: {{offset}})",
+      "inProgress": "Getting daily note (offset: {{offset}})...",
+      "label": "Getting daily note ...",
+      "notFound": "Daily note not found for {{date}}"
+    },
     "edit": {
       "label": "Editing todo ..."
     },
@@ -358,6 +389,8 @@
       "navigateToEditedTodo": "Navigate to edited todo",
       "navigateToUncheckedTodo": "Navigate to unchecked todo",
       "openCreatedDocument": "Open created document",
+      "openCurrentFile": "Open current file",
+      "openDayNote": "Open daily note for {{date}}",
       "openEditedDocument": "Open edited document",
       "openNote": "Open document"
     },
@@ -428,6 +461,12 @@
     },
     "tasks": {
       "plural": "tasks"
+    },
+    "toolsList": {
+      "completed": "Listed available tools",
+      "failed": "Failed to list tools",
+      "inProgress": "Listing available tools...",
+      "label": "Listing tools ..."
     },
     "uncheck": {
       "label": "Unchecking todo ..."

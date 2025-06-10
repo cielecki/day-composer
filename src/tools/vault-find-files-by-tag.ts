@@ -70,6 +70,7 @@ interface TaggedFileResult {
 export const vaultFindFilesByTagTool: ObsidianTool<VaultFindFilesByTagToolInput> = {
   specification: schema,
   icon: "tag",
+  sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
     return t('tools.findFilesByTag.label');
   },

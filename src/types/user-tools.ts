@@ -36,6 +36,7 @@ export interface UserDefinedTool {
   executeCode: string;
   schema: UserToolSchema; // Properly typed JSON schema
   enabled: boolean;
+  sideEffects?: boolean; // Whether this tool has side effects (defaults to true for safety)
   
   // Security
   approved: boolean;

@@ -71,6 +71,7 @@ type TaskAddToolInput = {
 export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 	specification: schema,
 	icon: "list-plus",
+	sideEffects: true, // Modifies files by adding tasks
 	get initialLabel() {
 		return t('tools.add.label');
 	},

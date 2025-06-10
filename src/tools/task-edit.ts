@@ -52,6 +52,7 @@ type TaskEditToolInput = {
 export const taskEditTool: ObsidianTool<TaskEditToolInput> = {
   specification: schema,
   icon: "edit",
+  sideEffects: true, // Modifies files by editing tasks
   get initialLabel() {
     return t('tools.edit.label');
   },

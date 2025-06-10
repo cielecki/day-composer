@@ -54,6 +54,7 @@ async function getVersionedPath(basePath: string, app: any): Promise<string> {
 export const noteCreateTool: ObsidianTool<NoteCreateToolInput> = {
   specification: schema,
   icon: "file-plus",
+  sideEffects: true, // Creates files, has side effects
 	get initialLabel() {
 		return t('tools.actions.createDocument.default', { path: '' });
 	},

@@ -199,6 +199,7 @@ type NoteEditToolInput = {
 export const noteEditTool: ObsidianTool<NoteEditToolInput> = {
   specification: schema,
   icon: "edit",
+  sideEffects: true, // Modifies files, has side effects
   get initialLabel() {
     return t('tools.noteEdit.label');
   },

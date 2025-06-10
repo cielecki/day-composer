@@ -169,17 +169,8 @@ After gathering all information, generate a complete description for Suno and sa
 [Formatted song lyrics]
 ```
 
-[[About Me]] 🧭
-[[Backlog]] 🧭
-[[Note Format]] 🧭
-[[ln-day-note-(-3)]] 🧭
-[[ln-day-note-(-2)]] 🧭
-[[ln-day-note-(-1)]] 🧭
-[[ln-day-note-(0)]] 🧭
-[[ln-day-note-(1)]] 🧭
-[[ln-day-note-(2)]] 🧭
-[[ln-day-note-(3)]] 🧭
-[[ln-day-note-(4)]] 🧭 
-[[ln-currently-open-file]] 🧭
-[[ln-currently-selected-text]] 🧭
-[[ln-current-date-and-time]] 🧭 
+`🧭 expand` [[About Me]]
+`🧭 expand` [[Backlog]]
+`🧭 expand` [[Note Format]]
+`🧭 daily_note(-3:4)`
+`🧭 current_date_time()` 

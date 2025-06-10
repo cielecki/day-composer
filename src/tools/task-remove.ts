@@ -50,6 +50,7 @@ type TaskRemoveToolInput = {
 export const taskRemoveTool: ObsidianTool<TaskRemoveToolInput> = {
   specification: schema,
   icon: "trash-2",
+  sideEffects: true, // Modifies files by removing tasks
   get initialLabel() {
     return t('tools.remove.label');
   },

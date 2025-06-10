@@ -29,6 +29,7 @@ type ToolValidatorInput = {
 export const toolValidatorTool: ObsidianTool<ToolValidatorInput> = {
   specification: schema,
   icon: "wrench",
+  sideEffects: false, // Read-only validation, safe for link expansion
   initialLabel: "Validate Tool",
   execute: async (context: ToolExecutionContext<ToolValidatorInput>): Promise<void> => {
     const { plugin, params } = context;

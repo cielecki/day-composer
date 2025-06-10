@@ -63,6 +63,7 @@ async function getUniqueTrashPath(originalPath: string, trashDir: string, app: a
 export const noteDeleteTool: ObsidianTool<NoteDeleteToolInput> = {
   specification: schema,
   icon: "trash-2",
+  sideEffects: true, // Modifies files by moving them to trash
   get initialLabel() {
     return t('tools.noteDelete.label');
   },

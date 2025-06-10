@@ -22,6 +22,7 @@ const INDEX_PATH = 'library/index.md';
 export const libraryListTool: ObsidianTool<LibraryListInput> = {
 	specification: schema,
 	icon: "library",
+	sideEffects: false, // Read-only operation, safe for link expansion
 	get initialLabel() {
 		return t('tools.library.list.label');
 	},

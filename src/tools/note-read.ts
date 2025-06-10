@@ -33,6 +33,7 @@ type NoteReadToolInput = {
 export const noteReadTool: ObsidianTool<NoteReadToolInput> = {
   specification: schema,
   icon: "file-text",
+  sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
     return t('tools.read.label');
   },

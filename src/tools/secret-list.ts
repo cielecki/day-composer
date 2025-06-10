@@ -18,6 +18,7 @@ type SecretListToolInput = Record<string, never>;
 export const secretListTool: ObsidianTool<SecretListToolInput> = {
   specification: schema,
   icon: "list",
+  sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
     return t('tools.actions.secretList.default');
   },

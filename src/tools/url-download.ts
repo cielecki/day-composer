@@ -98,6 +98,7 @@ function containsBinaryData(content: string): boolean {
 export const urlDownloadTool: ObsidianTool<UrlDownloadToolInput> = {
   specification: schema,
   icon: "download",
+  sideEffects: false, // Read-only operation (just downloads and displays content)
   get initialLabel() {
     return t('tools.urlDownload.label');
   },

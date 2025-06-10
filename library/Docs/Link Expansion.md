@@ -1,113 +1,121 @@
 # Link Expansion
 
-The Life Navigator plugin provides several special link formats that can be used to dynamically reference content in your vault. These links are expanded when they are followed by a compass emoji (🧭).
+The Life Navigator plugin provides tool calls that can be used to dynamically reference content in your vault. These tools use the new compass-first syntax for consistency and clarity.
 
-## Special Link Formats
+## Tool Calls
 
 ### Daily Notes
 
 #### Single Daily Note
-Format: `[[ln-day-note-(X)]] 🧭`
-- `X` is the number of days offset from today
+Format: `` `🧭 daily_note(offset)` ``
+- `offset` is the number of days offset from today
 - Positive numbers refer to future dates
 - Negative numbers refer to past dates
 - `0` refers to today
 
-Example: `[[ln-day-note-(-1)]] 🧭` expands to yesterday's daily note
+Example: `` `🧭 daily_note(-1)` `` expands to yesterday's daily note
 
 #### Daily Note Range
-Format: `[[ln-day-note-(start:end)]] 🧭`
-- `start` and `end` are the number of days offset from today
+Format: `` `🧭 daily_notes(start_offset, end_offset)` ``
+- `start_offset` and `end_offset` are the number of days offset from today
 - Both values can be positive (future) or negative (past)
 - The range is inclusive of both start and end dates
 - The start date must be less than or equal to the end date
 
-Example: `[[ln-day-note-(-7:0)]] 🧭` expands to the last 7 days of daily notes
+Example: `` `🧭 daily_notes(-7, 0)` `` expands to the last 7 days of daily notes
 
 ### Current Date and Time
-Format: `[[ln-current-date-and-time]] 🧭`
+Format: `` `🧭 current_date_time()` ``
 Expands to the current date and time in ISO format.
 
-### Currently Open File
-Format: `[[ln-currently-open-file]] 🧭`
-Expands to the full content of the currently open file.
-
-### Currently Selected Text
-Format: `[[ln-currently-selected-text]] 🧭`
-Expands to the text currently selected in the active editor. Includes file path and line number information.
+### Current File and Selection
+Format: `` `🧭 current_file_and_selection()` ``
+Expands to the full content of the currently open file and any selected text, formatted in XML for clear context.
 
 ### Current Chat
-Format: `[[ln-current-chat]] 🧭`
+Format: `` `🧭 current_chat()` ``
 Expands to the current chat session.
 
 ## Usage Notes
 
-1. All special links must be followed by a compass emoji (🧭) to be expanded (magnifying glass 🔎 is also supported for backward compatibility)
-2. Links can be aliased using the standard Obsidian format: `[[target|alias]]`
-3. The expansion process is recursive - any links within expanded content will also be expanded
+1. All tool calls use the compass-first format: `` `🧭 tool_name(params)` ``
+2. Tools support various parameter styles: positional, named, JavaScript object, and mixed
+3. The expansion process is recursive - any tool calls within expanded content will also be expanded
 4. Circular references are prevented by tracking visited paths
-5. Only markdown files are resolved and expanded
+5. Only tools without side effects can be used in automatic link expansion
+6. Regular wiki links can still be expanded using: `` `🧭 expand` [[File Name]] ``
 
 ## Examples
 
 ### Daily Notes
 ```markdown
 # Yesterday's Notes
-[[ln-day-note-(-1)]] 🧭
+`🧭 daily_note(-1)`
 
 # Last Week's Notes
-[[ln-day-note-(-7:0)]] 🧭
+`🧭 daily_notes(-7, 0)`
 
 # Next Week's Notes
-[[ln-day-note-(1:7)]] 🧭
+`🧭 daily_notes(1, 7)`
 ```
 
 ### Current Information
 ```markdown
-Current time: [[ln-current-date-and-time]] 🧭
-Current file: [[ln-currently-open-file]] 🧭
-Selected text: [[ln-currently-selected-text]] 🧭
-Current chat: [[ln-current-chat]] 🧭
+Current time: `🧭 current_date_time()`
+Current file and selection: `🧭 current_file_and_selection()`
+Current chat: `🧭 current_chat()`
 ```
 
-### Aliased Links
+### Wiki Link Expansion
 ```markdown
-[[ln-day-note-(-1)|Yesterday's Notes]] 🧭
-[[ln-day-note-(-7:0)|Last Week's Notes]] 🧭
+`🧭 expand` [[About Me]]
+`🧭 expand` [[Project Notes]]
 ```
 
 ## Purpose and Structure
 
-Link expansion allows you to build comprehensive AI prompts with maximum user control. When a link is followed by a compass emoji (🧭), its content is expanded and included in the AI's context.
+Tool calls and link expansion allow you to build comprehensive AI prompts with maximum user control. The new compass-first format provides clear, consistent syntax for dynamic content inclusion.
 
 This creates a powerful hierarchical structure:
-- From a main mode, you can link to an index file (as in the default setup)
-- The index can link to multiple sub-files (like "About Me", "Relationships", etc.)
-- Each sub-file can link to even more specific documents
+- From a main mode, you can use `` `🧭 expand` [[Index]] `` to include an index file
+- The index can link to multiple sub-files using `` `🧭 expand` [[About Me]] ``, `` `🧭 expand` [[Relationships]] ``, etc.
+- Each sub-file can include even more specific documents
+- Tool calls like `` `🧭 daily_note(0)` `` provide dynamic, date-based content
 
-This web of links enables you to:
+This system enables you to:
 1. Organize information in a modular way
 2. Control exactly what context is provided to the AI
 3. Maintain separate documents while creating a unified context
 4. Build complex context from simple, reusable components
+5. Include dynamic content that updates automatically
 
-## Regular Link Expansion
+## Tool Call Format
 
-Links followed by a compass emoji will be expanded when used in Life Navigator modes:
+All Life Navigator tools use the compass-first format with backticks:
 
 ```markdown
-[[Note Title]] 🧭
+`🧭 tool_name(parameters)`
+```
+
+This format is:
+- **Consistent**: All tools use the same syntax pattern
+- **Clear**: The compass emoji clearly indicates Life Navigator functionality  
+- **Flexible**: Supports various parameter styles (positional, named, mixed, JavaScript object)
+- **Safe**: Only tools without side effects execute during automatic expansion
+
+## Wiki Link Expansion
+
+Regular wiki links can be expanded using the expand tool:
+
+```markdown
+`🧭 expand` [[Note Title]]
 ```
 
 This will include the full content of "Note Title" in your query context.
 
-## Compass Emoji Requirement
-
-All special links must be followed by a compass emoji (🧭) to trigger the expansion. This is intentional to prevent accidental expansions. The magnifying glass emoji (🔎) is also supported for backward compatibility.
-
 ## HTML Comment Filtering
 
-During the link expansion process, Life Navigator automatically filters out top-level HTML comments from the final system prompt while preserving them in code blocks. This feature:
+During the expansion process, Life Navigator automatically filters out top-level HTML comments from the final system prompt while preserving them in code blocks. This feature:
 
 - **Removes top-level HTML comments**: Comments like `<!-- DELETED TASK: ... -->` used to mark deleted tasks are filtered out
 - **Preserves code examples**: HTML comments inside markdown code blocks (fenced with ``` or indented with 4+ spaces) are kept intact

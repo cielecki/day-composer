@@ -62,6 +62,7 @@ type TaskAbandonToolInput = {
 export const taskAbandonTool: ObsidianTool<TaskAbandonToolInput> = {
   specification: schema,
   icon: "x-square",
+  sideEffects: true, // Modifies files by abandoning tasks
   get initialLabel() {
     return t('tools.abandon.label');
   },

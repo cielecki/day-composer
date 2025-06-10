@@ -65,27 +65,28 @@ Life Navigator uses a special link system with the 🧭 compass emoji that deter
 
 **Critical Understanding:**
 - **Mode files ARE system prompts** - their content becomes the AI instructions sent to the language model
-- **Links with 🧭 in mode files determine what context gets loaded** into the AI's knowledge (🧭 also supported for backward compatibility)
+- **Tool calls with 🧭 in mode files determine what context gets loaded** into the AI's knowledge
 - **Hub-and-spoke pattern** - link to hub files (like About Me.md) that link to specific areas
 
 **Link Types:**
-- \`[[Note Name]] 🧭\` - Expands entire content of the linked note into AI context
+- \`\`🧭 expand\`\` [[Note Name]] - Expands entire content of the linked note into AI context
+- \`\`🧭 daily_note(0)\`\` - Automatically points to today's note
+- \`\`🧭 daily_notes(-6, 0)\`\` - Shows the last 7 days
+- \`\`🧭 current_date_time()\`\` - Inserts current date and time
 - Regular \`[[Note Name]]\` links without 🧭 are just references (not expanded)
-- Dynamic links: \`[[ln-day-note-(0)]] 🧭\` automatically point to today's note
-- Range support: \`[[ln-day-note-(-6:0)]] 🧭\` shows the last 7 days
 
 **Architecture Pattern:**
 \`\`\`
 Mode File (system prompt)
-├── [[About Me]] 🧭 ────┐
-├── [[ln-day-note-(-7:0)]] 🧭    │
-└── (prompt instructions)        │
-                                 │
-About Me.md ←───────────────────┘
-├── [[About Me/Relationships]] 🧭
-├── [[About Me/Role Models]] 🧭  
-├── [[About Me/Day Structure]] 🧭
-└── [[Current Projects]] 🧭
+├── \`🧭 expand\` [[About Me]] ────┐
+├── \`🧭 daily_notes(-7, 0)\`      │
+└── (prompt instructions)          │
+                                   │
+About Me.md ←─────────────────────┘
+├── \`🧭 expand\` [[About Me/Relationships]]
+├── \`🧭 expand\` [[About Me/Role Models]]  
+├── \`🧭 expand\` [[About Me/Day Structure]]
+└── \`🧭 expand\` [[Current Projects]]
 \`\`\`
 
 ### Daily Notes Structure
@@ -108,7 +109,7 @@ Modes are AI personalities that help with different aspects of life:
 When helping users create new modes, ALWAYS:
 1. **Design context architecture first** - What personal context does this mode need to be effective?
 2. **Select appropriate links** - Choose hub files and specific context using established patterns
-3. **Embed links in mode content** - Place \`[[File Name]] 🧭\` links directly in the mode file content
+3. **Embed tool calls in mode content** - Place tool calls like \`🧭 expand\` [[File Name]] or \`🧭 daily_notes(-7, 0)\` directly in the mode file content
 4. Check the library for existing examples and templates
 5. Reference relevant manuals (User Defined Tools, Mode creation guides)  
 6. Use the Mode Validator tool to ensure quality
@@ -119,41 +120,42 @@ When creating modes, embed these link patterns directly in the mode file content
 
 **Analytics Mode Pattern:**
 \`\`\`
-[[About Me]] 🧭
-[[ln-day-note-(-30:0)]] 🧭
-[[ln-current-date-and-time]] 🧭
+\`🧭 expand\` [[About Me]]
+\`🧭 daily_notes(-30, 0)\`
+\`🧭 current_date_time()\`
 \`\`\`
 
 **Planner Mode Pattern:**
 \`\`\`
-[[About Me]] 🧭  
-[[About Me/Day Structure]] 🧭
-[[Current Projects]] 🧭
-[[ln-day-note-(-3:0)]] 🧭
-[[ln-current-date-and-time]] 🧭
+\`🧭 expand\` [[About Me]]  
+\`🧭 expand\` [[About Me/Day Structure]]
+\`🧭 expand\` [[Current Projects]]
+\`🧭 daily_notes(-3, 0)\`
+\`🧭 current_date_time()\`
 \`\`\`
 
 **Reflection Mode Pattern:**
 \`\`\`
-[[About Me]] 🧭
-[[About Me/Role Models]] 🧭
-[[ln-day-note-(-30:0)]] 🧭
+\`🧭 expand\` [[About Me]]
+\`🧭 expand\` [[About Me/Role Models]]
+\`🧭 daily_notes(-30, 0)\`
 \`\`\`
 
 **Assistant Mode Pattern:**
 \`\`\`
-[[About Me]] 🧭
-[[Backlog]] 🧭
-[[ln-day-note-(-3:0)]] 🧭
-[[ln-currently-open-file]] 🧭
-[[ln-current-date-and-time]] 🧭
+\`🧭 expand\` [[About Me]]
+\`🧭 expand\` [[Backlog]]
+\`🧭 daily_notes(-3, 0)\`
+\`🧭 current_file_and_selection()\`
+\`🧭 current_date_time()\`
 \`\`\`
 
 ### Link Strategy Guidelines
-- **Use hub-and-spoke pattern**: Link to \`About Me.md\` which links to specific areas rather than linking directly to many specialized files
-- **Place links at end of mode file**: Common pattern is to put all \`🧭\` links after the system prompt content
-- **Choose minimal effective set**: Every link adds to token budget, so include only what's needed for the mode's purpose
-- **Don't duplicate context**: If About Me links to Relationships, mode doesn't need direct Relationships link unless specifically required
+- **Use hub-and-spoke pattern**: Use \`🧭 expand\` [[About Me]] which links to specific areas rather than linking directly to many specialized files
+- **Place tool calls at end of mode file**: Common pattern is to put all \`🧭\` tool calls after the system prompt content
+- **Choose minimal effective set**: Every tool call adds to token budget, so include only what's needed for the mode's purpose
+- **Don't duplicate context**: If About Me links to Relationships, mode doesn't need direct Relationships call unless specifically required
+- **Use backticks**: All tool calls must be wrapped in backticks: \`🧭 tool_name(params)\`
 
 ### The Info Directory
 This is where personal information lives:

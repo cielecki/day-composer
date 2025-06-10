@@ -61,6 +61,7 @@ type TaskCheckToolInput = {
 export const taskCheckTool: ObsidianTool<TaskCheckToolInput> = {
   specification: schema,
   icon: "check-circle",
+  sideEffects: true, // Modifies files by checking tasks
   get initialLabel() {
     return t('tools.check.label');
   },

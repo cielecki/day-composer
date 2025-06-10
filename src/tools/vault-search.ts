@@ -25,6 +25,7 @@ type VaultSearchToolInput = {
 export const vaultSearchTool: ObsidianTool<VaultSearchToolInput> = {
   specification: schema,
   	icon: "search",
+  sideEffects: false, // Read-only search operation, safe for link expansion
 	get initialLabel() {
 		return t('tools.search.label');
 	},

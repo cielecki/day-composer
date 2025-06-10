@@ -68,27 +68,28 @@ Life Navigator używa specjalnego systemu linków z emoji kompasu 🧭, który o
 
 **Kluczowe Zrozumienie:**
 - **Pliki trybów TO prompty systemowe** - ich zawartość staje się instrukcjami AI wysyłanymi do modelu językowego
-- **Linki z 🧭 w plikach trybów określają jaki kontekst zostanie załadowany** do wiedzy AI (🔎 również obsługiwane dla kompatybilności wstecznej)
+- **Wywołania narzędzi z 🧭 w plikach trybów określają jaki kontekst zostanie załadowany** do wiedzy AI
 - **Wzorzec hub-and-spoke** - linkuj do plików głównych (jak About Me.md), które linkują do konkretnych obszarów
 
 **Typy Linków:**
-- \`[[Nazwa Notatki]] 🧭\` - Rozwija całą zawartość linkowanej notatki do kontekstu AI
+- \`\`🧭 expand\`\` [[Nazwa Notatki]] - Rozwija całą zawartość linkowanej notatki do kontekstu AI
+- \`\`🧭 daily_note(0)\`\` - Automatycznie wskazuje na dzisiejszą notatkę
+- \`\`🧭 daily_notes(-6, 0)\`\` - Pokazuje ostatnie 7 dni
+- \`\`🧭 current_date_time()\`\` - Wstawia aktualną datę i czas
 - Zwykłe linki \`[[Nazwa Notatki]]\` bez 🧭 to tylko odniesienia (nie są rozwijane)
-- Dynamiczne linki: \`[[ln-day-note-(0)]] 🧭\` automatycznie wskazują na dzisiejszą notatkę
-- Wsparcie zakresów: \`[[ln-day-note-(-6:0)]] 🧭\` pokazuje ostatnie 7 dni
 
 **Wzorzec Architektury:**
 \`\`\`
 Plik Trybu (prompt systemowy)
-├── [[O mnie]] 🧭 ────┐
-├── [[ln-day-note-(-7:0)]] 🧭    │
+├── \`🧭 expand\` [[O mnie]] ────┐
+├── \`🧭 daily_notes(-7, 0)\`    │
 └── (instrukcje promptu)         │
                                  │
 O mnie.md ←─────────────────────┘
-├── [[O mnie/Relacje]] 🧭
-├── [[O mnie/Wzorce do naśladowania]] 🧭  
-├── [[O mnie/Struktura dnia]] 🧭
-└── [[Bieżące projekty]] 🧭
+├── \`🧭 expand\` [[O mnie/Relacje]]
+├── \`🧭 expand\` [[O mnie/Wzorce do naśladowania]]  
+├── \`🧭 expand\` [[O mnie/Struktura dnia]]
+└── \`🧭 expand\` [[Bieżące projekty]]
 \`\`\`
 
 ### Struktura Notatek Dziennych
@@ -111,7 +112,7 @@ Tryby to osobowości AI, które pomagają w różnych aspektach życia:
 Pomagając użytkownikom tworzyć nowe tryby, ZAWSZE:
 1. **Zaprojektuj architekturę kontekstu najpierw** - Jaki kontekst osobisty potrzebuje ten tryb, aby być skutecznym?
 2. **Wybierz odpowiednie linki** - Wybierz pliki główne i konkretny kontekst używając ustalonych wzorców
-3. **Osadź linki w treści trybu** - Umieść linki \`[[Nazwa Pliku]] 🧭\` bezpośrednio w treści pliku trybu
+3. **Osadź wywołania narzędzi w treści trybu** - Umieść wywołania narzędzi takie jak \`🧭 expand\` [[Nazwa Pliku]] lub \`🧭 daily_notes(-7, 0)\` bezpośrednio w treści pliku trybu
 4. Sprawdź bibliotekę pod kątem istniejących przykładów i szablonów
 5. Odwołaj się do odpowiednich podręczników (Narzędzia Zdefiniowane przez Użytkownika, poradniki tworzenia trybów)
 6. Użyj narzędzia Walidatora Trybów aby zapewnić jakość
@@ -122,41 +123,42 @@ Tworząc tryby, osadź te wzorce linków bezpośrednio w treści pliku trybu:
 
 **Wzorzec Trybu Analityka:**
 \`\`\`
-[[O mnie]] 🧭
-[[ln-day-note-(-30:0)]] 🧭
-[[ln-current-date-and-time]] 🧭
+\`🧭 expand\` [[O mnie]]
+\`🧭 daily_notes(-30, 0)\`
+\`🧭 current_date_time()\`
 \`\`\`
 
 **Wzorzec Trybu Planer:**
 \`\`\`
-[[O mnie]] 🧭  
-[[O mnie/Struktura dnia]] 🧭
-[[Bieżące projekty]] 🧭
-[[ln-day-note-(-3:0)]] 🧭
-[[ln-current-date-and-time]] 🧭
+\`🧭 expand\` [[O mnie]]  
+\`🧭 expand\` [[O mnie/Struktura dnia]]
+\`🧭 expand\` [[Bieżące projekty]]
+\`🧭 daily_notes(-3, 0)\`
+\`🧭 current_date_time()\`
 \`\`\`
 
 **Wzorzec Trybu Refleksja:**
 \`\`\`
-[[O mnie]] 🧭
-[[O mnie/Wzorce do naśladowania]] 🧭
-[[ln-day-note-(-30:0)]] 🧭
+\`🧭 expand\` [[O mnie]]
+\`🧭 expand\` [[O mnie/Wzorce do naśladowania]]
+\`🧭 daily_notes(-30, 0)\`
 \`\`\`
 
 **Wzorzec Trybu Asystentka:**
 \`\`\`
-[[O mnie]] 🧭
-[[Backlog]] 🧭
-[[ln-day-note-(-3:0)]] 🧭
-[[ln-currently-open-file]] 🧭
-[[ln-current-date-and-time]] 🧭
+\`🧭 expand\` [[O mnie]]
+\`🧭 expand\` [[Backlog]]
+\`🧭 daily_notes(-3, 0)\`
+\`🧭 current_file_and_selection()\`
+\`🧭 current_date_time()\`
 \`\`\`
 
 ### Wytyczne Strategii Linków
-- **Używaj wzorca hub-and-spoke**: Linkuj do \`O mnie.md\` które linkuje do konkretnych obszarów zamiast linkowania bezpośrednio do wielu wyspecjalizowanych plików
-- **Umieszczaj linki na końcu pliku trybu**: Powszechny wzorzec to umieszczenie wszystkich linków \`🧭\` po treści promptu systemowego
-- **Wybieraj minimalny skuteczny zestaw**: Każdy link zwiększa budżet tokenów, więc uwzględniaj tylko to, co jest potrzebne do celu trybu
-- **Nie duplikuj kontekstu**: Jeśli O mnie linkuje do Relacji, tryb nie potrzebuje bezpośredniego linku do Relacji, chyba że jest specjalnie wymagane
+- **Używaj wzorca hub-and-spoke**: Używaj \`🧭 expand\` [[O mnie]] który linkuje do konkretnych obszarów zamiast linkowania bezpośrednio do wielu wyspecjalizowanych plików
+- **Umieszczaj wywołania narzędzi na końcu pliku trybu**: Powszechny wzorzec to umieszczenie wszystkich wywołań \`🧭\` po treści promptu systemowego
+- **Wybieraj minimalny skuteczny zestaw**: Każde wywołanie narzędzia zwiększa budżet tokenów, więc uwzględniaj tylko to, co jest potrzebne do celu trybu
+- **Nie duplikuj kontekstu**: Jeśli O mnie linkuje do Relacji, tryb nie potrzebuje bezpośredniego wywołania Relacji, chyba że jest specjalnie wymagane
+- **Używaj backticks**: Wszystkie wywołania narzędzi muszą być otoczone backticks: \`🧭 tool_name(params)\`
 
 ### Katalog Info
 Tu znajdują się informacje osobiste:

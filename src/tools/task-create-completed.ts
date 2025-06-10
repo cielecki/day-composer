@@ -47,6 +47,7 @@ type TaskCreateCompletedToolInput = {
 export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput> = {
   specification: schema,
   icon: "check-circle",
+  sideEffects: true, // Modifies files by creating completed tasks
   get initialLabel() {
     return t('tools.createCompleted.label');
   },

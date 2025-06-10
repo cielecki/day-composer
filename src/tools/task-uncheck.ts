@@ -41,6 +41,7 @@ type TaskUncheckToolInput = {
 export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
   specification: schema,
   icon: "square",
+  sideEffects: true, // Modifies files by unchecking tasks
   get initialLabel() {
     return t('tools.uncheck.label');
   },

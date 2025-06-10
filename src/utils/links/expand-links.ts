@@ -1,16 +1,11 @@
 import { App, Notice } from "obsidian";
 import { removeTopLevelHtmlComments } from 'src/utils/text/html-comment-remover';
-import { 
-	handleCurrentDateTimeLink, 
-	handleCurrentlyOpenFileLink, 
-	handleCurrentlySelectedTextLink,
-	handleCurrentChatLink, 
-	handleDayNoteLink,
-	handleDayNoteRangeLink
-} from './special-link-handlers';
+// Old special link handlers are no longer used - only new format tools are supported
 import { processFileLink } from "./process-file-link";
 import { resolveLinkToFile } from 'src/utils/fs/link-resolver';
 import { t } from 'src/i18n';
+import { parseToolCall } from '../tools/tool-call-parser';
+import { getObsidianTools } from '../../obsidian-tools';
 
 /**
  * Recursively expands [[wikilinks]] in content
@@ -25,10 +20,14 @@ export async function expandLinks(
 	content: string,
 	visitedPaths: Set<string> = new Set(),
 ): Promise<string> {
-	// Find all [[wikilinks]] followed by compass or magnifying glass emoji in the content
-	const wikiLinkRegex = /\[\[([^\]]+?)\]\]\s*[🧭🔎]/gu;
-	let match;
 	let result = content;
+
+	// Process new format tool calls: `🧭 tool_name(params)` and `🧭 expand` [[link]]
+	result = await processNewFormatCalls(app, result, visitedPaths);
+
+	// Process regular [[wikilinks]] followed by compass emoji (non-special links only)
+	const wikiLinkRegex = /\[\[([^\]]+?)\]\]\s*🧭/gu;
+	let match;
 
 	// Collect matches
 	const matches: Array<RegExpExecArray> = [];
@@ -40,7 +39,6 @@ export async function expandLinks(
 	// Process all matches from last to first to avoid position shifting issues
 	for (let i = matches.length - 1; i >= 0; i--) {
 		const match = matches[i];
-		let dayNoteMatch: RegExpMatchArray | null = null;
 
 		// Extract the link target (remove the emoji from the match)
 		let linkText = match[1];
@@ -49,106 +47,6 @@ export async function expandLinks(
 		// Handle aliased links [[target|alias]]
 		if (linkText.includes("|")) {
 			[linkPath, linkText] = linkText.split("|", 2);
-		}
-
-		// Handle ln-day-note-(start:end) format for daily note ranges
-		const dayNoteRangeMatch = linkPath.match(/^ln-day-note-\(([+-]?\d+):([+-]?\d+)\)$/);
-		if (dayNoteRangeMatch) {
-			const startOffset = parseInt(dayNoteRangeMatch[1]);
-			const endOffset = parseInt(dayNoteRangeMatch[2]);
-			const rangeInfo = handleDayNoteRangeLink(app, startOffset, endOffset);
-			
-			if (rangeInfo.notes.length > 0) {
-				// Process each individual daily note in the range
-				let combinedContent = '';
-				
-				for (const noteInfo of rangeInfo.notes) {
-					if (noteInfo.found) {
-						const expandedContent = await processFileLink(
-							app,
-							noteInfo.linkPath,
-							`${noteInfo.dateStr} (${noteInfo.descriptiveLabel})`,
-							visitedPaths,
-							true,
-							{ formattedDate: noteInfo.formattedDate, descriptiveLabel: noteInfo.descriptiveLabel }
-						);
-						
-						if (expandedContent) {
-							combinedContent += expandedContent + '\n';
-						}
-					} else {
-						// Add individual marker for missing note using consistent XML format
-						combinedContent += `<daily_note_missing date="${noteInfo.dateStr}" label="${noteInfo.descriptiveLabel}" offset="${noteInfo.offset}" />\n\n`;
-					}
-				}
-				
-				// Replace the range link with the combined content
-				result = result.replace(match[0], combinedContent.trim());
-			} else {
-				// No notes in range (shouldn't happen with current logic)
-				console.warn(`No daily notes found for range: ${startOffset} to ${endOffset}`);
-				result = result.replace(match[0], `[No daily notes found for range ${startOffset} to ${endOffset}] 🧭`);
-			}
-			continue;
-		}
-
-		// Handle ln-day-note-(X) format for relative date notes
-		dayNoteMatch = linkPath.match(/^ln-day-note-\(([+-]?\d+)\)$/);
-		if (dayNoteMatch) {
-			const daysOffset = parseInt(dayNoteMatch[1]);
-			const dayNoteInfo = handleDayNoteLink(app, daysOffset);
-			
-			if (dayNoteInfo && dayNoteInfo.found) {
-				const expandedContent = await processFileLink(
-					app,
-					dayNoteInfo.linkPath,
-					`${dayNoteInfo.dateStr} (${dayNoteInfo.descriptiveLabel})`,
-					visitedPaths,
-					true,
-					{ formattedDate: dayNoteInfo.formattedDate, descriptiveLabel: dayNoteInfo.descriptiveLabel }
-				);
-				
-				if (expandedContent) {
-					result = result.replace(match[0], expandedContent);
-				} else {
-					result = result.replace(match[0], `<daily_note_missing date="${dayNoteInfo.dateStr}" label="${dayNoteInfo.descriptiveLabel}" offset="${dayNoteInfo.offset}" />`);
-				}
-			} else {
-				// No matching file found, skip this link
-				const dateStr = dayNoteInfo?.dateStr || "unknown date";
-				const descriptiveLabel = dayNoteInfo?.descriptiveLabel || "unknown";
-				const offset = dayNoteInfo?.offset || 0;
-				console.warn(`No daily note found for date: ${dateStr} (${offset} days offset)`);
-				result = result.replace(match[0], `<daily_note_missing date="${dateStr}" label="${descriptiveLabel}" offset="${offset}" />`);
-			}
-			continue;
-		}
-
-		// Handle ln-current-date-and-time format
-		if (linkPath === 'ln-current-date-and-time') {
-			result = result.replace(match[0], handleCurrentDateTimeLink());
-			continue;
-		}
-
-		// Handle ln-currently-open-file format
-		if (linkPath === 'ln-currently-open-file') {
-			const fileContent = await handleCurrentlyOpenFileLink(app);
-			result = result.replace(match[0], fileContent);
-			continue;
-		}
-
-		// Handle ln-currently-selected-text format
-		if (linkPath === 'ln-currently-selected-text') {
-			const selectedTextContent = handleCurrentlySelectedTextLink(app);
-			result = result.replace(match[0], selectedTextContent);
-			continue;
-		}
-
-		// Handle ln-current-chat format
-		if (linkPath === 'ln-current-chat') {
-			const chatContent = handleCurrentChatLink(app);
-			result = result.replace(match[0], chatContent);
-			continue;
 		}
 
 		// Handle regular file links using the common processing function
@@ -171,4 +69,114 @@ export async function expandLinks(
 	result = removeTopLevelHtmlComments(result);
 
 	return result;
+}
+
+/**
+ * Process new format tool calls: `🧭 tool_name(params)` and `🧭 expand` [[link]]
+ * Only executes tools that have sideEffects: false (safe for link expansion)
+ */
+async function processNewFormatCalls(app: App, content: string, visitedPaths: Set<string>): Promise<string> {
+	let result = content;
+
+	// First, handle `🧭 expand` [[link]] format
+	const expandRegex = /`🧭\s+expand`\s+\[\[([^\]]+)\]\]/gu;
+	let expandMatch;
+	const expandMatches: Array<RegExpExecArray> = [];
+	
+	while ((expandMatch = expandRegex.exec(content)) !== null) {
+		expandMatches.push(expandMatch);
+	}
+	
+	// Process expand matches from last to first
+	for (let i = expandMatches.length - 1; i >= 0; i--) {
+		const match = expandMatches[i];
+		const linkTarget = match[1];
+		
+		try {
+			const expandedContent = await processFileLink(app, linkTarget, linkTarget, visitedPaths);
+			if (expandedContent) {
+				result = result.replace(match[0], expandedContent);
+			} else {
+				result = result.replace(match[0], `[Could not expand: ${linkTarget}]`);
+			}
+		} catch (error) {
+			console.error(`Error expanding ${linkTarget}:`, error);
+			result = result.replace(match[0], `[Error expanding ${linkTarget}: ${error.message}]`);
+		}
+	}
+
+	// Second, handle `🧭 tool_name(params)` format
+	const toolCallRegex = /`🧭\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\([^)]*\)`/gu;
+	let toolMatch;
+	const toolMatches: Array<RegExpExecArray> = [];
+	
+	while ((toolMatch = toolCallRegex.exec(result)) !== null) {
+		toolMatches.push(toolMatch);
+	}
+
+	// Process tool matches from last to first
+	for (let i = toolMatches.length - 1; i >= 0; i--) {
+		const match = toolMatches[i];
+		const fullMatch = match[0];
+
+		try {
+			// Parse the tool call (remove backticks for parsing)
+			const toolCallContent = fullMatch.slice(1, -1); // Remove backticks
+			
+			// First parse to get the tool name
+			const initialParseResult = parseToolCall(toolCallContent);
+			const { toolName } = initialParseResult;
+
+			// Get the tool
+			const obsidianTools = getObsidianTools();
+			const tool = await obsidianTools.getToolByName(toolName);
+			
+			if (!tool) {
+				console.warn(`Tool not found: ${toolName}`);
+				result = result.replace(match[0], `[Tool not found: ${toolName}]`);
+				continue;
+			}
+			
+			// Re-parse with tool schema for proper parameter mapping
+			const parseResult = parseToolCall(toolCallContent, tool.specification);
+			const { parameters } = parseResult;
+
+			// Check if tool is safe for link expansion (no side effects)
+			if (tool.sideEffects) {
+				console.warn(`Tool ${toolName} has side effects and cannot be used in link expansion`);
+				result = result.replace(match[0], `[Tool ${toolName} has side effects and cannot be used in link expansion]`);
+				continue;
+			}
+
+			// Execute the tool
+			const progressMessages: string[] = [];
+			
+			const context = {
+				plugin: { app }, // Minimal plugin-like object
+				params: parameters,
+				signal: new AbortController().signal,
+				progress: (message: string) => {
+					progressMessages.push(message);
+				},
+				addNavigationTarget: () => {
+					// Navigation targets are not supported in link expansion
+				},
+				setLabel: () => {
+					// Label updates are not supported in link expansion
+				}
+			};
+
+			await tool.execute(context as any);
+
+			// Replace with the tool output
+			const toolOutput = progressMessages.join('\n');
+			result = result.replace(match[0], toolOutput || `[${toolName} executed successfully]`);
+
+		} catch (error) {
+			console.error(`Error processing tool call ${fullMatch}:`, error);
+			result = result.replace(match[0], `[Error processing ${fullMatch}: ${error.message}]`);
+		}
+	}
+
+		return result;
 } 

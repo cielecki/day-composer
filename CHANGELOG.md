@@ -249,12 +249,33 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ## [Unreleased]
 
+### Added
+- **Enhanced Tool Call System**: Revolutionary new compass-first syntax for calling tools directly in notes:
+  - **New format**: `` 🧭 tool_name(params)`` - Compass first for better readability
+  - **Expand command**: `` 🧭 expand [[Wiki Link]]`` - Special expand syntax for wiki links  
+  - **Daily note tools**: `` 🧭 daily_note(0)`` for single notes, `` 🧭 daily_notes(-3, 0)`` for ranges
+  - **Backward compatibility**: Original `` `tool_name(params)` 🧭`` format still supported
+  - Multiple parameter styles supported: zero, positional, named, JavaScript object, and mixed
+- **Tool Call Marker System**: Revolutionary new syntax for calling tools directly in notes using `` `tool_name(params)` 🧭`` format. This powerful feature supports multiple parameter styles:
+  - Zero parameters: `` `current_date_time()` 🧭``
+  - Positional parameters: `` `day_note(-1)` 🧭``
+  - Named parameters: `` `note_read(path="My Note.md", expand_links=true)` 🧭``
+  - JavaScript object syntax: `` `tools_list({safe_only: true})` 🧭``
+  - Mixed parameters: `` `note_read("My Note.md", expand_links=true)` 🧭``
+- **Safe Tool Execution in Link Expansion**: Tools are now marked with a `sideEffects` property. Only tools without side effects can be executed during link expansion, ensuring safe automatic execution while preventing unintended modifications
+- **New Core Tools**: Added essential tools that replace special link handlers:
+  - `current_date_time()` - Returns current date and time in user's locale  
+  - `day_note(offset)` - Retrieves daily notes with offset (0=today, -1=yesterday, etc.)
+  - `current_file_and_selection()` - Returns content of currently open file and selected text in XML format
+  - `current_chat()` - Returns content of the current chat conversation
+  - `tools_list()` - Lists available tools with filtering by mode and safety
+- **Comprehensive Tool Call Parser**: Advanced parser supporting all JavaScript-style parameter formats with proper JSON parsing, parameter mapping, and error handling
+- **Migration from Special Links**: All existing special links like `[[ln-current-date-and-time]] 🧭` continue to work while new tool call syntax provides more flexibility and power
+- **Automatic Link Migration**: Enhanced mode validator tool can automatically migrate old special link syntax to new tool call syntax with `migrate_links=true` parameter
+- **Tool parameter validation**: Tools now validate all parameters against their JSON schema before execution, providing clear error messages to the AI when parameters are invalid or missing. This prevents tools from running with incorrect data and improves error feedback.
+
 ### Fixed
 - **Todo editing display**: Fixed issue where todo labels showed the original text instead of the new text after editing, and success messages displayed template placeholders instead of actual values
-
-
-### Added
-- **Tool parameter validation**: Tools now validate all parameters against their JSON schema before execution, providing clear error messages to the AI when parameters are invalid or missing. This prevents tools from running with incorrect data and improves error feedback.
 
 ### Enhanced
 - **Schema-based parameter validation**: All tool parameters are now validated for type correctness, required fields, string length constraints, number ranges, array sizes, enum values, and nested object properties. Invalid parameters are caught early with descriptive error messages.
@@ -338,3 +359,17 @@ Replace popup notifications with in-chat error messages for better user experien
 
 ### Added
 - **Auto-opening on first setup**: Life Navigator now automatically opens when the plugin is first enabled or when setup is incomplete, providing better onboarding UX and guiding users directly to the setup flow without requiring them to find and click the compass icon
+
+### Changed
+- **Mode Validator Tool**: Now purely read-only - provides detailed analysis and migration recommendations without modifying files. AI must use other tools (like note_edit) to make actual changes based on validator recommendations.
+
+### ⚠️ BREAKING CHANGES
+- **Removed Old Link Format Support**: Old Life Navigator link formats are no longer supported:
+  - ❌ `[[ln-day-note-(0)]] 🧭` → ✅ `🧭 daily_note(0)`
+  - ❌ `[[ln-day-note-(-3:0)]] 🧭` → ✅ `🧭 daily_notes(-3, 0)` 
+  - ❌ `[[ln-current-date-and-time]] 🧭` → ✅ `🧭 current_date_time()`
+  - ❌ `[[ln-currently-open-file]] 🧭` → ✅ `🧭 current_file_and_selection()`
+  - ❌ `[[ln-currently-selected-text]] 🧭` → ✅ `🧭 current_file_and_selection()`
+  - ❌ `[[ln-current-chat]] 🧭` → ✅ `🧭 current_chat()`
+  - ❌ `🔎` emoji no longer supported → ✅ Use `🧭` only
+- **Validation Updates**: Mode and tool validators now report old format usage as validation errors rather than warnings. Files with old format will be marked as invalid and must be updated to the new format.

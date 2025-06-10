@@ -75,6 +75,7 @@ function generateDefaultPath(title: string): string {
 export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
   specification: schema,
   icon: "save",
+  sideEffects: true, // Creates files by saving conversations
   get initialLabel() {
     return t('tools.conversationSave.label');
   },

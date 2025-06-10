@@ -120,6 +120,7 @@ export class UserDefinedToolManager {
         const obsidianTool: ObsidianTool<any> = {
           specification: this.generateToolSpecification(tool),
           icon: tool.icon,
+          sideEffects: tool.sideEffects !== false, // Default to true for user tools unless explicitly marked as safe
           initialLabel: tool.name,
           execute: async (context: ToolExecutionContext) => {
             await this.executeUserDefinedTool(tool, context);

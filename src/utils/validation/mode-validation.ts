@@ -350,9 +350,55 @@ export async function validateModeFile(
 		if (hasOldLinkFormat) {
 			issues.push({
 				type: 'old_format',
-				message: 'Content uses old link expansion format (🔎). Consider updating to new format (🧭) for consistency, though 🔎 still works.',
-				severity: 'warning'
+				message: 'Content uses old link expansion format (🔎). Update to new format (🧭) as 🔎 is no longer supported.',
+				severity: 'error'
 			});
+		}
+		
+		// Check for old Life Navigator special link formats
+		const oldSpecialLinkPatterns = [
+			/\[\[ln-day-note-\([+-]?\d+\)\]\]\s*🧭/g,
+			/\[\[ln-day-note-\([+-]?\d+:[+-]?\d+\)\]\]\s*🧭/g,
+			/\[\[ln-current-date-and-time\]\]\s*🧭/g,
+			/\[\[ln-currently-open-file\]\]\s*🧭/g,
+			/\[\[ln-currently-selected-text\]\]\s*🧭/g,
+			/\[\[ln-current-chat\]\]\s*🧭/g
+		];
+		
+		for (const pattern of oldSpecialLinkPatterns) {
+			const matches = [...contentAfterFrontmatter.matchAll(pattern)];
+			for (const match of matches) {
+				let replacement = '';
+				const linkText = match[0];
+				
+				if (linkText.includes('ln-day-note-')) {
+					if (linkText.includes(':')) {
+						// Range format
+						const rangeMatch = linkText.match(/\[\[ln-day-note-\(([+-]?\d+):([+-]?\d+)\)\]\]/);
+						if (rangeMatch) {
+							replacement = `🧭 daily_notes(${rangeMatch[1]}, ${rangeMatch[2]})`;
+						}
+					} else {
+						// Single day format
+						const dayMatch = linkText.match(/\[\[ln-day-note-\(([+-]?\d+)\)\]\]/);
+						if (dayMatch) {
+							replacement = `🧭 daily_note(${dayMatch[1]})`;
+						}
+					}
+				} else if (linkText.includes('ln-current-date-and-time')) {
+					replacement = '🧭 current_date_time()';
+				} else if (linkText.includes('ln-currently-open-file') || linkText.includes('ln-currently-selected-text')) {
+					replacement = '🧭 current_file_and_selection()';
+				} else if (linkText.includes('ln-current-chat')) {
+					replacement = '🧭 current_chat()';
+				}
+				
+				issues.push({
+					type: 'old_format',
+					message: `Old Life Navigator link format is no longer supported: ${linkText}. Use new format: ${replacement}`,
+					severity: 'error'
+				});
+			}
 		}
 		
 		if (!contentAfterFrontmatter) {

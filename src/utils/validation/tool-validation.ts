@@ -9,7 +9,7 @@ export interface ToolValidationResult {
 }
 
 export interface ToolValidationIssue {
-	type: 'missing_required_field' | 'invalid_field_value' | 'invalid_code' | 'invalid_structure' | 'security_issue' | 'compatibility_warning' | 'info';
+	type: 'old_format' | 'missing_required_field' | 'invalid_field_value' | 'invalid_code' | 'invalid_structure' | 'security_issue' | 'compatibility_warning' | 'info';
 	field?: string;
 	message: string;
 	severity: 'error' | 'warning' | 'info';
@@ -106,15 +106,8 @@ export async function validateToolFile(
 	const jsBlocks = extractJavaScriptBlocks(bodyContent);
 	validateJavaScriptCode(jsBlocks, issues);
 
-	// Check for old link formats in tool content (🔎 instead of 🧭)
-	const hasOldLinkFormat = /\]\]\s*🔎/.test(bodyContent);
-	if (hasOldLinkFormat) {
-		issues.push({
-			type: 'compatibility_warning',
-			message: 'Content uses old link expansion format (🔎). Consider updating to new format (🧭) for consistency, though 🔎 still works.',
-			severity: 'warning'
-		});
-	}
+	// Note: Tool files contain JavaScript code, not markdown content subject to link expansion.
+	// Therefore, we don't need to validate for Life Navigator link formats here.
 
 	// Try to parse tool using the actual scanner
 	try {

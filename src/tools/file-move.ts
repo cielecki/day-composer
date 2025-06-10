@@ -40,6 +40,7 @@ type FileMoveToolInput = {
 export const fileMoveTool: ObsidianTool<FileMoveToolInput> = {
   specification: schema,
   icon: "move",
+  sideEffects: true, // Modifies files by moving them
   get initialLabel() {
     return t('tools.fileMove.label');
   },

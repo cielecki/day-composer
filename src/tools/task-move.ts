@@ -70,6 +70,7 @@ type TaskMoveToolInput = {
 export const taskMoveTool: ObsidianTool<TaskMoveToolInput> = {
   specification: schema,
   icon: "move",
+  sideEffects: true, // Modifies files by moving tasks
   get initialLabel() {
     return t('tools.move.label');
   },

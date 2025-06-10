@@ -30,6 +30,7 @@ const LIBRARY_PATH = 'library';
 export const libraryReadTool: ObsidianTool<LibraryReadInput> = {
   specification: schema,
   icon: "file-text",
+  sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
     return t('tools.library.read.label');
   },
