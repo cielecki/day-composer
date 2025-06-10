@@ -3,7 +3,7 @@ import { Message, ContentBlock, ThinkingBlock, ToolUseBlock, RedactedThinkingBlo
 import { ensureContentBlocks } from "./content-blocks";
 
 // Define the type for the stream parameter
-type AnthropicMessageStream = AsyncIterable<Anthropic.Messages.MessageStreamEvent>;
+type AnthropicMessageStream = AsyncIterable<Anthropic.Beta.Messages.BetaRawMessageStreamEvent>;
 
 export interface StreamProcessorCallbacks {
 	onMessageStart?: () => void;
@@ -56,6 +56,12 @@ export const processAnthropicStream = async (
 					localMessage = { role: "assistant", content: [] };
 					finalContent = [];
 					thinkingBlocksInProgress = {}; // Reset on new message
+					
+					// Extract usage information if available
+					if (chunk.message?.usage) {
+						console.debug("API Usage", chunk.message.usage);
+					}
+					
 					callbacks.onMessageStart?.();
 					callbacks.onMessageUpdate?.(localMessage);
 					break;
@@ -227,6 +233,11 @@ export const processAnthropicStream = async (
 					}
 
 					thinkingBlocksInProgress = {};
+					break;
+				case "message_delta":
+					if (chunk.usage) {
+						console.debug("API Usage", chunk.usage);
+					}
 					break;
 			}
 		}

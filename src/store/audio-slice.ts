@@ -246,7 +246,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         targetLanguageForApi = targetLanguageForApi.split('-')[0];
       }
 
-      const expandedPrompt = await expandLinks(window.app, promptToUse);
+      const expandedPrompt = (await expandLinks(window.app, promptToUse)).fullContent;
       const trimmedPrompt = expandedPrompt.length > MAX_AUDIO_PROMPT_LENGTH 
         ? expandedPrompt.substring(0, Math.floor(MAX_AUDIO_PROMPT_LENGTH / 2)) + "..." + expandedPrompt.substring(expandedPrompt.length - Math.floor(MAX_AUDIO_PROMPT_LENGTH / 2))
         : expandedPrompt;

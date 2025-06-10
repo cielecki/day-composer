@@ -57,11 +57,13 @@ export async function processFileLink(
 	visitedPaths.add(linkFile.path);
 
 	// Recursively expand any links in the linked content
-	const expandedLinkedContent = await expandLinks(
+	const expandedSystemPrompt = await expandLinks(
 		app,
 		contentToExpand,
 		visitedPaths
 	);
+	
+	const expandedLinkedContent = expandedSystemPrompt.fullContent;
 
 	const tabbedContent = expandedLinkedContent.split('\n').map(line => '  ' + line).join('\n');
 

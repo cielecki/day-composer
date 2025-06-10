@@ -8,18 +8,109 @@ import { parseToolCall } from '../tools/tool-call-parser';
 import { getObsidianTools } from '../../obsidian-tools';
 
 /**
- * Recursively expands [[wikilinks]] in content
+ * Interface for the three-part system prompt based on stability
+ */
+export interface SystemPromptParts {
+	/** Static content until first expansion or tool call */
+	staticSection: string;
+	/** Semi-dynamic content with links until first dynamic tool call */
+	semiDynamicSection: string;
+	/** Dynamic content with tool calls and runtime data */
+	dynamicSection: string;
+	/** Full combined content of all sections */
+	fullContent: string;
+}
+
+/**
+ * Recursively expands [[wikilinks]] in content and returns three sections based on stability
  * Handles circular references by tracking visited paths
  * @param app The Obsidian App instance
  * @param content The text content to expand links in
  * @param visitedPaths Set of already visited paths to prevent circular references
- * @returns Content with expanded links
+ * @returns Object with three sections: static, semi-dynamic, and dynamic
  */
 export async function expandLinks(
 	app: App,
 	content: string,
 	visitedPaths: Set<string> = new Set(),
-): Promise<string> {
+): Promise<SystemPromptParts> {
+	// Find breakpoints in the original content
+	const breakpoints = findContentBreakpoints(content);
+	
+	// Split content into three sections based on breakpoints
+	const staticContent = content.slice(0, breakpoints.firstExpansion);
+	const semiDynamicContent = content.slice(breakpoints.firstExpansion, breakpoints.firstToolCall);
+	const dynamicContent = content.slice(breakpoints.firstToolCall);
+	
+	// Process each section
+	let staticResult = staticContent;
+	let semiDynamicResult = await processContentSection(app, semiDynamicContent, visitedPaths);
+	let dynamicResult = await processContentSection(app, dynamicContent, visitedPaths);
+	
+	// Remove top-level HTML comments from all sections
+	staticResult = removeTopLevelHtmlComments(staticResult);
+	semiDynamicResult = removeTopLevelHtmlComments(semiDynamicResult);
+	dynamicResult = removeTopLevelHtmlComments(dynamicResult);
+
+	return {
+		staticSection: staticResult,
+		semiDynamicSection: semiDynamicResult,
+		dynamicSection: dynamicResult,
+		fullContent: staticResult + semiDynamicResult + dynamicResult
+	};
+}
+
+/**
+ * Find breakpoints in content to split into three sections
+ */
+function findContentBreakpoints(content: string): { firstExpansion: number; firstToolCall: number } {
+	// Find first `🧭 expand` or any `🧭 tool_name()` pattern
+	const expandRegex = /`🧭\s+expand`\s+\[\[([^\]]+)\]\]/g;
+	const toolCallRegex = /`🧭\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\([^)]*\)`/g;
+	const wikiLinkCompassRegex = /\[\[([^\]]+?)\]\]\s*🧭/g;
+	
+	let firstExpansion = content.length; // Default to end of content
+	let firstToolCall = content.length; // Default to end of content
+	
+	// Check for expand patterns
+	let match = expandRegex.exec(content);
+	if (match && match.index < firstExpansion) {
+		firstExpansion = match.index;
+	}
+	
+	// Check for old-style wikilink + compass patterns
+	wikiLinkCompassRegex.lastIndex = 0;
+	match = wikiLinkCompassRegex.exec(content);
+	if (match && match.index < firstExpansion) {
+		firstExpansion = match.index;
+	}
+	
+	// Check for tool calls (these are considered dynamic)
+	toolCallRegex.lastIndex = 0;
+	match = toolCallRegex.exec(content);
+	while (match) {
+		// Skip expand calls as they're not dynamic tool calls
+		if (!match[0].includes('expand')) {
+			if (match.index < firstToolCall) {
+				firstToolCall = match.index;
+			}
+			break;
+		}
+		match = toolCallRegex.exec(content);
+	}
+	
+	// Ensure firstExpansion <= firstToolCall
+	if (firstExpansion > firstToolCall) {
+		firstExpansion = firstToolCall;
+	}
+	
+	return { firstExpansion, firstToolCall };
+}
+
+/**
+ * Process a section of content with link expansion and tool calls
+ */
+async function processContentSection(app: App, content: string, visitedPaths: Set<string>): Promise<string> {
 	let result = content;
 
 	// Process new format tool calls: `🧭 tool_name(params)` and `🧭 expand` [[link]]

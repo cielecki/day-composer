@@ -1,12 +1,12 @@
 import type { ImmerStateCreator } from '../store/plugin-store';
-import { Message, ToolResultBlock, ErrorMessageBlock } from '../types/message';
+import { Message, ToolResultBlock } from '../types/message';
 import { AttachedImage } from 'src/types/attached-image';
 import { Chat } from 'src/utils/chat/conversation';
 import { generateChatId } from 'src/utils/chat/generate-conversation-id';
 import { createUserMessage, extractUserMessageContent } from 'src/utils/chat/message-builder';
 import { runConversationTurn } from 'src/utils/chat/conversation-turn';
 import { getObsidianTools } from '../obsidian-tools';
-import { expandLinks } from 'src/utils/links/expand-links';
+import { expandLinks, SystemPromptParts } from 'src/utils/links/expand-links';
 import { Notice } from 'obsidian';
 import { t } from 'src/i18n';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
@@ -58,7 +58,7 @@ export interface ChatSlice {
   addUserMessage: (userMessage: string, images?: AttachedImage[]) => Promise<void>;
   editUserMessage: (messageIndex: number, newContent: string, images?: AttachedImage[]) => Promise<void>;
   getCurrentConversationId: () => string | null;
-  getSystemPrompt: () => Promise<string>;
+  getSystemPrompt: () => Promise<SystemPromptParts>;
   startEditingMessage: (messageIndex: number) => void;
   cancelEditingMessage: () => void;
   runConversationTurnWithContext: () => Promise<void>;
@@ -231,14 +231,24 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       const plugin = LifeNavigatorPlugin.getInstance();
       
       if (!currentActiveMode || !plugin) {
-        return '';
+        return {
+          staticSection: '',
+          semiDynamicSection: '',
+          dynamicSection: '',
+          fullContent: ''
+        };
       }
       
       // Conditionally expand links based on mode setting
       if (currentActiveMode.expand_links) {
-        return (await expandLinks(plugin.app, currentActiveMode.system_prompt)).trim();
+        return (await expandLinks(plugin.app, currentActiveMode.system_prompt));
       } else {
-        return currentActiveMode.system_prompt.trim();
+        return {
+          staticSection: currentActiveMode.system_prompt.trim(),
+          semiDynamicSection: '',
+          dynamicSection: '',
+          fullContent: currentActiveMode.system_prompt.trim()
+        };
       }
     },
     

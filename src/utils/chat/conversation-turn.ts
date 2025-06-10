@@ -10,6 +10,7 @@ import { getStore } from "../../store/plugin-store";
 import { getDefaultLNMode, resolveAutoModel } from '../../utils/modes/ln-mode-defaults';
 import type { ObsidianTool } from "../../obsidian-tools";
 import { usePluginStore } from "../../store/plugin-store";
+import { SystemPromptParts } from "../links/expand-links";
 
 /**
  * Runs a complete conversation turn with the AI, handling tool calls and streaming
@@ -30,7 +31,12 @@ export const runConversationTurn = async (
 
 	// Track current mode for system prompt optimization
 	let currentModeId: string = store.modes.activeId;
-	let systemPrompt: string = '';
+	let systemPrompt: SystemPromptParts = {
+		staticSection: '',
+		semiDynamicSection: '',
+		dynamicSection: '',
+		fullContent: ''
+	};
 	let systemPromptCalculated = false;
 
 	try {
@@ -84,22 +90,56 @@ export const runConversationTurn = async (
 				const maxTokens = currentActiveMode.max_tokens ?? defaultMode.max_tokens;
 				const thinkingBudgetTokens = currentActiveMode.thinking_budget_tokens ?? defaultMode.thinking_budget_tokens;
 
-				const params: MessageCreateParamsStreaming = {
+
+				const cacheControlLong: Anthropic.Beta.Messages.BetaCacheControlEphemeral = {
+					"type": "ephemeral",
+					"ttl": "1h"
+				}
+
+				const cacheControlShort: Anthropic.Beta.Messages.BetaCacheControlEphemeral = {
+					"type": "ephemeral"
+				}
+
+				const systemBlocks: Anthropic.Messages.TextBlockParam[] = [
+					...(systemPrompt.staticSection ? [{
+						type: "text",
+						text: systemPrompt.staticSection,
+						"cache_control": cacheControlLong
+					} as Anthropic.Messages.TextBlockParam] : []),
+					...(systemPrompt.semiDynamicSection ? [{
+						type: "text",
+						text: systemPrompt.semiDynamicSection,
+						"cache_control": cacheControlLong
+					} as Anthropic.Messages.TextBlockParam] : []),
+					...(systemPrompt.dynamicSection ? [{
+						type: "text",
+						text: systemPrompt.dynamicSection,
+						cache_control: cacheControlShort
+					} as Anthropic.Messages.TextBlockParam] : [])
+				]
+
+				const params: Anthropic.Beta.Messages.MessageCreateParams = {
 					model: model,
 					max_tokens: maxTokens,
-					system: systemPrompt,
+					system: systemBlocks,
 					stream: true,
 					messages: messagesForAPI,
-					tools: tools.map((tool) => tool.specification as Anthropic.Messages.Tool),
+					tools: tools.map((tool, index) => ({
+						...tool.specification as Anthropic.Messages.Tool,
+						...(index === tools.length - 1 ? {
+							"cache_control": cacheControlLong
+						} : {}),
+					})),
 					thinking: {
 						type: "enabled",
 						budget_tokens: thinkingBudgetTokens,
 					},
+					betas: ["extended-cache-ttl-2025-04-11"]
 				};
 
 				console.debug("🔥 API Params:", params);
 
-				const stream = await anthropicClient.messages.create(params, { signal: signal });
+				const stream = await anthropicClient.beta.messages.create(params, { signal: signal });
 
 				// Set up stream processor callbacks
 				const callbacks: StreamProcessorCallbacks = {

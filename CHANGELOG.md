@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- Added basic caching for Anthropic API responses to improve performance and reduce API costs
+- Implemented cache control headers for better response handling
+- Added validation for cached responses to ensure data integrity
+
+
 ## [0.11.0] - 2025-01-08
 
 ### ⚠️ IMPORTANT: Breaking Changes - Action Required
