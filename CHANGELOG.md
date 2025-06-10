@@ -2,13 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-
-### Fixed
-- Added basic caching for Anthropic API responses to improve performance and reduce API costs
-- Implemented cache control headers for better response handling
-- Added validation for cached responses to ensure data integrity
-
 
 ## [0.11.0] - 2025-01-08
 
@@ -355,3 +348,11 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ## [0.6.6] - 2025-05-22
 
+## [Unreleased]
+
+### Fixed
+- Added basic caching for Anthropic API responses to improve performance and reduce API costs
+- Implemented cache control headers for better response handling
+- Added validation for cached responses to ensure data integrity
+
+- **Tool parameter validation**: Fixed integer parameter validation error where tools expecting integer values (like daily note offset) were incorrectly rejecting valid whole numbers

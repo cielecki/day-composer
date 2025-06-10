@@ -213,7 +213,11 @@ function getValueType(value: unknown): string {
   if (Array.isArray(value)) return 'array';
   if (typeof value === 'object') return 'object';
   if (typeof value === 'boolean') return 'boolean';
-  if (typeof value === 'number') return 'number';
+  if (typeof value === 'number') {
+    // JSON Schema distinguishes between integer and number
+    // Return 'integer' for whole numbers, 'number' for decimals
+    return Number.isInteger(value) ? 'integer' : 'number';
+  }
   if (typeof value === 'string') return 'string';
   return 'unknown';
 }
