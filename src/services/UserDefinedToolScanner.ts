@@ -77,13 +77,13 @@ export class UserDefinedToolScanner {
     
     const tool: UserDefinedTool = {
       name: file.basename,
-      description: metadata?.frontmatter?.description || metadata?.frontmatter?.ln_description || '',
-      icon: metadata?.frontmatter?.icon || metadata?.frontmatter?.ln_icon || 'wrench',
+      description: metadata?.frontmatter?.description  || '',
+      icon: metadata?.frontmatter?.icon || 'wrench',
       filePath: file.path,
       version: version.trim(),
       executeCode,
       schema,
-      enabled: (metadata?.frontmatter?.enabled !== false) && (metadata?.frontmatter?.ln_enabled !== false),
+      enabled: (metadata?.frontmatter?.enabled !== false),
       approved: false,
       codeHash: this.calculateHash(executeCode),
       schemaHash: this.calculateHash(JSON.stringify(schema)),

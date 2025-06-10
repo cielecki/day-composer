@@ -15,6 +15,12 @@ The **Mode Validator** tool validates Life Navigator mode files for completeness
 - **Icon Validation**: Ensures icons are valid Lucide icons available in Obsidian
 - **Link Expansion**: Tests if links in the system prompt expand correctly
 - **System Prompt**: Ensures the system prompt content is present and valid
+- **Legacy Format Detection**: Identifies and flags deprecated `ln_` format patterns including:
+  - Deprecated `ln_` prefixed fields (like `ln_icon`, `ln_description`, `ln_enabled`)
+  - Version format issues (`v1.0.0` should be `1.0.0`)
+  - Boolean format problems (`yes/no` should be `true/false`)
+  - Legacy filename patterns (`Mode-v1.md`)
+  - Old link formats (`🔎` instead of `🧭`)
 
 ### Usage:
 
@@ -43,12 +49,19 @@ The **Tool Validator** tool validates user-defined tool files for proper structu
 
 - **File Structure**: Ensures the file has proper frontmatter and the required `ln-tool` tag
 - **YAML Parsing**: Validates frontmatter YAML formatting
-- **Required Frontmatter**: Checks for `ln-tool-version` and `ln-tool-description`
+- **Required Frontmatter**: Checks for required fields like `version` and `description`
 - **Version Format**: Validates semantic versioning format (e.g., "1.0.0")
 - **Icon Validation**: Ensures icons are valid Lucide icons available in Obsidian
 - **JSON Schema**: Validates the tool's parameter schema in JSON code blocks
 - **JavaScript Code**: Checks code syntax and common patterns
 - **Tool Integration**: Tests if the tool can be loaded by the tool system
+- **Legacy Format Detection**: Identifies and flags deprecated `ln_` format patterns including:
+  - Deprecated `ln_` prefixed fields (like `ln_version`, `ln_description`, `ln_icon`, `ln_enabled`)
+  - Version format issues (`v1.0.0` should be `1.0.0`)
+  - Boolean format problems (`yes/no` should be `true/false`)
+  - Mixed format usage (both old `ln_` prefixes and new format together)
+  - Legacy filename patterns (`Tool-v1.md`)
+  - Old link formats (`🔎` instead of `🧭`)
 
 ### Usage:
 

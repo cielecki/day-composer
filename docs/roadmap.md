@@ -78,8 +78,8 @@ Implement an endless chat window in Obsidian with a recent messages view that in
 **Mode Switch Button Relocation:**
 Move the mode switching button closer to the text input area for improved accessibility and faster mode changes during conversations. This will enhance the user experience by reducing the distance users need to move their cursor to switch modes.
 
-**AI model aliases:**
-Implement aliases for AI models to allow users to use different model names in the mode settings. This would allow users to use different model names in the mode settings. Requires verification that lower-tier models well enough to warrant this feature.
+**AI Model Aliases:**
+Implement aliases for AI models to allow users to use custom or simplified model names in the mode settings. This would provide more flexibility in model naming and configuration. Requires verification that lower-tier models perform well enough to warrant this feature.
 
 **Fire and forget chat workflow:**
 Rethink the concept of creating a new chat for each voice message without automatically switching to it.
@@ -110,6 +110,8 @@ Investigate the possibility of an agent that activates based on cron jobs or ran
 **Passive Listening Agent:**
 Explore the ability to enter a voice-activated mode where the system waits for a wake phrase like "Hi Navigator" to start interacting. **This is only possible via external app.**
 
+**Computer Activity Monitoring and Plan Adherence:**
+Explore intelligent computer activity monitoring that tracks task adherence and discovers new tasks based on actual usage patterns. The system would analyze applications, websites, files, and time allocation to verify plan adherence, redirect users when they deviate, suggest tasks from recurring patterns, and provide productivity insights. This creates seamless integration between digital behavior tracking and personal productivity management. **Privacy and user consent would be paramount, with full control over monitored data.**
 
 ## General Notes
 

@@ -48,6 +48,21 @@ export async function validateModeFile(
 	const oldLnKeys = Object.keys(frontmatter).filter(key => key.startsWith('ln_'));
 	const hasLifeNavigatorSection = frontmatter.life_navigator !== undefined;
 	
+	// Check for version format issues
+	const version = frontmatter.version;
+	const hasVersionFormatIssue = version && typeof version === 'string' && 
+		version.trim().startsWith('v') && /^v\d+\.\d+\.\d+/.test(version.trim());
+	
+	// Check for boolean format issues (yes/no instead of true/false)
+	const booleanFields = ['enabled', 'voice_autoplay', 'expand_links'];
+	const hasBooleanFormatIssues = booleanFields.some(field => {
+		if (frontmatter[field] !== undefined) {
+			const value = String(frontmatter[field]).toLowerCase();
+			return value === 'yes' || value === 'no';
+		}
+		return false;
+	});
+	
 	if (oldLnKeys.length > 0) {
 		issues.push({
 			type: 'old_format',
@@ -64,7 +79,31 @@ export async function validateModeFile(
 		});
 	}
 	
-	const isOldFormat = oldLnKeys.length > 0 || hasLifeNavigatorSection;
+	if (hasVersionFormatIssue) {
+		const versionStr = version.trim();
+		issues.push({
+			type: 'old_format',
+			message: `Version format '${versionStr}' should not include 'v' prefix. Use '${versionStr.substring(1)}' instead.`,
+			severity: 'error'
+		});
+	}
+	
+	if (hasBooleanFormatIssues) {
+		const problemFields = booleanFields.filter(field => {
+			if (frontmatter[field] !== undefined) {
+				const value = String(frontmatter[field]).toLowerCase();
+				return value === 'yes' || value === 'no';
+			}
+			return false;
+		});
+		issues.push({
+			type: 'old_format',
+			message: `Boolean fields use old format: ${problemFields.join(', ')}. Use 'true' or 'false' instead of 'yes' or 'no'.`,
+			severity: 'error'
+		});
+	}
+	
+	const isOldFormat = oldLnKeys.length > 0 || hasLifeNavigatorSection || hasVersionFormatIssue || hasBooleanFormatIssues;
 	
 	// For new format modes, check required fields and validate known attributes
 	if (!isOldFormat) {
@@ -305,6 +344,16 @@ export async function validateModeFile(
 	if (content !== undefined) {
 		const frontmatterRegex = /^---\n([\s\S]*?)\n---\n?/;
 		const contentAfterFrontmatter = content.replace(frontmatterRegex, '').trim();
+		
+		// Check for old link formats (🔎 instead of 🧭)
+		const hasOldLinkFormat = /\]\]\s*🔎/.test(contentAfterFrontmatter);
+		if (hasOldLinkFormat) {
+			issues.push({
+				type: 'old_format',
+				message: 'Content uses old link expansion format (🔎). Consider updating to new format (🧭) for consistency, though 🔎 still works.',
+				severity: 'warning'
+			});
+		}
 		
 		if (!contentAfterFrontmatter) {
 			issues.push({

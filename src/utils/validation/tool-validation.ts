@@ -106,6 +106,16 @@ export async function validateToolFile(
 	const jsBlocks = extractJavaScriptBlocks(bodyContent);
 	validateJavaScriptCode(jsBlocks, issues);
 
+	// Check for old link formats in tool content (🔎 instead of 🧭)
+	const hasOldLinkFormat = /\]\]\s*🔎/.test(bodyContent);
+	if (hasOldLinkFormat) {
+		issues.push({
+			type: 'compatibility_warning',
+			message: 'Content uses old link expansion format (🔎). Consider updating to new format (🧭) for consistency, though 🔎 still works.',
+			severity: 'warning'
+		});
+	}
+
 	// Try to parse tool using the actual scanner
 	try {
 		const scanner = new UserDefinedToolScanner(app);
@@ -144,31 +154,66 @@ export async function validateToolFile(
 }
 
 function validateRequiredFrontmatterFields(frontmatter: Record<string, any>, issues: ToolValidationIssue[]): void {
-	// Check for required fields - support both new and old formats
-	const requiredFields = ['version', 'description']; // New format
-	const oldRequiredFields = ['ln_version', 'ln_description']; // Old format for backward compatibility
+	// Only support new format fields
+	const requiredFields = ['version', 'description'];
+	const oldFormatFields = ['ln_version', 'ln_description', 'ln_name', 'ln_icon', 'ln_enabled'];
 	
-	// Check if tool uses new format or old format
-	const hasNewFormat = requiredFields.some(field => frontmatter[field]);
-	const hasOldFormat = oldRequiredFields.some(field => frontmatter[field]);
-	
-	if (!hasNewFormat && !hasOldFormat) {
+	// Check for old format usage and generate errors
+	for (const oldField of oldFormatFields) {
+		if (frontmatter[oldField] !== undefined) {
+			const newField = oldField.replace('ln_', '');
+			issues.push({
+				type: 'invalid_field_value',
+				field: oldField,
+				message: `Old format field '${oldField}' is no longer supported. Please use '${newField}' instead.`,
+				severity: 'error'
+			});
+		}
+	}
+
+	// Check for version format inconsistencies
+	const version = frontmatter.version;
+	if (version && typeof version === 'string') {
+		const versionStr = version.trim();
+		if (versionStr.startsWith('v') && /^v\d+\.\d+\.\d+/.test(versionStr)) {
+			issues.push({
+				type: 'invalid_field_value',
+				field: 'version',
+				message: `Version format '${versionStr}' should not include 'v' prefix. Use '${versionStr.substring(1)}' instead.`,
+				severity: 'error'
+			});
+		}
+	}
+
+	// Check for boolean format issues
+	const booleanFields = ['enabled'];
+	for (const field of booleanFields) {
+		if (frontmatter[field] !== undefined) {
+			const value = String(frontmatter[field]).toLowerCase();
+			if (value === 'yes' || value === 'no') {
+				issues.push({
+					type: 'invalid_field_value',
+					field: field,
+					message: `Boolean field '${field}' uses old format '${value}'. Use 'true' or 'false' instead.`,
+					severity: 'error'
+				});
+			}
+		}
+	}
+
+	// Check for mixed format usage (using both old and new)
+	const hasOldFormat = oldFormatFields.some(field => frontmatter[field] !== undefined);
+	const hasNewFormat = requiredFields.some(field => frontmatter[field] !== undefined);
+	if (hasOldFormat && hasNewFormat) {
 		issues.push({
-			type: 'missing_required_field',
-			message: `Missing required fields. Please add either new format (${requiredFields.join(', ')}) or old format (${oldRequiredFields.join(', ')})`,
+			type: 'invalid_field_value',
+			message: 'Mixed format usage detected. Remove all old format fields (ln_*) and use only new format fields.',
 			severity: 'error'
-		});
-	} else if (hasOldFormat && !hasNewFormat) {
-		issues.push({
-			type: 'compatibility_warning',
-			message: `Tool uses old ln_ format. Consider updating to new format: ${oldRequiredFields.map((old, i) => `${old} → ${requiredFields[i]}`).join(', ')}`,
-			severity: 'warning'
 		});
 	}
 	
-	// Check for missing fields in the format being used
-	const fieldsToCheck = hasNewFormat ? requiredFields : oldRequiredFields;
-	for (const field of fieldsToCheck) {
+	// Check for required fields (new format only)
+	for (const field of requiredFields) {
 		if (!frontmatter[field]) {
 			issues.push({
 				type: 'missing_required_field',
@@ -192,8 +237,7 @@ function validateRequiredFrontmatterFields(frontmatter: Record<string, any>, iss
 		}
 	}
 
-	// Check version format - support both old and new formats
-	const version = frontmatter.version || frontmatter.ln_version;
+	// Check version format (new format only)
 	if (version) {
 		const versionStr = String(version).trim();
 		if (!/^\d+\.\d+\.\d+/.test(versionStr)) {
@@ -212,8 +256,8 @@ function validateRequiredFrontmatterFields(frontmatter: Record<string, any>, iss
 		}
 	}
 
-	// Validate name field (new format) or extract from description (old format)
-	const name = frontmatter.name || frontmatter.ln_name;
+	// Validate name field (new format only)
+	const name = frontmatter.name;
 	if (name) {
 		if (typeof name !== 'string') {
 			issues.push({
@@ -235,14 +279,11 @@ function validateRequiredFrontmatterFields(frontmatter: Record<string, any>, iss
 		}
 	}
 
-	// Check optional fields - support both old and new formats
-	const icon = frontmatter.icon || frontmatter.ln_icon;
+	// Check optional fields (new format only)
+	const icon = frontmatter.icon;
 	if (icon) {
-		// Determine which field format is being used
-		const fieldName = frontmatter.icon ? 'icon' : 'ln_icon';
-		
 		// Validate the icon using Lucide icon validation
-		const iconValidation = validateIconField(icon, fieldName, false);
+		const iconValidation = validateIconField(icon, 'icon', false);
 		if (iconValidation.isValid) {
 			issues.push({
 				type: 'info',
@@ -260,7 +301,7 @@ function validateRequiredFrontmatterFields(frontmatter: Record<string, any>, iss
 		});
 	}
 
-	const enabled = frontmatter.enabled !== undefined ? frontmatter.enabled : frontmatter.ln_enabled;
+	const enabled = frontmatter.enabled;
 	if (enabled !== undefined) {
 		if (typeof enabled === 'boolean') {
 			issues.push({
@@ -704,8 +745,24 @@ export function validateToolFileSync(
 	
 	const frontmatter = metadata?.frontmatter || {};
 	
-	// Basic required field checks
-	if (!frontmatter.name && !frontmatter.ln_name) {
+	// Check for old format fields and generate errors
+	const oldFormatFields = ['ln_version', 'ln_description', 'ln_name', 'ln_icon', 'ln_enabled'];
+	for (const oldField of oldFormatFields) {
+		if (frontmatter[oldField] !== undefined) {
+			const newField = oldField.replace('ln_', '');
+			issues.push({
+				type: 'invalid_field_value',
+				field: oldField,
+				message: `Old format field '${oldField}' is no longer supported. Please use '${newField}' instead.`,
+				severity: 'error'
+			});
+		}
+	}
+	
+
+	
+	// Basic required field checks (new format only)
+	if (!frontmatter.name) {
 		issues.push({
 			type: 'missing_required_field',
 			field: 'name',
@@ -714,11 +771,20 @@ export function validateToolFileSync(
 		});
 	}
 	
-	if (!frontmatter.description && !frontmatter.ln_description) {
+	if (!frontmatter.description) {
 		issues.push({
 			type: 'missing_required_field',
 			field: 'description',
 			message: 'Tool description is required',
+			severity: 'error'
+		});
+	}
+	
+	if (!frontmatter.version) {
+		issues.push({
+			type: 'missing_required_field',
+			field: 'version',
+			message: 'Tool version is required',
 			severity: 'error'
 		});
 	}

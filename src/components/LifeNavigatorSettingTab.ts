@@ -2,6 +2,7 @@ import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { App, PluginSettingTab, Setting, Notice, Modal, getIcon } from 'obsidian';
 import { getStore } from '../store/plugin-store';
 import { t } from 'src/i18n';
+import { closeCurrentSettingsModal } from '../utils/ui/modal-utils';
 
 export class LifeNavigatorSettingTab extends PluginSettingTab {
 	plugin: LifeNavigatorPlugin;
@@ -275,19 +276,30 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 	async refreshUserToolsDisplay(): Promise<void> {
 		this.userToolsContainer.empty();
 		
-		// Check for validation issues and show fix button if needed
+		// Check for validation issues and show fix button if needed - MOVED ABOVE TOOLS LIST
 		const store = getStore();
 		const invalidTools = store.validation.invalidTools;
 		
 		if (invalidTools.length > 0) {
-			const validationContainer = this.userToolsContainer.createEl('div', {
-				cls: 'setting-item',
-				attr: { style: 'border: 1px solid var(--color-orange); border-radius: 6px; padding: 12px; margin: 8px 0; background: var(--background-modifier-warning);' }
+			// Create validation section with standard styling - ABOVE the tools list
+			const validationSection = this.userToolsContainer.createEl('div', {
+				cls: 'setting-item-description',
+				attr: { 
+					style: 'margin-bottom: 16px; padding: 12px; background: var(--background-secondary); border-radius: 6px; border-left: 3px solid var(--color-orange);' 
+				}
 			});
 			
-			const warningHeader = validationContainer.createEl('div', {
-				attr: { style: 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;' }
+			// Horizontal layout: message on left, button on right
+			const validationContent = validationSection.createEl('div', {
+				attr: { style: 'display: flex; align-items: center; justify-content: space-between; gap: 12px;' }
 			});
+			
+			// Left side: warning message
+			const messageSection = validationContent.createEl('div', {
+				attr: { style: 'display: flex; align-items: center; gap: 8px; flex: 1;' }
+			});
+			
+			messageSection.createEl('span', { text: '⚠️' });
 			
 			const toolIssuesFound = invalidTools.length === 1 ? t('validation.toolIssuesFound.singular', {
 				count: invalidTools.length,
@@ -296,33 +308,26 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			}) : t('validation.toolIssuesFound.many', {
 				count: invalidTools.length,
 			}));
-
-			const fixToolsButton = invalidTools.length === 1 ? t('validation.fixTools.buttonSettings.singular', {
-				count: invalidTools.length,
-			}) : (invalidTools.length >= 2 && invalidTools.length <= 4 ? t('validation.fixTools.buttonSettings.few', {
-				count: invalidTools.length,
-			}) : t('validation.fixTools.buttonSettings.many', {
-				count: invalidTools.length,
-			}));
 			
-			warningHeader.createEl('span', { text: '⚠️' });
-			warningHeader.createEl('strong', { 
-				text: toolIssuesFound
+			messageSection.createEl('span', { 
+				text: toolIssuesFound,
+				attr: { style: 'color: var(--text-normal);' }
 			});
 			
-			const fixBtn = validationContainer.createEl('button', {
+			// Right side: fix button
+			const fixToolsButton = t('validation.fixTools.buttonSettings');
+			
+			const fixBtn = validationContent.createEl('button', {
 				text: fixToolsButton,
 				attr: { 
-					style: 'padding: 6px 12px; background: var(--interactive-accent); color: white; border: none; border-radius: 4px; cursor: pointer;'
+					style: 'padding: 6px 12px; background: var(--interactive-accent); color: white; border: none; border-radius: 4px; cursor: pointer; flex-shrink: 0;'
 				}
 			});
 			
-			// Add wrench emoji before text
-			fixBtn.prepend('🔧 ');
-			
 			fixBtn.addEventListener('click', () => {
-				// Close settings by navigating away (Obsidian will close settings tab)
+				// Set active mode and add message first
 				store.setActiveModeWithPersistence(':prebuilt:guide');
+				
 				// Format file paths nicely - show first 5 and indicate if there are more
 				const toolPathsFormatted = invalidTools.length <= 5 
 					? invalidTools.join(', ')
@@ -338,8 +343,8 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 
 				store.addUserMessage(fixToolsMessage);
 				
-				// Close settings tab by navigating to main view
-				this.app.workspace.getLeaf().detach();
+				// Close the settings modal properly
+				closeCurrentSettingsModal();
 			});
 		}
 		
@@ -372,7 +377,7 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			
 			const toolContainer = this.userToolsContainer.createEl('div', {
 				cls: 'setting-item',
-				attr: { style: 'border: 1px solid var(--background-modifier-border); border-radius: 6px; padding: 12px; margin: 8px 0;' }
+				attr: { style: 'border: 0px; border-radius: 6px; padding: 12px; margin: 8px 0;' }
 			});
 
 			// Tool header with icon and name
@@ -431,17 +436,7 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			toolInfo.addEventListener('click', async () => {
 				try {
 					// Close the settings modal first
-					const settingsModal = document.querySelector('.modal-container');
-					if (settingsModal) {
-						// Find and click the close button or trigger close
-						const closeBtn = settingsModal.querySelector('.modal-close-button') as HTMLElement;
-						if (closeBtn) {
-							closeBtn.click();
-						} else {
-							// Fallback: remove modal manually
-							settingsModal.remove();
-						}
-					}
+					closeCurrentSettingsModal();
 
 					// Small delay to ensure modal is closed before opening file
 					setTimeout(async () => {
@@ -458,7 +453,7 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 
 			// Controls - only approval management
 			const controlsEl = toolContainer.createEl('div', {
-				attr: { style: 'display: flex; gap: 8px; align-items: center; margin-top: 8px;' }
+				attr: { style: 'display: flex; gap: 8px; align-items: center;' }
 			});
 
 			// Approve/Revoke button

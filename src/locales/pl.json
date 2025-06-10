@@ -139,8 +139,8 @@
     "userTools": {
       "list": {
         "controls": {
-          "approve": "Zatwierdź Narzędzie",
-          "revoke": "Cofnij Zatwierdzenie"
+          "approve": "Zatwierdź narzędzie",
+          "revoke": "Cofnij zatwierdzenie"
         },
         "noManager": "Menedżer narzędzi użytkownika nie został zainicjowany. Spróbuj uruchomić ponownie Obsidian.",
         "noTools": "Nie znaleziono narzędzi zdefiniowanych przez użytkownika. Użyj trybu Tool Creator, aby tworzyć niestandardowe narzędzia poprzez rozmowę.",
@@ -550,20 +550,16 @@
   },
   "validation": {
     "fixModes": {
-      "button": {
-        "few": "Napraw Tryby",
-        "many": "Napraw Tryby",
-        "singular": "Napraw Tryb"
-      },
+      "button": "Napraw",
       "description": {
         "few": "Kilka trybów ma błędy walidacji, które wymagają naprawy.",
         "many": "Wiele trybów ma błędy walidacji, które wymagają naprawy.",
         "singular": "Tryb ma błędy walidacji, które wymagają naprawy."
       },
       "message": {
-        "few": "Pomóż mi naprawić błędy walidacji w kilku plikach trybów. Te tryby mają błędy walidacji, które wymagają naprawy.",
-        "many": "Pomóż mi naprawić błędy walidacji w wielu plikach trybów. Te tryby mają błędy walidacji, które wymagają naprawy.",
-        "singular": "Pomóż mi naprawić błędy walidacji w pliku trybu. Ten tryb ma błędy walidacji, które wymagają naprawy."
+        "few": "Pomóż mi naprawić błędy walidacji w plikach trybów: {{filePaths}}. Te tryby mają błędy walidacji, które wymagają naprawy.",
+        "many": "Pomóż mi naprawić błędy walidacji w plikach trybów: {{filePaths}}. Te tryby mają błędy walidacji, które wymagają naprawy.",
+        "singular": "Pomóż mi naprawić błędy walidacji w pliku trybu \"{{filePaths}}\". Ten tryb ma błędy walidacji, które wymagają naprawy."
       }
     },
     "fixSpecificMode": {
@@ -572,24 +568,16 @@
       "message": "Pomóż mi naprawić błędy walidacji w pliku trybu \"{{filePath}}\". Ten plik trybu ma błędy walidacji, które wymagają naprawy."
     },
     "fixTools": {
-      "button": {
-        "few": "Napraw Narzędzia",
-        "many": "Napraw Narzędzia",
-        "singular": "Napraw Narzędzie"
-      },
-      "buttonSettings": {
-        "few": "Napraw Narzędzia w Ustawieniach",
-        "many": "Napraw Narzędzia w Ustawieniach",
-        "singular": "Napraw Narzędzie w Ustawieniach"
-      },
+      "button": "Napraw",
+      "buttonSettings": "Napraw",
       "description": {
         "few": "Kilka narzędzi ma błędy walidacji, które wymagają naprawy.",
         "many": "Wiele narzędzi ma błędy walidacji, które wymagają naprawy.",
         "singular": "Narzędzie ma błędy walidacji, które wymagają naprawy."
       },
       "message": {
-        "few": "Pomóż mi naprawić błędy walidacji w kilku plikach narzędzi: {{filePaths}}. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
-        "many": "Pomóż mi naprawić błędy walidacji w wielu plikach narzędzi: {{filePaths}}. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
+        "few": "Pomóż mi naprawić błędy walidacji w plikach narzędzi: {{filePaths}}. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
+        "many": "Pomóż mi naprawić błędy walidacji w plikach narzędzi: {{filePaths}}. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
         "singular": "Pomóż mi naprawić błędy walidacji w pliku narzędzia \"{{filePaths}}\". To narzędzie ma błędy walidacji, które wymagają naprawy."
       }
     },

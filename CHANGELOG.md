@@ -2,6 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
+
 ## [0.10.6] - 2025-06-06
 
 ### Added
@@ -308,10 +309,29 @@ change: enforce thinking in claude, as it's needed for handover to work
 ### Fixed
 - **Task editing navigation**: Fixed issue where editing a task would cause the entire file to be selected instead of just the modified task. The problem was that navigation targets were calculated using the old document structure instead of the updated one after task modification.
 
-
 ### Added
 - **Expand Life Navigator links in note reading**: The note_read tool now supports an optional `expand_links` parameter that expands special Life Navigator links (like `[[ln-day-note-(-1)]] 🧭`, `[[ln-current-date-and-time]] 🧭`) when reading files. This allows AI to access dynamic content when analyzing notes.
 
 ### Changed
 - **In-Chat Error Handling:**
 Replace popup notifications with in-chat error messages for better user experience and context preservation. When API key errors, authentication failures, or other system errors occur, display them as special error messages directly in the chat interface instead of disruptive popup notifications. This would keep error information accessible within the conversation context, allow users to reference errors while troubleshooting, and maintain a smoother conversational flow without interrupting the user's workflow.
+
+### Enhanced
+- **Improved validation issues display in settings**: Validation issues for tools are now shown in a cleaner, more professional format above the tools list rather than mixed in with individual tools. The fix button is now positioned on the right side for better visual hierarchy, and the styling uses standard Obsidian design patterns instead of the prominent orange border.
+
+
+### Fixed
+- **Fix tools button in settings**: The "Fix tools" button in settings now properly closes the settings modal when clicked, instead of just processing in the background
+
+### Enhanced
+- **Improved old format detection**: Enhanced tool and mode validation systems to better detect deprecated `ln_` format patterns and provide clearer migration guidance:
+  - **Deprecated `ln_` fields**: Detects and flags old format fields like `ln_version`, `ln_description`, `ln_name`, `ln_icon`, `ln_enabled` with clear instructions to remove the `ln_` prefix
+  - **Format inconsistencies**: Flags version formats with 'v' prefix (`v1.0.0` → `1.0.0`) and boolean formats using `yes/no` instead of `true/false`
+  - **Mixed format usage**: Detects when both old `ln_` prefixes and new format fields are used together
+  - **Legacy filename patterns**: Warns about files with version suffixes like `Tool-v1.md`
+  - **Old link formats**: Identifies usage of `🔎` instead of `🧭` (shows as warning since both work)
+  This focused detection helps users migrate from deprecated `ln_` patterns to the current format
+
+### Changed
+- **Simplified fix buttons**: Fix buttons now use a simple "Fix" / "Napraw" label instead of complex pluralization, making the interface cleaner and more straightforward
+- **Code cleanup**: Eliminated duplicate modal closing code by creating a reusable utility function, improving code maintainability and reducing duplication

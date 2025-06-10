@@ -550,20 +550,16 @@
   },
   "validation": {
     "fixModes": {
-      "button": {
-        "few": "Fix Modes",
-        "many": "Fix Modes",
-        "singular": "Fix Mode"
-      },
+      "button": "Fix",
       "description": {
         "few": "Multiple modes have validation issues that need to be resolved.",
         "many": "Multiple modes have validation issues that need to be resolved.",
         "singular": "A mode has validation issues that need to be resolved."
       },
       "message": {
-        "few": "Help me fix validation issues with multiple mode files. These modes have validation errors that need to be resolved.",
-        "many": "Help me fix validation issues with multiple mode files. These modes have validation errors that need to be resolved.",
-        "singular": "Help me fix validation issues with a mode file. This mode has validation errors that need to be resolved."
+        "few": "Help me fix validation issues with mode files: {{filePaths}}. These modes have validation errors that need to be resolved.",
+        "many": "Help me fix validation issues with mode files: {{filePaths}}. These modes have validation errors that need to be resolved.",
+        "singular": "Help me fix validation issues with a mode file \"{{filePaths}}\". This mode has validation errors that need to be resolved."
       }
     },
     "fixSpecificMode": {
@@ -572,25 +568,17 @@
       "message": "Help me fix validation issues with the mode file \"{{filePath}}\". This mode file has validation errors that need to be resolved."
     },
     "fixTools": {
-      "button": {
-        "few": "Fix Tools",
-        "many": "Fix Tools",
-        "singular": "Fix Tool"
-      },
-      "buttonSettings": {
-        "few": "Fix Tools in Settings",
-        "many": "Fix Tools in Settings",
-        "singular": "Fix Tool in Settings"
-      },
+      "button": "Fix",
+      "buttonSettings": "Fix",
       "description": {
         "few": "Multiple tools have validation issues that need to be resolved.",
         "many": "Multiple tools have validation issues that need to be resolved.",
         "singular": "A tool has validation issues that need to be resolved."
       },
       "message": {
-        "few": "Help me fix validation issues with multiple tool files: {{filePaths}}. These tools have validation errors that need to be resolved.",
-        "many": "Help me fix validation issues with multiple tool files: {{filePaths}}. These tools have validation errors that need to be resolved.",
-        "singular": "Help me fix validation issues with the tool file \"{{filePaths}}\". This tool has validation errors that need to be resolved."
+        "few": "Help me fix validation issues with tool files: {{filePaths}}. These tools have validation errors that need to be resolved.",
+        "many": "Help me fix validation issues with tool files: {{filePaths}}. These tools have validation errors that need to be resolved.",
+        "singular": "Help me fix validation issues with a tool file \"{{filePaths}}\". This tool has validation errors that need to be resolved."
       }
     },
     "helpButton": {

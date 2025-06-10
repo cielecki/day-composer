@@ -76,23 +76,11 @@ export const ValidationFixButton: React.FC<ValidationFixButtonProps> = ({
 	const getButtonText = () => {
 		switch (type) {
 			case 'modes':
-				return invalidModes.length === 1 ? t('validation.fixModes.button.singular', {
-					count: invalidModes.length,
-				}) : (invalidModes.length >= 2 && invalidModes.length <= 4 ? t('validation.fixModes.button.few', {
-					count: invalidModes.length,
-				}) : t('validation.fixModes.button.many', {
-					count: invalidModes.length,
-				}));
+				return t('validation.fixModes.button');
 			case 'tools':
-				return invalidTools.length === 1 ? t('validation.fixTools.button.singular', {
-					count: invalidTools.length,
-				}) : (invalidTools.length >= 2 && invalidTools.length <= 4 ? t('validation.fixTools.button.few', {
-					count: invalidTools.length,
-				}) : t('validation.fixTools.button.many', {
-					count: invalidTools.length,
-				}));
+				return t('validation.fixTools.button');
 			case 'specific-mode':
-				return t('validation.fixSpecificMode.button', {});
+				return t('validation.fixSpecificMode.button');
 		}
 	};
 	
