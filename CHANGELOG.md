@@ -335,3 +335,6 @@ Replace popup notifications with in-chat error messages for better user experien
 ### Changed
 - **Simplified fix buttons**: Fix buttons now use a simple "Fix" / "Napraw" label instead of complex pluralization, making the interface cleaner and more straightforward
 - **Code cleanup**: Eliminated duplicate modal closing code by creating a reusable utility function, improving code maintainability and reducing duplication
+
+### Added
+- **Auto-opening on first setup**: Life Navigator now automatically opens when the plugin is first enabled or when setup is incomplete, providing better onboarding UX and guiding users directly to the setup flow without requiring them to find and click the compass icon

@@ -53,10 +53,9 @@
 ## Step 4: **Open Life Navigator and Complete Setup**
 
 - Open Life Navigator:
-    - Close the settings window
-    - The graph view in the center of your screen is not needed, you can close it.
-    - In the left ribbon of Obsidian, find a new compass icon labeled "Life Navigator"
-    - Click it to open the plugin's side panel
+    - **Automatic opening**: Life Navigator will automatically open its side panel when you first enable the plugin, so you can start setup immediately
+    - **Manual opening** (if needed): If Life Navigator doesn't open automatically, close the settings window first, then find the compass icon labeled "Life Navigator" in the left ribbon of Obsidian and click it to open the plugin's side panel
+    - You can close the graph view in the center of your screen if it's not needed
 - Complete the guided setup:
     Life Navigator will now guide you through a step-by-step setup process of choosing a language, setting up your initial content and configuring API keys. Once setup is complete, you'll have immediate access to Life Navigator Guide Mode in chat, just press Start in order to continue your own personalised setup using AI.
 

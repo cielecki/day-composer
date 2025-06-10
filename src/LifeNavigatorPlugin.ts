@@ -7,13 +7,14 @@ import { getObsidianTools, resetObsidianTools } from './obsidian-tools';
 import { LifeNavigatorSettingTab } from './components/LifeNavigatorSettingTab';
 import { UserDefinedToolManager } from './services/UserDefinedToolManager';
 import { cleanupStore, initializeStore } from './store/store-initialization';
-import { usePluginStore } from './store/plugin-store';
+import { usePluginStore, getStore } from './store/plugin-store';
 
 export class LifeNavigatorPlugin extends Plugin {
 	private static _instance: LifeNavigatorPlugin | null = null;
 	
 	view: LifeNavigatorView | null = null;
 	userToolManager: UserDefinedToolManager | null = null;
+	private setupChangeSubscription: (() => void) | null = null;
 
 	static getInstance(): LifeNavigatorPlugin {
 		if (!LifeNavigatorPlugin._instance) {
@@ -41,6 +42,41 @@ export class LifeNavigatorPlugin extends Plugin {
 
 		// Initialize Zustand store
 		await initializeStore();
+
+		// Auto-open Life Navigator if setup is incomplete (language not configured)
+		this.app.workspace.onLayoutReady(() => {
+			const store = getStore();
+			const needsSetup = !store.getObsidianLanguageConfigured();
+			
+			if (needsSetup) {
+				console.debug("Auto-opening Life Navigator for setup");
+				// Small delay to ensure UI is stable
+				setTimeout(() => {
+					this.autoOpenForSetup();
+				}, 1000);
+			}
+
+			// Subscribe to language configuration changes for dynamic auto-opening
+			this.setupChangeSubscription = usePluginStore.subscribe(
+				(state) => {
+					try {
+						return state.getObsidianLanguageConfigured();
+					} catch {
+						return true; // Assume configured if error reading
+					}
+				},
+				(hasLanguageConfigured: boolean, prevHasLanguageConfigured: boolean) => {
+					// If language configuration changed from true to false (tutorial reset)
+					if (prevHasLanguageConfigured && !hasLanguageConfigured) {
+						console.debug("Language configuration reset, auto-opening Life Navigator for setup");
+						setTimeout(() => {
+							this.autoOpenForSetup();
+						}, 500);
+					}
+				},
+				{ fireImmediately: false }
+			);
+		});
 
 		// Initialize the obsidian tools with this plugin instance
 		getObsidianTools();
@@ -217,6 +253,12 @@ export class LifeNavigatorPlugin extends Plugin {
 		// Save any pending changes immediately before unloading
 		await usePluginStore.getState().saveImmediatelyIfNeeded(false);
 		
+		// Cleanup setup change subscription
+		if (this.setupChangeSubscription) {
+			this.setupChangeSubscription();
+			this.setupChangeSubscription = null;
+		}
+		
 		// Cleanup user-defined tools manager
 		if (this.userToolManager) {
 			this.userToolManager.cleanup();
@@ -232,5 +274,37 @@ export class LifeNavigatorPlugin extends Plugin {
 		}
 		
 		resetObsidianTools();
+	}
+
+	private async autoOpenForSetup(): Promise<void> {
+		try {
+			// Check if the view is already open in a leaf
+			const leaves = this.app.workspace.getLeavesOfType(LIFE_NAVIGATOR_VIEW_TYPE);
+
+			if (leaves.length > 0) {
+				// View is already open, just focus on it
+				const viewLeaf = leaves[0];
+				this.app.workspace.revealLeaf(viewLeaf);
+				return;
+			}
+
+			// Open the view in a new leaf
+			const rightLeaf = this.app.workspace.getRightLeaf(false);
+			if (rightLeaf) {
+				await rightLeaf.setViewState({
+					type: LIFE_NAVIGATOR_VIEW_TYPE,
+					active: true,
+					state: {
+						initialMessages: [],
+					},
+				});
+
+				// Reveal the leaf
+				this.app.workspace.revealLeaf(rightLeaf);
+			}
+		} catch (error) {
+			console.error("Error auto-opening Life Navigator for setup:", error);
+			// Fail silently to avoid disrupting user experience
+		}
 	}
 }
