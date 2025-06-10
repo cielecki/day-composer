@@ -588,9 +588,9 @@
         "singular": "A tool has validation issues that need to be resolved."
       },
       "message": {
-        "few": "Help me fix validation issues with multiple tool files. These tools have validation errors that need to be resolved.",
-        "many": "Help me fix validation issues with multiple tool files. These tools have validation errors that need to be resolved.",
-        "singular": "Help me fix validation issues with a tool file. This tool has validation errors that need to be resolved."
+        "few": "Help me fix validation issues with multiple tool files: {{filePaths}}. These tools have validation errors that need to be resolved.",
+        "many": "Help me fix validation issues with multiple tool files: {{filePaths}}. These tools have validation errors that need to be resolved.",
+        "singular": "Help me fix validation issues with the tool file \"{{filePaths}}\". This tool has validation errors that need to be resolved."
       }
     },
     "helpButton": {

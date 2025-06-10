@@ -3,6 +3,8 @@ import { LNMode } from "../../types/mode";
 import { TTS_VOICES, TTSVoice } from "src/store/audio-slice";
 import { ANTHROPIC_MODELS, AnthropicModel } from "../modes/ln-mode-defaults";
 import { validateIconField } from "./lucide-icon-validation";
+import { expandLinks } from "../links/expand-links";
+import { LifeNavigatorPlugin } from "../../LifeNavigatorPlugin";
 
 export interface ModeValidationResult {
 	isValid: boolean;
@@ -19,11 +21,11 @@ export interface ModeValidationIssue {
 /**
  * Validates a mode file and returns all detected issues
  */
-export function validateModeFile(
+export async function validateModeFile(
 	file: TFile,
 	metadata: CachedMetadata | null,
 	content?: string
-): ModeValidationResult {
+): Promise<ModeValidationResult> {
 	const issues: ModeValidationIssue[] = [];
 	
 	// Check if this has the required ln-mode tag
@@ -310,39 +312,30 @@ export function validateModeFile(
 				message: 'Mode file has no system prompt content after frontmatter',
 				severity: 'warning'
 			});
+		} else {
+			// Test system prompt generation if expand_links is enabled
+			const expandLinksEnabled = frontmatter.expand_links !== undefined 
+				? String(frontmatter.expand_links).toLowerCase() === 'true'
+				: true; // Default is true
+			
+			if (expandLinksEnabled) {
+				try {
+					const plugin = LifeNavigatorPlugin.getInstance();
+					if (plugin) {
+						// Test link expansion to catch errors similar to "View system prompt" button
+						await expandLinks(plugin.app, contentAfterFrontmatter);
+					}
+				} catch (error) {
+					// Errors during link expansion (e.g., unresolved links, missing files)
+					const errorMessage = error instanceof Error ? error.message : String(error);
+					issues.push({
+						type: 'invalid_structure',
+						message: `System prompt generation failed: ${errorMessage}`,
+						severity: 'error'
+					});
+				}
+			}
 		}
-	}
-	
-	const hasErrors = issues.some(issue => issue.severity === 'error');
-	
-	return {
-		isValid: !hasErrors,
-		issues
-	};
-}
-
-/**
- * Validates a parsed LNMode object
- */
-export function validateLNMode(mode: LNMode): ModeValidationResult {
-	const issues: ModeValidationIssue[] = [];
-	
-	if (!mode.name || mode.name.trim() === '') {
-		issues.push({
-			type: 'missing_required_field',
-			field: 'name',
-			message: 'Mode name is required',
-			severity: 'error'
-		});
-	}
-	
-	if (!mode.system_prompt || mode.system_prompt.trim() === '') {
-		issues.push({
-			type: 'missing_required_field',
-			field: 'system_prompt',
-			message: 'System prompt is required',
-			severity: 'error'
-		});
 	}
 	
 	const hasErrors = issues.some(issue => issue.severity === 'error');

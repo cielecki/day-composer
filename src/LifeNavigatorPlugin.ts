@@ -217,6 +217,11 @@ export class LifeNavigatorPlugin extends Plugin {
 		// Save any pending changes immediately before unloading
 		await usePluginStore.getState().saveImmediatelyIfNeeded(false);
 		
+		// Cleanup user-defined tools manager
+		if (this.userToolManager) {
+			this.userToolManager.cleanup();
+		}
+		
 		cleanupStore();
 		
 		// Clear the static instance reference

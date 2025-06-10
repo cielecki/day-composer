@@ -11,6 +11,7 @@ import { sanitizeToolName } from 'src/utils/text/string-sanitizer';
 import { validateToolFile } from '../utils/validation/tool-validation';
 import { getStore } from '../store/plugin-store';
 import { TFile } from 'obsidian';
+import { FileWatcher } from '../utils/fs/file-watcher';
 
 export class UserDefinedToolManager {
   private plugin: LifeNavigatorPlugin;
@@ -18,6 +19,7 @@ export class UserDefinedToolManager {
   private approvalManager: UserToolApprovalManager;
   private scanner: UserDefinedToolScanner;
   private secureContext: SecureExecutionContext;
+  private fileWatcher: FileWatcher | null = null;
 
   constructor(plugin: LifeNavigatorPlugin) {
     this.plugin = plugin;
@@ -30,82 +32,19 @@ export class UserDefinedToolManager {
     // Initial scan for tools
     await this.refreshTools();
 
-    // Watch for changes to tool files
-    this.plugin.registerEvent(
-      this.plugin.app.metadataCache.on('changed', async (file) => {
-        if (file.extension === 'md') {
-          // Check if this file has or had the ln-tool tag
-          const metadata = this.plugin.app.metadataCache.getFileCache(file);
-          const tags = metadata?.frontmatter?.tags || metadata?.tags || [];
-          const hasLnToolTag = Array.isArray(tags) 
-            ? tags.includes('ln-tool')
-            : tags === 'ln-tool';
-          
-          // Also check if this was previously a tool file by seeing if it's in our current tools
-          const wasToolFile = Array.from(this.tools.values()).some(tool => tool.filePath === file.path);
-          
-          if (hasLnToolTag || wasToolFile) {
-            await this.refreshTools();
-          }
-        }
-      })
-    );
+    // Create and start file watcher for tools
+    this.fileWatcher = new FileWatcher({
+      tag: 'ln-tool',
+      reloadFunction: () => this.refreshTools(),
+      debounceDelay: 2000,
+      debugPrefix: 'USER-TOOLS'
+    });
 
-    // Watch for file deletions
-    this.plugin.registerEvent(
-      this.plugin.app.vault.on('delete', async (file) => {
-        if (file.path.endsWith('.md')) {
-          // Check if this was a tool file
-          const wasToolFile = Array.from(this.tools.values()).some(tool => tool.filePath === file.path);
-          if (wasToolFile) {
-            await this.refreshTools();
-          }
-        }
-      })
-    );
+    this.fileWatcher.start();
 
-    // Watch for file creation
-    this.plugin.registerEvent(
-      this.plugin.app.vault.on('create', async (file) => {
-        if (file instanceof TFile && file.extension === 'md') {
-          // Wait for metadata to be indexed before checking for tool tags
-          setTimeout(async () => {
-            const metadata = this.plugin.app.metadataCache.getFileCache(file);
-            const tags = metadata?.frontmatter?.tags || metadata?.tags || [];
-            const hasLnToolTag = Array.isArray(tags) 
-              ? tags.includes('ln-tool')
-              : tags === 'ln-tool';
-            
-            if (hasLnToolTag) {
-              await this.refreshTools();
-            }
-          }, 100);
-        }
-      })
-    );
-
-    // Watch for file renames
-    this.plugin.registerEvent(
-      this.plugin.app.vault.on('rename', async (file, oldPath) => {
-        if (file instanceof TFile && (file.extension === 'md' || oldPath.endsWith('.md'))) {
-          // Check if the old path was a tool file or new path has tool tag
-          const wasToolFile = Array.from(this.tools.values()).some(tool => tool.filePath === oldPath);
-          
-          // Wait for metadata to be indexed before checking for tool tags
-          setTimeout(async () => {
-            const metadata = this.plugin.app.metadataCache.getFileCache(file);
-            const tags = metadata?.frontmatter?.tags || metadata?.tags || [];
-            const hasLnToolTag = Array.isArray(tags) 
-              ? tags.includes('ln-tool')
-              : tags === 'ln-tool';
-            
-            if (wasToolFile || hasLnToolTag) {
-              await this.refreshTools();
-            }
-          }, 100);
-        }
-      })
-    );
+    // Update tracked paths with current tool file paths
+    const toolFilePaths = Array.from(this.tools.values()).map(tool => tool.filePath);
+    this.fileWatcher.updateTrackedPaths(toolFilePaths);
   }
 
   async refreshTools(): Promise<void> {
@@ -124,7 +63,7 @@ export class UserDefinedToolManager {
             const content = await this.plugin.app.vault.read(file);
             
             // Validate the tool file
-            const validation = validateToolFile(file, metadata, content);
+            const validation = await validateToolFile(this.plugin.app, file, metadata, content);
             
             if (!validation.isValid) {
               invalidTools.push(tool.filePath);
@@ -152,6 +91,12 @@ export class UserDefinedToolManager {
 
       // Update obsidian tools registry
       this.updateObsidianToolsRegistry();
+      
+      // Update file watcher with current tool file paths
+      if (this.fileWatcher) {
+        const toolFilePaths = Array.from(this.tools.values()).map(tool => tool.filePath);
+        this.fileWatcher.updateTrackedPaths(toolFilePaths);
+      }
       
     } catch (error) {
       console.error('[USER-TOOLS] Failed to refresh tools:', error);
@@ -271,5 +216,17 @@ export class UserDefinedToolManager {
     this.approvalManager.revokeApproval(toolPath);
     // Refresh tools to update the registry
     this.updateObsidianToolsRegistry();
+  }
+
+  /**
+   * Clean up resources when the plugin is unloaded
+   */
+  cleanup(): void {
+    if (this.fileWatcher) {
+      this.fileWatcher.stop();
+      this.fileWatcher = null;
+    }
+    this.tools.clear();
+    console.debug('[USER-TOOLS] UserDefinedToolManager cleanup completed');
   }
 } 

@@ -1,5 +1,4 @@
 ---
-ln_mode: true
 voice: onyx
 voice_instructions: "Speak in a clear, analytical tone with slight enthusiasm when discovering interesting patterns. Use pauses for emphasis when presenting important correlations."
 icon: "trending-up"

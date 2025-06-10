@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+
+
 ## [0.10.6] - 2025-06-06
 
 ### Added
@@ -301,3 +305,6 @@ change: enforce thinking in claude, as it's needed for handover to work
 - **API error handling**: Fixed critical error where error messages were being sent to the Anthropic API with an invalid 'error_message' content type. Error messages are now converted to regular text blocks so the AI can be aware of errors and provide better assistance.
 - **Error message context**: Error messages now include the mode name when asking for help, providing better context to the AI about which mode is experiencing the problem.
 - **Error messages with fix buttons**: When link expansion errors occur (like missing `[[Backlog2]] 🧭` links), they now appear as styled error messages in the chat instead of popup notifications. Error messages include a "Fix with Guide" button that automatically switches to Guide mode and sends an appropriate help request.
+
+### Enhanced
+- **Shared file monitoring**: Improved performance by creating a reusable file watcher utility that both modes and tools systems now use with debouncing to prevent excessive reloading during rapid file changes. The utility uses a clean tag-based approach similar to the existing `hasModeTag` function, reducing code duplication and ensuring consistent behavior across both systems.

@@ -72,7 +72,7 @@ export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
         const tags = metadata?.frontmatter?.tags || [];
         const normalizedTags = Array.isArray(tags) ? tags : [tags];
         
-        if (normalizedTags.includes("ln-mode") || metadata?.frontmatter?.ln_mode) {
+        if (normalizedTags.includes("ln-mode")) {
           fileType = "mode";
         } else if (normalizedTags.includes("ln-tool")) {
           fileType = "tool";
@@ -85,9 +85,9 @@ export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
       // Validate based on type
       let result: ModeValidationResult | ToolValidationResult;
       if (fileType === "mode") {
-        result = validateModeFile(file, metadata, content);
+        result = await validateModeFile(file, metadata, content);
       } else {
-        result = validateToolFile(file, metadata, content);
+        result = await validateToolFile(plugin.app, file, metadata, content);
       }
       
       // Add navigation target

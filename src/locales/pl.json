@@ -588,9 +588,9 @@
         "singular": "Narzędzie ma błędy walidacji, które wymagają naprawy."
       },
       "message": {
-        "few": "Pomóż mi naprawić błędy walidacji w kilku plikach narzędzi. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
-        "many": "Pomóż mi naprawić błędy walidacji w wielu plikach narzędzi. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
-        "singular": "Pomóż mi naprawić błędy walidacji w pliku narzędzia. To narzędzie ma błędy walidacji, które wymagają naprawy."
+        "few": "Pomóż mi naprawić błędy walidacji w kilku plikach narzędzi: {{filePaths}}. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
+        "many": "Pomóż mi naprawić błędy walidacji w wielu plikach narzędzi: {{filePaths}}. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
+        "singular": "Pomóż mi naprawić błędy walidacji w pliku narzędzia \"{{filePaths}}\". To narzędzie ma błędy walidacji, które wymagają naprawy."
       }
     },
     "helpButton": {

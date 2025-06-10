@@ -1,19 +1,14 @@
-import { TFile, EventRef } from 'obsidian';
+import { TFile } from 'obsidian';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { getStore } from './plugin-store';
 import { getPrebuiltModes } from '../utils/modes/prebuilt-modes';
 import { extractLNModeFromFile } from '../utils/modes/extract-mode-from-file';
-import { hasModeTag } from 'src/utils/modes/has-mode-tag';
 import { LNMode } from '../types/mode';
-import { t } from 'src/i18n';
 import { validateModeFile } from '../utils/validation/mode-validation';
+import { FileWatcher } from '../utils/fs/file-watcher';
 
-// Store event references for cleanup
-let fileEventRefs: EventRef[] = [];
-// Track mode file paths to watch for changes
-let modeFilePathsSet: Set<string> = new Set();
-// Timeout for debounced loading
-let loadLNModesTimeout: NodeJS.Timeout | null = null;
+// File watcher instance for modes
+let modeFileWatcher: FileWatcher | null = null;
 
 /**
  * Initialize modes store and setup file watching
@@ -27,8 +22,8 @@ export async function initializeModesStore(): Promise<void> {
     // Load all modes
     await loadLNModes();
     
-    // Setup file watchers for mode files
-    setupModeFileWatchers();
+    // Setup file watcher for mode files
+    setupModeFileWatcher();
     
     console.debug('Modes store initialized');
   } finally {
@@ -65,14 +60,14 @@ async function loadLNModes(): Promise<void> {
       const metadata = LifeNavigatorPlugin.getInstance().app.metadataCache.getFileCache(file);
       
       // Check if this is a mode file
-      if (metadata?.frontmatter?.tags?.includes('ln-mode') || metadata?.frontmatter?.ln_mode) {
+      if (metadata?.frontmatter?.tags?.includes('ln-mode')) {
         // Read content for thorough validation
         const content = await LifeNavigatorPlugin.getInstance().app.vault.read(file);
         
 
         
         // Validate the mode file
-        const validation = validateModeFile(file, metadata, content);
+        const validation = await validateModeFile(file, metadata, content);
         
         if (!validation.isValid) {
           // Track invalid mode
@@ -95,7 +90,11 @@ async function loadLNModes(): Promise<void> {
     
     // Update mode file paths (only include file-based modes)
     const fileModeKeys = Object.keys(modesMap).filter((path) => path !== "" && !path.startsWith(':prebuilt:'));
-    modeFilePathsSet = new Set(fileModeKeys);
+    
+    // Update file watcher with tracked paths
+    if (modeFileWatcher) {
+      modeFileWatcher.updateTrackedPaths(fileModeKeys);
+    }
     
     console.debug(
       `Loaded ${Object.keys(modesMap).length} modes (${prebuiltModes.length} pre-built, ${Object.keys(modesMap).length - prebuiltModes.length} from files)`
@@ -127,111 +126,29 @@ async function loadLNModes(): Promise<void> {
 }
 
 /**
- * Debounced version of loadLNModes to prevent excessive reloading
+ * Setup file watcher for mode files using the shared FileWatcher utility
  */
-function debouncedLoadLNModes(delay: number = 300): void {
-  if (loadLNModesTimeout) {
-    clearTimeout(loadLNModesTimeout);
-  }
-  
-  loadLNModesTimeout = setTimeout(() => {
-    loadLNModes();
-    loadLNModesTimeout = null;
-  }, delay);
-}
-
-/**
- * Setup file watchers for mode files
- */
-function setupModeFileWatchers(): void {
+function setupModeFileWatcher(): void {
   const state = getStore();
   
-  // Clean up existing event references
-  fileEventRefs.forEach((ref) => LifeNavigatorPlugin.getInstance().app.vault.offref(ref));
-  fileEventRefs = [];
+  // Clean up existing watcher if any
+  if (modeFileWatcher) {
+    modeFileWatcher.stop();
+  }
   
-  // When a file is created
-  const createRef = LifeNavigatorPlugin.getInstance().app.vault.on("create", (file) => {
-    if (file instanceof TFile && file.extension === "md") {
-      // Wait for metadata to be indexed
-      setTimeout(() => {
-        if (hasModeTag(file)) {
-          debouncedLoadLNModes();
-        }
-      }, 100);
-    }
+  // Create new file watcher
+  modeFileWatcher = new FileWatcher({
+    tag: 'ln-mode',
+    reloadFunction: loadLNModes,
+    debounceDelay: 2000,
+    debugPrefix: 'MODES'
   });
-  fileEventRefs.push(createRef);
-
-  // When a file is modified
-  const modifyRef = LifeNavigatorPlugin.getInstance().app.vault.on("modify", (file) => {
-    if (file instanceof TFile && file.extension === "md") {
-      // Check if this file had or has the tag
-      const hadTag = modeFilePathsSet.has(file.path);
-
-      // Wait for metadata to be indexed
-      setTimeout(() => {
-        const hasTag = hasModeTag(file);
-        if (hadTag || hasTag) {
-          debouncedLoadLNModes();
-        }
-      }, 100);
-    }
-  });
-  fileEventRefs.push(modifyRef);
-
-  // When a file is deleted
-  const deleteRef = LifeNavigatorPlugin.getInstance().app.vault.on("delete", (file) => {
-    if (file instanceof TFile && file.extension === "md") {
-      // Check if this was a mode file
-      const wasMode = modeFilePathsSet.has(file.path);
-      console.debug(`File deleted: ${file.path}, was mode: ${wasMode}`);
-      
-      if (wasMode) {
-        console.debug("Reloading modes after mode file deletion");
-        debouncedLoadLNModes();
-      }
-    }
-  });
-  fileEventRefs.push(deleteRef);
-
-  // When a file is renamed
-  const renameRef = LifeNavigatorPlugin.getInstance().app.vault.on("rename", (file, oldPath) => {
-    if (file instanceof TFile && file.extension === "md") {
-      // Check if this was a mode file
-      const wasMode = modeFilePathsSet.has(oldPath);
-      
-      if (wasMode) {
-        debouncedLoadLNModes();
-      } else {
-        // Wait for metadata to be indexed
-        setTimeout(() => {
-          if (hasModeTag(file)) {
-            debouncedLoadLNModes();
-          }
-        }, 100);
-      }
-    }
-  });
-  fileEventRefs.push(renameRef);
-
-  // When metadata is changed
-  const metadataRef = LifeNavigatorPlugin.getInstance().app.metadataCache.on("changed", (file) => {
-    if (file instanceof TFile && file.extension === "md") {
-      // Check if this file had the tag before
-      const hadTag = modeFilePathsSet.has(file.path);
-      const hasTag = hasModeTag(file);
-
-      // Only reload if tag status changed
-      if (hadTag !== hasTag) {
-        debouncedLoadLNModes();
-      }
-    }
-  });
-  fileEventRefs.push(metadataRef);
+  
+  // Start watching
+  modeFileWatcher.start();
   
   state.setFileWatcherActive(true);
-  console.debug('Mode file watchers set up');
+  console.debug('Mode file watcher set up');
 }
 
 /**
@@ -271,23 +188,11 @@ export function getAllModes(): Record<string, LNMode> {
 export function cleanupModesStore(): void {
   const state = getStore();
   
-  // Clear any pending debounced load
-  if (loadLNModesTimeout) {
-    clearTimeout(loadLNModesTimeout);
-    loadLNModesTimeout = null;
+  // Stop file watcher
+  if (modeFileWatcher) {
+    modeFileWatcher.stop();
+    modeFileWatcher = null;
   }
-  
-  // Clean up file event listeners
-  fileEventRefs.forEach((ref) => {
-    const plugin = LifeNavigatorPlugin.getInstance();
-    if (plugin?.app?.vault) {
-      plugin.app.vault.offref(ref);
-    }
-  });
-  fileEventRefs = [];
-  
-  // Clear file paths set
-  modeFilePathsSet.clear();
   
   state.setFileWatcherActive(false);
   console.debug('Modes store cleanup completed');

@@ -18,7 +18,7 @@ export async function extractLNModeFromFile(
 		}
 
 		// Check if this is a mode file
-		if (!metadata?.frontmatter?.tags?.includes('ln-mode') && !metadata?.frontmatter?.ln_mode) {
+		if (!metadata?.frontmatter?.tags?.includes('ln-mode')) {
 			return null;
 		}
 
