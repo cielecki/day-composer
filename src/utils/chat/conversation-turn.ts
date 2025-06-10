@@ -109,7 +109,7 @@ export const runConversationTurn = async (
 					...(systemPrompt.semiDynamicSection ? [{
 						type: "text",
 						text: systemPrompt.semiDynamicSection,
-						"cache_control": cacheControlLong
+						"cache_control": cacheControlShort
 					} as Anthropic.Messages.TextBlockParam] : []),
 					...(systemPrompt.dynamicSection ? [{
 						type: "text",
