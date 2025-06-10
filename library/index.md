@@ -11,15 +11,15 @@ This index catalogs all files in the Life Navigator library with descriptions an
 
 
 
-- **Path**: `Info/About Me/Day Structure.md`
+- **Path**: `Info/Details/Day Structure.md`
 - **Description**: Comprehensive daily planning procedure with 18 specific steps covering morning routines, cornerstone habits, weekly tasks, monthly reviews, and adaptive recommendations based on behavioral patterns
 - **Use When**: User asks to plan any day, needs help with daily routine structure, wants to understand the planning methodology, or requires context about expected daily activities and habits
 
-- **Path**: `Info/About Me/Relationships.md`
+- **Path**: `Info/Details/Relationships.md`
 - **Description**: Directory of family members (James, Mary, Anna, Peter Smith), romantic relationship (Eva Johnson), close friends (Alexander, Maria, David), and professional contacts (Dr. Wilson, Sophie Johnson)
 - **Use When**: User mentions people by name, planning social activities, relationship advice, or when contextualizing social interactions and personal connections
 
-- **Path**: `Info/About Me/Role Models.md`
+- **Path**: `Info/Details/Role Models.md`
 - **Description**: List of inspirational figures (Marcus Aurelius, Naval Ravikant, Tim Ferriss, Jocko Willink, Ryan Holiday, Cal Newport, James Clear) with their key topics and example quotes for motivation and guidance
 - **Use When**: User seeks motivation, needs philosophical guidance, wants personal development advice, or requires inspiration from established thought leaders
 
@@ -135,8 +135,8 @@ This index catalogs all files in the Life Navigator library with descriptions an
 4. Current day notes (ln-day-note files) - For task context
 
 ### Context-Dependent
-- **Planning Sessions**: `Modes/Planner.md` + `Info/About Me/Day Structure.md` + `Info/Backlog.md` + day notes
-- **Personal Discussions**: `Info/About Me/` directory + `Modes/Reflection.md`
+- **Planning Sessions**: `Modes/Planner.md` + `Info/Details/Day Structure.md` + `Info/Backlog.md` + day notes
+- **Personal Discussions**: `Info/Details/` directory + `Modes/Reflection.md`
 - **Technical Help**: `Modes/Tool Creator.md` + `Tools/Template Tool.md` + `Docs/User Defined Tools.md`
 - **Research Requests**: `Tools/Deep Research Tool.md` or `Tools/YouTube Transcript Tool.md`
 - **Creative Projects**: `Modes/Songwriter.md` + `Tools/Image Generation Tool.md`
@@ -148,8 +148,8 @@ This index catalogs all files in the Life Navigator library with descriptions an
 - Weather-related queries: `Tools/Weather Tool.md`
 - Tool development: `Tools/Template Tool.md` + `Modes/Tool Creator.md` + `Docs/User Defined Tools.md`
 - Casual conversation: `Modes/Bro.md`
-- Goal setting: `Info/Backlog.md` + `Info/About Me/Role Models.md`
-- Daily routine questions: `Info/About Me/Day Structure.md`
+- Goal setting: `Info/Backlog.md` + `Info/Details/Role Models.md`
+- Daily routine questions: `Info/Details/Day Structure.md`
 - Link expansion questions: `Docs/Link Expansion.md`
 - Tool usage questions: `Docs/Tools.md`
 - Mode/tool validation: `Docs/Validation Tools.md`
@@ -159,7 +159,7 @@ This index catalogs all files in the Life Navigator library with descriptions an
 
 **Task Management**: Always include `Info/Note Format.md` and `Modes/Assistant.md`
 **Personal Advice**: Include `Info/About Me.md` and relevant relationship/role model files
-**Daily Planning**: Combine `Modes/Planner.md` with `Info/About Me/Day Structure.md` and day notes
+**Daily Planning**: Combine `Modes/Planner.md` with `Info/Details/Day Structure.md` and day notes
 **Creative Work**: Use specialized modes (`Modes/Songwriter.md`) with appropriate tools
 **Technical Support**: Load `Modes/Tool Creator.md` and `Docs/User Defined Tools.md` for development assistance
 **Reflection Sessions**: Use `Modes/Reflection.md` with personal info and recent day notes

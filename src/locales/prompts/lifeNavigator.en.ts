@@ -83,9 +83,9 @@ Mode File (system prompt)
 └── (prompt instructions)          │
                                    │
 About Me.md ←─────────────────────┘
-├── \`🧭 expand\` [[About Me/Relationships]]
-├── \`🧭 expand\` [[About Me/Role Models]]  
-├── \`🧭 expand\` [[About Me/Day Structure]]
+├── \`🧭 expand\` [[Details/Relationships]]
+├── \`🧭 expand\` [[Details/Role Models]]  
+├── \`🧭 expand\` [[Details/Day Structure]]
 └── \`🧭 expand\` [[Current Projects]]
 \`\`\`
 
@@ -128,7 +128,7 @@ When creating modes, embed these link patterns directly in the mode file content
 **Planner Mode Pattern:**
 \`\`\`
 \`🧭 expand\` [[About Me]]  
-\`🧭 expand\` [[About Me/Day Structure]]
+\`🧭 expand\` [[Details/Day Structure]]
 \`🧭 expand\` [[Current Projects]]
 \`🧭 daily_notes(-3, 0)\`
 \`🧭 current_date_time()\`
@@ -137,7 +137,7 @@ When creating modes, embed these link patterns directly in the mode file content
 **Reflection Mode Pattern:**
 \`\`\`
 \`🧭 expand\` [[About Me]]
-\`🧭 expand\` [[About Me/Role Models]]
+\`🧭 expand\` [[Details/Role Models]]
 \`🧭 daily_notes(-30, 0)\`
 \`\`\`
 

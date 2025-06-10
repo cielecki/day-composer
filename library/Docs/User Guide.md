@@ -50,17 +50,17 @@ Life Navigator features a comprehensive guided setup process that ensures you're
 - To add new information files, you MUST link them from `About Me.md` using `[[File Name]] 🧭`
 - The more relevant details you provide, the more personalized the AI's assistance becomes
 
-**About Me/Day Structure.md** - Your ideal daily routine
+**Details/Day Structure.md** - Your ideal daily routine
 - This defines how the AI plans your days when you ask for daily planning
 - Describe your preferred schedule, habits, and recurring activities
 - Example: "Morning routine: Wake at 7:00, meditation, coffee, review daily plan"
 - **Note:** This should describe your ideal day, not necessarily your current reality
 
-**About Me/Role Models.md** - Influential figures or role models
+**Details/Role Models.md** - Influential figures or role models
 - List people whose wisdom you value (historical figures, mentors, authors, etc.)
 - The Reflection mode references these when providing guidance
 
-**About Me/Relationships.md** - Important people in your life
+**Details/Relationships.md** - Important people in your life
 - Document family, friends, colleagues, and their key characteristics
 - Helps the AI understand your social context when you mention people by name
 
