@@ -253,12 +253,39 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
 
       console.debug(`Transcribing audio. Language for API: ${targetLanguageForApi}. Using prompt:`, trimmedPrompt);
       
-      const transcription = await openai.audio.transcriptions.create({
-        file: file,
-        model: 'gpt-4o-transcribe',
-        prompt: trimmedPrompt,
-        language: targetLanguageForApi,
-      }, { signal });
+      // Simpler approach - try using fetch with FormData since requestUrl might have issues
+      // Based on successful examples, use browser's native FormData API
+      console.debug('Creating FormData for OpenAI Whisper API...');
+      
+      const formData = new FormData();
+      formData.append('file', file, file.name);
+      formData.append('model', 'whisper-1');
+      formData.append('prompt', trimmedPrompt);
+      formData.append('language', targetLanguageForApi);
+      
+      console.debug('Sending request to OpenAI...');
+      
+      const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openaiApiKey}`,
+          // Don't set Content-Type - let browser set it with boundary
+        },
+        body: formData,
+        signal: signal
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('OpenAI API Error:', response.status, errorText);
+        throw new Error(`OpenAI API Error: ${response.status} - ${errorText}`);
+      }
+
+      const transcription = await response.json();
+
+      if (signal.aborted) {
+        return;
+      }
 
       console.debug('Transcribed text:', transcription.text);
       set((state) => {
@@ -272,7 +299,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
       
       // If not aborted, show error notice
       if (!signal.aborted) {
-        console.error('Error during transcription:', error);
+        console.error(error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error during transcription';
         new Notice(t('errors.audio.transcriptionFailed', { error: errorMessage }));
         throw error;
