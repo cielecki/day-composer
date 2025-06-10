@@ -130,6 +130,12 @@ Introduce support for weekly and monthly summaries via `ln-monthly-note` and `ln
 **System Prompt Context in TTS:**
 Implement system prompt injection into TTS prompt via current chat expansion so that the entire system prompt will be included in the context of text-to-speech generation. This would ensure that the AI's voice responses maintain consistency with the current mode's personality, instructions, and context, providing a more coherent and contextually aware audio experience that aligns with the written conversation flow and system configuration.
 
+**Obsidian Link Support in AI-Generated Text:**
+Add support for Obsidian's `[[]]` link syntax in AI-generated text and update analyst prompts to use this syntax. This would enable the AI to create proper internal links when generating content, making the output more integrated with Obsidian's linking system and allowing users to navigate seamlessly between AI-generated content and their existing notes.
+
+**Eleven Labs Audio Generation Prototype:**
+Develop a prototype for generating audio content using Eleven Labs' text-to-speech capabilities within Life Navigator. This would explore advanced voice synthesis options, potentially offering more natural-sounding speech, voice customization, and enhanced audio quality compared to current TTS solutions. The prototype would evaluate integration feasibility, cost-effectiveness, and user experience improvements for audio-based interactions.
+
 **Document Collaboration:**
 Enable document sharing with collaborative editing capabilities, allowing multiple users to check off todos, add notes, and see updates in real-time. This would enhance team productivity and coordination, though technical feasibility within Obsidian's architecture needs to be evaluated.
 
