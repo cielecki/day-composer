@@ -128,8 +128,6 @@ export function handleCurrentlySelectedTextLink(app: App): string {
 		const from = selection.from;
 		const to = selection.to;
 
-		console.debug(`Selection range: ${from} to ${to} in file: ${activeFile.path}`);
-
 		// Check if there's actually text selected
 		if (from === to) {
 			// No text selected

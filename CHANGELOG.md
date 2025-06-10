@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 
 
+
+
 ## [0.10.6] - 2025-06-06
 
 ### Added
@@ -308,3 +310,6 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ### Enhanced
 - **Shared file monitoring**: Improved performance by creating a reusable file watcher utility that both modes and tools systems now use with debouncing to prevent excessive reloading during rapid file changes. The utility uses a clean tag-based approach similar to the existing `hasModeTag` function, reducing code duplication and ensuring consistent behavior across both systems.
+
+### Fixed
+- **Task editing navigation**: Fixed issue where editing a task would cause the entire file to be selected instead of just the modified task. The problem was that navigation targets were calculated using the old document structure instead of the updated one after task modification.
