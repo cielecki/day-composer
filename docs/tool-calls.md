@@ -123,10 +123,10 @@ Current file and selection context:
 
 ## Migration from Special Links
 
-The new tool call system replaces old special links. **Note: Old formats are no longer supported** and will show as validation errors:
+The new tool call system replaces old special links. **⚠️ BREAKING CHANGE: Old formats are no longer supported as of version 0.11.0** and will show as validation errors:
 
-| Old Special Link | New Tool Call |
-|------------------|---------------|
+| ❌ Old Special Link (No Longer Works) | ✅ New Tool Call |
+|---------------------------------------|------------------|
 | `[[ln-current-date-and-time]] 🧭` | `` `🧭 current_date_time()` `` |
 | `[[ln-day-note-(-1)]] 🧭` | `` `🧭 daily_note(-1)` `` |
 | `[[ln-day-note-(0)]] 🧭` | `` `🧭 daily_note(0)` `` |
@@ -136,7 +136,7 @@ The new tool call system replaces old special links. **Note: Old formats are no 
 | `[[ln-currently-selected-text]] 🧭` | `` `🧭 current_file_and_selection()` `` |
 | `[[About Me]] 🧭` | `` `🧭 expand` [[About Me]] `` |
 
-The new format provides a cleaner, more consistent syntax.
+The new format provides a cleaner, more consistent syntax and enables much more powerful functionality.
 
 ## Migration Detection
 

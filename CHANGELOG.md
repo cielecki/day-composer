@@ -2,6 +2,109 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+## [0.11.0] - 2025-01-08
+
+### ⚠️ IMPORTANT: Breaking Changes - Action Required
+
+**This update includes breaking changes that require you to update your existing notes and modes.** Life Navigator will help you through this process with built-in validation and fix tools.
+
+#### What Stopped Working
+Old Life Navigator link formats are **no longer supported** and will show as errors:
+
+| ❌ Old Format (No Longer Works) | ✅ New Format (Use This Instead) |
+|----------------------------------|-----------------------------------|
+| `[[ln-current-date-and-time]] 🧭` | `` `🧭 current_date_time()` `` |
+| `[[ln-day-note-(0)]] 🧭` | `` `🧭 daily_note(0)` `` |
+| `[[ln-day-note-(-1)]] 🧭` | `` `🧭 daily_note(-1)` `` |
+| `[[ln-day-note-(-7:0)]] 🧭` | `` `🧭 daily_notes(-7, 0)` `` |
+| `[[ln-currently-open-file]] 🧭` | `` `🧭 current_file_and_selection()` `` |
+| `[[ln-currently-selected-text]] 🧭` | `` `🧭 current_file_and_selection()` `` |
+| `[[ln-current-chat]] 🧭` | `` `🧭 current_chat()` `` |
+| `🔎` emoji | `🧭` emoji only |
+
+#### How to Fix Your Content
+
+**Life Navigator makes this easy with automatic detection and guided fixes:**
+
+1. **Automatic Detection**: When you open Life Navigator, it will automatically detect any old formats in your modes and notes
+2. **Fix Buttons**: You'll see "Fix" buttons throughout the interface when issues are found:
+   - In the mode dropdown when your current mode has issues
+   - In settings when tools need updating
+   - In error messages when old links are found
+3. **Click to Fix**: Simply click these "Fix" buttons - they'll switch to Guide mode and help you update your content
+4. **AI Assistance**: The AI will show you exactly what needs to change and can help make the updates
+
+#### Why This Change Benefits You
+
+The new tool call system is much more powerful and flexible:
+- **More options**: Support for calling all tools accessible by a mode directly in your notes
+- **Seamless integration**: AI can now access your current editor content and daily notes directly during conversations and  get information from your notes when needed
+- **Cleaner syntax**: `` `🧭 daily_note(-1)` `` is shorter and clearer than `[[ln-day-note-(-1)]] 🧭`
+- **Future-proof**: New system supports many more capabilities and customization
+
+### 🛠️ Migration Help - We've Got You Covered
+
+- **Smart Validation System**: Automatically scans all your modes and tools to find issues
+- **Contextual Fix Buttons**: Fix buttons appear exactly where you need them - no hunting around
+- **Detailed Error Reports**: Clear explanations of what needs changing with before/after examples  
+- **Guide Mode Integration**: All fix buttons connect to Guide mode for step-by-step assistance
+- **Validation Tool**: Use the mode validator to check any file and get detailed migration guidance
+
+### 🚀 New Powerful Tool Call System
+
+**Revolutionary way to use Life Navigator tools directly in your notes:**
+
+#### Multiple Ways to Call Tools
+```
+`🧭 current_date_time()`                    # No parameters
+`🧭 daily_note(-1)`                         # Simple parameters  
+`🧭 note_read(path="My Note.md")`           # Named parameters
+`🧭 tools_list({safe_only: true})`         # JavaScript objects
+`🧭 expand` [[Wiki Link]]                   # Special expand syntax
+```
+
+#### Smart Safety System
+- **Safe tools** (like reading dates, notes) work automatically in link expansion
+- **Potentially dangerous tools** (like creating/editing files) only work in chat conversations
+
+#### Discover Available Tools
+Have your ai use `` `🧭 tools_list()` `` to see all available tools for your current mode
+
+### 📊 Enhanced Validation & Quality Control
+
+- **Comprehensive Validation**: Automatic checking of modes and tools for completeness and correctness
+- **Icon Validation**: Ensures all mode and tool icons are valid and will display properly
+- **Parameter Validation**: Tools validate their inputs before running, preventing errors
+- **Better Error Messages**: Clear, helpful error messages instead of technical jargon
+- **Multi-language Support**: All validation messages properly translated
+
+### 🎯 User Experience Improvements
+
+- **Auto-Setup**: Life Navigator automatically opens when first installed to guide you through setup
+- **Retry Any Message**: Every AI response now has a retry button to regenerate from that point
+- **Better Error Handling**: Errors appear in chat instead of disruptive popups
+- **Improved Performance**: Better file monitoring system that responds faster to changes
+
+### 🏗️ Under the Hood Improvements
+
+- **Modernized Format**: Mode and tool files now use clean, readable attribute names (`description` instead of `ln_description`)
+- **Consistent APIs**: All note editing tools now use the same parameter names for consistency
+- **Better File Management**: Improved file watching and change detection
+- **Enhanced Internationalization**: Better support for multiple languages with proper grammar rules
+
+### 🐛 Bug Fixes
+
+- **Task Editing**: Fixed task editing to highlight only the changed task instead of the entire file
+- **Todo Display**: Fixed todo labels showing correct text after editing
+- **Navigation**: Proper navigation targeting after file modifications  
+- **Settings**: Fix buttons in settings now properly close the modal
+- **Translation**: Fixed various translation issues for non-English users
+
+---
+
+**Ready to Upgrade?** Life Navigator will guide you through the process. Look for the fix buttons and let the AI help you migrate your content to the new, more powerful format!
 
 ## [0.10.6] - 2025-06-06
 
@@ -246,130 +349,3 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ## [0.6.6] - 2025-05-22
 
-
-## [Unreleased]
-
-### Added
-- **Enhanced Tool Call System**: Revolutionary new compass-first syntax for calling tools directly in notes:
-  - **New format**: `` 🧭 tool_name(params)`` - Compass first for better readability
-  - **Expand command**: `` 🧭 expand [[Wiki Link]]`` - Special expand syntax for wiki links  
-  - **Daily note tools**: `` 🧭 daily_note(0)`` for single notes, `` 🧭 daily_notes(-3, 0)`` for ranges
-  - **Backward compatibility**: Original `` `tool_name(params)` 🧭`` format still supported
-  - Multiple parameter styles supported: zero, positional, named, JavaScript object, and mixed
-- **Tool Call Marker System**: Revolutionary new syntax for calling tools directly in notes using `` `tool_name(params)` 🧭`` format. This powerful feature supports multiple parameter styles:
-  - Zero parameters: `` `current_date_time()` 🧭``
-  - Positional parameters: `` `day_note(-1)` 🧭``
-  - Named parameters: `` `note_read(path="My Note.md", expand_links=true)` 🧭``
-  - JavaScript object syntax: `` `tools_list({safe_only: true})` 🧭``
-  - Mixed parameters: `` `note_read("My Note.md", expand_links=true)` 🧭``
-- **Safe Tool Execution in Link Expansion**: Tools are now marked with a `sideEffects` property. Only tools without side effects can be executed during link expansion, ensuring safe automatic execution while preventing unintended modifications
-- **New Core Tools**: Added essential tools that replace special link handlers:
-  - `current_date_time()` - Returns current date and time in user's locale  
-  - `day_note(offset)` - Retrieves daily notes with offset (0=today, -1=yesterday, etc.)
-  - `current_file_and_selection()` - Returns content of currently open file and selected text in XML format
-  - `current_chat()` - Returns content of the current chat conversation
-  - `tools_list()` - Lists available tools with filtering by mode and safety
-- **Comprehensive Tool Call Parser**: Advanced parser supporting all JavaScript-style parameter formats with proper JSON parsing, parameter mapping, and error handling
-- **Migration from Special Links**: All existing special links like `[[ln-current-date-and-time]] 🧭` continue to work while new tool call syntax provides more flexibility and power
-- **Automatic Link Migration**: Enhanced mode validator tool can automatically migrate old special link syntax to new tool call syntax with `migrate_links=true` parameter
-- **Tool parameter validation**: Tools now validate all parameters against their JSON schema before execution, providing clear error messages to the AI when parameters are invalid or missing. This prevents tools from running with incorrect data and improves error feedback.
-
-### Fixed
-- **Todo editing display**: Fixed issue where todo labels showed the original text instead of the new text after editing, and success messages displayed template placeholders instead of actual values
-
-### Enhanced
-- **Schema-based parameter validation**: All tool parameters are now validated for type correctness, required fields, string length constraints, number ranges, array sizes, enum values, and nested object properties. Invalid parameters are caught early with descriptive error messages.
-- **Translation cleanup script improvements**: The script now explicitly detects and warns about dynamic translation keys that break static analysis, provides clear step-by-step instructions for fixing issues, and gives specific guidance on what to do after adding new translation keys
-
-### Changed
-- **Mode attributes now use human-readable names**: Changed from `ln_` prefixes to clear names (`ln_description` → `description`, `ln_icon` → `icon`, etc.) for better readability and following Obsidian naming conventions
-- **Static error messages for old format modes**: Replaced dynamic error messages with static ones to improve translation management and prevent runtime issues
-- **Validation messages now properly translated**: Tool and mode validation completion messages show different status based on results (success, warnings, errors) with proper translations instead of hard-coded English text
-
-### Added
-- **Old format detection with guided fix**: When old `ln_` format is detected in mode files, a static error message is displayed with a button that automatically switches to guide mode and asks for help fixing the mode file formatting
-
-### Fixed
-- **Documentation examples updated**: Fixed Tool Development Guide and Tool Creator mode examples that were using outdated `ln_` format attributes, which could mislead AI when creating modes and tools
-
-### Added
-- **Comprehensive validation system**: New centralized validation for both mode and tool files that detects various issues including old format, missing fields, invalid values, and security concerns. Validation runs automatically when files are loaded and provides detailed error reports.
-- **Contextual fix buttons**: Smart fix buttons appear throughout the UI when validation issues are detected:
-  - Empty chat shows fix button for the current mode if it has validation issues
-  - Mode dropdown shows fix button for the currently selected mode if it has issues (positioned as last option before mode switching section)  
-  - Guide mode shows fix buttons for modes and tools when issues exist
-  - Settings tool section shows fix button when tool validation errors are found
-  - All buttons automatically switch to Guide mode and send appropriate help messages
-- **Enhanced validation tool**: Updated mode validator tool now supports both modes and tools with comprehensive validation using the centralized system, providing detailed reports with specific error types and severity levels.
-
-### Fixed
-- **Note editing tool parameter consistency**: Unified all note editing operations to use a single 'content' parameter instead of having separate 'content' and 'replacement_text' parameters. This makes the API more consistent and intuitive - all operations now use 'content' for the text they work with.
-
-### Enhanced
-- **Icon validation for modes and tools**: All mode and tool icons are now validated to ensure they are valid Lucide icons available in Obsidian. The validation system checks icon names and provides helpful error messages with links to the Lucide icon library when invalid icons are used.
-- **Tool attributes now use human-readable names**: Updated all tool parameters from `ln_` prefixes to clear names (`ln_description` → `description`, `ln_icon` → `icon`, `ln_version` → `version`, `ln_enabled` → `enabled`) for consistency with mode format and better readability. All library tools and documentation updated to use new format while maintaining backward compatibility.
-- **Backward compatibility**: Mode and tool files using old `ln_` format continue to work while validation system detects and reports the format issues for user awareness.
-- **Validation tracking**: Store now tracks invalid modes and tools separately, enabling targeted fix suggestions and better user experience.
-- **Improved internationalization**: Validation messages now use separate translation keys for different plural forms instead of handling pluralization in code, providing better language support and maintaining proper grammar rules for each language.
-- **Detailed validation error messages**: Validation fix buttons now show actual file paths instead of just counts, making it easier to identify which specific files need attention. Messages display up to 5 file paths and indicate when there are more files with issues.
-- **Mode validator tool translations**: Fixed hardcoded English text in the mode validator tool to use proper translation keys, ensuring all tool labels and status messages display correctly in the user's selected language.
-- **Enhanced error message interface**: Error messages now display clean icon-based buttons (retry and help) using the same styling as other interface elements, improving visual consistency and user experience
-- **Improved error message styling**: Updated error message buttons to use consistent clickable-icon styling with proper icons (life-buoy for help, rotate-ccw for retry) instead of text-based buttons
-
-### Added
-- **Retry button on all assistant messages**: Every assistant message now has a retry button that allows you to retry from that point in the conversation. The retry removes the selected message and all messages after it, then generates a new response.
-
-### Fixed
-- **API error handling**: Fixed critical error where error messages were being sent to the Anthropic API with an invalid 'error_message' content type. Error messages are now converted to regular text blocks so the AI can be aware of errors and provide better assistance.
-- **Error message context**: Error messages now include the mode name when asking for help, providing better context to the AI about which mode is experiencing the problem.
-- **Error messages with fix buttons**: When link expansion errors occur (like missing `[[Backlog2]] 🧭` links), they now appear as styled error messages in the chat instead of popup notifications. Error messages include a "Fix with Guide" button that automatically switches to Guide mode and sends an appropriate help request.
-
-### Enhanced
-- **Shared file monitoring**: Improved performance by creating a reusable file watcher utility that both modes and tools systems now use with debouncing to prevent excessive reloading during rapid file changes. The utility uses a clean tag-based approach similar to the existing `hasModeTag` function, reducing code duplication and ensuring consistent behavior across both systems.
-
-### Fixed
-- **Task editing navigation**: Fixed issue where editing a task would cause the entire file to be selected instead of just the modified task. The problem was that navigation targets were calculated using the old document structure instead of the updated one after task modification.
-
-### Added
-- **Expand Life Navigator links in note reading**: The note_read tool now supports an optional `expand_links` parameter that expands special Life Navigator links (like `[[ln-day-note-(-1)]] 🧭`, `[[ln-current-date-and-time]] 🧭`) when reading files. This allows AI to access dynamic content when analyzing notes.
-
-### Changed
-- **In-Chat Error Handling:**
-Replace popup notifications with in-chat error messages for better user experience and context preservation. When API key errors, authentication failures, or other system errors occur, display them as special error messages directly in the chat interface instead of disruptive popup notifications. This would keep error information accessible within the conversation context, allow users to reference errors while troubleshooting, and maintain a smoother conversational flow without interrupting the user's workflow.
-
-### Enhanced
-- **Improved validation issues display in settings**: Validation issues for tools are now shown in a cleaner, more professional format above the tools list rather than mixed in with individual tools. The fix button is now positioned on the right side for better visual hierarchy, and the styling uses standard Obsidian design patterns instead of the prominent orange border.
-
-
-### Fixed
-- **Fix tools button in settings**: The "Fix tools" button in settings now properly closes the settings modal when clicked, instead of just processing in the background
-
-### Enhanced
-- **Improved old format detection**: Enhanced tool and mode validation systems to better detect deprecated `ln_` format patterns and provide clearer migration guidance:
-  - **Deprecated `ln_` fields**: Detects and flags old format fields like `ln_version`, `ln_description`, `ln_name`, `ln_icon`, `ln_enabled` with clear instructions to remove the `ln_` prefix
-  - **Format inconsistencies**: Flags version formats with 'v' prefix (`v1.0.0` → `1.0.0`) and boolean formats using `yes/no` instead of `true/false`
-  - **Mixed format usage**: Detects when both old `ln_` prefixes and new format fields are used together
-  - **Legacy filename patterns**: Warns about files with version suffixes like `Tool-v1.md`
-  - **Old link formats**: Identifies usage of `🔎` instead of `🧭` (shows as warning since both work)
-  This focused detection helps users migrate from deprecated `ln_` patterns to the current format
-
-### Changed
-- **Simplified fix buttons**: Fix buttons now use a simple "Fix" / "Napraw" label instead of complex pluralization, making the interface cleaner and more straightforward
-- **Code cleanup**: Eliminated duplicate modal closing code by creating a reusable utility function, improving code maintainability and reducing duplication
-
-### Added
-- **Auto-opening on first setup**: Life Navigator now automatically opens when the plugin is first enabled or when setup is incomplete, providing better onboarding UX and guiding users directly to the setup flow without requiring them to find and click the compass icon
-
-### Changed
-- **Mode Validator Tool**: Now purely read-only - provides detailed analysis and migration recommendations without modifying files. AI must use other tools (like note_edit) to make actual changes based on validator recommendations.
-
-### ⚠️ BREAKING CHANGES
-- **Removed Old Link Format Support**: Old Life Navigator link formats are no longer supported:
-  - ❌ `[[ln-day-note-(0)]] 🧭` → ✅ `🧭 daily_note(0)`
-  - ❌ `[[ln-day-note-(-3:0)]] 🧭` → ✅ `🧭 daily_notes(-3, 0)` 
-  - ❌ `[[ln-current-date-and-time]] 🧭` → ✅ `🧭 current_date_time()`
-  - ❌ `[[ln-currently-open-file]] 🧭` → ✅ `🧭 current_file_and_selection()`
-  - ❌ `[[ln-currently-selected-text]] 🧭` → ✅ `🧭 current_file_and_selection()`
-  - ❌ `[[ln-current-chat]] 🧭` → ✅ `🧭 current_chat()`
-  - ❌ `🔎` emoji no longer supported → ✅ Use `🧭` only
-- **Validation Updates**: Mode and tool validators now report old format usage as validation errors rather than warnings. Files with old format will be marked as invalid and must be updated to the new format.
