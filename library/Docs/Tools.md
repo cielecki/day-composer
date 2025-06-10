@@ -22,6 +22,16 @@ When `auto_version` parameter is set to `true`, the tool automatically creates v
 - Reads the content of existing files in your vault
 - Allows the AI to access and reference information from your existing content
 - Essential for providing contextual assistance based on your existing content
+- **Expand Life Navigator Links**: Optional `expand_links` parameter expands special links when reading files
+
+**Link Expansion Feature:**
+When `expand_links` is set to `true`, the tool automatically expands Life Navigator links in the document:
+- `[[ln-day-note-(-1)]] 🧭` → Previous day's daily note content
+- `[[ln-current-date-and-time]] 🧭` → Current timestamp
+- `[[ln-currently-open-file]] 🧭` → Currently active file content
+- `[[ln-current-chat]] 🧭` → Current conversation context
+
+This allows AI to access dynamic, real-time content when analyzing notes, making it perfect for reviewing files that reference daily notes, current context, or other dynamic Life Navigator links.
 
 ### Edit Document
 **Tool:** `note_edit`

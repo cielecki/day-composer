@@ -2,12 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-
-
-
-
-
 ## [0.10.6] - 2025-06-06
 
 ### Added
@@ -313,3 +307,9 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ### Fixed
 - **Task editing navigation**: Fixed issue where editing a task would cause the entire file to be selected instead of just the modified task. The problem was that navigation targets were calculated using the old document structure instead of the updated one after task modification.
+
+
+### Added
+- **Expand Life Navigator links in note reading**: The note_read tool now supports an optional `expand_links` parameter that expands special Life Navigator links (like `[[ln-day-note-(-1)]] 🧭`, `[[ln-current-date-and-time]] 🧭`) when reading files. This allows AI to access dynamic content when analyzing notes.
+
+

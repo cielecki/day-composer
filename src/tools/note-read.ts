@@ -1,18 +1,24 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from 'src/types/tool-execution-context';
+import { ToolExecutionContext } from '../types/tool-execution-context';
 import { t } from 'src/i18n';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { TFile } from "obsidian";
+import { expandLinks } from 'src/utils/links/expand-links';
 
 const schema = {
   name: "note_read",
-  description: "Reads the content of a note from the vault",
+  description: "Reads the content of a note from the vault. Optionally expands Life Navigator links (like [[ln-day-note-(-1)]] 🧭) when expand_links is set to true.",
   input_schema: {
     type: "object",
     properties: {
       path: {
         type: "string",
         description: "The path of the note to read (including .md extension)",
+      },
+      expand_links: {
+        type: "boolean",
+        description: "Whether to expand Life Navigator links (like [[ln-day-note-(-1)]] 🧭, [[ln-current-date-and-time]] 🧭, etc.) in the note content. Default: false",
+        default: false
       }
     },
     required: ["path"]
@@ -20,7 +26,8 @@ const schema = {
 };
 
 type NoteReadToolInput = {
-  path: string
+  path: string;
+  expand_links?: boolean;
 }
 
 export const noteReadTool: ObsidianTool<NoteReadToolInput> = {
@@ -31,7 +38,7 @@ export const noteReadTool: ObsidianTool<NoteReadToolInput> = {
   },
   execute: async (context: ToolExecutionContext<NoteReadToolInput>): Promise<void> => {
     const { plugin, params } = context;
-    const { path } = params;
+    const { path, expand_links = false } = params;
 
     context.setLabel(t('tools.read.inProgress', { path }));
 
@@ -49,7 +56,19 @@ export const noteReadTool: ObsidianTool<NoteReadToolInput> = {
         throw new ToolExecutionError(`Path is not a file: ${path}`);
       }
 
-      const content = await plugin.app.vault.read(file);
+      let content = await plugin.app.vault.read(file);
+      
+      // Expand Life Navigator links if requested
+      if (expand_links) {
+        try {
+          content = await expandLinks(plugin.app, content);
+          context.progress(`Expanded Life Navigator links in: ${path}`);
+        } catch (error) {
+          // If link expansion fails, continue with original content but log warning
+          console.warn(`Failed to expand links in ${path}:`, error);
+          context.progress(`Warning: Failed to expand some links in: ${path}`);
+        }
+      }
       
       // Add navigation target
       context.addNavigationTarget({

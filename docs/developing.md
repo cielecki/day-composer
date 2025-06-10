@@ -137,7 +137,7 @@ Life Navigator includes several built-in tools that provide core functionality:
 - **Vault Find** (`vault_find`): Finds files and folders by name
 - **Vault Find by Tags** (`vault_find_files_by_tag`): Finds files by their tags
 - **Note Create** (`note_create`): Creates new notes
-- **Note Read** (`note_read`): Reads existing notes
+- **Note Read** (`note_read`): Reads existing notes with optional Life Navigator link expansion
 - **Note Edit** (`note_edit`): Edits note content
 - **Note Delete** (`note_delete`): Moves notes to trash
 
