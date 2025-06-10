@@ -312,4 +312,6 @@ change: enforce thinking in claude, as it's needed for handover to work
 ### Added
 - **Expand Life Navigator links in note reading**: The note_read tool now supports an optional `expand_links` parameter that expands special Life Navigator links (like `[[ln-day-note-(-1)]] 🧭`, `[[ln-current-date-and-time]] 🧭`) when reading files. This allows AI to access dynamic content when analyzing notes.
 
-
+### Changed
+- **In-Chat Error Handling:**
+Replace popup notifications with in-chat error messages for better user experience and context preservation. When API key errors, authentication failures, or other system errors occur, display them as special error messages directly in the chat interface instead of disruptive popup notifications. This would keep error information accessible within the conversation context, allow users to reference errors while troubleshooting, and maintain a smoother conversational flow without interrupting the user's workflow.
