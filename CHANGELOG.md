@@ -369,3 +369,9 @@ change: enforce thinking in claude, as it's needed for handover to work
 - Standardized naming from "Starter Pack" to "Starter Kit" throughout the codebase for consistency
 
 ## [0.6.6] - 2025-05-22
+
+## [Unreleased]
+
+### 🎯 Improved Language Setup Experience
+
+- **Simplified language selection**: Removed highlighting of currently selected language in setup screen to avoid confusion. Users can now clearly see available language options without wondering whether they need to click a highlighted selection again. The setup process is now more straightforward and intuitive.

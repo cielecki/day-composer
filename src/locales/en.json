@@ -547,7 +547,6 @@
         "title": "Configure Anthropic API Key"
       },
       "language": {
-        "currentLanguage": "Current Obsidian language:",
         "description": "Choose your preferred language. Life Navigator will work best when your language matches how you write your notes.",
         "manualRestart": "Please restart Obsidian to apply the language changes.",
         "note": "If you change languages, Obsidian will restart automatically to apply the changes.",

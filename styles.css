@@ -2169,17 +2169,6 @@ If your plugin does not need CSS, delete this file.
 }
 
 /* Language selection - simplified */
-.life-navigator-view .setup-language-info {
-	padding: 0.75rem;
-	background: var(--background-secondary);
-	border-radius: var(--radius-s);
-	border-left: 2px solid var(--interactive-accent);
-}
-
-.life-navigator-view .setup-current-language {
-	font-size: 0.9rem;
-	color: var(--text-normal);
-}
 
 .life-navigator-view .setup-language-options h3 {
 	margin: 0 0 1rem 0;
@@ -2214,10 +2203,7 @@ If your plugin does not need CSS, delete this file.
 	background: var(--background-modifier-hover);
 }
 
-.life-navigator-view .setup-language-button.current {
-	border-color: var(--interactive-accent);
-	background: var(--background-modifier-active-hover);
-}
+
 
 .life-navigator-view .language-button-content {
 	display: flex;
@@ -2232,22 +2218,7 @@ If your plugin does not need CSS, delete this file.
 	flex-grow: 1;
 }
 
-.life-navigator-view .language-current-indicator {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-left: 0.5rem;
-	opacity: 0.8;
-}
 
-.life-navigator-view .language-current {
-	font-size: 0.75rem;
-	background: var(--interactive-accent);
-	color: var(--text-on-accent);
-	padding: 0.25rem 0.5rem;
-	border-radius: var(--radius-xs);
-	margin-top: 0.25rem;
-}
 
 @media (max-width: 600px) {
 	.life-navigator-view .setup-screen-focused {

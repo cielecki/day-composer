@@ -1,17 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { t } from 'src/i18n';
 import { getStore } from '../../store/plugin-store';
 import { LucideIcon } from '../LucideIcon';
 
 export const LanguageSelectionScreen: React.FC = () => {
-	const [currentLanguage, setCurrentLanguage] = useState<string>('');
 	const [isConfiguring, setIsConfiguring] = useState(false);
-
-	// Get current Obsidian language setting
-	useEffect(() => {
-		const obsidianLang = window.localStorage.getItem('language') || 'en';
-		setCurrentLanguage(obsidianLang);
-	}, []);
 
 	const supportedLanguages = [
 		{ code: 'en', name: 'English', nativeName: 'English' },
@@ -21,6 +14,9 @@ export const LanguageSelectionScreen: React.FC = () => {
 	const handleLanguageChange = async (languageCode: string) => {
 		setIsConfiguring(true);
 		try {
+			// Get current language from Obsidian
+			const currentLanguage = window.localStorage.getItem('language');
+			
 			// Set Obsidian's language
 			window.localStorage.setItem('language', languageCode);
 			
@@ -43,31 +39,6 @@ export const LanguageSelectionScreen: React.FC = () => {
 		}
 	};
 
-	const isCurrentLanguageSupported = () => {
-		return supportedLanguages.some(lang => lang.code === currentLanguage);
-	};
-
-	const getCurrentLanguageName = () => {
-		const lang = supportedLanguages.find(l => l.code === currentLanguage);
-		return lang ? lang.nativeName : currentLanguage;
-	};
-
-	// Create available language options including current unsupported language
-	const getAvailableLanguages = () => {
-		const languages = [...supportedLanguages];
-		
-		// Add current language if it's not supported
-		if (!isCurrentLanguageSupported() && currentLanguage) {
-			languages.push({
-				code: currentLanguage,
-				name: currentLanguage,
-				nativeName: `${currentLanguage}`
-			});
-		}
-		
-		return languages;
-	};
-
 	return (
 		<div className="setup-screen-focused">
 			<div className="setup-content-focused">
@@ -82,22 +53,14 @@ export const LanguageSelectionScreen: React.FC = () => {
 				<p className="setup-description-focused">
 					{t('ui.setup.language.description')}
 				</p>
-
-				{!isCurrentLanguageSupported() && (
-					<div className="setup-language-info">
-						<div className="setup-current-language">
-							<strong>{t('ui.setup.language.currentLanguage')}</strong> {getCurrentLanguageName()}
-						</div>
-					</div>
-				)}
 				
 				<div className="setup-language-options">
 					<h3>{t('ui.setup.language.supportedLanguages')}</h3>
 					<div className="setup-language-buttons">
-						{getAvailableLanguages().map((lang) => (
+						{supportedLanguages.map((lang) => (
 							<button
 								key={lang.code}
-								className={`setup-language-button ${currentLanguage === lang.code ? 'current' : ''}`}
+								className="setup-language-button"
 								onClick={() => handleLanguageChange(lang.code)}
 								disabled={isConfiguring}
 							>
@@ -105,11 +68,6 @@ export const LanguageSelectionScreen: React.FC = () => {
 									<span className="language-name">
 										{lang.nativeName}
 									</span>
-									{currentLanguage === lang.code && (
-										<span className="language-current-indicator">
-											<LucideIcon name="check" size={16} color="var(--interactive-accent)" />
-										</span>
-									)}
 								</div>
 							</button>
 						))}
