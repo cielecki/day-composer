@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, KeyboardEvent, useCallback } from "
 import { usePluginStore } from "../store/plugin-store";
 import { t } from 'src/i18n';
 import { LucideIcon } from '../components/LucideIcon';
-import { AttachedImage } from '../types/chat-types';
+import { AttachedImage } from 'src/types/attached-image';
 
 // Define the number of samples to keep for the waveform (5 seconds at 10 samples per second)
 const WAVEFORM_HISTORY_LENGTH = 120; // 4 seconds at 30 samples per second

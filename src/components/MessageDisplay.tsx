@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ContentBlock } from '../types/chat-types';
+import { ContentBlock } from '../types/message';
 import { NavigationTarget } from '../obsidian-tools';
 import { ThinkingCollapsibleBlock, RedactedThinkingBlock as RedactedThinking, ToolBlock } from 'src/components/CollapsibleBlock';
 import { getObsidianTools } from '../obsidian-tools';
 import { usePluginStore } from '../store/plugin-store';
 import { t } from 'src/i18n';
 import { LucideIcon } from './LucideIcon';
-import { ToolResultBlock } from '../types/chat-types';
+import { ToolResultBlock } from '../types/message';
 import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface MessageDisplayProps {
@@ -19,88 +19,58 @@ interface MessageDisplayProps {
 }
 
 /**
- * Component for rendering action buttons in error messages
+ * Component for rendering fix with guide buttons in error messages
  */
-const ErrorMessageButton: React.FC<{
-  action: string;
-  icon: string;
-  label: string;
-  description: string;
-}> = ({ action, icon, label, description }) => {
+const FixWithGuideButton: React.FC<{
+  helpPrompt: string;
+  buttonText: string;
+}> = ({ helpPrompt, buttonText }) => {
   const { setActiveModeWithPersistence, addUserMessage } = usePluginStore();
 
   const handleButtonClick = async () => {
-    if (action === 'fix-mode-format') {
-      // Switch to guide mode
-      await setActiveModeWithPersistence(':prebuilt:guide');
-      
-      // Send a message to help fix the mode format
-      		const message = "I have a mode file that uses the old ln_ attribute format (like ln_description, ln_icon, etc.) and I need help updating it to the new human-readable format (description, icon, etc.). Can you help me fix this mode file formatting?";
-      
-      // Send the message
-      await addUserMessage(message, []);
-    }
+    // Switch to guide mode
+    await setActiveModeWithPersistence(':prebuilt:guide');
+    
+    // Send the fix prompt
+    await addUserMessage(helpPrompt, []);
   };
 
   return (
     <button
-      className="error-action-button"
+      className="clickable-icon"
       onClick={handleButtonClick}
-      title={description}
+      aria-label={buttonText}
+      title="Switch to Guide mode and get help fixing this issue"
     >
-      <span className="error-button-icon">{icon}</span>
-      <span className="error-button-label">{label}</span>
+      <LucideIcon name="message-circle-question" size={18} />
     </button>
   );
 };
 
 /**
- * Parses content to extract buttons and regular text
+ * Component for rendering retry buttons
  */
-function parseContentWithButtons(content: string): {
-  parts: Array<{ type: 'text' | 'button'; content: string; buttonData?: any }>;
-} {
-  const buttonRegex = /\[BUTTON:([^:]+):([^:]+):([^\]]+)\]/g;
-  const parts: Array<{ type: 'text' | 'button'; content: string; buttonData?: any }> = [];
-  
-  let lastIndex = 0;
-  let match;
-  
-  while ((match = buttonRegex.exec(content)) !== null) {
-    // Add text before button
-    if (match.index > lastIndex) {
-      const textContent = content.slice(lastIndex, match.index).trim();
-      if (textContent) {
-        parts.push({ type: 'text', content: textContent });
-      }
+const RetryButton: React.FC<{ messageIndex?: number }> = ({ messageIndex }) => {
+  const { retryFromMessage } = usePluginStore();
+
+  const handleRetryClick = async () => {
+    if (messageIndex !== undefined) {
+      // Retry from the specified message index
+      await retryFromMessage(messageIndex);
     }
-    
-    // Add button
-    const [, action, icon, label] = match;
-    parts.push({
-      type: 'button',
-      content: match[0],
-      buttonData: { action, icon, label, description: `${label}` }
-    });
-    
-    lastIndex = match.index + match[0].length;
-  }
-  
-  // Add remaining text
-  if (lastIndex < content.length) {
-    const textContent = content.slice(lastIndex).trim();
-    if (textContent) {
-      parts.push({ type: 'text', content: textContent });
-    }
-  }
-  
-  // If no buttons found, return the whole content as text
-  if (parts.length === 0) {
-    parts.push({ type: 'text', content });
-  }
-  
-  return { parts };
-}
+  };
+
+  return (
+    <button
+      className="clickable-icon"
+      onClick={handleRetryClick}
+      aria-label={t('errors.retryButton')}
+      title="Retry from this message"
+    >
+      <LucideIcon name="rotate-ccw" size={18} />
+    </button>
+  );
+};
 
 // Helper to ensure content is always ContentBlock[]
 const ensureContentBlocksForDisplay = (content: string | ContentBlock[]): ContentBlock[] => {
@@ -123,6 +93,8 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
 }) => {
   // Get specific state slices from Zustand store with granular subscriptions
   const isRecording = usePluginStore(state => state.audio.isRecording);
+  const currentModeId = usePluginStore(state => state.modes.activeId);
+  const currentMode = usePluginStore(state => state.modes.available[state.modes.activeId]);
   
   // Extract individual values from TTS state - updated property names
   const isSpeaking = usePluginStore(state => state.audio.isSpeaking);
@@ -239,42 +211,11 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   const renderContentBlock = (block: ContentBlock, index: number) => {
     switch (block.type) {
       case 'text': {
-        // Check if this text contains buttons (for error messages)
-        const { parts } = parseContentWithButtons(block.text);
-        
-        if (parts.some(part => part.type === 'button')) {
-          return (
-            <div key={`block-${index}`} className="markdown-content error-message-with-buttons">
-              {parts.map((part, partIndex) => {
-                if (part.type === 'button' && part.buttonData) {
-                  return (
-                    <ErrorMessageButton
-                      key={`button-${partIndex}`}
-                      action={part.buttonData.action}
-                      icon={part.buttonData.icon}
-                      label={part.buttonData.label}
-                      description={part.buttonData.description}
-                    />
-                  );
-                } else {
-                  return (
-                    <MarkdownRenderer
-                      key={`text-${partIndex}`}
-                      content={part.content}
-                    />
-                  );
-                }
-              })}
-            </div>
-          );
-        }
-        
         return (
-          <div key={`block-${index}`} className="markdown-content">
-            <MarkdownRenderer
-              content={block.text}
-            />
-          </div>
+          <MarkdownRenderer
+            key={`text-${index}`}
+            content={block.text}
+          />
         );
       }
       case 'image': {
@@ -362,6 +303,29 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
       }
       case 'tool_result':
         return null; // Not rendered directly
+      case 'error_message': {
+        const errorBlock = block as any;
+        const modeName = currentMode?.name || currentModeId || 'unknown mode';
+        const helpPrompt = t('errors.helpPrompt', { 
+          error: errorBlock.text,
+          mode: modeName
+        });
+        
+        return (
+          <div key={`block-${index}`} className="error-message-block">
+            <div className="error-message-content">
+              <MarkdownRenderer content={errorBlock.text} />
+              <div className="error-message-actions">
+                <RetryButton messageIndex={messageIndex} />
+                <FixWithGuideButton 
+                  helpPrompt={helpPrompt}
+                  buttonText={t('errors.helpButton')}
+                />
+              </div>
+            </div>
+          </div>
+        );
+      }
       default:
         console.warn("Unknown content block type encountered:", (block as any)?.type);
         return null;
@@ -459,6 +423,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
                       <LucideIcon name={copyIcon} size={18} />
                     </button>
                   )}
+                  <RetryButton messageIndex={messageIndex} />
                 </>
               )}
             </>}

@@ -1,6 +1,6 @@
 import { TFile, TFolder, normalizePath } from "obsidian";
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from '../types/chat-types';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { t } from 'src/i18n';
 

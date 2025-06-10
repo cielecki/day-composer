@@ -4,7 +4,7 @@ import { getFile } from "../utils/fs/get-file";
 import { ensureDirectoryExists } from "../utils/fs/ensure-directory-exists";
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from '../types/chat-types';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import i18next from 'i18next';
 

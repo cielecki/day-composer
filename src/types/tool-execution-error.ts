@@ -3,4 +3,4 @@ export class ToolExecutionError extends Error {
     super(message);
     this.name = 'ToolExecutionError';
   }
-} 
+}

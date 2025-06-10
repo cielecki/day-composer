@@ -5,7 +5,7 @@ import { LifeNavigatorView, LIFE_NAVIGATOR_VIEW_TYPE } from './life-navigator-vi
 import { checkForAvailableUpdate, checkForUpdatesOnStartup } from './utils/auto-update/auto-update';
 import { getObsidianTools, resetObsidianTools } from './obsidian-tools';
 import { LifeNavigatorSettingTab } from './components/LifeNavigatorSettingTab';
-import { UserDefinedToolManager } from './user-tools/UserDefinedToolManager';
+import { UserDefinedToolManager } from './services/UserDefinedToolManager';
 import { cleanupStore, initializeStore } from './store/store-initialization';
 import { usePluginStore } from './store/plugin-store';
 

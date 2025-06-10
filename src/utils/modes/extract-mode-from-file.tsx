@@ -1,5 +1,5 @@
 import { App, TFile, CachedMetadata, FrontMatterCache } from "obsidian";
-import { LNMode } from "../../types/LNMode";
+import { LNMode } from "../../types/mode";
 import { mergeWithDefaultMode, getDefaultLNMode } from "./ln-mode-defaults";
 
 /**

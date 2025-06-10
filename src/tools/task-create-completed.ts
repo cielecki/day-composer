@@ -1,5 +1,5 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from '../types/chat-types';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";

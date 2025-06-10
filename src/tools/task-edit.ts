@@ -1,5 +1,5 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from '../types/chat-types';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import { readNote, updateNote, NoteNode } from 'src/utils/tools/note-utils';
 import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';
@@ -58,16 +58,6 @@ export const taskEditTool: ObsidianTool<TaskEditToolInput> = {
   execute: async (context: ToolExecutionContext<TaskEditToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { original_todo_text } = params;
-    
-    if (!original_todo_text) {
-      context.setLabel(t('tools.actions.editTodo.failed', { task: '' }));
-      throw new ToolExecutionError("Original todo text is required");
-    }
-    
-    if (!params.replacement_todo_text) {
-      context.setLabel(t('tools.actions.editTodo.failed', { task: original_todo_text }));
-      throw new ToolExecutionError("Replacement todo text is required");
-    }
     
     context.setLabel(t('tools.actions.editTodo.inProgress', { task: original_todo_text }));
     

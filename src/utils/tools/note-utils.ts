@@ -94,7 +94,7 @@ export async function readNote({
 
 	if (!exists) {
 		throw new ToolExecutionError(
-			t("errors.files.notFound", { path: filePath }),
+			t("errors.files.notFound", { path: filePath })
 		);
 	}
 
@@ -345,12 +345,12 @@ export function determineInsertionPosition(
 			}
 		} catch (error) {
 			throw new ToolExecutionError(
-				`Error finding reference task: ${error.message}`,
+				`Error finding reference task: ${error.message}`
 			);
 		}
 	} else {
 		throw new ToolExecutionError(
-			`Invalid position: ${position}`,
+			`Invalid position: ${position}`
 		);
 	}
 

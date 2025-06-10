@@ -1,5 +1,5 @@
 import { Anthropic } from "@anthropic-ai/sdk";
-import { Message, ContentBlock, ThinkingBlock, ToolUseBlock, RedactedThinkingBlock } from "../../types/chat-types";
+import { Message, ContentBlock, ThinkingBlock, ToolUseBlock, RedactedThinkingBlock } from "../../types/message";
 import { ensureContentBlocks } from "./content-blocks";
 
 // Define the type for the stream parameter

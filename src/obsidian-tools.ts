@@ -27,8 +27,8 @@ import { noteDeleteTool } from './tools/note-delete';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tools/tool-filter";
-import { LNMode } from './types/LNMode';
-import { ToolExecutionContext } from './types/chat-types';
+import { LNMode } from './types/mode';
+import { ToolExecutionContext } from './types/tool-execution-context';
 import { validateToolParameters, formatValidationErrors } from "./utils/validation/parameter-validator";
 
 // Import React

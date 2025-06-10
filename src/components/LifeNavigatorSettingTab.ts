@@ -289,37 +289,29 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 				attr: { style: 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;' }
 			});
 			
-			// Helper functions for pluralization
-			const getPluralForm = (count: number): 'singular' | 'few' | 'many' => {
-				if (count === 1) return 'singular';
-				if (count >= 2 && count <= 4) return 'few';
-				return 'many';
-			};
-			
-			const getEnglishPluralForm = (count: number): 'singular' | 'plural' => {
-				return count === 1 ? 'singular' : 'plural';
-			};
-			
-			const pluralForm = getPluralForm(invalidTools.length);
-			const englishPluralForm = getEnglishPluralForm(invalidTools.length);
+			const toolIssuesFound = invalidTools.length === 1 ? t('validation.toolIssuesFound.singular', {
+				count: invalidTools.length,
+			}) : (invalidTools.length >= 2 && invalidTools.length <= 4 ? t('validation.toolIssuesFound.few', {
+				count: invalidTools.length,
+			}) : t('validation.toolIssuesFound.many', {
+				count: invalidTools.length,
+			}));
+
+			const fixToolsButton = invalidTools.length === 1 ? t('validation.fixTools.buttonSettings.singular', {
+				count: invalidTools.length,
+			}) : (invalidTools.length >= 2 && invalidTools.length <= 4 ? t('validation.fixTools.buttonSettings.few', {
+				count: invalidTools.length,
+			}) : t('validation.fixTools.buttonSettings.many', {
+				count: invalidTools.length,
+			}));
 			
 			warningHeader.createEl('span', { text: '⚠️' });
 			warningHeader.createEl('strong', { 
-				text: t(`validation.toolIssuesFound.${pluralForm}`, {
-					count: invalidTools.length,
-					defaultValue: t(`validation.toolIssuesFound.${englishPluralForm}`, {
-						count: invalidTools.length,
-						defaultValue: `${invalidTools.length} tool file${invalidTools.length > 1 ? 's' : ''} have validation issues`
-					})
-				})
+				text: toolIssuesFound
 			});
 			
 			const fixBtn = validationContainer.createEl('button', {
-				text: t(`validation.fixTools.buttonSettings.${pluralForm}`, {
-					defaultValue: t(`validation.fixTools.buttonSettings.${englishPluralForm}`, {
-						defaultValue: 'Fix Tool Issues'
-					})
-				}),
+				text: fixToolsButton,
 				attr: { 
 					style: 'padding: 6px 12px; background: var(--interactive-accent); color: white; border: none; border-radius: 4px; cursor: pointer;'
 				}
@@ -335,13 +327,16 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 				const toolPathsFormatted = invalidTools.length <= 5 
 					? invalidTools.join(', ')
 					: `${invalidTools.slice(0, 5).join(', ')} and ${invalidTools.length - 5} more`;
-				store.addUserMessage(t(`validation.fixTools.message.${pluralForm}`, {
+
+				const fixToolsMessage = invalidTools.length === 1 ? t('validation.fixTools.message.singular', {
 					filePaths: toolPathsFormatted,
-					defaultValue: t(`validation.fixTools.message.${englishPluralForm}`, {
-						filePaths: toolPathsFormatted,
-						defaultValue: `Help me fix validation issues with my tools. I have the following tool files with validation errors: ${toolPathsFormatted}`
-					})
+				}) : (invalidTools.length >= 2 && invalidTools.length <= 4 ? t('validation.fixTools.message.few', {
+					filePaths: toolPathsFormatted,
+				}) : t('validation.fixTools.message.many', {
+					filePaths: toolPathsFormatted,
 				}));
+
+				store.addUserMessage(fixToolsMessage);
 				
 				// Close settings tab by navigating to main view
 				this.app.workspace.getLeaf().detach();

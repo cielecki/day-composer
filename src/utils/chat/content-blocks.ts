@@ -6,7 +6,8 @@ import {
 	ToolUseBlock,
 	ToolResultBlock,
 	ImageBlock,
-} from "../../types/chat-types";
+	ErrorMessageBlock,
+} from "../../types/message";
 
 /**
  * Ensures content is always in ContentBlock[] format
@@ -48,7 +49,7 @@ export const filterEmptyContentBlocks = (blocks: ContentBlock[]): ContentBlock[]
 		if (block.type === "tool_result") {
 			return block.tool_use_id && (block.content || block.is_error);
 		}
-		// Keep other block types by default
+		// Keep other block types by default (error_message blocks will be converted to text blocks)
 		return true;
 	});
 };
@@ -86,6 +87,13 @@ export const formatContentBlocks = (content: ContentBlock[]): APIContentBlock[] 
 			/* trunk-ignore(eslint/@typescript-eslint/no-unused-vars) */
 			const { reasoningInProgress, ...cleanedBlock } = block;
 			return cleanedBlock as APIContentBlock;
+		} else if (block.type === "error_message") {
+			// Convert error_message blocks to text blocks so the AI can be aware of errors
+			const errorBlock = block as ErrorMessageBlock;
+			return {
+				type: "text",
+				text: `Error: ${errorBlock.text}`
+			} as TextBlock;
 		}
 		return block as APIContentBlock;
 	}).filter((block): block is APIContentBlock => block !== null); // Remove null blocks (incomplete thinking)

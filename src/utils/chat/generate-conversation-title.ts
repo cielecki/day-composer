@@ -1,6 +1,6 @@
 import { getStore } from "../../store/plugin-store";
-import { Message } from 'src/types/chat-types';
-import { LNMode } from 'src/types/LNMode';
+import { Message } from 'src/types/message';
+import { LNMode } from 'src/types/mode';
 import { getFirstUserMessage } from "./get-first-user-message";
 import { getFirstAssistantMessage } from "./get-first-assistant-message";
 import { generateAITitle } from '../../utils/chat/generate-aititle';

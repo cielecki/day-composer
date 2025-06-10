@@ -10,7 +10,7 @@ import { ThinkingMessage } from "./ThinkingMessage";
 import {
 	ToolResultBlock,
 	ContentBlock,
-} from '../types/chat-types';
+} from '../types/message';
 import { LucideIcon } from "./LucideIcon";
 import { LNModePill } from '../components/LNModePills';
 import { TFile, Modal, Notice } from "obsidian";
@@ -364,13 +364,6 @@ export const LifeNavigatorApp: React.FC = () => {
 							</div>
 						)}
 
-						{/* Show validation fix button for current mode if it has issues */}
-						<ValidationFixButton 
-							type="specific-mode" 
-							modeId={activeMode.path}
-							displayMode="text-and-button"
-						/>
-
 						{/* Show validation fix buttons if we're in Guide mode and there are issues */}
 						{activeMode.path === ':prebuilt:guide' && (
 							<div className="validation-issues-container">
@@ -545,14 +538,6 @@ export const LifeNavigatorApp: React.FC = () => {
 										{t('ui.mode.viewSystemPrompt')}
 									</div>
 
-									{/* Validation fix button for current mode - positioned as last option */}
-									<ValidationFixButton 
-										type="specific-mode" 
-										modeId={activeMode.path}
-										showIcon={true}
-										displayMode="dropdown-item"
-									/>
-
 									{/* Separator */}
 									<div className="ln-separator" />
 								</>
@@ -649,6 +634,13 @@ export const LifeNavigatorApp: React.FC = () => {
 						isGeneratingResponse={isGeneratingResponse}
 					/>
 				))}
+
+				{/* Show validation fix button for current mode if it has issues */}
+				{!isGeneratingResponse && activeMode && <ValidationFixButton 
+					type="specific-mode" 
+					modeId={activeMode.path}
+					displayMode="text-and-button"
+				/>}
 
 				{isGeneratingResponse && <ThinkingMessage status="thinking" />}
 			</div>

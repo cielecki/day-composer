@@ -1,6 +1,6 @@
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionError } from 'src/types/tool-execution-error';
-import { ToolExecutionContext } from '../types/chat-types';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import { getStore } from "../store/plugin-store";
 

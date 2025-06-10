@@ -1,6 +1,6 @@
 import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';
 import { ObsidianTool } from 'src/obsidian-tools';
-import { ToolExecutionContext } from 'src/types/chat-types';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { updateNote } from 'src/utils/tools/note-utils';
 import { readNote } from 'src/utils/tools/note-utils';
 import { ToolExecutionError } from 'src/types/tool-execution-error';

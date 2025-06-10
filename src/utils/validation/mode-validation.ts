@@ -1,5 +1,5 @@
 import { TFile, CachedMetadata, FrontMatterCache } from "obsidian";
-import { LNMode } from "../../types/LNMode";
+import { LNMode } from "../../types/mode";
 import { TTS_VOICES, TTSVoice } from "src/store/audio-slice";
 import { ANTHROPIC_MODELS, AnthropicModel } from "../modes/ln-mode-defaults";
 import { validateIconField } from "./lucide-icon-validation";

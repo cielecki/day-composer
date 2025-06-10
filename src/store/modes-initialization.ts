@@ -4,7 +4,7 @@ import { getStore } from './plugin-store';
 import { getPrebuiltModes } from '../utils/modes/prebuilt-modes';
 import { extractLNModeFromFile } from '../utils/modes/extract-mode-from-file';
 import { hasModeTag } from 'src/utils/modes/has-mode-tag';
-import { LNMode } from '../types/LNMode';
+import { LNMode } from '../types/mode';
 import { t } from 'src/i18n';
 import { validateModeFile } from '../utils/validation/mode-validation';
 

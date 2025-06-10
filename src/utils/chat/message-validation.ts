@@ -1,4 +1,4 @@
-import { Message, ContentBlock, ThinkingBlock } from "../../types/chat-types";
+import { Message, ContentBlock, ThinkingBlock } from "../../types/message";
 import { ensureContentBlocks, filterEmptyContentBlocks } from "./content-blocks";
 
 /**

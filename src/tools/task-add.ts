@@ -3,7 +3,7 @@ import { fileExists } from "../utils/fs/file-exists";
 import { Task } from 'src/utils/tasks/task-utils';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { ObsidianTool } from 'src/obsidian-tools';
-import { ToolExecutionContext } from 'src/types/chat-types';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import {
 	readNote,
 	updateNote,

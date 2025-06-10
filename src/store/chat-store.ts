@@ -1,5 +1,6 @@
 import type { ImmerStateCreator } from '../store/plugin-store';
-import { Message, ToolResultBlock, AttachedImage } from '../types/chat-types';
+import { Message, ToolResultBlock, ErrorMessageBlock } from '../types/message';
+import { AttachedImage } from 'src/types/attached-image';
 import { Chat } from 'src/utils/chat/conversation';
 import { generateChatId } from 'src/utils/chat/generate-conversation-id';
 import { createUserMessage, extractUserMessageContent } from 'src/utils/chat/message-builder';
@@ -61,6 +62,7 @@ export interface ChatSlice {
   startEditingMessage: (messageIndex: number) => void;
   cancelEditingMessage: () => void;
   runConversationTurnWithContext: () => Promise<void>;
+  retryFromMessage: (messageIndex: number) => Promise<void>;
   chatStop: () => void;
   saveImmediatelyIfNeeded: (force?: boolean) => Promise<void>;
 }
@@ -376,7 +378,19 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         }
       } catch (error) {
         console.error("Error in conversation turn:", error);
-        new Notice(t('errors.setup', { error: error instanceof Error ? error.message : "Unknown error" }));
+
+        // Add error message to conversation instead of showing notice
+        const errorMessage: Message = {
+          role: "assistant",
+          content: [{
+            type: "error_message",
+            text: error instanceof Error ? error.message : "Unknown error",
+          }]
+        };
+        
+        get().addMessage(errorMessage);
+       
+        
         // Ensure generating state is cleared even on error
         const currentState = get();
         currentState.setIsGenerating(false);
@@ -401,6 +415,31 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       if (needsToBeSaved) {
         await get().autoSaveConversation();
       }
+    },
+
+    retryFromMessage: async (messageIndex: number) => {
+      const state = get();
+      
+      // Validate message index
+      const currentMessages = state.chats.current.storedConversation.messages;
+      if (messageIndex < 0 || messageIndex >= currentMessages.length) {
+        console.error(`Invalid message index for retry: ${messageIndex}`);
+        return;
+      }
+      
+      // Remove the message at the given index and all messages after it
+      const messagesUpToRetry = currentMessages.slice(0, messageIndex);
+      
+      // Update the conversation without the message and everything after it
+      set((state) => {
+        state.chats.current.storedConversation.messages = messagesUpToRetry;
+      });
+      
+      // Trigger debounced autosave after content change
+      state.saveImmediatelyIfNeeded(true);
+      
+      // Retry the conversation
+      await state.runConversationTurnWithContext();
     }
   }
 }; 

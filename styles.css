@@ -2865,52 +2865,6 @@ If your plugin does not need CSS, delete this file.
   overflow: visible;
 }
 
-/* Error message action buttons */
-.life-navigator-view .error-message-with-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.life-navigator-view .error-action-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  margin-top: 12px;
-  background-color: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  align-self: flex-start;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.life-navigator-view .error-action-button:hover {
-  background-color: var(--interactive-accent-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.life-navigator-view .error-action-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.life-navigator-view .error-button-icon {
-  font-size: 16px;
-  line-height: 1;
-}
-
-.life-navigator-view .error-button-label {
-  white-space: nowrap;
-}
-
 /* Validation Fix Components */
 .validation-fix-button {
   background: var(--interactive-accent);
@@ -2984,3 +2938,24 @@ If your plugin does not need CSS, delete this file.
   margin-right: 4px;
 }
 
+
+/* Error message blocks */
+.life-navigator-view .error-message-block {
+  background-color: rgba(var(--background-modifier-error-rgb), 0.1);
+  border: 1px solid var(--background-modifier-error);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 8px 0;
+}
+
+.life-navigator-view .error-message-content {
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.life-navigator-view .error-message-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  align-items: center;
+}

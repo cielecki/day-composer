@@ -1,5 +1,5 @@
 import React from 'react';
-import { LNMode } from 'src/types/LNMode';
+import { LNMode } from 'src/types/mode';
 import { LucideIcon } from 'src/components/LucideIcon';
 
 interface LNModePillProps {

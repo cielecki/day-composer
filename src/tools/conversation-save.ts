@@ -1,5 +1,6 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext, ToolResultBlock } from '../types/chat-types';
+import { ToolResultBlock } from '../types/message';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { getStore } from "../store/plugin-store";
 import { formatConversationContent } from "../utils/chat/conversation-formatter";

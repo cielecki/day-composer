@@ -37,16 +37,18 @@
     "chat": {
       "noContent": "Brak dostępnej zawartości czatu"
     },
-    "conversationTurn": "Błąd podczas konwersacji: {{error}}",
     "failedToUpdatePlugin": "Nie udało się zaktualizować wtyczki: {{error}}",
     "files": {
       "formatFailed": "Nie udało się sformatować dokumentu po operacji na zadaniu",
       "getFailed": "Nie udało się pobrać pliku z {{path}}",
       "notFound": "Nie znaleziono pliku w {{path}}"
     },
+    "helpButton": "Pomoc",
+    "helpPrompt": "Napotkałem błąd podczas używania trybu {{mode}}:\n```{{error}}```\nCzy możesz mi pomóc?",
     "linkExpansion": {
       "couldNotResolve": "Nie można znaleźć celu linku \"{{linkPath}}\""
     },
+    "retryButton": "Ponów",
     "setup": "Błąd konfiguracji: {{error}}",
     "startingLifeNavigator": "Błąd uruchamiania Life Navigator",
     "tasks": {
@@ -547,18 +549,65 @@
     }
   },
   "validation": {
-    "fixButton": {
-      "tooltip": "Przełącz na tryb Guide i uzyskaj pomoc w naprawieniu błędów walidacji"
+    "fixModes": {
+      "button": {
+        "few": "Napraw Tryby",
+        "many": "Napraw Tryby",
+        "singular": "Napraw Tryb"
+      },
+      "description": {
+        "few": "Kilka trybów ma błędy walidacji, które wymagają naprawy.",
+        "many": "Wiele trybów ma błędy walidacji, które wymagają naprawy.",
+        "singular": "Tryb ma błędy walidacji, które wymagają naprawy."
+      },
+      "message": {
+        "few": "Pomóż mi naprawić błędy walidacji w kilku plikach trybów. Te tryby mają błędy walidacji, które wymagają naprawy.",
+        "many": "Pomóż mi naprawić błędy walidacji w wielu plikach trybów. Te tryby mają błędy walidacji, które wymagają naprawy.",
+        "singular": "Pomóż mi naprawić błędy walidacji w pliku trybu. Ten tryb ma błędy walidacji, które wymagają naprawy."
+      }
     },
     "fixSpecificMode": {
       "button": "Napraw ten tryb",
       "description": "Obecny tryb \"{{modeName}}\" ma błędy walidacji, które wymagają naprawy.",
       "message": "Pomóż mi naprawić błędy walidacji w pliku trybu \"{{filePath}}\". Ten plik trybu ma błędy walidacji, które wymagają naprawy."
     },
+    "fixTools": {
+      "button": {
+        "few": "Napraw Narzędzia",
+        "many": "Napraw Narzędzia",
+        "singular": "Napraw Narzędzie"
+      },
+      "buttonSettings": {
+        "few": "Napraw Narzędzia w Ustawieniach",
+        "many": "Napraw Narzędzia w Ustawieniach",
+        "singular": "Napraw Narzędzie w Ustawieniach"
+      },
+      "description": {
+        "few": "Kilka narzędzi ma błędy walidacji, które wymagają naprawy.",
+        "many": "Wiele narzędzi ma błędy walidacji, które wymagają naprawy.",
+        "singular": "Narzędzie ma błędy walidacji, które wymagają naprawy."
+      },
+      "message": {
+        "few": "Pomóż mi naprawić błędy walidacji w kilku plikach narzędzi. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
+        "many": "Pomóż mi naprawić błędy walidacji w wielu plikach narzędzi. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
+        "singular": "Pomóż mi naprawić błędy walidacji w pliku narzędzia. To narzędzie ma błędy walidacji, które wymagają naprawy."
+      }
+    },
+    "helpButton": {
+      "tooltip": "Przełącz na tryb Guide i uzyskaj pomoc w naprawieniu błędów walidacji"
+    },
     "results": {
+      "mode": {
+        "completed": "Walidacja trybu zakończona: {{filePath}} ({{errorCount}} błędów, {{warningCount}} ostrzeżeń)"
+      },
       "tool": {
         "completed": "Walidacja narzędzia zakończona: {{filePath}} ({{errorCount}} błędów, {{warningCount}} ostrzeżeń)"
       }
+    },
+    "toolIssuesFound": {
+      "few": "{{count}} narzędzia mają błędy walidacji",
+      "many": "{{count}} narzędzi ma błędy walidacji",
+      "singular": "{{count}} narzędzie ma błędy walidacji"
     }
   },
   "view": {

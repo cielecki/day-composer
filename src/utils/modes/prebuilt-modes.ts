@@ -1,4 +1,4 @@
-import { LNMode } from 'src/types/LNMode';
+import { LNMode } from 'src/types/mode';
 import { t } from 'src/i18n';
 import { mergeWithDefaultMode } from './ln-mode-defaults';
 

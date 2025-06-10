@@ -36,6 +36,13 @@ the past entries there are not good
 - Include concrete examples of new features
 - Only mention significant bug fixes that impact user experience
 
+## Css
+- Always check if there are maybe existing styles in styles.css that you can reuse
+- If not maybe you can make an existing style more general and reusable
+- Never do inline styles, always use classes
+- Favour general classes akin to tailwind rather than specific ones to a specific button or element
+- Prefer simplicity we want to keep the size of styles.css in check
+
 ## Format Examples
 Good:
 - "Life Navigator mode is now available to help guide you through your daily tasks"

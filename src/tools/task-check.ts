@@ -3,7 +3,7 @@ import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
 import { appendComment, Task } from 'src/utils/tasks/task-utils';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { ObsidianTool } from 'src/obsidian-tools';
-import { ToolExecutionContext } from 'src/types/chat-types';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { readNote, updateNote } from 'src/utils/tools/note-utils';
 import { moveTaskToPosition } from 'src/utils/tasks/move-task-to-position';
 import { validateTasks } from 'src/utils/tasks/task-validation';

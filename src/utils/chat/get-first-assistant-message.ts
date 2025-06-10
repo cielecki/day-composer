@@ -1,4 +1,4 @@
-import { Message, ContentBlock } from "../../types/chat-types";
+import { Message, ContentBlock } from "../../types/message";
 
 export function getFirstAssistantMessage(messages: Message[]): string | null {
     const firstAssistantMsg = messages.find(msg => msg.role === "assistant");

@@ -1,4 +1,4 @@
-import { Message } from '../../types/chat-types';
+import { Message } from '../../types/message';
 
 // Database schema version for migrations
 export const CURRENT_SCHEMA_VERSION = 1;

@@ -1,7 +1,6 @@
 import { Anthropic, APIUserAbortError } from "@anthropic-ai/sdk";
-import { Notice } from "obsidian";
 import { MessageCreateParamsStreaming } from "@anthropic-ai/sdk/resources/messages/messages";
-import { Message, ToolResultBlock } from "../../types/chat-types";
+import { Message, ToolResultBlock } from "../../types/message";
 import { formatMessagesForAPI } from "./api-formatting";
 import { processAnthropicStream, StreamProcessorCallbacks } from "./stream-processor";
 import { processToolUseBlocks } from "./tool-processing";
@@ -9,7 +8,6 @@ import { getToolUseBlocks, hasIncompleteToolCalls, hasIncompleteThinking, clearT
 import { cleanupLastMessage } from "./message-validation";
 import { getStore } from "../../store/plugin-store";
 import { getDefaultLNMode, resolveAutoModel } from '../../utils/modes/ln-mode-defaults';
-import { t } from 'src/i18n';
 import type { ObsidianTool } from "../../obsidian-tools";
 import { usePluginStore } from "../../store/plugin-store";
 
@@ -205,17 +203,16 @@ export const runConversationTurn = async (
 
 			} catch (error) {
 				// Catch errors from API/stream/tool handling
-				if (error instanceof APIUserAbortError) {
-					// Handle cleanup for aborted requests
-					handleStreamAbortCleanup();
+				
+				// Handle cleanup for aborted requests
+				handleStreamAbortCleanup();
+
+				if (!(error instanceof APIUserAbortError)) {
+					throw error;
 				} else {
-					console.error("Error during conversation turn processing:", error);
-					new Notice(t('errors.conversationTurn', { error: error instanceof Error ? error.message : "Unknown error" }));
-					// Also clean up incomplete tool calls on error
-					handleStreamAbortCleanup();
+					currentTurnAborted = true; // Stop the loop on error or abort
+					break; // Exit the while loop
 				}
-				currentTurnAborted = true; // Stop the loop on error or abort
-				break; // Exit the while loop
 			}
 		} // End of while loop
 

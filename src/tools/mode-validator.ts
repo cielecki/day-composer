@@ -1,5 +1,5 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from '../types/chat-types';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { TFile } from "obsidian";
@@ -100,11 +100,17 @@ export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
       const errorCount = result.issues.filter(issue => issue.severity === 'error').length;
       const warningCount = result.issues.filter(issue => issue.severity === 'warning').length;
       
-      context.setLabel(t(`validation.results.${fileType}.completed`, { 
+      const labelContent = fileType === "mode" ? t('validation.results.mode.completed', { 
         filePath: file_path,
         errorCount,
         warningCount
-      }));
+      }) : t('validation.results.tool.completed', { 
+        filePath: file_path,
+        errorCount,
+        warningCount
+      });
+
+      context.setLabel(labelContent);
       
       // Format the validation report
       let report = `# ${fileType.charAt(0).toUpperCase() + fileType.slice(1)} Validation Report: ${file.basename}\n\n`;

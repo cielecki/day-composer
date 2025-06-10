@@ -1,5 +1,5 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from '../types/chat-types';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import { updateNote, readNote, NoteNode, TextBlock } from 'src/utils/tools/note-utils';
 import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';

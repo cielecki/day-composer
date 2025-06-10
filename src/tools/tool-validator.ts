@@ -1,9 +1,9 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from '../types/chat-types';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { TFile } from "obsidian";
 import { UserDefinedTool } from "../types/user-tools";
-import { UserDefinedToolScanner } from "../user-tools/UserDefinedToolScanner";
+import { UserDefinedToolScanner } from "../services/UserDefinedToolScanner";
 import * as yaml from "js-yaml";
 import { t } from 'src/i18n';
 import { validateIconField } from '../utils/validation/lucide-icon-validation';

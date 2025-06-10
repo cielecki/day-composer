@@ -364,11 +364,11 @@ function findMissingKeys(allKeys, usedKeys, keyUsageMap) {
 function analyzeSuspiciousCalls(tCallsWithoutKeys) {
   if (tCallsWithoutKeys.length === 0) return;
   
-  log(colors.yellow, colors.bold, '\n⚠️  SUSPICIOUS T() CALLS THAT NEED REVIEW:');
+  log(colors.red, colors.bold, '\n❌ SUSPICIOUS T() CALLS THAT NEED REVIEW:');
   console.log();
   
   tCallsWithoutKeys.slice(0, 20).forEach((call, index) => {
-    log(colors.yellow, `${index + 1}. ${call.file}:${call.line}`);
+    log(colors.red, `${index + 1}. ${call.file}:${call.line}`);
     log(colors.dim, `   Call: ${call.call}`);
     log(colors.dim, `   Key: "${call.key}"`);
     
@@ -394,7 +394,7 @@ function analyzeSuspiciousCalls(tCallsWithoutKeys) {
   });
   
   if (tCallsWithoutKeys.length > 20) {
-    log(colors.yellow, `... and ${tCallsWithoutKeys.length - 20} more suspicious calls`);
+    log(colors.red, `... and ${tCallsWithoutKeys.length - 20} more suspicious calls`);
     console.log();
   }
 }
@@ -513,30 +513,6 @@ function generateSummary(results) {
     operationsPerformed.forEach(op => log(colors.green, op));
     
     console.log();
-    log(colors.cyan, colors.bold, '📝 YOUR NEXT STEPS (DO THESE NOW):');
-    if (results.addedEntries?.length > 0) {
-      const hasTranslatePlaceholders = results.addedEntries.some(entry => 
-        entry.value && entry.value.includes('[TRANSLATE]'));
-      const hasAddPlaceholders = results.addedEntries.some(entry => 
-        entry.value && entry.value.includes('[ADD TRANSLATION]'));
-        
-      log(colors.yellow, colors.bold, '🔍 IMMEDIATE TRANSLATION WORK REQUIRED:');
-      if (hasTranslatePlaceholders) {
-        log(colors.cyan, '1. Search for "[TRANSLATE]" in src/locales/en.json and src/locales/pl.json');
-        log(colors.cyan, '2. Replace ALL [TRANSLATE] placeholders with proper translations');
-      }
-      if (hasAddPlaceholders) {
-        log(colors.cyan, '3. Search for "[ADD TRANSLATION]" in translation files');
-        log(colors.cyan, '4. Replace ALL [ADD TRANSLATION] placeholders with actual translations');
-      }
-      log(colors.cyan, '5. Test the application to verify translations display correctly');
-      log(colors.cyan, '6. Run this script again to confirm no placeholders remain');
-      log(colors.cyan, '7. Commit the completed translation files to version control');
-    } else {
-      log(colors.cyan, '1. Test the application to ensure translations work correctly');
-      log(colors.cyan, '2. The translation files are now organized and optimized');
-      log(colors.cyan, '3. Commit the changes to version control');
-    }
   } else if (results.modificationsApplied) {
     log(colors.green, colors.bold, '🎉 TRANSLATION FILES ORGANIZED!');
     log(colors.green, 'Translation keys have been sorted alphabetically for better organization.');

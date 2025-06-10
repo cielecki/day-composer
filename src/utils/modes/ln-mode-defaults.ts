@@ -1,4 +1,4 @@
-import { LNMode } from 'src/types/LNMode';
+import { LNMode } from 'src/types/mode';
 import { TTS_VOICES, TTSVoice } from "src/store/audio-slice";
 
 // Available Anthropic models

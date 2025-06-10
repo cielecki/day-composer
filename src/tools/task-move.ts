@@ -2,7 +2,7 @@ import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { ObsidianTool } from 'src/obsidian-tools';
-import { ToolExecutionContext } from 'src/types/chat-types';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { readNote, updateNote, determineInsertionPosition } from 'src/utils/tools/note-utils';
 import { insertTaskAtPosition, Task, removeTaskFromDocument } from 'src/utils/tasks/task-utils';
 import { validateTasks } from 'src/utils/tasks/task-validation';

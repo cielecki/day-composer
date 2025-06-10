@@ -1,4 +1,5 @@
-import { ContentBlock, Message, AttachedImage } from "../../types/chat-types";
+import { ContentBlock, Message } from "../../types/message";
+import { AttachedImage } from 'src/types/attached-image';
 
 /**
  * Creates a user message with text and optional images

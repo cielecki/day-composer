@@ -1,5 +1,5 @@
 import { Anthropic } from "@anthropic-ai/sdk";
-import { Message } from "../../types/chat-types";
+import { Message } from "../../types/message";
 import { ensureContentBlocks, formatContentBlocks } from '../../utils/chat/content-blocks';
 import { validateAndCleanMessages } from "./message-validation";
 

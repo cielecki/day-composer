@@ -5,7 +5,7 @@ import { t } from 'src/i18n';
  * @param conversation The conversation to format
  * @returns A formatted markdown representation of the conversation
  */
-import { Message, ContentBlock, ToolUseBlock, ToolResultBlock } from '../../types/chat-types';
+import { Message, ContentBlock, ToolUseBlock, ToolResultBlock } from '../../types/message';
 
 export function formatConversationContent(conversation: Message[]): string {
 	if (!conversation || conversation.length === 0) {

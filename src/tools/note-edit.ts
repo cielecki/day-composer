@@ -1,7 +1,7 @@
 import { readFile } from "../utils/fs/read-file";
 import { getFile } from "../utils/fs/get-file";
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolExecutionContext } from '../types/chat-types';
+import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import { fileExists } from "../utils/fs/file-exists";
 import { ToolExecutionError } from 'src/types/tool-execution-error';

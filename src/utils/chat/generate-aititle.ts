@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { getStore } from 'src/store/plugin-store';
-import { LNMode } from 'src/types/LNMode';
+import { LNMode } from 'src/types/mode';
 import { t } from 'src/i18n';
 
 export async function generateAITitle(
