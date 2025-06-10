@@ -524,7 +524,7 @@ export const LifeNavigatorApp: React.FC = () => {
 												openSimpleObsidianModal(
 													window.app,
 													t('ui.modal.systemPrompt').replace('{{modeName}}', activeMode.name),
-													systemPrompt || ""
+													systemPrompt.fullContent || ""
 												);
 											} catch (error) {
 												// Show notice for unresolved links
