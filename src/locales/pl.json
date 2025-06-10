@@ -100,7 +100,7 @@
       "title": "Ustawienia zaawansowane"
     },
     "prompts": {
-      "defaultPrompt": "# Domena\nKomunikat lub komenda głosowa wydawana przez użytkownika asystentowi AI.\n\n# Przykłady\n- Odfajcz zadanie ... eeee ... wyrzuciłem śmieci\n- Zrobiłem kolację\n- Dodaj na jutro, żebym pamiętał o odezwaniu się do Jana.\n\n# Słowniczek\n[[ln-currently-open-file]] 🧭\n[[ln-current-chat]] 🧭\n\nPoczątek transkrypcji:",
+      "defaultPrompt": "# Domena\nKomunikat lub komenda głosowa wydawana przez użytkownika asystentowi AI.\n\n# Słowniczek\n`🧭 current_file_and_selection()`\n`🧭 current_chat()`\n\nPoczątek transkrypcji:",
       "speechToTextPrompt": "Prompt dla zamiany mowy na tekst",
       "speechToTextPromptDesc": "Prompt, który zostanie wysłany do silnika zamiany mowy na tekst. Dostarcza kontekstu dla modelu AI. Możesz użyć <a href='https://github.com/cielecki/life-navigator/blob/main/library/Docs/Link%20Expansion.md'>rozszerzania linków</a>."
     },
