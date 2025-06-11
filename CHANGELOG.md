@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.3] - 2025-01-11
+
+### 🚀 New Chat Menu - Everything You Need in One Place
+
+**Life Navigator now includes a context menu in your chat interface that puts all new features at your fingertips:**
+
+- **💰 View Costs**: Instantly check your API usage and spending data for a given conversation
+- **📁 Reveal in Finder**: Open your file manager and jump directly to your conversation files for easy backup, sharing, or organization
+- **🗑️ Delete Chat**: Quickly remove conversations you no longer need
+- **⭐ Star on GitHub**: Show your support by starring the Life Navigator project
+- **💬 Join Community**: Connect with other users on Discord for support, tips, and discussions
+- **👤 Follow Author**: Stay updated with the latest news and updates on Twitter/X
+
+### 🎯 Smoother Setup Experience
+
+- **Clearer language selection**: Removed confusing highlighting in language setup - now it's crystal clear which language options are available
+- **Better API key guidance**: Step-by-step instructions with numbered steps make it much easier to set up your API keys with clear visual guidance and helpful tips
+
+### 🚀 Enhanced Library System
+
+- **Version-matched content**: Library tools now automatically fetch content that matches your installed plugin version, ensuring perfect compatibility
+- **Smart source detection**: Automatically uses the best source for library content based on your environment
+
+### 🎯 What This Means for You
+
+You'll enjoy a more streamlined experience with:
+- Clear visibility into your API usage and costs
+- Quick access to your conversation files for easy management
+- A smoother, more intuitive setup process
+- Reliable access to library content that matches your version
 
 ## [0.11.2] - 2025-01-10
 
@@ -370,61 +400,3 @@ change: enforce thinking in claude, as it's needed for handover to work
 - Standardized naming from "Starter Pack" to "Starter Kit" throughout the codebase for consistency
 
 ## [0.6.6] - 2025-05-22
-
-## [Unreleased]
-
-### 🎯 Improved Language Setup Experience
-
-- **Simplified language selection**: Removed highlighting of currently selected language in setup screen to avoid confusion. Users can now clearly see available language options without wondering whether they need to click a highlighted selection again. The setup process is now more straightforward and intuitive.
-
-### 🎯 User Experience Improvements
-
-- **Improved task addition messages**: Task addition messages now show just the filename (without .md extension) instead of the full path, and long task descriptions are automatically truncated with "..." for better readability. Example: "Added 'Buy groceries' to Daily Note" instead of "Added 'Buy groceries for the family and prepare...' to Daily Notes/2024-01-15.md"
-
-### 🎯 User Experience Improvements
-
-- **Better API key setup guidance**: API key setup screens now provide clear step-by-step instructions with numbered steps, making it much easier to understand what to do. Instead of a simple link, users now see:
-  - Step 1: How to open the API provider website
-  - Step 2: What to look for and copy on the website  
-  - Step 3: Where to paste the key in Life Navigator
-  - Visual guidance with prominent action buttons
-  - Helpful tips about what to expect on each website
-
-### 🚀 Enhanced Library Access System
-
-- **Smart library source detection**: Life Navigator now automatically detects if you're in a development environment and reads library content from local files instead of GitHub. This makes development much faster and more reliable.
-
-- **Version-synchronized library content**: When using released versions, library tools now fetch content from the matching GitHub release tag instead of the main branch. This ensures you always get library content that's compatible with your installed plugin version.
-
-- **Intelligent fallback system**: If a specific version tag doesn't have library content, the system automatically falls back to the main branch to ensure compatibility and reliability.
-
-### 🎯 What This Means for You
-
-These improvements work seamlessly in the background:
-- **Faster development**: Local developers get instant access to library content without network requests
-- **Better version consistency**: Production users get library content tested with their specific plugin version  
-- **Improved reliability**: Automatic fallback ensures library access always works, even for older versions
-
-### 🔧 Technical Details
-
-- Library tools now check for local `library/` folder in plugin directory first
-- Remote access uses plugin version from `manifest.json` (e.g., `0.11.2`) for GitHub URLs
-- Fallback to `main` branch if version-specific content unavailable
-- Source information displayed in tool outputs for transparency
-- Refactored shared library utilities to eliminate code duplication between tools
-
-### Added
-- **Delete Chat Option in 3-Dot Menu**: You can now delete the current conversation directly from the 3-dot menu in the chat interface. This provides quick access to the same delete functionality available in the chat history dropdown.
-- **Reveal in Finder Option**: Added "Reveal in Finder" functionality to the 3-dot menu that opens your system's file explorer and highlights the current conversation file. Perfect for quick access to conversation files for backup, sharing, or organization purposes.
-- **Community Links in Menu**: The 3-dot menu now includes quick access to the Life Navigator community - jump directly to the GitHub repository for updates and documentation, join the Discord community for support and discussions, or follow the author on Twitter/X for project updates.
-
-### Improved
-- **Faster Chat Loading**: Loading a conversation that's already open now happens instantly without unnecessary disk reads, making the interface more responsive.
-- **Smart Menu Items**: "Reveal in Finder" and "Delete Chat" options in the 3-dot menu now only appear when there's an actual conversation file saved to disk, providing a cleaner interface for new chats that haven't been saved yet.
-
-### Fixed
-- **Cost Tracking for Multi-Turn Conversations**: Fixed an issue where only the first API call in conversations involving tool use was being tracked for cost analysis. Now all API calls within a conversation are properly recorded, giving you complete visibility into your usage costs.
-- **Reveal in Finder Implementation**: Updated the reveal functionality to use Obsidian's built-in `app.showInFolder()` API instead of direct Electron shell access, ensuring reliable cross-platform file revelation.
-- **Platform-Specific UI Labels**: Menu items now show the correct file manager name for each platform - "Reveal in Finder" on macOS, "Reveal in Explorer" on Windows, "Reveal in Files" on iOS, and "Reveal in File Manager" on Android/Linux.
-- **Cost Analysis Translation**: All cost analysis interface elements are now properly translated, including the "View Costs" menu option, cost analysis titles, data labels, error messages, and loading states. Both English and Polish translations are now complete for the entire cost analysis feature.
-
