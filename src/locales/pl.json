@@ -541,9 +541,14 @@
     "setup": {
       "anthropicKey": {
         "description": "Anthropic Claude zasila główną funkcjonalność AI. Potrzebujesz klucza API, aby kontynuować.",
-        "getKey": "Pobierz swój klucz API Anthropic",
+        "getKey": "Pobierz klucz",
         "placeholder": "Wklej tutaj swój klucz API Anthropic",
         "saveButton": "Zapisz i kontynuuj",
+        "steps": {
+          "step1": "Krok 1: Pobierz swój klucz API",
+          "step1Description": "Otwiera konsolę Anthropic. Zarejestruj się/zaloguj, następnie utwórz lub skopiuj klucz.",
+          "step2": "Krok 2: Wklej go poniżej"
+        },
         "title": "Skonfiguruj klucz API Anthropic"
       },
       "language": {
@@ -555,10 +560,15 @@
       },
       "openaiKey": {
         "description": "OpenAI zasila funkcje głosowe takie jak synteza mowy. To jest opcjonalne, ale zalecane.",
-        "getKey": "Pobierz swój klucz API OpenAI",
+        "getKey": "Pobierz klucz",
         "placeholder": "Wklej tutaj swój klucz API OpenAI",
         "saveButton": "Zapisz i kontynuuj",
         "skipButton": "Pomiń na razie",
+        "steps": {
+          "step1": "Krok 1: Pobierz swój klucz API",
+          "step1Description": "Otwiera platformę OpenAI. Zarejestruj się/zaloguj, następnie utwórz lub skopiuj klucz.",
+          "step2": "Krok 2: Wklej go poniżej"
+        },
         "title": "Skonfiguruj klucz API OpenAI"
       },
       "saving": "Zapisywanie...",

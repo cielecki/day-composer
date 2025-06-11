@@ -541,9 +541,14 @@
     "setup": {
       "anthropicKey": {
         "description": "Anthropic Claude powers the main AI functionality. You'll need an API key to continue.",
-        "getKey": "Get your Anthropic API key",
+        "getKey": "Get Key",
         "placeholder": "Paste your Anthropic API key here",
         "saveButton": "Save and Continue",
+        "steps": {
+          "step1": "Step 1: Get your API key",
+          "step1Description": "Opens Anthropic console. Sign up/login, then create or copy your key.",
+          "step2": "Step 2: Paste it below"
+        },
         "title": "Configure Anthropic API Key"
       },
       "language": {
@@ -555,10 +560,15 @@
       },
       "openaiKey": {
         "description": "OpenAI powers voice features like text-to-speech. This is optional but recommended.",
-        "getKey": "Get your OpenAI API key",
+        "getKey": "Get Key",
         "placeholder": "Paste your OpenAI API key here",
         "saveButton": "Save and Continue",
         "skipButton": "Skip for now",
+        "steps": {
+          "step1": "Step 1: Get your API key",
+          "step1Description": "Opens OpenAI platform. Sign up/login, then create or copy your key.",
+          "step2": "Step 2: Paste it below"
+        },
         "title": "Configure OpenAI API Key"
       },
       "saving": "Saving...",

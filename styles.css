@@ -2027,12 +2027,13 @@ If your plugin does not need CSS, delete this file.
 	align-items: center;
 	justify-content: center;
 	height: 100%;
-	padding: 2rem;
+	padding: 1rem;
 	overflow-y: auto;
 }
 
 .life-navigator-view .setup-content-focused {
-	max-width: 420px;
+	max-width: 350px;
+  min-width: 300px;
 	width: 100%;
 	text-align: center;
 	display: flex;
@@ -2060,18 +2061,64 @@ If your plugin does not need CSS, delete this file.
 	line-height: 1.4;
 }
 
-.life-navigator-view .setup-get-key-link {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.5rem;
-	color: var(--interactive-accent);
-	text-decoration: none;
-	font-size: 0.9rem;
+
+/* Step-by-step guidance for API key setup */
+.life-navigator-view .setup-steps-guide {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	margin: 1.5rem 0;
 }
 
-.life-navigator-view .setup-get-key-link:hover {
-	text-decoration: underline;
+.life-navigator-view .setup-step {
+	display: flex;
+	flex-direction: row;
+	gap: 1rem;
+	align-items: flex-start;
 }
+
+.life-navigator-view .setup-step-number {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-radius: 50%;
+	font-size: 0.9rem;
+	font-weight: 600;
+	flex-shrink: 0;
+}
+
+.life-navigator-view .setup-step-content {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.life-navigator-view .setup-step-title {
+	font-weight: 600;
+	color: var(--text-normal);
+	font-size: 1rem;
+	margin: 0;
+	line-height: 1.4;
+	display: flex;
+	align-items: center;
+	min-height: 28px; /* Match number circle height */
+}
+
+.life-navigator-view .setup-step-description {
+  margin: 0;
+	color: var(--text-faint);
+	font-size: 0.85rem;
+	line-height: 1.3;
+	opacity: 0.8;
+  text-align: left;
+}
+
+
 
 .life-navigator-view .setup-input-large {
 	width: 100%;
@@ -2140,6 +2187,58 @@ If your plugin does not need CSS, delete this file.
 }
 
 .life-navigator-view .setup-button-secondary:hover:not(:disabled) {
+	color: var(--text-normal);
+	border-color: var(--background-modifier-border-hover);
+}
+
+.life-navigator-view .setup-action-button {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border: none;
+	padding: 0.75rem 1.5rem;
+	border-radius: var(--radius-s);
+	font-weight: 500;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	text-decoration: none;
+	transition: background-color 0.2s ease;
+  height: var(--input-height);
+  --text-color: var(--text-normal);
+  -webkit-app-region: no-drag;
+  justify-content: center;
+  font-size: var(--font-ui-small);
+  font-family: inherit;
+  outline: none;
+}
+
+.life-navigator-view .setup-action-button:hover:not(:disabled) {
+	background: var(--interactive-accent-hover);
+}
+
+.life-navigator-view .setup-action-button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.life-navigator-view .setup-action-button-secondary {
+	background: transparent;
+	color: var(--text-muted);
+	border: 1px solid var(--background-modifier-border);
+	padding: 0.75rem 1.5rem;
+	border-radius: var(--radius-s);
+	font-weight: 500;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	text-decoration: none;
+	transition: all 0.2s ease;
+	margin-left: 0.5rem;
+}
+
+.life-navigator-view .setup-action-button-secondary:hover:not(:disabled) {
 	color: var(--text-normal);
 	border-color: var(--background-modifier-border-hover);
 }
@@ -2218,19 +2317,6 @@ If your plugin does not need CSS, delete this file.
 	flex-grow: 1;
 }
 
-
-
-@media (max-width: 600px) {
-	.life-navigator-view .setup-screen-focused {
-		padding: 1rem;
-		height: 100%;
-	}
-	
-	.life-navigator-view .setup-content-focused {
-		gap: 1rem;
-		max-height: calc(100% - 2rem);
-	}
-}
 
 /* Tool Approval Modal Styles */
 .tool-approval-modal {

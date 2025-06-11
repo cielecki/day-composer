@@ -381,3 +381,12 @@ change: enforce thinking in claude, as it's needed for handover to work
 ### 🎯 User Experience Improvements
 
 - **Improved task addition messages**: Task addition messages now show just the filename (without .md extension) instead of the full path, and long task descriptions are automatically truncated with "..." for better readability. Example: "Added 'Buy groceries' to Daily Note" instead of "Added 'Buy groceries for the family and prepare...' to Daily Notes/2024-01-15.md"
+
+### 🎯 User Experience Improvements
+
+- **Better API key setup guidance**: API key setup screens now provide clear step-by-step instructions with numbered steps, making it much easier to understand what to do. Instead of a simple link, users now see:
+  - Step 1: How to open the API provider website
+  - Step 2: What to look for and copy on the website  
+  - Step 3: Where to paste the key in Life Navigator
+  - Visual guidance with prominent action buttons
+  - Helpful tips about what to expect on each website
