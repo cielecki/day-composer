@@ -4,47 +4,37 @@ This document outlines potential future features and improvements for the Life N
 
 ## In Development
 
-**Link Expansion to Tool Call Migration:**
-Consider migrating certain link expansion functionality to tool calls for better consistency and flexibility:
-- Convert `ln-day-note` from link expansion to tool calls
-- Convert `ln-currently-open-file` and `ln-currently-selected-text` from link expansion to tool calls
-- Potentially add support for calling any tool calls through link format (e.g., `[[tool-name]] 🧭`)
-This would provide more structured access to dynamic content, better error handling, and align with the existing tool architecture while potentially maintaining backward compatibility and expanding link format capabilities to all tools.
-
 **Parallel Conversations:**
 Implement support for multiple concurrent conversation windows, allowing users to maintain separate contexts and modes simultaneously. Each window would maintain its own state , enabling more efficient multitasking and context switching.
-
-## Floating Ideas
-
-**Tool Architecture Review:**
-Investigate whether any other tools should be migrated to user tools to improve plugin architecture and user customization capabilities. This would involve reviewing the current tool system to identify tools that could benefit from being user-configurable rather than built-in, potentially improving flexibility and allowing users to better customize their Life Navigator experience.
-
-**Thinking Blocks Control:**
-Research and implement enabling/disabling thinking blocks in Life Navigator - check if Anthropic will accept removal of thinking blocks.
 
 **Weekly and Monthly Note Support:**
 Introduce support for weekly and monthly summaries via `ln-monthly-note` and `ln-weekly-note` link expansions, following the standards from the periodic notes plugin. This would extend the existing daily note functionality to support broader time periods, allowing users to access and reference their weekly and monthly notes directly within Life Navigator conversations for better long-term planning and reflection.
 
-**Enhanced Model Support:**
-Add support for multiple AI models including Google's Gemini and local models through LMStudio/Ollama integration. This would provide users with more flexibility in choosing their preferred AI provider while maintaining the core Life Navigator functionality. Local model support would be desktop-only, enabling offline functionality and enhanced privacy by processing sensitive data locally. The plugin will automatically detect if running on mobile and disable local model features. A new model selection option in mode settings would allow users to easily switch between different AI providers.
-
 **Todo Tools Support for Better Rich Text Format of Daily Notes:**
 Maybe todo tools should support better a rich text format of the entire daily note? maybe they should be less rigid?
+
+**Tool Architecture Review:**
+Investigate whether any other tools should be migrated to user tools to improve plugin architecture and user customization capabilities. This would involve reviewing the current tool system to identify tools that could benefit from being user-configurable rather than built-in, potentially improving flexibility and allowing users to better customize their Life Navigator experience.
 
 **Tool Management for Modes:**
 Implement a tool management system for modes based on tags with a dedicated UI interface for editing modes. Prebuilt modes would have read-only interfaces, while custom modes could be fully editable. This interface should allow users to edit all mode settings including tool configurations, permissions, and parameters through an intuitive visual editor.
 
-**Prompt Caching for Anthropic:**
-Implement prompt caching to make conversations faster and more cost-effective by storing frequently used context and reducing repetitive processing. This would improve response times and create a smoother conversational experience for users.
+## Floating Ideas
+
+**File Attachment Support:**
+Add support for file attachments (not just images) in Life Navigator chat with automatic PDF to text conversion and drag & drop functionality from both file system and internally from Obsidian. This would allow users to seamlessly work with various document types and reference materials directly within their conversations.
+
+**Thinking Blocks Control:**
+Research and implement enabling/disabling thinking blocks in Life Navigator - check if Anthropic will accept removal of thinking blocks.
+
+**Enhanced Model Support:**
+Add support for multiple AI models including Google's Gemini and local models through LMStudio/Ollama integration. This would provide users with more flexibility in choosing their preferred AI provider while maintaining the core Life Navigator functionality. Local model support would be desktop-only, enabling offline functionality and enhanced privacy by processing sensitive data locally. The plugin will automatically detect if running on mobile and disable local model features. A new model selection option in mode settings would allow users to easily switch between different AI providers.
 
 **Eleven Labs Audio Generation:**
 Develop a prototype for generating audio content using Eleven Labs' text-to-speech capabilities within Life Navigator. This would explore advanced voice synthesis options, potentially offering more natural-sounding speech, voice customization, and enhanced audio quality compared to current TTS solutions. The prototype would evaluate integration feasibility, cost-effectiveness, and user experience improvements for audio-based interactions.
 
 **Streaming Audio Playback:**
 Rework the audio system to enable streaming speech playback that starts before message generation is complete. This would provide a more responsive and natural conversation experience by allowing users to hear the AI's response as it's being generated, rather than waiting for the entire message to be completed before audio playback begins.
-
-**File Attachment Support:**
-Add support for file attachments (not just images) in Life Navigator chat with automatic PDF to text conversion and drag & drop functionality from both file system and internally from Obsidian. This would allow users to seamlessly work with various document types and reference materials directly within their conversations.
 
 **Google Calendar Integration and Management:**
 Implement a comprehensive calendar system that combines external calendar integration with internal event management. The system will:
@@ -54,11 +44,8 @@ Implement a comprehensive calendar system that combines external calendar integr
 - Support event creation, editing, scheduling, and recurring event management
 - Allow users to maintain their own calendar events while leveraging external calendar data
 
-**Google Drive Integration:**
-Implement Google Drive integration within Life Navigator to enable seamless sharing of Obsidian vault content. Through Google Drive's API, users could automatically sync and share specific files or folders from their Obsidian vault to Google Drive for external collaboration and access. This would allow selective sharing of notes, research, or project files while maintaining the core workflow within Obsidian. The integration could include automatic synchronization of designated files, sharing permissions management, and the ability to collaborate on documents that remain integrated with the Life Navigator ecosystem.
-
 **Enhanced API Error Handling and Rate Limiting:**
-Improve error handling and user communication for API-related issues, particularly Anthropic's "Overloaded" errors and rate limiting problems faced by Tier 1 organizations and heavy Life Navigator users. Implement intelligent error interpretation that provides meaningful, user-friendly error messages instead of technical stack traces, automatic retry mechanisms with exponential backoff, and graceful degradation when services are temporarily unavailable. Include comprehensive rate limiting management with intelligent request queuing, rate limit detection and prevention, usage monitoring and alerts, and user notifications when approaching limits. This system would help organizations manage their API usage more effectively while maintaining a smooth user experience even under high-usage scenarios.
+Improve error handling for API issues, particularly Anthropic's "Overloaded" errors and rate limiting problems. Implement user-friendly error messages, automatic retry with exponential backoff, intelligent request queuing, rate limit detection, and usage alerts to help organizations manage API usage effectively while maintaining smooth user experience.
 
 **Automatic Update Notifications:**
 Implement periodic scanning for plugin updates with a hovering dialog that displays "update available" notifications. This would improve user experience by keeping users informed about new versions. Investigation needed to determine if this is feasible within Obsidian's plugin architecture and API limitations.
@@ -95,6 +82,9 @@ Redesign the task handoff system to create a proper framework for seamless integ
 
 **Audio Feedback System:**
 Add audio signals/sounds to Life Navigator for various actions (task completion, end of speech, start of transcription processing) to provide better user feedback and interaction cues.
+
+**Google Drive Integration:**
+Implement Google Drive integration within Life Navigator to enable automatic syncing and sharing of specific Obsidian vault files/folders for external collaboration. The integration would include selective file sharing, permissions management, and seamless collaboration while maintaining the core Obsidian workflow.
 
 **Flat Design Input Buttons:**
 Evaluate transitioning to a flat design approach for input buttons and interface elements to create a more modern, streamlined visual experience. This would involve reviewing the current button styling and potentially adopting a minimalist design approach that reduces visual clutter while maintaining functionality.
