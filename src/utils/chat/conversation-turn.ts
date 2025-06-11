@@ -57,6 +57,10 @@ export const runConversationTurn = async (
 				const apiKey = getStore().getSecret('ANTHROPIC_API_KEY');
 				const anthropicClient = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
 
+				// Generate unique API call ID and track start time for cost tracking
+				const apiCallId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+				const apiCallStartTime = Date.now();
+
 				// Create a stable reference to messages for API formatting
 				const currentMessages = [...usePluginStore.getState().chats.current.storedConversation.messages];
 				const messagesForAPI = formatMessagesForAPI(currentMessages);
@@ -171,6 +175,12 @@ export const runConversationTurn = async (
 					},
 					onAbort: () => {
 						currentTurnAborted = true;
+					},
+					onUsageData: (usage) => {
+						// Calculate and store cost data when usage information is received
+						const apiCallDuration = Date.now() - apiCallStartTime;
+						const store = usePluginStore.getState();
+						store.updateCostEntry(model, usage, apiCallStartTime, apiCallDuration, apiCallId);
 					}
 				};
 

@@ -1,12 +1,3 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
-
 /* Ensure text selection works on iOS */
 .life-navigator-view * {
   -webkit-user-select: text;
@@ -326,126 +317,6 @@ If your plugin does not need CSS, delete this file.
   }
 }
 
-/* Responsive styles */
-@media (max-width: 600px) {
-  .life-navigator-view .message {
-    max-width: 95%;
-  }
-  
-  .life-navigator-view .record-button {
-    width: 56px;
-    height: 56px;
-  }
-  
-  .life-navigator-view .audio-console {
-    width: 250px;
-    right: -50px;
-  }
-
-  /* Mobile-optimized mode pills */
-  .life-navigator-view .ln-mode-pills-container {
-    gap: 10px;
-    margin-top: 1.2rem;
-  }
-
-  .life-navigator-view .ln-mode-pill {
-    padding: 10px 14px;
-    min-height: 44px; /* Touch-friendly minimum size */
-    font-size: 14px;
-    border-width: 1.5px;
-    background-color: var(--background-secondary);
-    border-color: var(--background-modifier-border-focus);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-  }
-
-  .life-navigator-view .ln-mode-pill:hover,
-  .life-navigator-view .ln-mode-pill:active {
-    background-color: var(--interactive-accent);
-    color: var(--text-on-accent);
-    border-color: var(--interactive-accent);
-    transform: none; /* Disable transform on mobile for better performance */
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-  }
-
-  .life-navigator-view .ln-mode-pill .ln-mode-icon-container {
-    flex-shrink: 0;
-  }
-
-  .life-navigator-view .ln-mode-pill .ln-mode-name {
-    font-weight: 600;
-    letter-spacing: 0.01em;
-  }
-
-  /* Ensure proper touch targets and accessibility on mobile */
-  .life-navigator-view .ln-mode-pill {
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-
-  /* Mobile long press feedback for tool blocks */
-  .life-navigator-view .clickable-summary {
-    -webkit-tap-highlight-color: transparent;
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    -webkit-touch-callout: none !important; /* Prevent iOS callout/selection on long press */
-    touch-action: manipulation;
-  }
-
-  .life-navigator-view .clickable-tool-block .collapsible-summary {
-    position: relative;
-    transition: background-color 0.2s ease;
-  }
-
-  .life-navigator-view .clickable-tool-block .collapsible-summary:active {
-    background-color: var(--background-modifier-hover);
-  }
-
-  /* Better focus states for mobile accessibility */
-  .life-navigator-view .ln-mode-pill:focus {
-    outline: 2px solid var(--interactive-accent);
-    outline-offset: 2px;
-  }
-
-  /* Always show message action buttons on mobile */
-  .life-navigator-view .message-actions {
-    opacity: 1 !important;
-  }
-
-  /* Mobile editing optimizations */
-  .life-navigator-view .unified-input-area {
-    padding: 16px 12px;
-    gap: 16px;
-  }
-
-  .life-navigator-view .unified-input-textarea {
-    font-size: 16px; /* Prevent zoom on iOS */
-    min-height: 44px;
-    padding: 12px 8px;
-    max-height: 200px; /* More space on mobile when editing */
-  }
-
-  .life-navigator-view .input-control-button {
-    min-height: 44px; /* Touch-friendly minimum size */
-    padding: 8px 16px;
-    font-size: 16px;
-  }
-
-  /* Improve contrast in dark mode on mobile */
-  @media (prefers-color-scheme: dark) {
-    .life-navigator-view .ln-mode-pill {
-      background-color: var(--background-primary-alt);
-      border-color: var(--background-modifier-border-hover);
-    }
-    
-    .life-navigator-view .ln-mode-pill:hover,
-    .life-navigator-view .ln-mode-pill:active {
-      background-color: var(--interactive-accent);
-      color: var(--text-on-accent);
-    }
-  }
-}
-
 /* Chat Bar Styles */
 .life-navigator-view .chat-bar {
   display: flex;
@@ -463,12 +334,11 @@ If your plugin does not need CSS, delete this file.
 
 .life-navigator-view .chat-bar-actions {
   display: flex;
-  gap: 12px;
 }
 
-.life-navigator-view .chat-bar-button {
-  width: 32px;
-  height: 32px;
+.life-navigator-view .clickable-icon {
+  width: 42px;
+  height: 42px;
   padding: 8px;
 }
 
@@ -1847,14 +1717,13 @@ If your plugin does not need CSS, delete this file.
 .life-navigator-view .conversation-history-dropdown {
   position: absolute;
   top: 100%;
-  right: 0;
+  right: -42px;
+  left: -250px;
   z-index: 1000;
   background: var(--background-primary);
   border: 1px solid var(--background-modifier-border);
   border-radius: 4px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  min-width: 320px;
-  max-width: 400px;
   max-height: 400px;
   overflow: hidden;
   margin-top: 4px;
@@ -3016,4 +2885,350 @@ If your plugin does not need CSS, delete this file.
   gap: 8px;
   margin-top: 12px;
   align-items: center;
+}
+
+/* Chat Menu Dropdown */
+.life-navigator-view .ln-chat-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.life-navigator-view .ln-chat-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  font-size: 13px;
+  color: var(--text-normal);
+}
+
+.life-navigator-view .ln-chat-menu-item:hover {
+  background: var(--background-modifier-hover);
+}
+
+/* Cost Analysis View Styles */
+.cost-analysis-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
+  background-color: var(--background-primary);
+  user-select: text;
+}
+
+.cost-analysis-view .react-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.cost-analysis-view .cost-analysis-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.cost-analysis-view .cost-analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: 24px;
+}
+
+.cost-analysis-view .cost-analysis-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.cost-analysis-view .cost-analysis-refresh-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.cost-analysis-view .cost-analysis-refresh-btn .lucide-loader-2 {
+  animation: spin 1s linear infinite;
+}
+
+.cost-analysis-view .cost-analysis-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 16px;
+  color: var(--text-muted);
+}
+
+.cost-analysis-view .cost-analysis-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.cost-analysis-view .cost-overview-section {
+  background-color: var(--background-secondary);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.cost-analysis-view .cost-overview-section h2 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.cost-analysis-view .cost-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.cost-analysis-view .cost-overview-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background-color: var(--background-primary);
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+}
+
+.cost-analysis-view .cost-overview-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cost-analysis-view .cost-overview-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.cost-analysis-view .cost-overview-value.total-cost {
+  color: var(--text-accent);
+}
+
+.cost-analysis-view .conversation-selector-section {
+  background-color: var(--background-secondary);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.cost-analysis-view .conversation-selector-section h2 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.cost-analysis-view .conversation-selector {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  color: var(--text-normal);
+  font-size: 14px;
+}
+
+.cost-analysis-view .conversation-selector:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px var(--interactive-accent-hover);
+}
+
+.cost-analysis-view .conversation-summary-section {
+  background-color: var(--background-secondary);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.cost-analysis-view .conversation-summary-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.cost-analysis-view .conversation-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.cost-analysis-view .conversation-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  background-color: var(--background-primary);
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+}
+
+.cost-analysis-view .conversation-summary-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cost-analysis-view .conversation-summary-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.cost-analysis-view .conversation-summary-value.total-cost {
+  color: var(--text-accent);
+}
+
+.cost-analysis-view .api-calls-section {
+  background-color: var(--background-secondary);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.cost-analysis-view .api-calls-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.cost-analysis-view .api-calls-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cost-analysis-view .api-call-entry {
+  background-color: var(--background-primary);
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  padding: 16px;
+}
+
+.cost-analysis-view .api-call-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.cost-analysis-view .api-call-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cost-analysis-view .api-call-model {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.cost-analysis-view .api-call-time {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.cost-analysis-view .api-call-duration {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.cost-analysis-view .api-call-total {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-accent);
+}
+
+.cost-analysis-view .api-call-details {
+  padding-top: 12px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.cost-analysis-view .api-call-tokens {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cost-analysis-view .api-call-token-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.cost-analysis-view .api-call-token-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.cost-analysis-view .api-call-token-value {
+  color: var(--text-normal);
+  font-family: var(--font-monospace);
+}
+
+.cost-analysis-view .cost-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 16px;
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px;
+}
+
+.cost-analysis-view .cost-empty-state h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.cost-analysis-view .cost-empty-state p {
+  margin: 0;
+  font-size: 14px;
+  max-width: 400px;
+}
+
+.cost-analysis-view .animate-spin {
+  animation: spin 1s linear infinite;
 }

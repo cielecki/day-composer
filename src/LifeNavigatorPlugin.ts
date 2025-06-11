@@ -1,7 +1,8 @@
 import { Plugin, Notice, requestUrl } from 'obsidian';
 import { ConfirmReloadModal } from './components/ConfirmReloadModal';
 import { initI18n, t } from './i18n';
-import { LifeNavigatorView, LIFE_NAVIGATOR_VIEW_TYPE } from './life-navigator-view';
+import { LifeNavigatorView, LIFE_NAVIGATOR_VIEW_TYPE } from './views/life-navigator-view';
+import { CostAnalysisView, COST_ANALYSIS_VIEW_TYPE } from './views/cost-analysis-view';
 import { checkForAvailableUpdate, checkForUpdatesOnStartup } from './utils/auto-update/auto-update';
 import { getObsidianTools, resetObsidianTools } from './obsidian-tools';
 import { LifeNavigatorSettingTab } from './components/LifeNavigatorSettingTab';
@@ -12,7 +13,6 @@ import { usePluginStore, getStore } from './store/plugin-store';
 export class LifeNavigatorPlugin extends Plugin {
 	private static _instance: LifeNavigatorPlugin | null = null;
 	
-	view: LifeNavigatorView | null = null;
 	userToolManager: UserDefinedToolManager | null = null;
 	private setupChangeSubscription: (() => void) | null = null;
 
@@ -85,13 +85,13 @@ export class LifeNavigatorPlugin extends Plugin {
 		this.userToolManager = new UserDefinedToolManager(this);
 		await this.userToolManager.initialize();
 
-		// Register the view type
+		// Register the view types
 		this.registerView(LIFE_NAVIGATOR_VIEW_TYPE, (leaf) => {
-			// Create view with empty context first
-			this.view = new LifeNavigatorView(leaf);
+			return new LifeNavigatorView(leaf);
+		});
 
-			return this.view;
-
+		this.registerView(COST_ANALYSIS_VIEW_TYPE, (leaf) => {
+			return new CostAnalysisView(leaf);
 		});
 
 		// Add command to reset tutorial
@@ -115,6 +115,15 @@ export class LifeNavigatorPlugin extends Plugin {
 					console.error('Error resetting tutorial:', error);
 					new Notice(t('settings.actions.resetTutorial.error', { error: error.message }));
 				}
+			},
+		});
+
+		// Add command to open cost analysis
+		this.addCommand({
+			id: "open-cost-analysis",
+			name: t('costAnalysis.commands.openCostAnalysis'),
+			callback: async () => {
+				await this.openCostAnalysis();
 			},
 		});
 
@@ -305,6 +314,58 @@ export class LifeNavigatorPlugin extends Plugin {
 		} catch (error) {
 			console.error("Error auto-opening Life Navigator for setup:", error);
 			// Fail silently to avoid disrupting user experience
+		}
+	}
+
+	async openCostAnalysis(conversationId?: string): Promise<void> {
+		try {
+			// Determine target conversation ID
+			let targetConversationId: string;
+			
+			if (conversationId) {
+				targetConversationId = conversationId;
+			} else {
+				// Use current conversation ID if none provided
+				const currentConversation = usePluginStore.getState().chats.current;
+				if (!currentConversation.meta.id) {
+					new Notice(t('costAnalysis.errors.noConversationAvailable'));
+					return;
+				}
+				targetConversationId = currentConversation.meta.id;
+			}
+
+
+			// Check if a cost analysis view for this conversation is already open
+			const leaves = this.app.workspace.getLeavesOfType(COST_ANALYSIS_VIEW_TYPE);
+			const existingLeaf = leaves.find(leaf => {
+				const view = leaf.view as CostAnalysisView;
+				return view.getState()?.conversationId === targetConversationId;
+			});
+
+			if (existingLeaf) {
+				// View for this conversation is already open, just focus on it
+				this.app.workspace.revealLeaf(existingLeaf);
+				return;
+			}
+
+			// Open a new view in the center workspace (main area)
+			const mainLeaf = this.app.workspace.getLeaf(false);
+			if (mainLeaf) {
+				await mainLeaf.setViewState({
+					type: COST_ANALYSIS_VIEW_TYPE,
+					active: true,
+					state: {
+						conversationId: targetConversationId,
+						conversationTitle: t("costAnalysis.title")
+					},
+				});
+
+				// Reveal the leaf
+				this.app.workspace.revealLeaf(mainLeaf);
+			}
+		} catch (error) {
+			console.error("Error opening cost analysis view:", error);
+			new Notice(t('costAnalysis.errors.failedToOpen', { error: error instanceof Error ? error.message : String(error) }));
 		}
 	}
 }

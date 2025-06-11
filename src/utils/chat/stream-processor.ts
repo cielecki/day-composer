@@ -1,5 +1,6 @@
 import { Anthropic } from "@anthropic-ai/sdk";
 import { Message, ContentBlock, ThinkingBlock, ToolUseBlock, RedactedThinkingBlock } from "../../types/message";
+import { ApiUsageData } from "../../types/cost-tracking";
 import { ensureContentBlocks } from "./content-blocks";
 
 // Define the type for the stream parameter
@@ -10,12 +11,14 @@ export interface StreamProcessorCallbacks {
 	onMessageUpdate?: (message: Message) => void;
 	onMessageStop?: (finalMessage: Message) => void;
 	onAbort?: () => void;
+	onUsageData?: (usage: ApiUsageData) => void;
 }
 
 export interface StreamProcessResult {
 	aborted: boolean;
 	finalContent: ContentBlock[] | null;
 	finalMessage: Message | null;
+	usageData?: ApiUsageData;
 }
 
 /**
@@ -31,6 +34,7 @@ export const processAnthropicStream = async (
 	let localMessage: Message | null = null;
 	let thinkingBlocksInProgress: Record<number, boolean> = {}; // Track thinking blocks in progress
 	const partialJsonRef: Record<number, string> = {}; // Local JSON accumulator
+	let accumulatedUsage: ApiUsageData | undefined; // Track accumulated usage data
 
 	// Set up immediate abort detection
 	const handleAbort = () => {
@@ -57,9 +61,21 @@ export const processAnthropicStream = async (
 					finalContent = [];
 					thinkingBlocksInProgress = {}; // Reset on new message
 					
-					// Extract usage information if available
+					// Extract usage information if available (but don't send to callback yet)
 					if (chunk.message?.usage) {
-						console.debug("API Usage", chunk.message.usage);
+						console.debug("API Usage (message_start)", chunk.message.usage);
+						accumulatedUsage = {
+							input_tokens: chunk.message.usage.input_tokens,
+							cache_creation_input_tokens: chunk.message.usage.cache_creation_input_tokens ?? 0,
+							cache_read_input_tokens: chunk.message.usage.cache_read_input_tokens ?? 0,
+							output_tokens: chunk.message.usage.output_tokens,
+							cache_creation: {
+							  ephemeral_5m_input_tokens: chunk.message.usage.cache_creation?.ephemeral_5m_input_tokens,
+							  ephemeral_1h_input_tokens: chunk.message.usage.cache_creation?.ephemeral_1h_input_tokens,
+							},
+							service_tier: chunk.message.usage.service_tier,
+						}
+						callbacks.onUsageData?.(accumulatedUsage);
 					}
 					
 					callbacks.onMessageStart?.();
@@ -235,9 +251,21 @@ export const processAnthropicStream = async (
 					thinkingBlocksInProgress = {};
 					break;
 				case "message_delta":
-					if (chunk.usage) {
-						console.debug("API Usage", chunk.usage);
+					console.debug("API Usage (message_delta)", chunk.usage);
+					// Merge or update usage data (but don't send to callback yet)
+					if (accumulatedUsage) {
+						// Merge with existing usage data
+						accumulatedUsage = {
+							input_tokens: accumulatedUsage.input_tokens + (chunk.usage.input_tokens ?? 0),
+							cache_creation_input_tokens: accumulatedUsage.cache_creation_input_tokens + (chunk.usage.cache_creation_input_tokens ?? 0),
+							cache_read_input_tokens: accumulatedUsage.cache_read_input_tokens + (chunk.usage.cache_read_input_tokens ?? 0),
+							output_tokens: accumulatedUsage.output_tokens + (chunk.usage.output_tokens ?? 0),
+							cache_creation: accumulatedUsage.cache_creation, // No cache creation in delta
+						};
+					} else {
+						accumulatedUsage = chunk.usage as ApiUsageData;
 					}
+					callbacks.onUsageData?.(accumulatedUsage);
 					break;
 			}
 		}
@@ -274,5 +302,6 @@ export const processAnthropicStream = async (
 		aborted,
 		finalContent: finalContent.length > 0 ? finalContent : null,
 		finalMessage: localMessage,
+		usageData: accumulatedUsage,
 	};
 }; 

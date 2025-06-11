@@ -1,7 +1,6 @@
 import { TFile, CachedMetadata, FrontMatterCache } from "obsidian";
-import { LNMode } from "../../types/mode";
 import { TTS_VOICES, TTSVoice } from "src/store/audio-slice";
-import { ANTHROPIC_MODELS, AnthropicModel } from "../modes/ln-mode-defaults";
+import { ANTHROPIC_MODELS, AnthropicModel } from "../../types/anthropic-models";
 import { validateIconField } from "./lucide-icon-validation";
 import { expandLinks } from "../links/expand-links";
 import { LifeNavigatorPlugin } from "../../LifeNavigatorPlugin";

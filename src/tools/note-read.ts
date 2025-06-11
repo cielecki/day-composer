@@ -41,19 +41,19 @@ export const noteReadTool: ObsidianTool<NoteReadToolInput> = {
     const { plugin, params } = context;
     const { path, expand_links = false } = params;
 
-    context.setLabel(t('tools.read.labels.inProgress', { path }));
+    context.setLabel(t('tools.read.labels.inProgress', { name: path }));
 
     try {
       // Read the file content
       const file = plugin.app.vault.getAbstractFileByPath(path);
       
       if (!file) {
-        context.setLabel(t('tools.read.labels.failed', { path }));
+        context.setLabel(t('tools.read.labels.failed', { name: path }));
         throw new ToolExecutionError(`File not found: ${path}`);
       }
       
       if (!(file instanceof TFile)) {
-        context.setLabel(t('tools.read.labels.failed', { path }));
+        context.setLabel(t('tools.read.labels.failed', { name: path }));
         throw new ToolExecutionError(`Path is not a file: ${path}`);
       }
 
@@ -77,10 +77,10 @@ export const noteReadTool: ObsidianTool<NoteReadToolInput> = {
         description: t("tools.navigation.openNote")
       });
 
-      context.setLabel(t('tools.read.labels.completed', { path }));
+      context.setLabel(t('tools.read.labels.completed', { name: path }));
       context.progress(content);
     } catch (error) {
-      context.setLabel(t('tools.read.labels.failed', { path }));
+      context.setLabel(t('tools.read.labels.failed', { name: path }));
       throw error;
     }
   }

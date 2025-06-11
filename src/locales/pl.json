@@ -18,6 +18,48 @@
     },
     "userMessage": "wiadomość użytkownika"
   },
+  "costAnalysis": {
+    "commands": {
+      "openCostAnalysis": "Otwórz analizę kosztów"
+    },
+    "emptyState": {
+      "description": "Ta rozmowa nie wykonała jeszcze żadnych wywołań API.",
+      "title": "Brak danych o kosztach"
+    },
+    "errors": {
+      "failedToOpen": "Nie udało się otworzyć analizy kosztów: {{error}}",
+      "noConversationAvailable": "Brak dostępnej rozmowy do analizy kosztów",
+      "noConversationSpecified": "Nie określono rozmowy",
+      "requiresConversationId": "Ten widok analizy kosztów wymaga ID rozmowy do wyświetlania danych."
+    },
+    "history": {
+      "cacheRead": "Odczyt cache:",
+      "cacheWrite": "Zapis cache:",
+      "input": "Wejście:",
+      "output": "Wyjście:",
+      "title": "Historia wywołań API"
+    },
+    "loading": "Ładowanie danych rozmowy...",
+    "menu": {
+      "authorTwitter": "Obserwuj autora",
+      "discordCommunity": "Dołącz do społeczności",
+      "githubRepo": "Ogwiazdkuj na GitHubie",
+      "viewCosts": "Pokaż koszty"
+    },
+    "refreshTooltip": "Odśwież dane kosztów",
+    "summary": {
+      "apiCalls": "Wywołania API",
+      "cacheReads": "Odczyty cache",
+      "cacheWrites": "Zapisy cache",
+      "inputTokens": "Tokeny wejściowe",
+      "outputTokens": "Tokeny wyjściowe",
+      "title": "Podsumowanie",
+      "totalCost": "Całkowity koszt"
+    },
+    "title": "Analiza kosztów",
+    "titleWithName": "Analiza kosztów: {{title}}",
+    "untitledConversation": "Rozmowa bez tytułu"
+  },
   "dateTime": {
     "current": "Aktualna Data i Czas"
   },
@@ -550,12 +592,19 @@
       "conversationNotFound": "Nie znaleziono rozmowy",
       "conversationTitleUpdateFailed": "Nie udało się zaktualizować tytułu rozmowy",
       "conversationTitleUpdated": "Tytuł rozmowy zaktualizowany",
+      "delete": "Usuń rozmowę",
+      "deleteConfirm": "Czy na pewno chcesz usunąć tę rozmowę?",
       "history": "Historia rozmów",
       "historyEmpty": "Brak rozmów",
       "historyLoading": "Ładowanie rozmów...",
       "historyNoResults": "Nie znaleziono rozmów",
       "historySearchPlaceholder": "Szukaj rozmów...",
-      "new": "Nowa rozmowa"
+      "new": "Nowa rozmowa",
+      "revealFailed": "Nie udało się pokazać pliku rozmowy",
+      "revealInExplorer": "Pokaż w Eksploratorze",
+      "revealInFileManager": "Pokaż w Menedżerze plików",
+      "revealInFiles": "Pokaż w Plikach",
+      "revealInFinder": "Pokaż w Finder"
     },
     "input": {
       "attachImage": "Załącz obraz",

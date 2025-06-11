@@ -1,7 +1,8 @@
 import { Message } from '../../types/message';
+import { ChatCostData } from '../../types/cost-tracking';
 
 // Database schema version for migrations
-export const CURRENT_SCHEMA_VERSION = 1;
+export const CURRENT_SCHEMA_VERSION = 2;
 
 export interface ConversationMeta {
 	id: string;
@@ -15,6 +16,7 @@ export interface StoredConversation {
 	modeId: string;
 	titleGenerated: boolean;
 	messages: Message[];
+	costData?: ChatCostData; // Optional for backward compatibility
 }
 
 export interface Chat {

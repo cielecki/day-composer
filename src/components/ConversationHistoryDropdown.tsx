@@ -3,6 +3,7 @@ import { ConversationMeta } from 'src/utils/chat/conversation';
 import { LucideIcon } from './LucideIcon';
 import { usePluginStore } from '../store/plugin-store';
 import { t } from 'src/i18n';
+import { handleDeleteConversation } from 'src/utils/chat/delete-conversation-handler';
 
 interface ConversationHistoryDropdownProps {
     onConversationSelect: (conversationId: string) => void;
@@ -67,16 +68,9 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
         onToggle();
     };
 
-    const handleDeleteConversation = async (e: React.MouseEvent, conversationId: string) => {
+    const handleDeleteConversationClick = async (e: React.MouseEvent, conversationId: string) => {
         e.stopPropagation();
-        if (confirm('Are you sure you want to delete this conversation?')) {
-            try {
-                await deleteConversation(conversationId);
-                await loadConversations();
-            } catch (error) {
-                console.error('Failed to delete conversation:', error);
-            }
-        }
+        await handleDeleteConversation(conversationId, deleteConversation, loadConversations);
     };
 
     const handleStartEdit = (e: React.MouseEvent, conversation: ConversationMeta) => {
@@ -189,7 +183,7 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
                                         <LucideIcon name="pencil" size={18} />
                                     </button>
                                     <button
-                                        onClick={(e) => handleDeleteConversation(e, conversation.id)}
+                                        onClick={(e) => handleDeleteConversationClick(e, conversation.id)}
                                         className="clickable-icon"
                                         title="Delete conversation"
                                     >

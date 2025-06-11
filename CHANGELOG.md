@@ -3,8 +3,6 @@
 All notable changes to this project will be documented in this file.
 
 
-
-
 ## [0.11.2] - 2025-01-10
 
 ### 🚀 Performance & Reliability Improvements
@@ -414,3 +412,19 @@ These improvements work seamlessly in the background:
 - Fallback to `main` branch if version-specific content unavailable
 - Source information displayed in tool outputs for transparency
 - Refactored shared library utilities to eliminate code duplication between tools
+
+### Added
+- **Delete Chat Option in 3-Dot Menu**: You can now delete the current conversation directly from the 3-dot menu in the chat interface. This provides quick access to the same delete functionality available in the chat history dropdown.
+- **Reveal in Finder Option**: Added "Reveal in Finder" functionality to the 3-dot menu that opens your system's file explorer and highlights the current conversation file. Perfect for quick access to conversation files for backup, sharing, or organization purposes.
+- **Community Links in Menu**: The 3-dot menu now includes quick access to the Life Navigator community - jump directly to the GitHub repository for updates and documentation, join the Discord community for support and discussions, or follow the author on Twitter/X for project updates.
+
+### Improved
+- **Faster Chat Loading**: Loading a conversation that's already open now happens instantly without unnecessary disk reads, making the interface more responsive.
+- **Smart Menu Items**: "Reveal in Finder" and "Delete Chat" options in the 3-dot menu now only appear when there's an actual conversation file saved to disk, providing a cleaner interface for new chats that haven't been saved yet.
+
+### Fixed
+- **Cost Tracking for Multi-Turn Conversations**: Fixed an issue where only the first API call in conversations involving tool use was being tracked for cost analysis. Now all API calls within a conversation are properly recorded, giving you complete visibility into your usage costs.
+- **Reveal in Finder Implementation**: Updated the reveal functionality to use Obsidian's built-in `app.showInFolder()` API instead of direct Electron shell access, ensuring reliable cross-platform file revelation.
+- **Platform-Specific UI Labels**: Menu items now show the correct file manager name for each platform - "Reveal in Finder" on macOS, "Reveal in Explorer" on Windows, "Reveal in Files" on iOS, and "Reveal in File Manager" on Android/Linux.
+- **Cost Analysis Translation**: All cost analysis interface elements are now properly translated, including the "View Costs" menu option, cost analysis titles, data labels, error messages, and loading states. Both English and Polish translations are now complete for the entire cost analysis feature.
+

@@ -1,18 +1,10 @@
 import { LNMode } from 'src/types/mode';
 import { TTS_VOICES, TTSVoice } from "src/store/audio-slice";
+import { ANTHROPIC_MODELS, AnthropicModel } from 'src/types/anthropic-models';
 
-// Available Anthropic models
-export const ANTHROPIC_MODELS = [
-  "auto",                          // Auto-select based on mode characteristics
-  "claude-opus-4-20250514",        // Claude Opus 4 - Most capable
-  "claude-sonnet-4-20250514",      // Claude Sonnet 4 - High performance
-  "claude-3-5-haiku-20241022",     // Claude Haiku 3.5 - Fastest
-  "claude-3-7-sonnet-20250219",    // Claude Sonnet 3.7 - Current default
-  "claude-3-5-sonnet-20241022",    // Claude Sonnet 3.5 v2
-  "claude-3-5-sonnet-20240620",    // Claude Sonnet 3.5 v1
-] as const;
-
-export type AnthropicModel = typeof ANTHROPIC_MODELS[number];
+// Re-export for backward compatibility
+export { ANTHROPIC_MODELS };
+export type { AnthropicModel };
 
 export const DEFAULT_VOICE_INSTRUCTIONS = `
 Voice: Warm, empathetic, and professional, reassuring the customer that their issue is understood and will be resolved.

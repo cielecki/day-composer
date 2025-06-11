@@ -1,7 +1,7 @@
 import type { ImmerStateCreator } from '../store/plugin-store';
 import { Message, ToolResultBlock } from '../types/message';
 import { AttachedImage } from 'src/types/attached-image';
-import { Chat } from 'src/utils/chat/conversation';
+import { Chat, CURRENT_SCHEMA_VERSION } from 'src/utils/chat/conversation';
 import { generateChatId } from 'src/utils/chat/generate-conversation-id';
 import { createUserMessage, extractUserMessageContent } from 'src/utils/chat/message-builder';
 import { runConversationTurn } from 'src/utils/chat/conversation-turn';
@@ -12,6 +12,8 @@ import { t } from 'src/i18n';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { ensureContentBlocks, extractTextForTTS } from 'src/utils/chat/content-blocks';
 import { getDefaultLNMode } from 'src/utils/modes/ln-mode-defaults';
+import { ApiUsageData } from 'src/types/cost-tracking';
+import { calculateApiCallCost, calculateChatCostData } from 'src/utils/cost/cost-calculator';
 
 // Extend Message type to include unique ID for React keys
 export interface MessageWithId extends Message {
@@ -65,6 +67,9 @@ export interface ChatSlice {
   retryFromMessage: (messageIndex: number) => Promise<void>;
   chatStop: () => void;
   saveImmediatelyIfNeeded: (force?: boolean) => Promise<void>;
+  
+  // Cost tracking
+  updateCostEntry: (model: string, usage: ApiUsageData, timestamp: number, duration?: number, apiCallId?: string) => void;
 }
 
 // Create conversation slice - now get() returns full PluginStore type
@@ -108,10 +113,18 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
           updatedAt: 0
         },
         storedConversation: {
-          version: 0,
+          version: CURRENT_SCHEMA_VERSION,
           modeId: '',
           titleGenerated: false,
-          messages: []
+          messages: [],
+          costData: {
+            total_cost: 0,
+            total_input_tokens: 0,
+            total_output_tokens: 0,
+            total_cache_write_tokens: 0,
+            total_cache_read_tokens: 0,
+            entries: [],
+          }
         }
       },
       isGenerating: false,
@@ -177,10 +190,18 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
             updatedAt: 0
           },
           storedConversation: {
-            version: 0,
+            version: CURRENT_SCHEMA_VERSION,
             modeId: '',
             titleGenerated: false,
-            messages: []
+            messages: [],
+            costData: {
+              total_cost: 0,
+              total_input_tokens: 0,
+              total_output_tokens: 0,
+              total_cache_write_tokens: 0,
+              total_cache_read_tokens: 0,
+              entries: [],
+            }
           }
         };
         state.chats.liveToolResults.clear();
@@ -450,6 +471,50 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       
       // Retry the conversation
       await state.runConversationTurnWithContext();
+    },
+
+    // Cost tracking implementation
+    updateCostEntry: (model: string, usage: ApiUsageData, timestamp: number, duration?: number, apiCallId?: string) => {
+      set((state) => {
+        // Initialize cost data if it doesn't exist
+        if (!state.chats.current.storedConversation.costData) {
+          state.chats.current.storedConversation.costData = {
+            total_cost: 0,
+            total_input_tokens: 0,
+            total_output_tokens: 0,
+            total_cache_write_tokens: 0,
+            total_cache_read_tokens: 0,
+            entries: [],
+          };
+        }
+        
+        // Calculate the cost entry with custom ID if provided
+        const costEntry = calculateApiCallCost(model, usage, timestamp, duration, apiCallId);
+        
+        // Update the existing entry with new values
+        const existingEntry = state.chats.current.storedConversation.costData?.entries.find(entry => 
+          entry.id === costEntry.id
+        );
+
+        if (existingEntry) {
+          existingEntry.breakdown.cache_read_cost += costEntry.breakdown.cache_read_cost;
+          existingEntry.breakdown.cache_write_cost += costEntry.breakdown.cache_write_cost;
+          existingEntry.breakdown.input_cost += costEntry.breakdown.input_cost;
+          existingEntry.breakdown.output_cost += costEntry.breakdown.output_cost;
+          existingEntry.cost += costEntry.cost;
+          existingEntry.duration = costEntry.duration;
+          existingEntry.usage = costEntry.usage;
+        } else {
+          state.chats.current.storedConversation.costData?.entries.push(costEntry);
+        }
+
+        // Recalculate totals
+        const newTotals = calculateChatCostData(state.chats.current.storedConversation.costData.entries);
+        state.chats.current.storedConversation.costData = newTotals;
+      });
+      
+      // Save the conversation with the new cost data
+      get().saveImmediatelyIfNeeded(true);
     }
   }
 }; 

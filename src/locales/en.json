@@ -18,6 +18,48 @@
     },
     "userMessage": "user message"
   },
+  "costAnalysis": {
+    "commands": {
+      "openCostAnalysis": "Open Cost Analysis"
+    },
+    "emptyState": {
+      "description": "This conversation hasn't made any API calls yet.",
+      "title": "No cost data available"
+    },
+    "errors": {
+      "failedToOpen": "Failed to open cost analysis: {{error}}",
+      "noConversationAvailable": "No conversation available for cost analysis",
+      "noConversationSpecified": "No Conversation Specified",
+      "requiresConversationId": "This cost analysis view requires a conversation ID to display data."
+    },
+    "history": {
+      "cacheRead": "Cache Read:",
+      "cacheWrite": "Cache Write:",
+      "input": "Input:",
+      "output": "Output:",
+      "title": "API Call History"
+    },
+    "loading": "Loading conversation data...",
+    "menu": {
+      "authorTwitter": "Follow Author",
+      "discordCommunity": "Join Community",
+      "githubRepo": "Star on GitHub",
+      "viewCosts": "View Costs"
+    },
+    "refreshTooltip": "Refresh cost data",
+    "summary": {
+      "apiCalls": "API Calls",
+      "cacheReads": "Cache Reads",
+      "cacheWrites": "Cache Writes",
+      "inputTokens": "Input Tokens",
+      "outputTokens": "Output Tokens",
+      "title": "Summary",
+      "totalCost": "Total Cost"
+    },
+    "title": "Cost Analysis",
+    "titleWithName": "Cost Analysis: {{title}}",
+    "untitledConversation": "Untitled Conversation"
+  },
   "dateTime": {
     "current": "Current Date and Time"
   },
@@ -550,12 +592,19 @@
       "conversationNotFound": "Conversation not found",
       "conversationTitleUpdateFailed": "Failed to update conversation title",
       "conversationTitleUpdated": "Conversation title updated",
+      "delete": "Delete Chat",
+      "deleteConfirm": "Are you sure you want to delete this conversation?",
       "history": "Chat History",
       "historyEmpty": "No conversations yet",
       "historyLoading": "Loading conversations...",
       "historyNoResults": "No conversations found",
       "historySearchPlaceholder": "Search conversations...",
-      "new": "New Chat"
+      "new": "New Chat",
+      "revealFailed": "Failed to reveal conversation file",
+      "revealInExplorer": "Reveal in Explorer",
+      "revealInFileManager": "Reveal in File Manager",
+      "revealInFiles": "Reveal in Files",
+      "revealInFinder": "Reveal in Finder"
     },
     "input": {
       "attachImage": "Attach Image",

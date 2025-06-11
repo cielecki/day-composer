@@ -166,6 +166,10 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         console.debug(`Attempting to save conversation to: ${fileName}`);
         await app.vault.adapter.write(fileName, conversationData);
         console.debug(`Successfully saved conversation: ${fileName}`);
+
+        set((state) => {
+          state.chats.current.meta.filePath = fileName;
+        });
         
         return conversation.meta.id;
       } catch (error) {
@@ -218,6 +222,13 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
 
     loadConversation: async (conversationId) => {
       try {
+        // Check if the requested conversation is already loaded
+        const currentConversationId = get().getCurrentConversationId();
+        if (currentConversationId === conversationId) {
+          console.debug(`Conversation ${conversationId} is already loaded, skipping disk load`);
+          return true;
+        }
+
         // Load the stored conversation data
         const storedConversation = await get().loadConversationData(conversationId);
         

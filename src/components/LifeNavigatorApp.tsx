@@ -22,17 +22,18 @@ import { MarkdownRenderer } from './MarkdownRenderer';
 import { MessageWithId } from '../store/chat-store';
 import { useAutoscroll } from '../hooks/useAutoscroll';
 import { ValidationFixButton } from './ValidationFixButton';
+import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
+import { handleDeleteConversation } from 'src/utils/chat/delete-conversation-handler';
+import { revealFileInSystem } from 'src/utils/chat/reveal-file-handler';
+import { PlatformUtils } from 'src/utils/platform';
 
 // Add Zustand store imports
 import {
 	usePluginStore
 } from "../store/plugin-store";
+import { ConversationMeta } from "src/utils/chat/conversation";
 
-declare global {
-	interface Window {
-		app: import('obsidian').App;
-	}
-}
+// Global Window interface now handled in reveal-file-handler.ts
 
 function openSimpleObsidianModal(app: import('obsidian').App, title: string, text: string) {
 	class SimpleObsidianModal extends Modal {
@@ -42,19 +43,19 @@ function openSimpleObsidianModal(app: import('obsidian').App, title: string, tex
 		onOpen() {
 			const { contentEl } = this;
 			contentEl.empty();
-			
+
 			// Create main container with flexbox layout
 			const container = contentEl.createEl("div", { cls: "ln-simple-modal-container" });
-			
+
 			// Header section (always visible)
 			const header = container.createEl("div", { cls: "ln-simple-modal-header" });
 			header.createEl("h2", { text: title });
-			
+
 			// Content section (scrollable)
 			const content = container.createEl("div", { cls: "ln-simple-modal-content" });
 			const pre = content.createEl("pre", { cls: "ln-pre-code" });
 			pre.innerText = text;
-			
+
 			// Footer section (always visible)
 			const footer = container.createEl("div", { cls: "ln-simple-modal-footer" });
 			const button = footer.createEl("button", { text: t('ui.modal.copyToClipboard'), cls: "mod-cta" });
@@ -96,6 +97,7 @@ export const LifeNavigatorApp: React.FC = () => {
 	const audioStop = usePluginStore(state => state.audioStop);
 	const chatStop = usePluginStore(state => state.chatStop);
 
+
 	// Create a stable reference to the conversation to prevent proxy issues
 	// Only recreate when the conversation content actually changes
 	const stableConversation = useMemo(() => {
@@ -110,8 +112,12 @@ export const LifeNavigatorApp: React.FC = () => {
 	// Use actual store methods instead of placeholder functions
 	const addUserMessage = usePluginStore(state => state.addUserMessage);
 	const loadConversation = usePluginStore(state => state.loadConversation);
-	const getCurrentConversationId = usePluginStore(state => state.getCurrentConversationId);
+	const deleteConversation = usePluginStore(state => state.deleteConversation);
+	const currentConversationId = usePluginStore(state => state.getCurrentConversationId());
 	const getSystemPrompt = usePluginStore(state => state.getSystemPrompt);
+
+	const currentConversationMeta = usePluginStore(state => state.chats.current.meta);
+
 
 	// Get active mode
 	const activeMode = availableModes[activeModeId];
@@ -151,7 +157,7 @@ export const LifeNavigatorApp: React.FC = () => {
 	// Filter out user messages that contain only tool results
 	const filteredConversation = useMemo(() => {
 		let conversationToFilter = stableConversation;
-		
+
 		// If editing, only show messages up to (but NOT including) the one being edited
 		if (editingMessage) {
 			conversationToFilter = stableConversation.slice(0, editingMessage.index);
@@ -188,7 +194,7 @@ export const LifeNavigatorApp: React.FC = () => {
 	const messageIndexMap = useMemo(() => {
 		const indexMap: Array<{ filteredIndex: number; originalIndex: number; messageId: string }> = [];
 		let filteredIndex = 0;
-		
+
 		stableConversation.forEach((message, originalIndex) => {
 			// Skip messages during editing
 			if (editingMessage && originalIndex >= editingMessage.index) {
@@ -215,7 +221,7 @@ export const LifeNavigatorApp: React.FC = () => {
 			if (shouldInclude) {
 				const messageWithId = message as MessageWithId;
 				const messageId = messageWithId.messageId || `fallback-${originalIndex}`;
-				
+
 				indexMap.push({
 					filteredIndex,
 					originalIndex,
@@ -224,7 +230,7 @@ export const LifeNavigatorApp: React.FC = () => {
 				filteredIndex++;
 			}
 		});
-		
+
 		return indexMap;
 	}, [stableConversation, editingMessage]);
 
@@ -353,10 +359,10 @@ export const LifeNavigatorApp: React.FC = () => {
 													`Auto-triggering message for mode ${activeMode.name}: "${usage}"`,
 												);
 
-																							// Wait a short moment before sending to ensure state updates have propagated
-											setTimeout(() => {
-												addUserMessage(usage);
-											}, 100);
+												// Wait a short moment before sending to ensure state updates have propagated
+												setTimeout(() => {
+													addUserMessage(usage);
+												}, 100);
 											}
 										}}
 									/>
@@ -377,7 +383,7 @@ export const LifeNavigatorApp: React.FC = () => {
 
 			return (
 				<div className="empty-conversation">
-					
+
 				</div>
 			);
 		}
@@ -386,11 +392,11 @@ export const LifeNavigatorApp: React.FC = () => {
 
 	// Check if setup is complete
 	const isSetupCompleted = usePluginStore(state => state.isSetupComplete());
-	
+
 	// If setup is not complete, show setup flow
 	if (!isSetupCompleted) {
 		return (
-			<SetupFlow 
+			<SetupFlow
 				lnModes={availableModes}
 			/>
 		);
@@ -574,7 +580,7 @@ export const LifeNavigatorApp: React.FC = () => {
 											</span>
 										</div>
 									))}
-									
+
 								</>
 							)}
 						</div>
@@ -593,7 +599,7 @@ export const LifeNavigatorApp: React.FC = () => {
 						<LucideIcon name="square-pen" size={18} />
 					</button>
 
-					<div 
+					<div
 						className="ln-relative"
 						ref={conversationHistoryContainerRef}
 					>
@@ -610,8 +616,86 @@ export const LifeNavigatorApp: React.FC = () => {
 								onConversationSelect={handleConversationSelect}
 								isOpen={conversationHistoryOpen}
 								onToggle={() => setConversationHistoryOpen(false)}
-								currentConversationId={getCurrentConversationId()}
+								currentConversationId={currentConversationId}
 							/>
+						)}
+					</div>
+
+					<div className="ln-relative" ref={menuRef}>
+						<button
+							ref={menuButtonRef}
+							className="clickable-icon"
+							aria-label="More options"
+							onClick={() => setMenuOpen(!menuOpen)}
+						>
+							<LucideIcon name="more-horizontal" size={18} />
+						</button>
+
+						{menuOpen && (
+							<div className="ln-chat-menu-dropdown">
+								<div className="ln-chat-menu-item" onClick={async () => {
+									try {
+										const plugin = LifeNavigatorPlugin.getInstance();
+										await plugin.openCostAnalysis(currentConversationId || undefined);
+									} catch (error) {
+										console.error('Failed to open cost analysis:', error);
+									}
+									setMenuOpen(false);
+								}}>
+									<LucideIcon name="dollar-sign" size={16} />
+									<span>{t('costAnalysis.menu.viewCosts')}</span>
+								</div>
+								{currentConversationMeta && currentConversationMeta.filePath && (
+									<>
+										<div className="ln-chat-menu-item" onClick={async () => {
+											if (currentConversationId) {
+												try {
+													if (currentConversationMeta && currentConversationMeta.filePath) {
+														await revealFileInSystem(currentConversationMeta.filePath);
+													}
+												} catch (error) {
+													console.error('Failed to reveal conversation file:', error);
+												}
+											}
+											setMenuOpen(false);
+										}}>
+											<LucideIcon name="folder-open" size={16} />
+											<span>{PlatformUtils.getRevealLabel()}</span>
+										</div>
+										<div className="ln-chat-menu-item" onClick={async () => {
+											if (currentConversationId) {
+												await handleDeleteConversation(currentConversationId, deleteConversation);
+											}
+											setMenuOpen(false);
+										}}>
+											<LucideIcon name="trash-2" size={16} />
+											<span>{t('ui.chat.delete')}</span>
+										</div>
+									</>
+								)}
+								<div className="ln-separator" />
+								<div className="ln-chat-menu-item" onClick={() => {
+									window.open('https://github.com/cielecki/life-navigator', '_blank');
+									setMenuOpen(false);
+								}}>
+									<LucideIcon name="github" size={16} />
+									<span>{t('costAnalysis.menu.githubRepo')}</span>
+								</div>
+								<div className="ln-chat-menu-item" onClick={() => {
+									window.open('https://discord.com/invite/VrxZdr3JWH', '_blank');
+									setMenuOpen(false);
+								}}>
+									<LucideIcon name="message-circle" size={16} />
+									<span>{t('costAnalysis.menu.discordCommunity')}</span>
+								</div>
+								<div className="ln-chat-menu-item" onClick={() => {
+									window.open('https://x.com/mcielecki', '_blank');
+									setMenuOpen(false);
+								}}>
+									<LucideIcon name="user" size={16} />
+									<span>{t('costAnalysis.menu.authorTwitter')}</span>
+								</div>
+							</div>
 						)}
 					</div>
 				</div>
@@ -636,8 +720,8 @@ export const LifeNavigatorApp: React.FC = () => {
 				))}
 
 				{/* Show validation fix button for current mode if it has issues */}
-				{!isGeneratingResponse && activeMode && <ValidationFixButton 
-					type="specific-mode" 
+				{!isGeneratingResponse && activeMode && <ValidationFixButton
+					type="specific-mode"
 					modeId={activeMode.path}
 					displayMode="text-and-button"
 				/>}
@@ -651,7 +735,9 @@ export const LifeNavigatorApp: React.FC = () => {
 						editingMessage={editingMessage}
 					/>
 				</div>
-			</div> }
+			</div>}
+
+
 		</div>
 	);
 };
