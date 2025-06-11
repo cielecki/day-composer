@@ -149,8 +149,7 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 			// Create navigation target
 			const navigationTarget = createNavigationTarget(
 				filePath,
-				lineNumbers,
-				`Navigate to added todo${addedTasks.length > 1 ? 's' : ''}`
+				lineNumbers
 			);
 
 			context.addNavigationTarget(navigationTarget);

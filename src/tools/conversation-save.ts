@@ -155,8 +155,7 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
 
       // Add navigation target
       context.addNavigationTarget({
-        filePath: targetPath,
-        description: t('tools.conversationSave.navigation.openSavedConversation')
+        filePath: targetPath
       });
 
       context.setLabel(t('tools.conversationSave.labels.success', { path: targetPath }));

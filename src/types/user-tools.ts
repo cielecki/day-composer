@@ -19,7 +19,6 @@ export interface UserToolSchema {
 export interface NavigationTarget {
 	filePath: string;
 	lineRange?: { start: number; end: number };
-	description: string;
 }
 
 export interface UserDefinedTool {

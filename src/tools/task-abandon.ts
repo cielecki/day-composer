@@ -139,8 +139,7 @@ export const taskAbandonTool: ObsidianTool<TaskAbandonToolInput> = {
       const navigationTargets = createNavigationTargetsForTasks(
         updatedNote,
         movedTasks,
-        filePath,
-        `Navigate to abandoned todo{{count}}`
+        filePath
       );
       
       // Add navigation targets

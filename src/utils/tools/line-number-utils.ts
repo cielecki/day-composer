@@ -75,20 +75,17 @@ export function findTaskLineRanges(note: Note, tasks: Task[]): Array<{ start: nu
  * Create a navigation target from line ranges
  * @param filePath The file path
  * @param lineRanges Array of line ranges
- * @param description Description for the navigation target
  * @returns NavigationTarget object
  */
 export function createNavigationTargetFromRanges(
   filePath: string, 
-  lineRanges: Array<{ start: number; end: number }>, 
-  description: string
+  lineRanges: Array<{ start: number; end: number }>
 ): NavigationTarget {
   if (lineRanges.length === 0) {
     // Default to line 1 if no line ranges provided
     return {
       filePath,
-      lineRange: { start: 1, end: 1 },
-      description
+      lineRange: { start: 1, end: 1 }
     };
   }
   
@@ -96,8 +93,7 @@ export function createNavigationTargetFromRanges(
   if (lineRanges.length === 1) {
     return {
       filePath,
-      lineRange: lineRanges[0],
-      description
+      lineRange: lineRanges[0]
     };
   }
   
@@ -107,8 +103,7 @@ export function createNavigationTargetFromRanges(
     lineRange: { 
       start: Math.min(...lineRanges.map(r => r.start)), 
       end: Math.max(...lineRanges.map(r => r.end)) 
-    },
-    description
+    }
   };
 }
 
@@ -117,19 +112,16 @@ export function createNavigationTargetFromRanges(
  * @param note The updated note containing the tasks
  * @param tasks Array of tasks to create navigation targets for
  * @param filePath The file path
- * @param description Description template (use {{count}} for task count)
  * @returns Array containing a single navigation target for all tasks
  */
 export function createNavigationTargetsForTasks(
   note: Note,
   tasks: Task[],
-  filePath: string,
-  description: string
+  filePath: string
 ): NavigationTarget[] {
   const lineRanges = findTaskLineRanges(note, tasks);
-  const finalDescription = description.replace('{{count}}', tasks.length > 1 ? 's' : '');
   
-  return [createNavigationTargetFromRanges(filePath, lineRanges, finalDescription)];
+  return [createNavigationTargetFromRanges(filePath, lineRanges)];
 }
 
 /**
@@ -161,21 +153,18 @@ export function findTaskLineNumbers(note: Note, tasks: Task[]): number[] {
  * Create a navigation target from line numbers
  * @param filePath The file path
  * @param lineNumbers Array of line numbers
- * @param description Description for the navigation target
  * @returns NavigationTarget object
  * @deprecated Use createNavigationTargetFromRanges for proper comment highlighting
  */
 export function createNavigationTarget(
   filePath: string, 
-  lineNumbers: number[], 
-  description: string
+  lineNumbers: number[]
 ): NavigationTarget {
   if (lineNumbers.length === 0) {
     // Default to line 1 if no line numbers provided
     return {
       filePath,
-      lineRange: { start: 1, end: 1 },
-      description
+      lineRange: { start: 1, end: 1 }
     };
   }
   
@@ -184,6 +173,5 @@ export function createNavigationTarget(
     lineRange: lineNumbers.length === 1 
       ? { start: lineNumbers[0], end: lineNumbers[0] }
       : { start: Math.min(...lineNumbers), end: Math.max(...lineNumbers) },
-    description
   };
 } 

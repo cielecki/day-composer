@@ -117,8 +117,7 @@ export const vaultSearchTool: ObsidianTool<VaultSearchToolInput> = {
       // Add navigation targets for each result
       limitedResults.forEach(result => {
         context.addNavigationTarget({
-          filePath: result.file,
-          description: `Open: ${result.file}`
+          filePath: result.file
         });
       });
 

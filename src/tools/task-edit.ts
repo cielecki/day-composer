@@ -117,8 +117,7 @@ export const taskEditTool: ObsidianTool<TaskEditToolInput> = {
       const navigationTargets = createNavigationTargetsForTasks(
         updatedNote,
         [taskToUpdate],
-        filePath,
-        t('tools.navigation.navigateToEditedTodo')
+        filePath
       );
       
       // Prepare success message

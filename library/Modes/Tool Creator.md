@@ -157,9 +157,7 @@ The schema defines what parameters your tool accepts:
 const fileName = `Output ${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.md`;
 await plugin.app.vault.create(fileName, content);
 addNavigationTarget({
-  type: 'file',
-  path: fileName,
-  label: `Open ${fileName}`
+  filePath: fileName
 });
 ```
 
@@ -243,9 +241,7 @@ async function execute(input, { progress, setLabel, addNavigationTarget, plugin 
     
     // Add navigation target
     addNavigationTarget({
-      type: 'file',
-      path: filePath,
-      label: `Open ${input.title}`
+      filePath: filePath
     });
     
     setLabel("Note created");

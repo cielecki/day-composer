@@ -279,9 +279,6 @@
         "initial": "Zapisywanie rozmowy ...",
         "success": "Zapisano rozmowę do '{{path}}'"
       },
-      "navigation": {
-        "openSavedConversation": "Otwórz zapisaną rozmowę"
-      },
       "progress": {
         "empty": "Brak rozmowy do zapisania - obecna rozmowa jest pusta",
         "fileExists": "Plik już istnieje w '{{name}}'. Ustaw auto_version na true, aby utworzyć plik z wersją",
@@ -371,9 +368,6 @@
         "initial": "Przenoszenie pliku",
         "success": "Przeniesiono plik z '{{source}}' do '{{destination}}'"
       },
-      "navigation": {
-        "openMovedFile": "Otwórz przeniesiony plik"
-      },
       "progress": {
         "completed": "Przeniesiono plik z '{{source}}' do '{{destination}}'",
         "creatingDirectories": "Tworzenie katalogu docelowego: '{{dir}}'",
@@ -450,16 +444,6 @@
         "success": "Przeniesiono '{{task}}' z '{{source}}' do '{{target}}' na pozycji '{{position}}'"
       }
     },
-    "navigation": {
-      "navigateToCompletedTodo": "Przejdź do ukończonego zadania",
-      "navigateToEditedTodo": "Przejdź do edytowanego zadania",
-      "navigateToUncheckedTodo": "Przejdź do odznaczonego zadania",
-      "openCreatedDocument": "Otwórz utworzony dokument",
-      "openCurrentFile": "Otwórz aktualny plik",
-      "openDayNote": "Otwórz notatkę dzienną dla '{{date}}'",
-      "openEditedDocument": "Otwórz edytowany dokument",
-      "openNote": "Otwórz dokument"
-    },
     "noteDelete": {
       "errors": {
         "cannotAccess": "Nie można uzyskać dostępu do pliku: '{{name}}'",
@@ -472,9 +456,6 @@
         "initial": "Usuwanie notatki ...",
         "requiresConfirmation": "Usunięcie wymaga potwierdzenia",
         "success": "Przeniesiono '{{name}}' do katalogu '{{trashDir}}'"
-      },
-      "navigation": {
-        "openDeletedFile": "Otwórz plik w śmietniku"
       },
       "progress": {
         "completed": "Przeniesiono '{{source}}' do katalogu '{{trashDir}}'",

@@ -336,8 +336,7 @@ export const noteEditTool: ObsidianTool<NoteEditToolInput> = {
       // Create navigation target with the line range from diff
       context.addNavigationTarget({
         filePath: path,
-        lineRange: { start: minLine, end: maxLine },
-        description: t("tools.navigation.openEditedDocument")
+        lineRange: { start: minLine, end: maxLine }
       });
       
       // Remove the header lines (first 4 lines) to keep just the actual diff

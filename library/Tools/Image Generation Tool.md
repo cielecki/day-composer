@@ -161,8 +161,7 @@ async function execute(context) {
 
     // Add navigation target
     addNavigationTarget({
-      filePath: normalizedPath,
-      description: 'Open generated image'
+      filePath: normalizedPath
     });
 
     setLabel(`Image saved: ${normalizedPath}`);

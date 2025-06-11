@@ -109,8 +109,7 @@ export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput>
       const navigationTargets = createNavigationTargetsForTasks(
         updatedNote,
         [task],
-        filePath,
-        t('tools.navigation.navigateToCompletedTodo')
+        filePath
       );
 
       // Add navigation targets

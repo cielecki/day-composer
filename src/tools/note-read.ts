@@ -73,8 +73,7 @@ export const noteReadTool: ObsidianTool<NoteReadToolInput> = {
       
       // Add navigation target
       context.addNavigationTarget({
-        filePath: path,
-        description: t("tools.navigation.openNote")
+        filePath: path
       });
 
       context.setLabel(t('tools.read.labels.completed', { name: path }));

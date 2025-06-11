@@ -279,9 +279,6 @@
         "initial": "Saving conversation ...",
         "success": "Saved conversation to '{{path}}'"
       },
-      "navigation": {
-        "openSavedConversation": "Open saved conversation"
-      },
       "progress": {
         "empty": "No conversation to save - the current conversation is empty",
         "fileExists": "File already exists at '{{name}}'. Set auto_version to true to create a versioned file",
@@ -371,9 +368,6 @@
         "initial": "Move File",
         "success": "Moved file from '{{source}}' to '{{destination}}'"
       },
-      "navigation": {
-        "openMovedFile": "Open moved file"
-      },
       "progress": {
         "completed": "Moved file from '{{source}}' to '{{destination}}'",
         "creatingDirectories": "Creating destination directory: '{{dir}}'",
@@ -450,16 +444,6 @@
         "success": "Moved '{{task}}' from '{{source}}' to '{{target}}' at position '{{position}}'"
       }
     },
-    "navigation": {
-      "navigateToCompletedTodo": "Navigate to completed task",
-      "navigateToEditedTodo": "Navigate to edited task",
-      "navigateToUncheckedTodo": "Navigate to unchecked task",
-      "openCreatedDocument": "Open created document",
-      "openCurrentFile": "Open current file",
-      "openDayNote": "Open daily note for '{{date}}'",
-      "openEditedDocument": "Open edited document",
-      "openNote": "Open document"
-    },
     "noteDelete": {
       "errors": {
         "cannotAccess": "Could not access file: '{{name}}'",
@@ -472,9 +456,6 @@
         "initial": "Deleting note ...",
         "requiresConfirmation": "Deletion requires confirmation",
         "success": "Moved '{{name}}' to '{{trashDir}}' directory"
-      },
-      "navigation": {
-        "openDeletedFile": "Open file in trash"
       },
       "progress": {
         "completed": "Moved '{{source}}' to '{{trashDir}}' directory",

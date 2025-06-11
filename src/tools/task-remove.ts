@@ -136,8 +136,7 @@ ${originalTaskText}
       // Create navigation target
       const navigationTargets = [createNavigationTarget(
         filePath,
-        lineNumbers,
-        `Navigate to removed todo${removedTasks.length > 1 ? 's' : ''}`
+        lineNumbers
       )];
       
       // Add navigation targets

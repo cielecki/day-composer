@@ -55,8 +55,7 @@ export const dailyNoteTool: ObsidianTool<DailyNoteInput> = {
           
           // Add navigation target
           context.addNavigationTarget({
-            filePath: dayNoteInfo.linkPath + '.md', // Add extension for navigation
-            description: t('tools.navigation.openDayNote', { date: dayNoteInfo.descriptiveLabel })
+            filePath: dayNoteInfo.linkPath + '.md' // Add extension for navigation
           });
         } else {
           context.setLabel(t('tools.dayNote.labels.failed', { offset }));

@@ -226,8 +226,7 @@ async function execute(context) {
     
     // Create navigation target for the research report
     addNavigationTarget({
-      filePath: finalPath,
-      description: 'Open research report'
+      filePath: finalPath
     });
 
     const sourceCount = researchData.sources ? researchData.sources.length : 0;

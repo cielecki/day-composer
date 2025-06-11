@@ -216,8 +216,7 @@ export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
       
       // Add navigation target
       context.addNavigationTarget({
-        filePath: file_path,
-        description: `Open ${fileType} file`
+        filePath: file_path
       });
 
       // Set completion label with issue counts

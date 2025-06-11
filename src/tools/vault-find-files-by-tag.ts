@@ -132,8 +132,7 @@ export const vaultFindFilesByTagTool: ObsidianTool<VaultFindFilesByTagToolInput>
         
         // Add navigation target for each file
         context.addNavigationTarget({
-          filePath: file.path,
-          description: `Open: ${file.path}`
+          filePath: file.path
         });
       }
       

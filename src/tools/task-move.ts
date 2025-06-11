@@ -156,8 +156,7 @@ export const taskMoveTool: ObsidianTool<TaskMoveToolInput> = {
       const navigationTargets = createNavigationTargetsForTasks(
         targetNote,
         movedTasks,
-        targetFilePath,
-        `Navigate to moved todo{{count}}`
+        targetFilePath
       );
       
       // Add navigation targets

@@ -107,9 +107,7 @@ async function execute(input, { progress, setLabel, addNavigationTarget, plugin 
     
     // Add navigation target so user can click to open the file
     addNavigationTarget({
-      type: 'file',
-      path: file.path,
-      label: `Open ${title}`
+      filePath: file.path
     });
     
     progress(`✅ Created note: ${title}`);

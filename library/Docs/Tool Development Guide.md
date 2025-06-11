@@ -193,9 +193,7 @@ async function execute(input, { progress, setLabel, addNavigationTarget, plugin 
     
     // Add clickable link to result
     addNavigationTarget({
-        type: 'file',
-        path: 'result.md',
-        label: 'Open Result'
+        filePath: 'result.md'
     });
     
     setLabel("Completed");

@@ -122,8 +122,7 @@ progress("Processing results...");
 Add clickable links to files:
 ```javascript
 addNavigationTarget({
-  filePath: "created-file.md",
-  description: "View created file"
+  filePath: "created-file.md"
 });
 ```
 
@@ -254,9 +253,7 @@ async function execute(input, { progress, setLabel, addNavigationTarget, plugin 
     
     // Add navigation
     addNavigationTarget({
-      type: 'file',
-      path: file.path,
-      label: `Open note: ${title}`
+      filePath: file.path
     });
     
     setLabel("Note created");

@@ -114,8 +114,7 @@ export const noteDeleteTool: ObsidianTool<NoteDeleteToolInput> = {
       
       // Add navigation target to the file in trash
       context.addNavigationTarget({
-        filePath: normalizedTrashPath,
-        description: t("tools.noteDelete.navigation.openDeletedFile")
+        filePath: normalizedTrashPath
       });
       
       context.setLabel(t('tools.noteDelete.labels.success', { path: file_path, trashDir: trashDirName }));

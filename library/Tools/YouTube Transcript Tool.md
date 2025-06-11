@@ -168,8 +168,7 @@ ${segments.map(item => {
     
     // Add navigation target
     addNavigationTarget({
-      filePath: filename,
-      description: `Open transcript: ${title}`
+      filePath: filename
     });
     
     setLabel("Transcript downloaded");

@@ -88,8 +88,7 @@ export const noteCreateTool: ObsidianTool<NoteCreateToolInput> = {
 
     // Add navigation target
     context.addNavigationTarget({
-      filePath: finalPath,
-      description: t("tools.navigation.openCreatedDocument")
+      filePath: finalPath
     });
 
     context.setLabel(t('tools.createDocument.labels.completed', { name: filename }));

@@ -83,8 +83,7 @@ export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
       const navigationTargets = createNavigationTargetsForTasks(
         note,
         [task],
-        filePath,
-        t('tools.navigation.navigateToUncheckedTodo')
+        filePath
       );
 
       // Add navigation targets

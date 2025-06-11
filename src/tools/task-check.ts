@@ -137,8 +137,7 @@ export const taskCheckTool: ObsidianTool<TaskCheckToolInput> = {
       const navigationTargets = createNavigationTargetsForTasks(
         updatedNote,
         movedTasks,
-        filePath,
-        `Navigate to checked todo{{count}}`
+        filePath
       );
 
       // Add navigation targets

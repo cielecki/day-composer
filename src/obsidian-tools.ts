@@ -46,7 +46,6 @@ import React from "react";
 export interface NavigationTarget {
 	filePath: string;
 	lineRange?: { start: number; end: number };
-	description: string;
 }
 
 /**

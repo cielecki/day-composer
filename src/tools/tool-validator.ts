@@ -59,8 +59,7 @@ export const toolValidatorTool: ObsidianTool<ToolValidatorInput> = {
       
       // Add navigation target
       context.addNavigationTarget({
-        filePath: tool_path,
-        description: "Open tool file"
+        filePath: tool_path
       });
 
       // Group issues by severity for backward compatibility

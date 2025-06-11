@@ -91,8 +91,7 @@ export const fileMoveTool: ObsidianTool<FileMoveToolInput> = {
       
       // Add navigation target to the moved file
       context.addNavigationTarget({
-        filePath: normalizedDestinationPath,
-        description: t("tools.fileMove.navigation.openMovedFile")
+        filePath: normalizedDestinationPath
       });
       
       context.setLabel(t('tools.fileMove.labels.success', { source: source_path, destination: destination_path }));

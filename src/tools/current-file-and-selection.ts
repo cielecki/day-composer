@@ -36,8 +36,7 @@ export const currentFileAndSelectionTool: ObsidianTool<CurrentFileAndSelectionIn
       const activeFile = plugin.app.workspace.getActiveFile();
       if (activeFile) {
         context.addNavigationTarget({
-          filePath: activeFile.path,
-          description: t('tools.navigation.openCurrentFile')
+          filePath: activeFile.path
         });
       }
       

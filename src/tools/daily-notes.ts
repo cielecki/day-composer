@@ -66,8 +66,7 @@ export const dailyNotesTool: ObsidianTool<DailyNotesInput> = {
               
               // Add navigation target for each found note
               context.addNavigationTarget({
-                filePath: noteInfo.linkPath + '.md',
-                description: t('tools.navigation.openDayNote', { date: noteInfo.descriptiveLabel })
+                filePath: noteInfo.linkPath + '.md'
               });
             }
           } else {
