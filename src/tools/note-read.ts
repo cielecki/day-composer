@@ -35,25 +35,25 @@ export const noteReadTool: ObsidianTool<NoteReadToolInput> = {
   icon: "file-text",
   sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
-    return t('tools.read.label');
+    return t('tools.read.labels.initial');
   },
   execute: async (context: ToolExecutionContext<NoteReadToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { path, expand_links = false } = params;
 
-    context.setLabel(t('tools.read.inProgress', { path }));
+    context.setLabel(t('tools.read.labels.inProgress', { path }));
 
     try {
       // Read the file content
       const file = plugin.app.vault.getAbstractFileByPath(path);
       
       if (!file) {
-        context.setLabel(t('tools.read.failed', { path }));
+        context.setLabel(t('tools.read.labels.failed', { path }));
         throw new ToolExecutionError(`File not found: ${path}`);
       }
       
       if (!(file instanceof TFile)) {
-        context.setLabel(t('tools.read.failed', { path }));
+        context.setLabel(t('tools.read.labels.failed', { path }));
         throw new ToolExecutionError(`Path is not a file: ${path}`);
       }
 
@@ -77,10 +77,10 @@ export const noteReadTool: ObsidianTool<NoteReadToolInput> = {
         description: t("tools.navigation.openNote")
       });
 
-      context.setLabel(t('tools.read.completed', { path }));
+      context.setLabel(t('tools.read.labels.completed', { path }));
       context.progress(content);
     } catch (error) {
-      context.setLabel(t('tools.read.failed', { path }));
+      context.setLabel(t('tools.read.labels.failed', { path }));
       throw error;
     }
   }

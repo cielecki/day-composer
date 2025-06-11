@@ -20,22 +20,22 @@ export const currentChatTool: ObsidianTool<CurrentChatInput> = {
   icon: "message-circle",
   sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
-    return t('tools.currentChat.label');
+    return t('tools.currentChat.labels.initial');
   },
   execute: async (context: ToolExecutionContext<CurrentChatInput>): Promise<void> => {
     const { plugin } = context;
 
-    context.setLabel(t('tools.currentChat.inProgress'));
+    context.setLabel(t('tools.currentChat.labels.inProgress'));
 
     try {
       // Use the exact same logic as the original special link handler
       const chatContent = handleCurrentChatLink(plugin.app);
       
-      context.setLabel(t('tools.currentChat.completed'));
+      context.setLabel(t('tools.currentChat.labels.completed'));
       context.progress(chatContent);
 
     } catch (error) {
-      context.setLabel(t('tools.currentChat.failed'));
+      context.setLabel(t('tools.currentChat.labels.failed'));
       throw error;
     }
   }

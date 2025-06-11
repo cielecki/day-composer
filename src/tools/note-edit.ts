@@ -201,27 +201,27 @@ export const noteEditTool: ObsidianTool<NoteEditToolInput> = {
   icon: "edit",
   sideEffects: true, // Modifies files, has side effects
   get initialLabel() {
-    return t('tools.noteEdit.label');
+    return t('tools.noteEdit.labels.initial');
   },
   execute: async (context: ToolExecutionContext<NoteEditToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { path, edits } = params;
 
-    context.setLabel(t('tools.noteEdit.inProgress', { path }));
+    context.setLabel(t('tools.noteEdit.labels.inProgress', { path }));
 
     try {
       // Check if the file exists
       const exists = await fileExists(path, plugin.app);
 
       if (!exists) {
-        context.setLabel(t('tools.noteEdit.failed', { path }));
+        context.setLabel(t('tools.noteEdit.labels.failed', { path }));
         throw new ToolExecutionError(`File not found: ${path}`);
       }
 
       // Read the existing file content
       const file = getFile(path, plugin.app);
       if (!file) {
-        context.setLabel(t('tools.noteEdit.failed', { path }));
+        context.setLabel(t('tools.noteEdit.labels.failed', { path }));
         throw new ToolExecutionError(`File not found: ${path}`);
       }
       
@@ -321,7 +321,7 @@ export const noteEditTool: ObsidianTool<NoteEditToolInput> = {
               throw new ToolExecutionError(`Edit ${editNumber}: Unknown edit type "${edit.type}"`);
           }
         } catch (error) {
-          context.setLabel(t('tools.noteEdit.failed', { path }));
+          context.setLabel(t('tools.noteEdit.labels.failed', { path }));
           throw error;
         }
       }
@@ -348,10 +348,10 @@ export const noteEditTool: ObsidianTool<NoteEditToolInput> = {
         ? `\n\n## ${t('tools.noteEdit.changesMade')}:\n\`\`\`diff\n${actualDiff}\n\`\`\``
         : '';
       
-      context.setLabel(t('tools.noteEdit.completed', { path }));
+      context.setLabel(t('tools.noteEdit.labels.completed', { path }));
       context.progress(`Successfully applied ${edits.length} edit(s) to ${path}:\n\n${editResults.join('\n')}${contextOutput}`);
     } catch (error) {
-      context.setLabel(t('tools.noteEdit.failed', { path }));
+      context.setLabel(t('tools.noteEdit.labels.failed', { path }));
       throw error;
     }
   }

@@ -20,12 +20,12 @@ export const currentFileAndSelectionTool: ObsidianTool<CurrentFileAndSelectionIn
   icon: "file-text",
   sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
-    return t('tools.currentFileAndSelection.label');
+    return t('tools.currentFileAndSelection.labels.initial');
   },
   execute: async (context: ToolExecutionContext<CurrentFileAndSelectionInput>): Promise<void> => {
     const { plugin } = context;
 
-    context.setLabel(t('tools.currentFileAndSelection.inProgress'));
+    context.setLabel(t('tools.currentFileAndSelection.labels.inProgress'));
 
     try {
       // Get both file content and selected text using original handlers
@@ -46,11 +46,11 @@ export const currentFileAndSelectionTool: ObsidianTool<CurrentFileAndSelectionIn
       combinedContent += `## Currently Open File\n\n${fileContent}\n\n`;
       combinedContent += `## Text Selection\n\n${selectedTextContent}\n`;
       
-      context.setLabel(t('tools.currentFileAndSelection.completed'));
+      context.setLabel(t('tools.currentFileAndSelection.labels.completed'));
       context.progress(combinedContent);
 
     } catch (error) {
-      context.setLabel(t('tools.currentFileAndSelection.failed'));
+      context.setLabel(t('tools.currentFileAndSelection.labels.failed'));
       throw error;
     }
   }

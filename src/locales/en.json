@@ -40,27 +40,27 @@
     "failedToUpdatePlugin": "Failed to update plugin: {{error}}",
     "files": {
       "formatFailed": "Failed to format document after task operation",
-      "getFailed": "Failed to get file at {{path}}",
-      "notFound": "File not found at {{path}}"
+      "getFailed": "Failed to get file at '{{name}}'",
+      "notFound": "File not found at '{{name}}'"
     },
     "helpButton": "Help",
-    "helpPrompt": "I got an error while using {{mode}} mode:\n'''{{error}}'''\nCan you help me?",
+    "helpPrompt": "I got an error while using '{{mode}}' mode:\n'''{{error}}'''\nCan you help me?",
     "linkExpansion": {
-      "couldNotResolve": "Could not resolve link target \"{{linkPath}}\""
+      "couldNotResolve": "Could not resolve link target '{{linkPath}}'"
     },
     "retryButton": "Retry",
-    "setup": "Setup Error: {{error}}",
+    "setup": "Setup Error: '{{error}}'",
     "startingLifeNavigator": "Error starting Life Navigator",
     "tasks": {
-      "insertOutOfBounds": "Cannot insert task at index {{index}}: Index out of bounds (document has {{total}} items)",
-      "multipleFound": "Multiple tasks found with description \"{{task}}\" in {{path}}. Please make your task description more specific.",
-      "notFound": "To-do item \"{{task}}\" not found in {{path}}. If the task is in another file, please specify it in the file_path parameter.",
-      "removeNotFound": "Task \"{{task}}\" not found in document"
+      "insertOutOfBounds": "Cannot insert task at index '{{index}}': Index out of bounds (document has '{{total}}' items)",
+      "multipleFound": "Multiple tasks found with description '{{task}}' in '{{name}}'. Please make your task description more specific.",
+      "notFound": "To-do item '{{task}}' not found in '{{name}}'. If the task is in another file, please specify it in the file_name parameter.",
+      "removeNotFound": "Task '{{task}}' not found in document"
     },
     "tools": {
-      "execution": "Error executing tool {{tool}}: {{error}}",
+      "execution": "Error executing tool '{{tool}}': '{{error}}'",
       "noName": "No tool name provided",
-      "unknown": "Unknown tool \"{{tool}}\""
+      "unknown": "Unknown tool '{{tool}}'"
     }
   },
   "file": {
@@ -68,9 +68,9 @@
   },
   "messages": {
     "checkingForUpdates": "Checking for updates...",
-    "newVersionFoundDownloading": "New version {{latestVersion}} found! Downloading update from {{currentVersion}}...",
-    "pluginUpToDate": "Life Navigator is up to date (version {{version}})",
-    "updateAvailable": "Update available! Version {{latestVersion}} is now available (you have {{currentVersion}})"
+    "newVersionFoundDownloading": "New version '{{latestVersion}}' found! Downloading update from '{{currentVersion}}'...",
+    "pluginUpToDate": "Life Navigator is up to date (version '{{version}}')",
+    "updateAvailable": "Update available! Version '{{latestVersion}}' is now available (you have '{{currentVersion}}')"
   },
   "prebuiltModes": {
     "lifeNavigator": {
@@ -90,7 +90,7 @@
       "resetTutorial": {
         "button": "Reset Tutorial",
         "desc": "Reset the setup tutorial and onboarding flow. This will show the setup screens again next time you open Life Navigator.",
-        "error": "Failed to reset tutorial: {{error}}",
+        "error": "Failed to reset tutorial: '{{error}}'",
         "name": "Reset Tutorial",
         "success": "Tutorial has been reset successfully"
       },
@@ -112,7 +112,7 @@
       "dialog": {
         "addTitle": "Add New Secret",
         "cancel": "Cancel",
-        "editTitle": "Edit Secret: {{key}}",
+        "editTitle": "Edit Secret: '{{key}}'",
         "errors": {
           "emptyKey": "Secret name cannot be empty.",
           "keyExists": "Secret '{{key}}' already exists. Do you want to overwrite it?"
@@ -157,8 +157,8 @@
   },
   "tasks": {
     "format": {
-      "abandonedAt": " (abandoned at {{time}})",
-      "completedAt": " (completed at {{time}})"
+      "abandonedAt": " (abandoned at '{{time}}')",
+      "completedAt": " (completed at '{{time}}')"
     }
   },
   "text": {
@@ -197,285 +197,345 @@
   },
   "tools": {
     "abandon": {
-      "label": "Abandoning todo ..."
-    },
-    "actions": {
-      "abandon": {
-        "failed": "Failed to abandon todo {{task}}",
-        "inProgress": "Abandoning todo {{task}}...",
-        "success": "Abandoned todo {{task}}"
+      "labels": {
+        "failed": "Failed to abandon '{{task}}'",
+        "inProgress": "Abandoning '{{task}}'...",
+        "initial": "Abandoning task ...",
+        "success": "Abandoned '{{task}}'"
       },
-      "add": {
-        "failed": "Failed to add todo {{task}} to '{{filename}}'",
-        "inProgress": "Adding todo...",
-        "success": "Added {{task}} to '{{filename}}'"
-      },
-      "check": {
-        "failed": "Failed to check '{{task}}'",
-        "inProgress": "Checking '{{task}}' ...",
-        "success": "Checked '{{task}}'"
-      },
-      "createCompleted": {
-        "failed": "Failed to create completed todo {{task}}",
-        "inProgress": "Creating completed todo {{task}}...",
-        "success": "Created completed todo {{task}}"
-      },
-      "createDocument": {
-        "completed": "Created '{{path}}'",
-        "failed": "Failed to create {{path}}",
-        "inProgress": "Creating {{path}}..."
-      },
-      "editTodo": {
-        "completed": "Edited todo {{task}}",
-        "failed": "Failed to edit todo {{task}}",
-        "inProgress": "Editing todo {{task}}..."
-      },
-      "move": {
-        "failed": "Failed to move todo {{task}}",
-        "inProgress": "Moving todo {{task}}...",
-        "success": "Moved todo {{task}}"
-      },
-      "remove": {
-        "failed": "Failed to remove todo {{task}}",
-        "inProgress": "Removing todo {{task}}...",
-        "success": "Removed todo {{task}}"
-      },
-      "secretList": {
-        "completed": "Listed configured secrets",
-        "default": "List Secrets",
-        "failed": "Failed to list secrets",
-        "inProgress": "Listing configured secrets..."
-      },
-      "secretSave": {
-        "completed": "Saved secret {{key}}",
-        "default": "Save Secret",
-        "failed": "Failed to save secret {{key}}",
-        "inProgress": "Saving secret {{key}}..."
-      },
-      "uncheck": {
-        "failed": "Failed to uncheck todo {{task}}",
-        "inProgress": "Unchecking todo {{task}}...",
-        "success": "Unchecked todo {{task}}"
+      "progress": {
+        "success": "Abandoned '{{task}}'"
       }
     },
     "add": {
-      "label": "Adding todo ..."
+      "labels": {
+        "failed": "Failed to add '{{task}}' to '{{filename}}'",
+        "inProgress": "Adding task...",
+        "initial": "Adding task ...",
+        "success": "Added '{{task}}' to '{{filename}}'"
+      },
+      "progress": {
+        "success": "Added '{{task}}' to '{{filename}}'"
+      }
     },
     "check": {
-      "label": "Checking todo ..."
+      "labels": {
+        "failed": "Failed to check '{{task}}'",
+        "inProgress": "Checking '{{task}}' ...",
+        "initial": "Checking task ...",
+        "success": "Checked '{{task}}'"
+      }
     },
     "checkForUpdates": "Check for Updates",
     "comments": {
       "removedTaskHeader": "REMOVED TASK"
     },
     "conversationSave": {
-      "completed": "Saved conversation to '{{path}}'",
-      "failed": "Failed to save conversation",
-      "inProgress": "Saving conversation...",
-      "label": "Saving conversation ...",
+      "labels": {
+        "failed": "Failed to save conversation",
+        "inProgress": "Saving conversation...",
+        "initial": "Saving conversation ...",
+        "success": "Saved conversation to '{{path}}'"
+      },
       "navigation": {
         "openSavedConversation": "Open saved conversation"
       },
       "progress": {
         "empty": "No conversation to save - the current conversation is empty",
-        "fileExists": "File already exists at {{path}}. Set auto_version to true to create a versioned file",
-        "success": "Successfully saved conversation with {{count}} messages to: {{path}}",
-        "versionedFile": "Creating versioned file: {{path}}"
+        "fileExists": "File already exists at '{{name}}'. Set auto_version to true to create a versioned file",
+        "success": "Successfully saved conversation with '{{count}}' messages to: '{{name}}'",
+        "versionedFile": "Creating versioned file: '{{name}}'"
       }
     },
     "createCompleted": {
-      "label": "Creating completed todo ..."
+      "labels": {
+        "failed": "Failed to create completed '{{task}}'",
+        "inProgress": "Creating completed '{{task}}'...",
+        "initial": "Creating completed task ...",
+        "success": "Created completed '{{task}}'"
+      },
+      "progress": {
+        "success": "Created completed '{{task}}'"
+      }
     },
     "createDocument": {
-      "label": "Creating document ...",
+      "labels": {
+        "completed": "Created '{{name}}'",
+        "failed": "Failed to create '{{name}}'",
+        "inProgress": "Creating '{{name}}'...",
+        "initial": "Creating document ..."
+      },
       "progress": {
-        "success": "Successfully created document in '{{path}}'",
-        "versionedPath": "File already exists. Creating versioned file: '{{originalPath}}' → '{{versionedPath}}'"
+        "success": "Successfully created document in '{{name}}'",
+        "versionedPath": "File already exists. Creating versioned file: '{{originalName}}' → '{{versionedName}}'"
       }
     },
     "currentChat": {
-      "completed": "Retrieved current chat content",
-      "failed": "Failed to get current chat",
-      "inProgress": "Getting current chat...",
-      "label": "Getting current chat ..."
+      "labels": {
+        "completed": "Retrieved current chat content",
+        "failed": "Failed to get current chat",
+        "inProgress": "Getting current chat...",
+        "initial": "Getting current chat ..."
+      }
     },
     "currentDateTime": {
-      "completed": "Retrieved current date and time",
-      "failed": "Failed to get current date and time",
-      "inProgress": "Getting current date and time...",
-      "label": "Getting current date and time ..."
+      "labels": {
+        "completed": "Retrieved current date and time",
+        "failed": "Failed to get current date and time",
+        "inProgress": "Getting current date and time...",
+        "initial": "Getting current date and time ..."
+      }
     },
     "currentFileAndSelection": {
-      "completed": "Retrieved current file and selection context",
-      "failed": "Failed to get current file and selection",
-      "inProgress": "Getting current file and selection...",
-      "label": "Getting current file and selection ..."
+      "labels": {
+        "completed": "Retrieved current file and selection context",
+        "failed": "Failed to get current file and selection",
+        "inProgress": "Getting current file and selection...",
+        "initial": "Getting current file and selection ..."
+      }
     },
     "dailyNotes": {
-      "completed": "Retrieved {{found}}/{{total}} daily notes from {{range}}",
-      "failed": "Failed to get daily notes ({{start}} to {{end}})",
-      "inProgress": "Getting daily notes ({{start}} to {{end}})...",
-      "label": "Getting daily notes range ..."
+      "labels": {
+        "completed": "Retrieved '{{found}}'/'{{total}}' daily notes from '{{range}}'",
+        "failed": "Failed to get daily notes ('{{start}}' to '{{end}}')",
+        "inProgress": "Getting daily notes ('{{start}}' to '{{end}}')...",
+        "initial": "Getting daily notes range ..."
+      }
     },
     "dayNote": {
-      "completed": "Retrieved daily note for {{date}}",
-      "failed": "Failed to get daily note (offset: {{offset}})",
-      "inProgress": "Getting daily note (offset: {{offset}})...",
-      "label": "Getting daily note ...",
-      "notFound": "Daily note not found for {{date}}"
+      "labels": {
+        "completed": "Retrieved daily note for '{{date}}'",
+        "failed": "Failed to get daily note (offset: '{{offset}}')",
+        "inProgress": "Getting daily note (offset: '{{offset}}')...",
+        "initial": "Getting daily note ...",
+        "notFound": "Daily note not found for '{{date}}'"
+      }
     },
-    "edit": {
-      "label": "Editing todo ..."
+    "editTodo": {
+      "labels": {
+        "completed": "Edited '{{task}}'",
+        "failed": "Failed to edit '{{task}}'",
+        "inProgress": "Editing '{{task}}'...",
+        "initial": "Editing task ..."
+      },
+      "progress": {
+        "success": "Edited '{{task}}'"
+      }
     },
     "fileMove": {
-      "completed": "Moved file from '{{source}}' to '{{destination}}'",
-      "creatingDirectories": "Creating destination directory: {{dir}}",
-      "failed": "Failed to move file '{{source}}'",
-      "inProgress": "Moving file from '{{source}}' to '{{destination}}'...",
-      "label": "Move File",
-      "moving": "Moving '{{source}}' to '{{destination}}'",
+      "labels": {
+        "failed": "Failed to move file '{{source}}'",
+        "inProgress": "Moving file from '{{source}}' to '{{destination}}'...",
+        "initial": "Move File",
+        "success": "Moved file from '{{source}}' to '{{destination}}'"
+      },
       "navigation": {
         "openMovedFile": "Open moved file"
       },
-      "success": "Moved file from '{{source}}' to '{{destination}}'"
+      "progress": {
+        "completed": "Moved file from '{{source}}' to '{{destination}}'",
+        "creatingDirectories": "Creating destination directory: '{{dir}}'",
+        "moving": "Moving '{{source}}' to '{{destination}}'"
+      }
     },
     "find": {
-      "completed": "Found {{count}} items in {{path}}",
-      "empty": "Directory {{path}} is empty",
-      "failed": "Failed to find content in {{path}}",
-      "header": "Contents of {{path}} ({{count}} items):",
-      "inProgress": "Finding content in {{path}}...",
-      "label": "Find Files"
+      "empty": "Directory '{{name}}' is empty",
+      "header": "Contents of '{{name}}' ('{{count}}' items):",
+      "labels": {
+        "completed": "Found '{{count}}' items in '{{name}}'",
+        "failed": "Failed to find content in '{{name}}'",
+        "inProgress": "Finding content in '{{name}}'...",
+        "initial": "Find Files"
+      }
     },
     "findFilesByTag": {
-      "completed": "Found {{count}} files with tag {{tag}}",
-      "failed": "Failed to find files with tag {{tag}}",
-      "foundFiles": "Found {{count}} files with tag {{tag}}",
-      "inProgress": "Finding files with tag {{tag}}...",
-      "label": "Find Files by Tag",
-      "noResults": "No files found with tag {{tag}}"
+      "labels": {
+        "completed": "Found '{{count}}' files with tag '{{tag}}'",
+        "failed": "Failed to find files with tag '{{tag}}'",
+        "inProgress": "Finding files with tag '{{tag}}'...",
+        "initial": "Find Files by Tag",
+        "noResults": "No files found with tag '{{tag}}'"
+      },
+      "progress": {
+        "foundFiles": "Found '{{count}}' files with tag '{{tag}}'",
+        "noResults": "No files found with tag '{{tag}}'"
+      }
     },
     "handover": {
-      "completed": "Switched to {{mode}} mode",
-      "completedFull": "You are now in {{mode}} mode. Perform a given task, immediately after you are done, switch back to \"{{fromMode}}\" using the handover_mode tool.",
-      "failed": "Failed to switch to {{mode}} mode",
-      "inProgress": "Switching to {{mode}} mode...",
-      "label": "Handing over control ..."
+      "labels": {
+        "completed": "Switched to '{{mode}}' mode",
+        "failed": "Failed to switch to '{{mode}}' mode",
+        "inProgress": "Switching to '{{mode}}' mode...",
+        "initial": "Handing over control ..."
+      },
+      "progress": {
+        "completedFull": "You are now in '{{mode}}' mode. Perform a given task, immediately after you are done, switch back to '{{fromMode}}' using the handover_mode tool."
+      }
     },
     "library": {
       "list": {
-        "completed": "Browsed Life Navigator library",
-        "failed": "Failed to browse library",
-        "inProgress": "Browsing Life Navigator library...",
-        "label": "Browsing Life Navigator library ..."
+        "labels": {
+          "completed": "Browsed Life Navigator library",
+          "failed": "Failed to browse library",
+          "inProgress": "Browsing Life Navigator library...",
+          "initial": "Browsing Life Navigator library ..."
+        }
       },
       "read": {
-        "completed": "Read '{{path}}' from library",
-        "failed": "Failed to read '{{path}}' from library",
-        "inProgress": "Reading '{{path}}' from library ...",
-        "label": "Reading library content ..."
+        "labels": {
+          "completed": "Read '{{name}}' from library",
+          "failed": "Failed to read '{{name}}' from library",
+          "inProgress": "Reading '{{name}}' from library ...",
+          "initial": "Reading library content ..."
+        }
       }
     },
     "modeValidator": {
-      "failed": "File validation failed: {{filePath}}",
-      "inProgress": "Validating file: {{filePath}}...",
-      "label": "Validating file ..."
+      "labels": {
+        "failed": "File validation failed: '{{fileName}}'",
+        "inProgress": "Validating file: '{{fileName}}'...",
+        "initial": "Validating file ..."
+      }
     },
     "move": {
-      "label": "Moving todo ..."
+      "labels": {
+        "failed": "Failed to move '{{task}}'",
+        "inProgress": "Moving '{{task}}'...",
+        "initial": "Moving task ...",
+        "success": "Moved '{{task}}' to '{{destination}}'"
+      },
+      "progress": {
+        "success": "Moved '{{task}}' from '{{source}}' to '{{target}}' at position '{{position}}'"
+      }
     },
     "navigation": {
-      "navigateToCompletedTodo": "Navigate to completed todo",
-      "navigateToEditedTodo": "Navigate to edited todo",
-      "navigateToUncheckedTodo": "Navigate to unchecked todo",
+      "navigateToCompletedTodo": "Navigate to completed task",
+      "navigateToEditedTodo": "Navigate to edited task",
+      "navigateToUncheckedTodo": "Navigate to unchecked task",
       "openCreatedDocument": "Open created document",
       "openCurrentFile": "Open current file",
-      "openDayNote": "Open daily note for {{date}}",
+      "openDayNote": "Open daily note for '{{date}}'",
       "openEditedDocument": "Open edited document",
       "openNote": "Open document"
     },
     "noteDelete": {
-      "completed": "Moved {{source}} to {{trashDir}} directory",
-      "creatingTrashDirectory": "Creating {{dir}} directory",
       "errors": {
-        "cannotAccess": "Could not access file: {{path}}",
+        "cannotAccess": "Could not access file: '{{name}}'",
         "confirmationRequired": "Deletion must be explicitly confirmed with confirm_deletion: true",
-        "fileNotFound": "File not found: {{path}}"
+        "fileNotFound": "File not found: '{{name}}'"
       },
-      "failed": "Failed to delete file '{{path}}'",
-      "inProgress": "Moving '{{path}}' to trash...",
-      "label": "Deleting note ...",
-      "movingToTrash": "Moving '{{source}}' to '{{destination}}'",
+      "labels": {
+        "failed": "Failed to delete file '{{name}}'",
+        "inProgress": "Moving '{{name}}' to trash...",
+        "initial": "Deleting note ...",
+        "requiresConfirmation": "Deletion requires confirmation",
+        "success": "Moved '{{name}}' to '{{trashDir}}' directory"
+      },
       "navigation": {
         "openDeletedFile": "Open file in trash"
       },
-      "requiresConfirmation": "Deletion requires confirmation",
-      "success": "Moved '{{path}}' to '{{trashDir}}' directory"
+      "progress": {
+        "completed": "Moved '{{source}}' to '{{trashDir}}' directory",
+        "creatingTrashDirectory": "Creating '{{dir}}' directory",
+        "movingToTrash": "Moving '{{source}}' to '{{destination}}'"
+      }
     },
     "noteEdit": {
       "changesMade": "Changes Made",
-      "completed": "Edited document {{path}}",
-      "failed": "Failed to edit document {{path}}",
-      "inProgress": "Editing document {{path}}...",
-      "label": "Editing document ..."
+      "labels": {
+        "completed": "Edited document '{{name}}'",
+        "failed": "Failed to edit document '{{name}}'",
+        "inProgress": "Editing document '{{name}}'...",
+        "initial": "Editing document ..."
+      }
     },
     "openLifeNavigator": "Open Life Navigator",
     "read": {
-      "completed": "Read document {{path}}",
-      "failed": "Failed to read document {{path}}",
-      "inProgress": "Reading document {{path}}...",
-      "label": "Reading document ..."
+      "labels": {
+        "completed": "Read document '{{name}}'",
+        "failed": "Failed to read document '{{name}}'",
+        "inProgress": "Reading document '{{name}}'...",
+        "initial": "Reading document ..."
+      }
     },
     "remove": {
-      "label": "Removing todo ..."
+      "labels": {
+        "failed": "Failed to remove task '{{task}}'",
+        "inProgress": "Removing task '{{task}}'...",
+        "initial": "Removing task ...",
+        "success": "Removed task '{{task}}'"
+      },
+      "progress": {
+        "success": "Removed task '{{task}}'"
+      }
     },
     "resetTutorial": "Reset Tutorial",
     "search": {
-      "completed": "Search completed for {{query}}",
-      "failed": "Failed to search for {{query}}",
-      "inProgress": "Searching for {{query}}...",
-      "label": "Searching vault ...",
-      "noResults": "No results found for {{query}}"
+      "labels": {
+        "completed": "Search completed for '{{query}}'",
+        "failed": "Failed to search for '{{query}}'",
+        "inProgress": "Searching for '{{query}}'...",
+        "initial": "Searching vault ...",
+        "noResults": "No results found for '{{query}}'"
+      },
+      "progress": {
+        "noResults": "No results found for '{{query}}'"
+      }
     },
     "secretList": {
+      "labels": {
+        "completed": "Listed configured secrets",
+        "default": "List Secrets",
+        "failed": "Failed to list secrets",
+        "inProgress": "Listing configured secrets..."
+      },
       "progress": {
-        "header": "📋 Configured Secrets ({{count}} total)",
+        "header": "📋 Configured Secrets ('{{count}}' total)",
         "noSecrets": "No secrets are currently configured. Use the secret_save tool to add API keys and other secrets.",
         "securityNote": "🔒 Security Note: Secret values are hidden for security. Only names are shown above."
       }
     },
     "secretSave": {
+      "labels": {
+        "completed": "Saved secret '{{key}}'",
+        "default": "Save Secret",
+        "failed": "Failed to save secret '{{key}}'",
+        "inProgress": "Saving secret '{{key}}'..."
+      },
       "progress": {
         "securityReminder": "⚠️ Security Notice: Secrets are encrypted using AES-256 and stored in your Obsidian config folder. While this provides protection against casual inspection, anyone with access to the plugin source code can potentially decrypt them.",
-        "success": "Successfully saved secret {{key}}"
+        "success": "Successfully saved secret '{{key}}'"
       }
-    },
-    "success": {
-      "abandon": "✓ Marked {{task}} as abandoned in {{path}}",
-      "add": "✓ Added {{task}} to {{path}}",
-      "complete": "✓ Added completed todo \"{{task}}\"{{time}} to {{path}}",
-      "edit": "✓ Edited {{originalTask}} to {{newTask}} in {{path}}{{details}}",
-      "move": "✓ Moved to-do {{task}} from {{source}} to {{target}} {{position}}",
-      "remove": "✓ Removed {{task}} from {{path}} (converted to comment)",
-      "uncheck": "✓ Unchecked \"{{task}}\" in {{path}}"
     },
     "tasks": {
       "plural": "tasks"
     },
     "toolsList": {
-      "completed": "Listed available tools",
-      "failed": "Failed to list tools",
-      "inProgress": "Listing available tools...",
-      "label": "Listing tools ..."
+      "labels": {
+        "completed": "Listed available tools",
+        "failed": "Failed to list tools",
+        "inProgress": "Listing available tools...",
+        "initial": "Listing tools ..."
+      }
     },
     "uncheck": {
-      "label": "Unchecking todo ..."
+      "labels": {
+        "failed": "Failed to uncheck task '{{task}}'",
+        "inProgress": "Unchecking task '{{task}}'...",
+        "initial": "Unchecking task ...",
+        "success": "Unchecked task '{{task}}'"
+      },
+      "progress": {
+        "success": "Unchecked task '{{task}}'"
+      }
     },
     "urlDownload": {
-      "completed": "Downloaded file from {{url}}",
-      "failed": "Failed to download file from {{url}}",
-      "inProgress": "Downloading file from {{url}}...",
-      "label": "Downloading file..."
+      "labels": {
+        "completed": "Downloaded file from '{{url}}'",
+        "failed": "Failed to download file from '{{url}}'",
+        "inProgress": "Downloading file from '{{url}}'...",
+        "initial": "Downloading file..."
+      }
     }
   },
   "ui": {
@@ -500,7 +560,7 @@
     "input": {
       "attachImage": "Attach Image",
       "placeholder": "Type your message...",
-      "removeFile": "Remove {{filename}}",
+      "removeFile": "Remove '{{filename}}'",
       "save": "Save",
       "send": "Send"
     },
@@ -518,12 +578,12 @@
     "modal": {
       "copied": "Copied!",
       "copyToClipboard": "Copy to clipboard",
-      "modeSettings": "Settings for mode {{modeName}}",
+      "modeSettings": "Settings for mode '{{modeName}}'",
       "reloadButton": "Restart Obsidian",
-      "reloadRequiredMessageWithVersions": "Plugin updated from version {{currentVersion}} to {{latestVersion}}.\nWould you like to restart Obsidian to apply changes?",
+      "reloadRequiredMessageWithVersions": "Plugin updated from version '{{currentVersion}}' to '{{latestVersion}}'.\nWould you like to restart Obsidian to apply changes?",
       "reloadRequiredTitle": "Reload Required",
-      "systemPrompt": "System prompt for \"{{modeName}}\"",
-      "systemPromptErrorMessage": "Cannot display system prompt: {{error}}. Check your mode file and ensure all linked files exist, or remove the 🧭 emoji from links that should not be expanded."
+      "systemPrompt": "System prompt for '{{modeName}}'",
+      "systemPromptErrorMessage": "Cannot display system prompt: '{{error}}'. Check your mode file and ensure all linked files exist, or remove the 🧭 emoji from links that should not be expanded."
     },
     "mode": {
       "loading": "Loading...",
@@ -590,10 +650,10 @@
     "todo": {
       "abandon": "Abandon task",
       "clickToChange": "Click to change status",
-      "noTodos": "No matching tasks found in {{filename}}",
+      "noTodos": "No matching tasks found in '{{filename}}'",
       "readOnly": "Read only",
-      "selectedFrom": "Selected tasks from {{filename}}",
-      "showMore": "Show {{count}} more items"
+      "selectedFrom": "Selected tasks from '{{filename}}'",
+      "showMore": "Show '{{count}}' more items"
     }
   },
   "validation": {
@@ -605,15 +665,15 @@
         "singular": "A mode has validation issues that need to be resolved."
       },
       "message": {
-        "few": "Help me fix validation issues with mode files: {{filePaths}}. These modes have validation errors that need to be resolved.",
-        "many": "Help me fix validation issues with mode files: {{filePaths}}. These modes have validation errors that need to be resolved.",
-        "singular": "Help me fix validation issues with a mode file \"{{filePaths}}\". This mode has validation errors that need to be resolved."
+        "few": "Help me fix validation issues with mode files: '{{filePaths}}'. These modes have validation errors that need to be resolved.",
+        "many": "Help me fix validation issues with mode files: '{{filePaths}}'. These modes have validation errors that need to be resolved.",
+        "singular": "Help me fix validation issues with a mode file '{{filePaths}}'. This mode has validation errors that need to be resolved."
       }
     },
     "fixSpecificMode": {
       "button": "Fix This Mode",
-      "description": "The current mode \"{{modeName}}\" has validation issues that need to be resolved.",
-      "message": "Help me fix validation issues with the mode file \"{{filePath}}\". This mode file has validation errors that need to be resolved."
+      "description": "The current mode '{{modeName}}' has validation issues that need to be resolved.",
+      "message": "Help me fix validation issues with the mode file '{{filePath}}'. This mode file has validation errors that need to be resolved."
     },
     "fixTools": {
       "button": "Fix",
@@ -624,9 +684,9 @@
         "singular": "A tool has validation issues that need to be resolved."
       },
       "message": {
-        "few": "Help me fix validation issues with tool files: {{filePaths}}. These tools have validation errors that need to be resolved.",
-        "many": "Help me fix validation issues with tool files: {{filePaths}}. These tools have validation errors that need to be resolved.",
-        "singular": "Help me fix validation issues with a tool file \"{{filePaths}}\". This tool has validation errors that need to be resolved."
+        "few": "Help me fix validation issues with tool files: '{{filePaths}}'. These tools have validation errors that need to be resolved.",
+        "many": "Help me fix validation issues with tool files: '{{filePaths}}'. These tools have validation errors that need to be resolved.",
+        "singular": "Help me fix validation issues with a tool file '{{filePaths}}'. This tool has validation errors that need to be resolved."
       }
     },
     "helpButton": {
@@ -634,16 +694,16 @@
     },
     "results": {
       "mode": {
-        "completed": "Mode validation completed: {{filePath}} ({{errorCount}} errors, {{warningCount}} warnings)"
+        "completed": "Mode validation completed: '{{filePath}}' ('{{errorCount}}' errors, '{{warningCount}}' warnings)"
       },
       "tool": {
-        "completed": "Tool validation completed: {{filePath}} ({{errorCount}} errors, {{warningCount}} warnings)"
+        "completed": "Tool validation completed: '{{filePath}}' ('{{errorCount}}' errors, '{{warningCount}}' warnings)"
       }
     },
     "toolIssuesFound": {
-      "few": "{{count}} tools have validation issues",
-      "many": "{{count}} tools have validation issues",
-      "singular": "{{count}} tool has validation issues"
+      "few": "'{{count}}' tools have validation issues",
+      "many": "'{{count}}' tools have validation issues",
+      "singular": "'{{count}}' tool has validation issues"
     }
   },
   "view": {

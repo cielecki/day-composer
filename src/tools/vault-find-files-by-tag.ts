@@ -72,13 +72,13 @@ export const vaultFindFilesByTagTool: ObsidianTool<VaultFindFilesByTagToolInput>
   icon: "tag",
   sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
-    return t('tools.findFilesByTag.label');
+    return t('tools.findFilesByTag.labels.initial');
   },
   execute: async (context: ToolExecutionContext<VaultFindFilesByTagToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { tag } = params;
     
-    context.setLabel(t('tools.findFilesByTag.inProgress', { tag }));
+    context.setLabel(t('tools.findFilesByTag.labels.inProgress', { tag }));
 
     try {
       // Get all files in the vault
@@ -106,14 +106,14 @@ export const vaultFindFilesByTagTool: ObsidianTool<VaultFindFilesByTagToolInput>
       }
       
       if (matchingFiles.length === 0) {
-        context.setLabel(t('tools.findFilesByTag.noResults', { tag }));
-        context.progress(t('tools.findFilesByTag.noResults', { tag }));
+        context.setLabel(t('tools.findFilesByTag.labels.noResults', { tag }));
+        context.progress(t('tools.findFilesByTag.progress.noResults', { tag }));
         return;
       }
       
       // Create formatted result
       const resultLines: string[] = [];
-      resultLines.push(t('tools.findFilesByTag.foundFiles', { count: matchingFiles.length, tag }));
+      resultLines.push(t('tools.findFilesByTag.progress.foundFiles', { count: matchingFiles.length, tag }));
       resultLines.push('');
       
       for (let i = 0; i < matchingFiles.length; i++) {
@@ -139,10 +139,10 @@ export const vaultFindFilesByTagTool: ObsidianTool<VaultFindFilesByTagToolInput>
       
       const resultText = resultLines.join('\n');
       
-      context.setLabel(t('tools.findFilesByTag.completed', { tag, count: matchingFiles.length }));
+      context.setLabel(t('tools.findFilesByTag.labels.completed', { tag, count: matchingFiles.length }));
       context.progress(resultText);
     } catch (error) {
-      context.setLabel(t('tools.findFilesByTag.failed', { tag }));
+      context.setLabel(t('tools.findFilesByTag.labels.failed', { tag }));
       throw error;
     }
   }

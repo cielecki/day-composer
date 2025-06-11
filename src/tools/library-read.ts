@@ -34,13 +34,13 @@ export const libraryReadTool: ObsidianTool<LibraryReadInput> = {
   icon: "file-text",
   sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
-    return t('tools.library.read.label');
+    return t('tools.library.read.labels.initial');
   },
   execute: async (context: ToolExecutionContext<LibraryReadInput>): Promise<void> => {
     const { params } = context;
     const { path } = params;
 
-    context.setLabel(t('tools.library.read.inProgress', { path }));
+    context.setLabel(t('tools.library.read.labels.inProgress', { path }));
 
     try {
       // Clean up the path
@@ -76,11 +76,11 @@ export const libraryReadTool: ObsidianTool<LibraryReadInput> = {
       formattedContent += content;
 
       // Display the formatted content
-      context.setLabel(t('tools.library.read.completed', { path: extractFilenameWithoutExtension(cleanPath) }));
+      context.setLabel(t('tools.library.read.labels.completed', { path: extractFilenameWithoutExtension(cleanPath) }));
       context.progress(formattedContent);
 
     } catch (error) {
-      context.setLabel(t('tools.library.read.failed', { path }));
+      context.setLabel(t('tools.library.read.labels.failed', { path }));
       if (error instanceof ToolExecutionError) {
         throw error;
       }

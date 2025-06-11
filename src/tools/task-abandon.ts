@@ -64,21 +64,21 @@ export const taskAbandonTool: ObsidianTool<TaskAbandonToolInput> = {
   icon: "x-square",
   sideEffects: true, // Modifies files by abandoning tasks
   get initialLabel() {
-    return t('tools.abandon.label');
+    return t('tools.abandon.labels.initial');
   },
   execute: async (context: ToolExecutionContext<TaskAbandonToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos, time } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
-      context.setLabel(t('tools.actions.abandon.failed', { task: '' }));
+      context.setLabel(t('tools.abandon.labels.failed', { task: '' }));
       throw new ToolExecutionError("No to-do items provided");
     }
     
     const count = todos.length;
     const todoText = count === 1 ? todos[0].todo_text : `${count} todos`;
     
-    context.setLabel(t('tools.actions.abandon.inProgress', { task: todoText }));
+    context.setLabel(t('tools.abandon.labels.inProgress', { task: todoText }));
     
     // Format the current time if provided (common for all tasks)
     const currentTime = getCurrentTime(time);
@@ -151,13 +151,13 @@ export const taskAbandonTool: ObsidianTool<TaskAbandonToolInput> = {
         ? `"${abandonedTasks[0]}"`
         : `${abandonedTasks.length} ${t('tools.tasks.plural')}`;
       
-      context.setLabel(t('tools.actions.abandon.success', { task: todoText }));
-      context.progress(t('tools.success.abandon', {
+      context.setLabel(t('tools.abandon.labels.success', { task: todoText }));
+      context.progress(t('tools.abandon.progress.success', {
         task: tasksDescription,
-        path: filePath
+        name: filePath
       }));
     } catch (error) {
-      context.setLabel(t('tools.actions.abandon.failed', { task: todoText }));
+      context.setLabel(t('tools.abandon.labels.failed', { task: todoText }));
       throw error;
     }
   }

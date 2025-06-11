@@ -20,10 +20,10 @@ export const secretListTool: ObsidianTool<SecretListToolInput> = {
   icon: "list",
   sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
-    return t('tools.actions.secretList.default');
+    return t('tools.secretList.labels.default');
   },
   execute: async (context: ToolExecutionContext<SecretListToolInput>): Promise<void> => {
-    context.setLabel(t('tools.actions.secretList.inProgress'));
+    context.setLabel(t('tools.secretList.labels.inProgress'));
 
     try {
       // Get store instance
@@ -33,7 +33,7 @@ export const secretListTool: ObsidianTool<SecretListToolInput> = {
       const secretKeys = store.getSecretKeys();
 
       if (secretKeys.length === 0) {
-        context.setLabel(t('tools.actions.secretList.completed'));
+        context.setLabel(t('tools.secretList.labels.completed'));
         context.progress(t('tools.secretList.progress.noSecrets'));
         return;
       }
@@ -42,7 +42,7 @@ export const secretListTool: ObsidianTool<SecretListToolInput> = {
       const sortedKeys = secretKeys.sort();
 
       // Success message
-      context.setLabel(t('tools.actions.secretList.completed'));
+      context.setLabel(t('tools.secretList.labels.completed'));
       
       // Build the list
       let resultMessage = t('tools.secretList.progress.header', { count: sortedKeys.length });
@@ -57,7 +57,7 @@ export const secretListTool: ObsidianTool<SecretListToolInput> = {
       context.progress(resultMessage);
 
     } catch (error) {
-      context.setLabel(t('tools.actions.secretList.failed'));
+      context.setLabel(t('tools.secretList.labels.failed'));
       throw error;
     }
   }

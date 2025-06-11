@@ -55,13 +55,13 @@ export const secretSaveTool: ObsidianTool<SecretSaveToolInput> = {
   icon: "key",
   sideEffects: true, // Modifies stored secrets
   get initialLabel() {
-    return t('tools.actions.secretSave.default');
+    return t('tools.secretSave.labels.default');
   },
   execute: async (context: ToolExecutionContext<SecretSaveToolInput>): Promise<void> => {
     const { params } = context;
     const { secret_key, secret_value, description = "" } = params;
 
-    context.setLabel(t('tools.actions.secretSave.inProgress', { key: secret_key }));
+    context.setLabel(t('tools.secretSave.labels.inProgress', { key: secret_key }));
 
     try {
       // Validate input
@@ -78,7 +78,7 @@ export const secretSaveTool: ObsidianTool<SecretSaveToolInput> = {
       await store.setSecret(secret_key.trim(), secret_value.trim());
       
       // Success message
-      context.setLabel(t('tools.actions.secretSave.completed', { key: secret_key }));
+      context.setLabel(t('tools.secretSave.labels.completed', { key: secret_key }));
       
       let successMessage = t('tools.secretSave.progress.success', { key: secret_key });
       if (description && description.trim().length > 0) {
@@ -91,7 +91,7 @@ export const secretSaveTool: ObsidianTool<SecretSaveToolInput> = {
       context.progress(t('tools.secretSave.progress.securityReminder'));
 
     } catch (error) {
-      context.setLabel(t('tools.actions.secretSave.failed', { key: secret_key }));
+      context.setLabel(t('tools.secretSave.labels.failed', { key: secret_key }));
       throw error;
     }
   }

@@ -69,13 +69,13 @@ export const toolsListTool: ObsidianTool<ToolsListInput> = {
   icon: "list",
   sideEffects: false, // This tool is read-only and safe for link expansion
   get initialLabel() {
-    return t('tools.toolsList.label');
+    return t('tools.toolsList.labels.initial');
   },
   execute: async (context: ToolExecutionContext<ToolsListInput>): Promise<void> => {
     const { params } = context;
     const { mode, safe_only = false, include_user_tools = true } = params;
 
-    context.setLabel(t('tools.toolsList.inProgress'));
+    context.setLabel(t('tools.toolsList.labels.inProgress'));
 
     try {
       const obsidianTools = getObsidianTools();
@@ -226,11 +226,11 @@ export const toolsListTool: ObsidianTool<ToolsListInput> = {
         output += `\`safe_tool_name()\` 🧭 - Will be expanded inline\n\n`;
       }
 
-      context.setLabel(t('tools.toolsList.completed'));
+      context.setLabel(t('tools.toolsList.labels.completed'));
       context.progress(output);
 
     } catch (error) {
-      context.setLabel(t('tools.toolsList.failed'));
+      context.setLabel(t('tools.toolsList.labels.failed'));
       throw error;
     }
   }

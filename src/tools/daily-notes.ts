@@ -33,13 +33,13 @@ export const dailyNotesTool: ObsidianTool<DailyNotesInput> = {
   icon: "calendar",
   sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
-    return t('tools.dailyNotes.label');
+    return t('tools.dailyNotes.labels.initial');
   },
   execute: async (context: ToolExecutionContext<DailyNotesInput>): Promise<void> => {
     const { plugin, params } = context;
     const { start_offset, end_offset } = params;
 
-    context.setLabel(t('tools.dailyNotes.inProgress', { start: start_offset, end: end_offset }));
+    context.setLabel(t('tools.dailyNotes.labels.inProgress', { start: start_offset, end: end_offset }));
 
     try {
       const rangeInfo = handleDayNoteRangeLink(plugin.app, start_offset, end_offset);
@@ -76,7 +76,7 @@ export const dailyNotesTool: ObsidianTool<DailyNotesInput> = {
           }
         }
         
-        context.setLabel(t('tools.dailyNotes.completed', { 
+        context.setLabel(t('tools.dailyNotes.labels.completed', { 
           found: foundCount, 
           total: rangeInfo.notes.length,
           range: rangeInfo.rangeLabel 
@@ -84,12 +84,12 @@ export const dailyNotesTool: ObsidianTool<DailyNotesInput> = {
         context.progress(combinedContent.trim());
       } else {
         // No notes in range (shouldn't happen with current logic)
-        context.setLabel(t('tools.dailyNotes.failed', { start: start_offset, end: end_offset }));
+        context.setLabel(t('tools.dailyNotes.labels.failed', { start: start_offset, end: end_offset }));
         context.progress(`No daily notes found for range ${start_offset} to ${end_offset}`);
       }
 
     } catch (error) {
-      context.setLabel(t('tools.dailyNotes.failed', { start: start_offset, end: end_offset }));
+      context.setLabel(t('tools.dailyNotes.labels.failed', { start: start_offset, end: end_offset }));
       throw error;
     }
   }

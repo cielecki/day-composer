@@ -26,14 +26,14 @@ export const vaultSearchTool: ObsidianTool<VaultSearchToolInput> = {
   specification: schema,
   	icon: "search",
   sideEffects: false, // Read-only search operation, safe for link expansion
-	get initialLabel() {
-		return t('tools.search.label');
-	},
+	  get initialLabel() {
+    return t('tools.search.labels.initial');
+  },
 	execute: async (context: ToolExecutionContext<VaultSearchToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { query } = params;
 
-    context.setLabel(t('tools.search.inProgress', { query }));
+    context.setLabel(t('tools.search.labels.inProgress', { query }));
 
     try {
       const files = plugin.app.vault.getMarkdownFiles();
@@ -102,8 +102,8 @@ export const vaultSearchTool: ObsidianTool<VaultSearchToolInput> = {
       const limitedResults = results.slice(0, 10);
 
       if (limitedResults.length === 0) {
-        context.setLabel(t('tools.search.noResults', { query }));
-        context.progress(t('tools.search.noResults', { query }));
+        context.setLabel(t('tools.search.labels.noResults', { query }));
+        context.progress(t('tools.search.progress.noResults', { query }));
         return;
       }
 
@@ -122,10 +122,10 @@ export const vaultSearchTool: ObsidianTool<VaultSearchToolInput> = {
         });
       });
 
-      context.setLabel(t('tools.search.completed', { query, count: limitedResults.length }));
+      context.setLabel(t('tools.search.labels.completed', { query, count: limitedResults.length }));
       context.progress(resultText);
     } catch (error) {
-      context.setLabel(t('tools.search.failed', { query }));
+      context.setLabel(t('tools.search.labels.failed', { query }));
       throw error;
     }
   }

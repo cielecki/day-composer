@@ -42,13 +42,13 @@ export const fileMoveTool: ObsidianTool<FileMoveToolInput> = {
   icon: "move",
   sideEffects: true, // Modifies files by moving them
   get initialLabel() {
-    return t('tools.fileMove.label');
+    return t('tools.fileMove.labels.initial');
   },
   execute: async (context: ToolExecutionContext<FileMoveToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { source_path, destination_path, create_directories = true } = params;
     
-    context.setLabel(t('tools.fileMove.inProgress', { source: source_path, destination: destination_path }));
+    context.setLabel(t('tools.fileMove.labels.inProgress', { source: source_path, destination: destination_path }));
 
     try {
       // Normalize paths
@@ -58,21 +58,21 @@ export const fileMoveTool: ObsidianTool<FileMoveToolInput> = {
       // Check if source file exists
       const sourceExists = await fileExists(normalizedSourcePath, plugin.app);
       if (!sourceExists) {
-        context.setLabel(t('tools.fileMove.failed', { source: source_path }));
+        context.setLabel(t('tools.fileMove.labels.failed', { source: source_path }));
         throw new ToolExecutionError(`Source file not found: ${source_path}`);
       }
       
       // Get the source file
       const sourceFile = getFile(normalizedSourcePath, plugin.app);
       if (!sourceFile) {
-        context.setLabel(t('tools.fileMove.failed', { source: source_path }));
+        context.setLabel(t('tools.fileMove.labels.failed', { source: source_path }));
         throw new ToolExecutionError(`Could not access source file: ${source_path}`);
       }
       
       // Check if destination already exists
       const destinationExists = await fileExists(normalizedDestinationPath, plugin.app);
       if (destinationExists) {
-        context.setLabel(t('tools.fileMove.failed', { source: source_path }));
+        context.setLabel(t('tools.fileMove.labels.failed', { source: source_path }));
         throw new ToolExecutionError(`Destination file already exists: ${destination_path}`);
       }
       
@@ -80,13 +80,13 @@ export const fileMoveTool: ObsidianTool<FileMoveToolInput> = {
       if (create_directories) {
         const destinationDir = normalizedDestinationPath.substring(0, normalizedDestinationPath.lastIndexOf('/'));
         if (destinationDir) {
-          context.progress(t('tools.fileMove.creatingDirectories', { dir: destinationDir }));
+          context.progress(t('tools.fileMove.progress.creatingDirectories', { dir: destinationDir }));
           await ensureDirectoryExists(destinationDir, plugin.app);
         }
       }
       
       // Perform the move operation
-      context.progress(t('tools.fileMove.moving', { source: source_path, destination: destination_path }));
+              context.progress(t('tools.fileMove.progress.moving', { source: source_path, destination: destination_path }));
       await plugin.app.vault.rename(sourceFile, normalizedDestinationPath);
       
       // Add navigation target to the moved file
@@ -95,14 +95,14 @@ export const fileMoveTool: ObsidianTool<FileMoveToolInput> = {
         description: t("tools.fileMove.navigation.openMovedFile")
       });
       
-      context.setLabel(t('tools.fileMove.success', { source: source_path, destination: destination_path }));
-      context.progress(t('tools.fileMove.completed', { 
+      context.setLabel(t('tools.fileMove.labels.success', { source: source_path, destination: destination_path }));
+              context.progress(t('tools.fileMove.progress.completed', { 
         source: source_path, 
         destination: destination_path 
       }));
       
     } catch (error) {
-      context.setLabel(t('tools.fileMove.failed', { source: source_path }));
+      context.setLabel(t('tools.fileMove.labels.failed', { source: source_path }));
       throw error;
     }
   }

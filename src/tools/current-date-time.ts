@@ -20,20 +20,20 @@ export const currentDateTimeTool: ObsidianTool<CurrentDateTimeInput> = {
   icon: "clock",
   sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
-    return t('tools.currentDateTime.label');
+    return t('tools.currentDateTime.labels.initial');
   },
   execute: async (context: ToolExecutionContext<CurrentDateTimeInput>): Promise<void> => {
-    context.setLabel(t('tools.currentDateTime.inProgress'));
+    context.setLabel(t('tools.currentDateTime.labels.inProgress'));
 
     try {
       // Use the exact same logic as the original special link handler
       const result = handleCurrentDateTimeLink();
 
-      context.setLabel(t('tools.currentDateTime.completed'));
+      context.setLabel(t('tools.currentDateTime.labels.completed'));
       context.progress(result);
 
     } catch (error) {
-      context.setLabel(t('tools.currentDateTime.failed'));
+      context.setLabel(t('tools.currentDateTime.labels.failed'));
       throw error;
     }
   }

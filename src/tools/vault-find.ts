@@ -64,13 +64,13 @@ export const vaultFindTool: ObsidianTool<VaultFindToolInput> = {
   icon: "search",
   sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
-    return t('tools.find.label');
+    return t('tools.find.labels.initial');
   },
   execute: async (context: ToolExecutionContext<VaultFindToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { directory_path = "", recursive = false, include_files = true, include_folders = true, file_types = [] } = params;
     
-    context.setLabel(t('tools.find.inProgress', { path: directory_path || 'root' }));
+    context.setLabel(t('tools.find.labels.inProgress', { path: directory_path || 'root' }));
 
     try {
       // Normalize the path and handle special cases
@@ -91,12 +91,12 @@ export const vaultFindTool: ObsidianTool<VaultFindToolInput> = {
       const folder = targetPath === "" ? plugin.app.vault.getRoot() : plugin.app.vault.getAbstractFileByPath(targetPath);
       
       if (!folder) {
-        context.setLabel(t('tools.find.failed', { path: targetPath }));
+        context.setLabel(t('tools.find.labels.failed', { path: targetPath }));
         throw new ToolExecutionError(`Directory not found: ${targetPath}`);
       }
       
       if (!(folder instanceof TFolder)) {
-        context.setLabel(t('tools.find.failed', { path: targetPath }));
+        context.setLabel(t('tools.find.labels.failed', { path: targetPath }));
         throw new ToolExecutionError(`Path is not a directory: ${targetPath}`);
       }
       
@@ -105,7 +105,7 @@ export const vaultFindTool: ObsidianTool<VaultFindToolInput> = {
       
       if (children.length === 0) {
         const emptyMessage = t('tools.find.empty', { path: targetPath || 'root' });
-        context.setLabel(t('tools.find.completed', { count: 0, path: targetPath || 'root' }));
+        context.setLabel(t('tools.find.labels.completed', { count: 0, path: targetPath || 'root' }));
         context.progress(emptyMessage);
         return;
       }
@@ -146,10 +146,10 @@ export const vaultFindTool: ObsidianTool<VaultFindToolInput> = {
       
       const resultText = result.join('\n');
       
-      context.setLabel(t('tools.find.completed', { count: children.length, path: targetPath || 'root' }));
+      context.setLabel(t('tools.find.labels.completed', { count: children.length, path: targetPath || 'root' }));
       context.progress(resultText);
     } catch (error) {
-      context.setLabel(t('tools.find.failed', { path: directory_path || 'root' }));
+      context.setLabel(t('tools.find.labels.failed', { path: directory_path || 'root' }));
       throw error;
     }
   }

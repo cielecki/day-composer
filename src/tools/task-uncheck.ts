@@ -43,14 +43,14 @@ export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
   icon: "square",
   sideEffects: true, // Modifies files by unchecking tasks
   get initialLabel() {
-    return t('tools.uncheck.label');
+    return t('tools.uncheck.labels.initial');
   },
   execute: async (context: ToolExecutionContext<TaskUncheckToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const todoDescription = params.todo_text;
     const comment = params.comment;
     
-    context.setLabel(t('tools.actions.uncheck.inProgress', { task: todoDescription }));
+    context.setLabel(t('tools.uncheck.labels.inProgress', { task: todoDescription }));
     
     try {
       const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
@@ -61,7 +61,7 @@ export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
       
       // Check if task was found
       if (!task) {
-        context.setLabel(t('tools.actions.uncheck.failed', { task: todoDescription }));
+        context.setLabel(t('tools.uncheck.labels.failed', { task: todoDescription }));
         throw new ToolExecutionError(t('errors.tasks.notFound', {
           task: todoDescription,
           path: filePath
@@ -90,13 +90,13 @@ export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
       // Add navigation targets
       navigationTargets.forEach(target => context.addNavigationTarget(target));
 
-      context.setLabel(t('tools.actions.uncheck.success', { task: todoDescription }));
-      context.progress(t('tools.success.uncheck', {
+      context.setLabel(t('tools.uncheck.labels.success', { task: todoDescription }));
+      context.progress(t('tools.uncheck.progress.success', {
         task: todoDescription,
-        path: filePath
+        name: filePath
       }));
     } catch (error) {
-      context.setLabel(t('tools.actions.uncheck.failed', { task: todoDescription }));
+      context.setLabel(t('tools.uncheck.labels.failed', { task: todoDescription }));
       throw error;
     }
   }

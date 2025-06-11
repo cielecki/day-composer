@@ -63,21 +63,21 @@ export const taskCheckTool: ObsidianTool<TaskCheckToolInput> = {
   icon: "check-circle",
   sideEffects: true, // Modifies files by checking tasks
   get initialLabel() {
-    return t('tools.check.label');
+    return t('tools.check.labels.initial');
   },
   execute: async (context: ToolExecutionContext<TaskCheckToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos, time } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
-      context.setLabel(t('tools.actions.check.failed', { task: 'todos' }));
+      context.setLabel(t('tools.check.labels.failed', { task: 'todos' }));
       throw new ToolExecutionError("No to-do items provided");
     }
 
     const count = todos.length;
     const todoText = count === 1 ? todos[0].todo_text : `${count} todos`;
     
-    context.setLabel(t('tools.actions.check.inProgress', { task: todoText }));
+    context.setLabel(t('tools.check.labels.inProgress', { task: todoText }));
 
     // Format the current time if provided (common for all tasks)
     const currentTime = getCurrentTime(time);
@@ -149,10 +149,10 @@ export const taskCheckTool: ObsidianTool<TaskCheckToolInput> = {
         ? `✅ Checked off: "${checkedTasks[0]}"` 
         : `✅ Checked off ${checkedTasks.length} todos:\n${checkedTasks.map(task => `• ${task}`).join('\n')}`;
 
-      context.setLabel(t('tools.actions.check.success', { task: todoText }));
+      context.setLabel(t('tools.check.labels.success', { task: todoText }));
       context.progress(resultMessage);
     } catch (error) {
-      context.setLabel(t('tools.actions.check.failed', { task: todoText }));
+      context.setLabel(t('tools.check.labels.failed', { task: todoText }));
       throw error;
     }
   }

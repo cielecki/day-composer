@@ -77,13 +77,13 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
   icon: "save",
   sideEffects: true, // Creates files by saving conversations
   get initialLabel() {
-    return t('tools.conversationSave.label');
+    return t('tools.conversationSave.labels.initial');
   },
   execute: async (context: ToolExecutionContext<ConversationSaveToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { path, title, include_metadata = true, auto_version = true } = params;
 
-    context.setLabel(t('tools.conversationSave.inProgress'));
+    context.setLabel(t('tools.conversationSave.labels.inProgress'));
 
     try {
       // Get the current conversation from the store
@@ -159,11 +159,11 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
         description: t('tools.conversationSave.navigation.openSavedConversation')
       });
 
-      context.setLabel(t('tools.conversationSave.completed', { path: targetPath }));
+      context.setLabel(t('tools.conversationSave.labels.success', { path: targetPath }));
       context.progress(t('tools.conversationSave.progress.success', { count: conversation.length, path: targetPath }));
       
     } catch (error) {
-      context.setLabel(t('tools.conversationSave.failed'));
+      context.setLabel(t('tools.conversationSave.labels.failed'));
       throw error;
     }
   }

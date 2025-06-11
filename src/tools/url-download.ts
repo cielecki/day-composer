@@ -100,13 +100,13 @@ export const urlDownloadTool: ObsidianTool<UrlDownloadToolInput> = {
   icon: "download",
   sideEffects: false, // Read-only operation (just downloads and displays content)
   get initialLabel() {
-    return t('tools.urlDownload.label');
+    return t('tools.urlDownload.labels.initial');
   },
   execute: async (context: ToolExecutionContext<UrlDownloadToolInput>): Promise<void> => {
     const { params } = context;
     const { url } = params;
 
-    context.setLabel(t('tools.urlDownload.inProgress', { url }));
+    context.setLabel(t('tools.urlDownload.labels.inProgress', { url }));
 
     try {
       // Validate URL format
@@ -114,7 +114,7 @@ export const urlDownloadTool: ObsidianTool<UrlDownloadToolInput> = {
       try {
         validUrl = new URL(url);
       } catch (error) {
-        context.setLabel(t('tools.urlDownload.failed', { url }));
+        context.setLabel(t('tools.urlDownload.labels.failed', { url }));
         throw new ToolExecutionError(`Invalid URL format: ${url}`);
       }
 
@@ -129,7 +129,7 @@ export const urlDownloadTool: ObsidianTool<UrlDownloadToolInput> = {
 
       // Check if request was successful
       if (response.status !== 200) {
-        context.setLabel(t('tools.urlDownload.failed', { url }));
+        context.setLabel(t('tools.urlDownload.labels.failed', { url }));
         throw new ToolExecutionError(`Failed to download from ${url}. Status: ${response.status}`);
       }
 
@@ -166,7 +166,7 @@ export const urlDownloadTool: ObsidianTool<UrlDownloadToolInput> = {
           '3. If it\'s a document, try converting it to text first'
         ].join('\n');
 
-        context.setLabel(t('tools.urlDownload.completed', { url }));
+        context.setLabel(t('tools.urlDownload.labels.completed', { url }));
         context.progress(binaryInfo);
       } else {
         // Add some basic formatting info for text content
@@ -181,11 +181,11 @@ export const urlDownloadTool: ObsidianTool<UrlDownloadToolInput> = {
           content
         ].join('\n');
 
-        context.setLabel(t('tools.urlDownload.completed', { url }));
+        context.setLabel(t('tools.urlDownload.labels.completed', { url }));
         context.progress(downloadInfo);
       }
     } catch (error) {
-      context.setLabel(t('tools.urlDownload.failed', { url }));
+      context.setLabel(t('tools.urlDownload.labels.failed', { url }));
       if (error instanceof ToolExecutionError) {
         throw error;
       }

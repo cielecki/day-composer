@@ -49,18 +49,18 @@ export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput>
   icon: "check-circle",
   sideEffects: true, // Modifies files by creating completed tasks
   get initialLabel() {
-    return t('tools.createCompleted.label');
+    return t('tools.createCompleted.labels.initial');
   },
   execute: async (context: ToolExecutionContext<TaskCreateCompletedToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todo_text, comment, file_path, completion_time } = params;
 
     if (!todo_text) {
-      context.setLabel(t('tools.actions.createCompleted.failed', { task: '' }));
+      context.setLabel(t('tools.createCompleted.labels.failed', { task: '' }));
       throw new ToolExecutionError("No to-do text provided");
     }
 
-    context.setLabel(t('tools.actions.createCompleted.inProgress', { task: todo_text }));
+    context.setLabel(t('tools.createCompleted.labels.inProgress', { task: todo_text }));
 
     const filePath = file_path ? file_path : await getDailyNotePath(plugin.app);
 
@@ -116,14 +116,14 @@ export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput>
       // Add navigation targets
       navigationTargets.forEach(target => context.addNavigationTarget(target));
 
-      context.setLabel(t('tools.actions.createCompleted.success', { task: todo_text }));
-      context.progress(t('tools.success.complete', {
+      context.setLabel(t('tools.createCompleted.labels.success', { task: todo_text }));
+      context.progress(t('tools.createCompleted.progress.success', {
         task: todo_text,
         time: currentTime ? ` ${currentTime}` : '',
-        path: filePath
+        name: filePath
       }));
     } catch (error) {
-      context.setLabel(t('tools.actions.createCompleted.failed', { task: todo_text }));
+      context.setLabel(t('tools.createCompleted.labels.failed', { task: todo_text }));
       throw error;
     }
   }

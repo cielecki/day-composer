@@ -74,27 +74,24 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 	icon: "list-plus",
 	sideEffects: true, // Modifies files by adding tasks
 	get initialLabel() {
-		return t('tools.add.label');
+    	return t('tools.add.labels.initial');
 	},
 	execute: async (context: ToolExecutionContext<TaskAddToolInput>): Promise<void> => {
 		const { plugin, params } = context;
 		const { todos, path, position, reference_todo_text } = params;
 
 		if (!todos || !Array.isArray(todos) || todos.length === 0) {
-			context.setLabel(t('tools.actions.add.failed', { task: '' }));
+			context.setLabel(t('tools.add.labels.failed', { task: '' }));
 			throw new ToolExecutionError("No to-do items provided");
 		}
 
 		const todoCount = todos.length;
-		let actionText = "";
-		
-		if (todoCount === 1) {
-			actionText = `\`${truncateText(todos[0].todo_text, 30)}\``;
-		} else {
-			actionText = `${todoCount} todos`;
-		}
 
-		context.setLabel(t('tools.actions.add.inProgress', { task: actionText }));
+		const taskDescriptionShort = todoCount === 1 
+			? `'${truncateText(todos[0].todo_text, 30)}'` 
+			: `${todoCount} ${t('tools.tasks.plural')}`;
+
+		context.setLabel(t('tools.add.labels.inProgress', { task: taskDescriptionShort }));
 
 		const filePath = path ? path : await getDailyNotePath(plugin.app);
 
@@ -160,25 +157,23 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 
 			// Prepare success message with improved formatting
 			const filename = extractFilenameWithoutExtension(filePath);
-			const tasksDescription = addedTasks.length === 1 
-				? `"${truncateText(addedTasks[0], 20)}"` 
-				: `${addedTasks.length} ${t('tools.tasks.plural')}`;
 			const taskDescriptionFull = addedTasks.length === 1 
-				? `"${addedTasks[0]}"` 
+				? `'${addedTasks[0]}'` 
 				: `${addedTasks.length} ${t('tools.tasks.plural')}`;
 				
-			context.setLabel(t('tools.actions.add.success', { 
-				task: actionText, 
+			context.setLabel(t('tools.add.labels.success', {
+				task: taskDescriptionShort, 
 				filename: filename 
 			}));
-			context.progress(t('tools.success.add', {
+
+			context.progress(t('tools.add.progress.success', {
 				task: taskDescriptionFull,
-				path: filePath
+				name: filePath
 			}));
 		} catch (error) {
 			const filename = extractFilenameWithoutExtension(filePath);
-			context.setLabel(t('tools.actions.add.failed', { 
-				task: actionText, 
+			context.setLabel(t('tools.add.labels.failed', {
+				task: taskDescriptionShort, 
 				filename: filename 
 			}));
 			throw error;

@@ -31,36 +31,36 @@
         "notFound": "Nie Znaleziono"
       },
       "noApiKey": "Brak Klucza API",
-      "playbackError": "Błąd odtwarzania audio: {{error}}",
+      "playbackError": "Błąd odtwarzania audio: '{{error}}'",
       "transcriptionFailed": "Transkrypcja Nieudana"
     },
     "chat": {
       "noContent": "Brak dostępnej zawartości czatu"
     },
-    "failedToUpdatePlugin": "Nie udało się zaktualizować wtyczki: {{error}}",
+    "failedToUpdatePlugin": "Nie udało się zaktualizować wtyczki: '{{error}}'",
     "files": {
       "formatFailed": "Nie udało się sformatować dokumentu po operacji na zadaniu",
-      "getFailed": "Nie udało się pobrać pliku z {{path}}",
-      "notFound": "Nie znaleziono pliku w {{path}}"
+      "getFailed": "Nie udało się pobrać pliku z '{{name}}'",
+      "notFound": "Nie znaleziono pliku w '{{name}}'"
     },
     "helpButton": "Pomoc",
-    "helpPrompt": "Napotkałem błąd podczas używania trybu {{mode}}:\n'''{{error}}'''\nCzy możesz mi pomóc?",
+    "helpPrompt": "Napotkałem błąd podczas używania trybu '{{mode}}':\n'''{{error}}'''\nCzy możesz mi pomóc?",
     "linkExpansion": {
-      "couldNotResolve": "Nie można znaleźć celu linku \"{{linkPath}}\""
+      "couldNotResolve": "Nie można znaleźć celu linku '{{linkPath}}'"
     },
     "retryButton": "Ponów",
-    "setup": "Błąd konfiguracji: {{error}}",
+    "setup": "Błąd konfiguracji: '{{error}}'",
     "startingLifeNavigator": "Błąd uruchamiania Life Navigator",
     "tasks": {
-      "insertOutOfBounds": "Nie można wstawić zadania w indeksie {{index}}: Indeks poza zakresem (dokument ma {{total}} elementów)",
-      "multipleFound": "Znaleziono wiele zadań z opisem \"{{task}}\" w {{path}}. Proszę podać bardziej szczegółowy opis zadania.",
-      "notFound": "Nie znaleziono zadania \"{{task}}\" w {{path}}. Jeśli zadanie znajduje się w innym pliku, określ go w parametrze file_path.",
-      "removeNotFound": "Nie znaleziono zadania \"{{task}}\" w dokumencie"
+      "insertOutOfBounds": "Nie można wstawić zadania w indeksie '{{index}}': Indeks poza zakresem (dokument ma '{{total}}' elementów)",
+      "multipleFound": "Znaleziono wiele zadań z opisem '{{task}}' w '{{name}}'. Proszę podać bardziej szczegółowy opis zadania.",
+      "notFound": "Nie znaleziono zadania '{{task}}' w '{{name}}'. Jeśli zadanie znajduje się w innym pliku, określ go w parametrze file_name.",
+      "removeNotFound": "Nie znaleziono zadania '{{task}}' w dokumencie"
     },
     "tools": {
-      "execution": "Błąd wykonania narzędzia {{tool}}: {{error}}",
+      "execution": "Błąd wykonania narzędzia '{{tool}}': '{{error}}'",
       "noName": "Nie podano nazwy narzędzia",
-      "unknown": "Nieznane narzędzie \"{{tool}}\""
+      "unknown": "Nieznane narzędzie '{{tool}}'"
     }
   },
   "file": {
@@ -68,9 +68,9 @@
   },
   "messages": {
     "checkingForUpdates": "Sprawdzanie aktualizacji...",
-    "newVersionFoundDownloading": "Znaleziono nową wersję {{latestVersion}}! Pobieranie aktualizacji z {{currentVersion}}...",
-    "pluginUpToDate": "Life Navigator jest aktualny (wersja {{version}})",
-    "updateAvailable": "Dostępna aktualizacja! Wersja {{latestVersion}} jest teraz dostępna (masz {{currentVersion}})"
+    "newVersionFoundDownloading": "Znaleziono nową wersję '{{latestVersion}}'! Pobieranie aktualizacji z '{{currentVersion}}'...",
+    "pluginUpToDate": "Life Navigator jest aktualny (wersja '{{version}}')",
+    "updateAvailable": "Dostępna aktualizacja! Wersja '{{latestVersion}}' jest teraz dostępna (masz '{{currentVersion}}')"
   },
   "prebuiltModes": {
     "lifeNavigator": {
@@ -90,7 +90,7 @@
       "resetTutorial": {
         "button": "Resetuj tutorial",
         "desc": "Resetuj tutorial konfiguracji i proces wdrażania. Spowoduje to ponowne wyświetlenie ekranów konfiguracji przy następnym otwarciu Life Navigator.",
-        "error": "Nie udało się zresetować tutoriala: {{error}}",
+        "error": "Nie udało się zresetować tutoriala: '{{error}}'",
         "name": "Resetuj tutorial",
         "success": "Tutorial został pomyślnie zresetowany"
       },
@@ -112,7 +112,7 @@
       "dialog": {
         "addTitle": "Dodaj Nowy Sekret",
         "cancel": "Anuluj",
-        "editTitle": "Edytuj Sekret: {{key}}",
+        "editTitle": "Edytuj Sekret: '{{key}}'",
         "errors": {
           "emptyKey": "Nazwa sekretu nie może być pusta.",
           "keyExists": "Sekret '{{key}}' już istnieje. Czy chcesz go nadpisać?"
@@ -157,8 +157,8 @@
   },
   "tasks": {
     "format": {
-      "abandonedAt": " (porzucone o {{time}})",
-      "completedAt": " (zakończone o {{time}})"
+      "abandonedAt": " (porzucone o '{{time}}')",
+      "completedAt": " (zakończone o '{{time}}')"
     }
   },
   "text": {
@@ -197,285 +197,345 @@
   },
   "tools": {
     "abandon": {
-      "label": "Porzucam todo ..."
-    },
-    "actions": {
-      "abandon": {
-        "failed": "Nie udało się porzucić zadania {{task}}",
-        "inProgress": "Porzucanie zadania {{task}}...",
-        "success": "Porzucono zadanie {{task}}"
+      "labels": {
+        "failed": "Nie udało się porzucić '{{task}}'",
+        "inProgress": "Porzucanie '{{task}}'...",
+        "initial": "Porzucanie zadania ...",
+        "success": "Porzucono '{{task}}'"
       },
-      "add": {
-        "failed": "Nie udało się dodać todo {{task}} do '{{filename}}'",
-        "inProgress": "Dodawanie todo...",
-        "success": "Dodano {{task}} do '{{filename}}'"
-      },
-      "check": {
-        "failed": "Nie udało się oznaczyć '{{task}}'",
-        "inProgress": "Oznaczanie '{{task}}' ...",
-        "success": "Oznaczono '{{task}}'"
-      },
-      "createCompleted": {
-        "failed": "Nie udało się utworzyć ukończonego todo {{task}}",
-        "inProgress": "Tworzenie ukończonego todo {{task}}...",
-        "success": "Utworzono ukończone todo {{task}}"
-      },
-      "createDocument": {
-        "completed": "Utworzono '{{path}}'",
-        "failed": "Nie udało się utworzyć '{{path}}'",
-        "inProgress": "Tworzenie '{{path}}'..."
-      },
-      "editTodo": {
-        "completed": "Edytowano todo {{task}}",
-        "failed": "Nie udało się edytować todo {{task}}",
-        "inProgress": "Edytowanie todo {{task}}..."
-      },
-      "move": {
-        "failed": "Nie udało się przenieść todo {{task}}",
-        "inProgress": "Przenoszenie todo {{task}}...",
-        "success": "Przeniesiono todo {{task}}"
-      },
-      "remove": {
-        "failed": "Nie udało się usunąć todo {{task}}",
-        "inProgress": "Usuwanie todo {{task}}...",
-        "success": "Usunięto todo {{task}}"
-      },
-      "secretList": {
-        "completed": "Wyświetlono skonfigurowane sekrety",
-        "default": "Pokaż Sekrety",
-        "failed": "Nie udało się wyświetlić sekretów",
-        "inProgress": "Wyświetlanie skonfigurowanych sekretów..."
-      },
-      "secretSave": {
-        "completed": "Zapisano sekret {{key}}",
-        "default": "Zapisz Sekret",
-        "failed": "Nie udało się zapisać sekretu {{key}}",
-        "inProgress": "Zapisywanie sekretu {{key}}..."
-      },
-      "uncheck": {
-        "failed": "Nie udało się odznaczyć todo {{task}}",
-        "inProgress": "Odznaczanie todo {{task}}...",
-        "success": "Odznaczono todo {{task}}"
+      "progress": {
+        "success": "Porzucono '{{task}}'"
       }
     },
     "add": {
-      "label": "Dodawanie todo ..."
+      "labels": {
+        "failed": "Nie udało się dodać '{{task}}' do '{{filename}}'",
+        "inProgress": "Dodawanie zadania...",
+        "initial": "Dodawanie zadania ...",
+        "success": "Dodano '{{task}}' do '{{filename}}'"
+      },
+      "progress": {
+        "success": "Dodano '{{task}}' do '{{filename}}'"
+      }
     },
     "check": {
-      "label": "Oznaczanie todo ..."
+      "labels": {
+        "failed": "Nie udało się zaznaczyć '{{task}}'",
+        "inProgress": "Zaznaczanie '{{task}}' ...",
+        "initial": "Zaznaczanie zadania ...",
+        "success": "Zaznaczono '{{task}}'"
+      }
     },
     "checkForUpdates": "Sprawdź aktualizacje",
     "comments": {
       "removedTaskHeader": "USUNIĘTE ZADANIE"
     },
     "conversationSave": {
-      "completed": "Zapisano rozmowę do {{path}}",
-      "failed": "Nie udało się zapisać rozmowy",
-      "inProgress": "Zapisywanie rozmowy...",
-      "label": "Zapisywanie rozmowy ...",
+      "labels": {
+        "failed": "Nie udało się zapisać rozmowy",
+        "inProgress": "Zapisywanie rozmowy...",
+        "initial": "Zapisywanie rozmowy ...",
+        "success": "Zapisano rozmowę do '{{path}}'"
+      },
       "navigation": {
         "openSavedConversation": "Otwórz zapisaną rozmowę"
       },
       "progress": {
-        "empty": "Brak rozmowy do zapisania - aktualna rozmowa jest pusta",
-        "fileExists": "Plik już istnieje w {{path}}. Ustaw auto_version na true, aby utworzyć wersję pliku",
-        "success": "Pomyślnie zapisano rozmowę z {{count}} wiadomościami do: {{path}}",
-        "versionedFile": "Tworzenie wersjonowanego pliku: {{path}}"
+        "empty": "Brak rozmowy do zapisania - obecna rozmowa jest pusta",
+        "fileExists": "Plik już istnieje w '{{name}}'. Ustaw auto_version na true, aby utworzyć plik z wersją",
+        "success": "Pomyślnie zapisano rozmowę z '{{count}}' wiadomościami do: '{{name}}'",
+        "versionedFile": "Tworzenie pliku z wersją: '{{name}}'"
       }
     },
     "createCompleted": {
-      "label": "Tworzę ukończone todo ..."
+      "labels": {
+        "failed": "Nie udało się utworzyć skończonego zadania '{{task}}'",
+        "inProgress": "Tworzenie skończonego zadania '{{task}}'...",
+        "initial": "Tworzenie skończonego zadania ...",
+        "success": "Utworzono skończone zadanie '{{task}}'"
+      },
+      "progress": {
+        "success": "Utworzono skończone zadanie '{{task}}'"
+      }
     },
     "createDocument": {
-      "label": "Tworzę dokument ...",
+      "labels": {
+        "completed": "Utworzono '{{name}}'",
+        "failed": "Nie udało się utworzyć '{{name}}'",
+        "inProgress": "Tworzenie '{{name}}'...",
+        "initial": "Tworzenie dokumentu ..."
+      },
       "progress": {
-        "success": "Pomyślnie utworzono dokument w '{{path}}'",
-        "versionedPath": "Plik już istnieje. Tworzenie wersjonowanego pliku: '{{originalPath}}' → '{{versionedPath}}'"
+        "success": "Pomyślnie utworzono dokument w '{{name}}'",
+        "versionedPath": "Plik już istnieje. Tworzenie pliku z wersją: '{{originalName}}' → '{{versionedName}}'"
       }
     },
     "currentChat": {
-      "completed": "Pobrano zawartość bieżącej rozmowy",
-      "failed": "Nie udało się pobrać bieżącej rozmowy",
-      "inProgress": "Pobieram bieżącą rozmowę...",
-      "label": "Pobieram bieżącą rozmowę ..."
+      "labels": {
+        "completed": "Pobrano zawartość bieżącej rozmowy",
+        "failed": "Nie udało się pobrać bieżącej rozmowy",
+        "inProgress": "Pobieram bieżącą rozmowę...",
+        "initial": "Pobieram bieżącą rozmowę ..."
+      }
     },
     "currentDateTime": {
-      "completed": "Pobrano aktualną datę i czas",
-      "failed": "Nie udało się pobrać aktualnej daty i czasu",
-      "inProgress": "Pobieram aktualną datę i czas...",
-      "label": "Pobieram aktualną datę i czas ..."
+      "labels": {
+        "completed": "Pobrano aktualną datę i czas",
+        "failed": "Nie udało się pobrać aktualnej daty i czasu",
+        "inProgress": "Pobieram aktualną datę i czas...",
+        "initial": "Pobieranie obecnej daty i czasu ..."
+      }
     },
     "currentFileAndSelection": {
-      "completed": "Pobrano aktualny plik i kontekst zaznaczenia",
-      "failed": "Nie udało się pobrać aktualnego pliku i zaznaczenia",
-      "inProgress": "Pobieram aktualny plik i zaznaczenie...",
-      "label": "Pobieram aktualny plik i zaznaczenie ..."
+      "labels": {
+        "completed": "Pobrano aktualny plik i kontekst zaznaczenia",
+        "failed": "Nie udało się pobrać aktualnego pliku i zaznaczenia",
+        "inProgress": "Pobieram aktualny plik i zaznaczenie...",
+        "initial": "Pobieranie obecnego pliku i zaznaczenia ..."
+      }
     },
     "dailyNotes": {
-      "completed": "Pobrano {{found}}/{{total}} notatek dziennych z {{range}}",
-      "failed": "Nie udało się pobrać notatek dziennych ({{start}} do {{end}})",
-      "inProgress": "Pobieram notatki dzienne ({{start}} do {{end}})...",
-      "label": "Pobieram zakres notatek dziennych ..."
+      "labels": {
+        "completed": "Pobrano '{{found}}'/'{{total}}' dziennych notatek z '{{range}}'",
+        "failed": "Nie udało się pobrać dziennych notatek ('{{start}}' do '{{end}}')",
+        "inProgress": "Pobieranie dziennych notatek ('{{start}}' do '{{end}}')...",
+        "initial": "Pobieranie zakresu dziennych notatek ..."
+      }
     },
     "dayNote": {
-      "completed": "Pobrano notatkę dzienną dla {{date}}",
-      "failed": "Nie udało się pobrać notatki dziennej (przesunięcie: {{offset}})",
-      "inProgress": "Pobieram notatkę dzienną (przesunięcie: {{offset}})...",
-      "label": "Pobieram notatkę dzienną ...",
-      "notFound": "Nie znaleziono notatki dziennej dla {{date}}"
+      "labels": {
+        "completed": "Pobrano dzienną notatkę dla '{{date}}'",
+        "failed": "Nie udało się pobrać dziennej notatki (przesunięcie: '{{offset}}')",
+        "inProgress": "Pobieranie dziennej notatki (przesunięcie: '{{offset}}')...",
+        "initial": "Pobieranie dziennej notatki ...",
+        "notFound": "Nie znaleziono dziennej notatki"
+      }
     },
-    "edit": {
-      "label": "Edytowanie todo ..."
+    "editTodo": {
+      "labels": {
+        "completed": "Edytowano '{{task}}'",
+        "failed": "Nie udało się edytować '{{task}}'",
+        "inProgress": "Edytowanie '{{task}}'...",
+        "initial": "Edytowanie zadania ..."
+      },
+      "progress": {
+        "success": "Edytowano '{{task}}'"
+      }
     },
     "fileMove": {
-      "completed": "Przeniesiono plik z '{{source}}' do '{{destination}}'",
-      "creatingDirectories": "Tworzenie katalogu docelowego: {{dir}}",
-      "failed": "Nie udało się przenieść pliku '{{source}}'",
-      "inProgress": "Przenoszenie pliku z '{{source}}' do '{{destination}}'...",
-      "label": "Przenoszenie pliku ...",
-      "moving": "Przenoszenie '{{source}}' do '{{destination}}'",
+      "labels": {
+        "failed": "Nie udało się przenieść pliku '{{source}}'",
+        "inProgress": "Przenoszenie pliku z '{{source}}' do '{{destination}}'...",
+        "initial": "Przenoszenie pliku",
+        "success": "Przeniesiono plik z '{{source}}' do '{{destination}}'"
+      },
       "navigation": {
         "openMovedFile": "Otwórz przeniesiony plik"
       },
-      "success": "Przeniesiono plik z {{source}} do {{destination}}"
+      "progress": {
+        "completed": "Przeniesiono plik z '{{source}}' do '{{destination}}'",
+        "creatingDirectories": "Tworzenie katalogu docelowego: '{{dir}}'",
+        "moving": "Przenoszenie '{{source}}' do '{{destination}}'"
+      }
     },
     "find": {
-      "completed": "Znaleziono {{count}} elementów w {{path}}",
-      "empty": "Katalog {{path}} jest pusty",
-      "failed": "Nie udało się znaleźć zawartości w {{path}}",
-      "header": "Zawartość {{path}} ({{count}} elementów):",
-      "inProgress": "Wyszukiwanie zawartości w {{path}}...",
-      "label": "Znajduję pliki ..."
+      "empty": "Katalog '{{name}}' jest pusty",
+      "header": "Zawartość '{{name}}' ('{{count}}' elementów):",
+      "labels": {
+        "completed": "Znaleziono '{{count}}' elementów w '{{name}}'",
+        "failed": "Nie udało się znaleźć zawartości w '{{name}}'",
+        "inProgress": "Wyszukiwanie zawartości w '{{name}}'...",
+        "initial": "Znajdź pliki"
+      }
     },
     "findFilesByTag": {
-      "completed": "Znaleziono {{count}} plików z tagiem {{tag}}",
-      "failed": "Nie udało się znaleźć plików z tagiem {{tag}}",
-      "foundFiles": "Znaleziono {{count}} plików z tagiem {{tag}}",
-      "inProgress": "Wyszukiwanie plików z tagiem {{tag}}...",
-      "label": "Znajduję pliki po tagu ...",
-      "noResults": "Nie znaleziono plików z tagiem {{tag}}"
+      "labels": {
+        "completed": "Znaleziono '{{count}}' plików z tagiem '{{tag}}'",
+        "failed": "Nie udało się znaleźć plików z tagiem '{{tag}}'",
+        "inProgress": "Wyszukiwanie plików z tagiem '{{tag}}'...",
+        "initial": "Znajdź pliki według tagu",
+        "noResults": "Nie znaleziono plików z tagiem '{{tag}}'"
+      },
+      "progress": {
+        "foundFiles": "Znaleziono '{{count}}' plików z tagiem '{{tag}}'",
+        "noResults": "Nie znaleziono plików z tagiem '{{tag}}'"
+      }
     },
     "handover": {
-      "completed": "Przekazano kontrolę do {{mode}}",
-      "completedFull": "Jesteś teraz w trybie {{mode}}. Wykonaj powierzone zadanie, natychmiast po jego zakończeniu, przełącz się z powrotem do trybu \"{{fromMode}}\" używając narzędzia handover_mode.",
-      "failed": "Nie udało się przekazać kontroli do {{mode}}",
-      "inProgress": "Przekazywanie kontroli do {{mode}}...",
-      "label": "Przekazywanie kontroli ..."
+      "labels": {
+        "completed": "Przełączono na tryb '{{mode}}'",
+        "failed": "Nie udało się przełączyć na tryb '{{mode}}'",
+        "inProgress": "Przełączanie na tryb '{{mode}}'...",
+        "initial": "Przekazywanie kontroli ..."
+      },
+      "progress": {
+        "completedFull": "Jesteś teraz w trybie '{{mode}}'. Wykonaj powierzone zadanie, natychmiast po jego zakończeniu, przełącz się z powrotem do trybu '{{fromMode}}' używając narzędzia handover_mode."
+      }
     },
     "library": {
       "list": {
-        "completed": "Przeglądnięto bibliotekę Life Navigator",
-        "failed": "Nie udało się przeglądnąć biblioteki",
-        "inProgress": "Przeglądanie biblioteki Life Navigator...",
-        "label": "Przeglądam bibliotekę Life Navigator ..."
+        "labels": {
+          "completed": "Przeglądnięto bibliotekę Life Navigator",
+          "failed": "Nie udało się przeglądnąć biblioteki",
+          "inProgress": "Przeglądanie biblioteki Life Navigator...",
+          "initial": "Przeglądanie biblioteki Life Navigator ..."
+        }
       },
       "read": {
-        "completed": "Odczytano '{{path}}' z biblioteki",
-        "failed": "Nie udało się odczytać '{{path}}' z biblioteki",
-        "inProgress": "Odczytywanie '{{path}}' z biblioteki ...",
-        "label": "Odczytuję zawartość biblioteki ..."
+        "labels": {
+          "completed": "Odczytano '{{name}}' z biblioteki",
+          "failed": "Nie udało się odczytać '{{name}}' z biblioteki",
+          "inProgress": "Odczytywanie '{{name}}' z biblioteki ...",
+          "initial": "Odczytywanie zawartości biblioteki ..."
+        }
       }
     },
     "modeValidator": {
-      "failed": "Walidacja pliku nieudana: {{filePath}}",
-      "inProgress": "Walidowanie pliku: {{filePath}}...",
-      "label": "Waliduję ..."
+      "labels": {
+        "failed": "Walidacja pliku nie powiodła się: '{{fileName}}'",
+        "inProgress": "Walidacja pliku: '{{fileName}}'...",
+        "initial": "Walidacja pliku ..."
+      }
     },
     "move": {
-      "label": "Przenoszenie todo ..."
+      "labels": {
+        "failed": "Nie udało się przenieść '{{task}}'",
+        "inProgress": "Przenoszenie '{{task}}'...",
+        "initial": "Przenoszenie zadania ...",
+        "success": "Przeniesiono '{{task}}' do '{{destination}}'"
+      },
+      "progress": {
+        "success": "Przeniesiono '{{task}}' z '{{source}}' do '{{target}}' na pozycji '{{position}}'"
+      }
     },
     "navigation": {
-      "navigateToCompletedTodo": "Przejdź do ukończonego todo",
-      "navigateToEditedTodo": "Przejdź do edytowanego todo",
-      "navigateToUncheckedTodo": "Przejdź do odznaczonego todo",
+      "navigateToCompletedTodo": "Przejdź do ukończonego zadania",
+      "navigateToEditedTodo": "Przejdź do edytowanego zadania",
+      "navigateToUncheckedTodo": "Przejdź do odznaczonego zadania",
       "openCreatedDocument": "Otwórz utworzony dokument",
       "openCurrentFile": "Otwórz aktualny plik",
-      "openDayNote": "Otwórz notatkę dzienną dla {{date}}",
+      "openDayNote": "Otwórz notatkę dzienną dla '{{date}}'",
       "openEditedDocument": "Otwórz edytowany dokument",
       "openNote": "Otwórz dokument"
     },
     "noteDelete": {
-      "completed": "Przeniesiono {{source}} do katalogu {{trashDir}}",
-      "creatingTrashDirectory": "Tworzenie katalogu {{dir}}",
       "errors": {
-        "cannotAccess": "Nie można uzyskać dostępu do pliku: {{path}}",
+        "cannotAccess": "Nie można uzyskać dostępu do pliku: '{{name}}'",
         "confirmationRequired": "Usunięcie musi być jawnie potwierdzone przez confirm_deletion: true",
-        "fileNotFound": "Nie znaleziono pliku: {{path}}"
+        "fileNotFound": "Nie znaleziono pliku: '{{name}}'"
       },
-      "failed": "Nie udało się usunąć pliku {{path}}",
-      "inProgress": "Przenoszenie {{path}} do śmietnika...",
-      "label": "Usuń notatkę",
-      "movingToTrash": "Przenoszenie {{source}} do {{destination}}",
+      "labels": {
+        "failed": "Nie udało się usunąć pliku '{{name}}'",
+        "inProgress": "Przenoszenie '{{name}}' do śmietnika...",
+        "initial": "Usuwanie notatki ...",
+        "requiresConfirmation": "Usunięcie wymaga potwierdzenia",
+        "success": "Przeniesiono '{{name}}' do katalogu '{{trashDir}}'"
+      },
       "navigation": {
         "openDeletedFile": "Otwórz plik w śmietniku"
       },
-      "requiresConfirmation": "Usunięcie wymaga potwierdzenia",
-      "success": "Przeniesiono {{path}} do katalogu {{trashDir}}"
+      "progress": {
+        "completed": "Przeniesiono '{{source}}' do katalogu '{{trashDir}}'",
+        "creatingTrashDirectory": "Tworzenie katalogu '{{dir}}'",
+        "movingToTrash": "Przenoszenie '{{source}}' do '{{destination}}'"
+      }
     },
     "noteEdit": {
       "changesMade": "Wprowadzone zmiany",
-      "completed": "Edytowano dokument {{path}}",
-      "failed": "Nie udało się edytować dokumentu {{path}}",
-      "inProgress": "Edytowanie dokumentu {{path}}...",
-      "label": "Edytowanie dokumentu ..."
+      "labels": {
+        "completed": "Edytowano dokument '{{name}}'",
+        "failed": "Nie udało się edytować dokumentu '{{name}}'",
+        "inProgress": "Edytowanie dokumentu '{{name}}'...",
+        "initial": "Edytowanie dokumentu ..."
+      }
     },
     "openLifeNavigator": "Otwórz Life Navigator",
     "read": {
-      "completed": "Odczytano dokument {{path}}",
-      "failed": "Nie udało się odczytać dokumentu {{path}}",
-      "inProgress": "Odczytywanie dokumentu {{path}}...",
-      "label": "Odczytuję dokument ..."
+      "labels": {
+        "completed": "Odczytano dokument '{{name}}'",
+        "failed": "Nie udało się odczytać dokumentu '{{name}}'",
+        "inProgress": "Odczytywanie dokumentu '{{name}}'...",
+        "initial": "Odczytywanie dokumentu ..."
+      }
     },
     "remove": {
-      "label": "Usuwam todo ..."
+      "labels": {
+        "failed": "Nie udało się usunąć zadania '{{task}}'",
+        "inProgress": "Usuwanie zadania '{{task}}'...",
+        "initial": "Usuwanie zadania ...",
+        "success": "Usunięto zadanie '{{task}}'"
+      },
+      "progress": {
+        "success": "Usunięto zadanie '{{task}}'"
+      }
     },
-    "resetTutorial": "Resetuj Tutorial",
+    "resetTutorial": "Resetuj samouczek",
     "search": {
-      "completed": "Wyszukiwanie zakończone dla {{query}}",
-      "failed": "Nie udało się wyszukać {{query}}",
-      "inProgress": "Wyszukiwanie {{query}}...",
-      "label": "Przeszukuję vault ...",
-      "noResults": "Nie znaleziono wyników dla {{query}}"
+      "labels": {
+        "completed": "Wyszukywanie zakończone dla '{{query}}'",
+        "failed": "Nie udało się wyszukać '{{query}}'",
+        "inProgress": "Wyszukiwanie '{{query}}'...",
+        "initial": "Przeszukuję vault ...",
+        "noResults": "Nie znaleziono wyników dla '{{query}}'"
+      },
+      "progress": {
+        "noResults": "Nie znaleziono wyników dla '{{query}}'"
+      }
     },
     "secretList": {
+      "labels": {
+        "completed": "Wyświetlono skonfigurowane sekrety",
+        "default": "Pokaż Sekrety",
+        "failed": "Nie udało się wyświetlić sekretów",
+        "inProgress": "Wyświetlanie skonfigurowanych sekretów..."
+      },
       "progress": {
-        "header": "📋 Skonfigurowane Sekrety ({{count}} łącznie)",
-        "noSecrets": "Brak skonfigurowanych sekretów. Użyj narzędzia secret_save, aby dodać klucze API i inne sekrety.",
-        "securityNote": "🔒 Informacja o bezpieczeństwie: Wartości sekretów są ukryte ze względów bezpieczeństwa. Powyżej pokazane są tylko nazwy."
+        "header": "📋 Skonfigurowane sekrety ('{{count}}' łącznie)",
+        "noSecrets": "Brak aktualnie skonfigurowanych sekretów. Użyj narzędzia secret_save, aby dodać klucze API i inne sekrety.",
+        "securityNote": "🔒 Uwaga bezpieczeństwa: Wartości sekretów są ukryte ze względów bezpieczeństwa. Powyżej pokazano tylko nazwy."
       }
     },
     "secretSave": {
+      "labels": {
+        "completed": "Zapisano sekret '{{key}}'",
+        "default": "Zapisz Sekret",
+        "failed": "Nie udało się zapisać sekretu '{{key}}'",
+        "inProgress": "Zapisywanie sekretu '{{key}}'..."
+      },
       "progress": {
-        "securityReminder": "⚠️ Informacja o bezpieczeństwie: Sekrety są zaszyfrowane przy użyciu AES-256 i przechowywane w folderze konfiguracyjnym Obsidian. Chociaż zapewnia to ochronę przed przypadkowym dostępem, każdy z dostępem do kodu źródłowego wtyczki może potencjalnie je odszyfrować.",
-        "success": "Pomyślnie zapisano sekret {{key}}"
+        "securityReminder": "⚠️ Uwaga bezpieczeństwa: Sekrety są szyfrowane za pomocą AES-256 i przechowywane w folderze konfiguracyjnym Obsidian. Chociaż zapewnia to ochronę przed przypadkowym wglądem, każdy, kto ma dostęp do kodu źródłowego wtyczki, może potencjalnie je odszyfrować.",
+        "success": "Pomyślnie zapisano sekret '{{key}}'"
       }
-    },
-    "success": {
-      "abandon": "✓ Oznaczono {{task}} jako porzucone w {{path}}",
-      "add": "✓ Dodano {{task}} do {{path}}",
-      "complete": "✓ Dodano ukończone todo \"{{task}}\"{{time}} do {{path}}",
-      "edit": "✓ Edytowano {{originalTask}} na {{newTask}} w {{path}}{{details}}",
-      "move": "✓ Przeniesiono zadanie {{task}} z {{source}} do {{target}} {{position}}",
-      "remove": "✓ Usunięto {{task}} z {{path}} (przekonwertowano na komentarz)",
-      "uncheck": "✓ Odznaczono \"{{task}}\" w {{path}}"
     },
     "tasks": {
       "plural": "zadania"
     },
     "toolsList": {
-      "completed": "Wyświetlono dostępne narzędzia",
-      "failed": "Nie udało się wyświetlić narzędzi",
-      "inProgress": "Wyświetlam dostępne narzędzia...",
-      "label": "Wyświetlam narzędzia ..."
+      "labels": {
+        "completed": "Wyświetlono dostępne narzędzia",
+        "failed": "Nie udało się wyświetlić narzędzi",
+        "inProgress": "Wyświetlam dostępne narzędzia...",
+        "initial": "Wyświetlam narzędzia ..."
+      }
     },
     "uncheck": {
-      "label": "Odznaczam todo ..."
+      "labels": {
+        "failed": "Nie udało się odznaczyć '{{task}}'",
+        "inProgress": "Odznaczanie '{{task}}'...",
+        "initial": "Odznaczanie zadania ...",
+        "success": "Odznaczono '{{task}}'"
+      },
+      "progress": {
+        "success": "Odznaczono '{{task}}'"
+      }
     },
     "urlDownload": {
-      "completed": "Pobrano plik z {{url}}",
-      "failed": "Nie udało się pobrać pliku z {{url}}",
-      "inProgress": "Pobieranie pliku z {{url}}...",
-      "label": "Pobieram plik..."
+      "labels": {
+        "completed": "Pobrano plik z '{{url}}'",
+        "failed": "Nie udało się pobrać pliku z '{{url}}'",
+        "inProgress": "Pobieranie pliku z '{{url}}'...",
+        "initial": "Pobieranie pliku..."
+      }
     }
   },
   "ui": {
@@ -500,7 +560,7 @@
     "input": {
       "attachImage": "Załącz obraz",
       "placeholder": "Napisz wiadomość...",
-      "removeFile": "Usuń {{filename}}",
+      "removeFile": "Usuń '{{filename}}'",
       "save": "Zapisz",
       "send": "Wyślij"
     },
@@ -518,12 +578,12 @@
     "modal": {
       "copied": "Skopiowano!",
       "copyToClipboard": "Kopiuj do schowka",
-      "modeSettings": "Ustawienia trybu: {{modeName}}",
+      "modeSettings": "Ustawienia trybu: '{{modeName}}'",
       "reloadButton": "Uruchom ponownie Obsidian",
-      "reloadRequiredMessageWithVersions": "Wtyczka zaktualizowana z wersji {{currentVersion}} do {{latestVersion}}.\nCzy chcesz ponownie uruchomić Obsidian, aby zastosować zmiany?",
+      "reloadRequiredMessageWithVersions": "Wtyczka zaktualizowana z wersji '{{currentVersion}}' do '{{latestVersion}}'.\nCzy chcesz ponownie uruchomić Obsidian, aby zastosować zmiany?",
       "reloadRequiredTitle": "Wymagane ponowne uruchomienie",
-      "systemPrompt": "Prompt systemowy: {{modeName}}",
-      "systemPromptErrorMessage": "Nie można wyświetlić promptu systemowego: {{error}}. Sprawdź plik trybu i upewnij się, że wszystkie linkowane pliki istnieją, lub usuń emoji 🧭 z linków, które nie powinny być rozwijane."
+      "systemPrompt": "Prompt systemowy: '{{modeName}}'",
+      "systemPromptErrorMessage": "Nie można wyświetlić promptu systemowego: '{{error}}'. Sprawdź plik trybu i upewnij się, że wszystkie linkowane pliki istnieją, lub usuń emoji 🧭 z linków, które nie powinny być rozwijane."
     },
     "mode": {
       "loading": "Ładowanie...",
@@ -590,10 +650,10 @@
     "todo": {
       "abandon": "Porzuć zadanie",
       "clickToChange": "Kliknij, aby zmienić status",
-      "noTodos": "Nie znaleziono pasujących zadań w {{filename}}",
+      "noTodos": "Nie znaleziono pasujących zadań w '{{filename}}'",
       "readOnly": "Tylko do odczytu",
-      "selectedFrom": "Wybrane zadania z {{filename}}",
-      "showMore": "Pokaż {{count}} więcej elementów"
+      "selectedFrom": "Wybrane zadania z '{{filename}}'",
+      "showMore": "Pokaż '{{count}}' więcej elementów"
     }
   },
   "validation": {
@@ -605,15 +665,15 @@
         "singular": "Tryb ma błędy walidacji, które wymagają naprawy."
       },
       "message": {
-        "few": "Pomóż mi naprawić błędy walidacji w plikach trybów: {{filePaths}}. Te tryby mają błędy walidacji, które wymagają naprawy.",
-        "many": "Pomóż mi naprawić błędy walidacji w plikach trybów: {{filePaths}}. Te tryby mają błędy walidacji, które wymagają naprawy.",
-        "singular": "Pomóż mi naprawić błędy walidacji w pliku trybu \"{{filePaths}}\". Ten tryb ma błędy walidacji, które wymagają naprawy."
+        "few": "Pomóż mi naprawić błędy walidacji w plikach trybów: '{{filePaths}}'. Te tryby mają błędy walidacji, które wymagają naprawy.",
+        "many": "Pomóż mi naprawić błędy walidacji w plikach trybów: '{{filePaths}}'. Te tryby mają błędy walidacji, które wymagają naprawy.",
+        "singular": "Pomóż mi naprawić błędy walidacji w pliku trybu '{{filePaths}}'. Ten tryb ma błędy walidacji, które wymagają naprawy."
       }
     },
     "fixSpecificMode": {
       "button": "Napraw ten tryb",
-      "description": "Obecny tryb \"{{modeName}}\" ma błędy walidacji, które wymagają naprawy.",
-      "message": "Pomóż mi naprawić błędy walidacji w pliku trybu \"{{filePath}}\". Ten plik trybu ma błędy walidacji, które wymagają naprawy."
+      "description": "Obecny tryb '{{modeName}}' ma błędy walidacji, które wymagają naprawy.",
+      "message": "Pomóż mi naprawić błędy walidacji w pliku trybu '{{filePath}}'. Ten plik trybu ma błędy walidacji, które wymagają naprawy."
     },
     "fixTools": {
       "button": "Napraw",
@@ -624,9 +684,9 @@
         "singular": "Narzędzie ma błędy walidacji, które wymagają naprawy."
       },
       "message": {
-        "few": "Pomóż mi naprawić błędy walidacji w plikach narzędzi: {{filePaths}}. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
-        "many": "Pomóż mi naprawić błędy walidacji w plikach narzędzi: {{filePaths}}. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
-        "singular": "Pomóż mi naprawić błędy walidacji w pliku narzędzia \"{{filePaths}}\". To narzędzie ma błędy walidacji, które wymagają naprawy."
+        "few": "Pomóż mi naprawić błędy walidacji w plikach narzędzi: '{{filePaths}}'. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
+        "many": "Pomóż mi naprawić błędy walidacji w plikach narzędzi: '{{filePaths}}'. Te narzędzia mają błędy walidacji, które wymagają naprawy.",
+        "singular": "Pomóż mi naprawić błędy walidacji w pliku narzędzia '{{filePaths}}'. To narzędzie ma błędy walidacji, które wymagają naprawy."
       }
     },
     "helpButton": {
@@ -634,16 +694,16 @@
     },
     "results": {
       "mode": {
-        "completed": "Walidacja trybu zakończona: {{filePath}} ({{errorCount}} błędów, {{warningCount}} ostrzeżeń)"
+        "completed": "Walidacja trybu zakończona: '{{filePath}}' ('{{errorCount}}' błędów, '{{warningCount}}' ostrzeżeń)"
       },
       "tool": {
-        "completed": "Walidacja narzędzia zakończona: {{filePath}} ({{errorCount}} błędów, {{warningCount}} ostrzeżeń)"
+        "completed": "Walidacja narzędzia zakończona: '{{filePath}}' ('{{errorCount}}' błędów, '{{warningCount}}' ostrzeżeń)"
       }
     },
     "toolIssuesFound": {
-      "few": "{{count}} narzędzia mają błędy walidacji",
-      "many": "{{count}} narzędzi ma błędy walidacji",
-      "singular": "{{count}} narzędzie ma błędy walidacji"
+      "few": "'{{count}}' narzędzia mają błędy walidacji",
+      "many": "'{{count}}' narzędzi ma błędy walidacji",
+      "singular": "'{{count}}' narzędzie ma błędy walidacji"
     }
   },
   "view": {

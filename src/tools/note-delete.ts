@@ -65,18 +65,18 @@ export const noteDeleteTool: ObsidianTool<NoteDeleteToolInput> = {
   icon: "trash-2",
   sideEffects: true, // Modifies files by moving them to trash
   get initialLabel() {
-    return t('tools.noteDelete.label');
+    return t('tools.noteDelete.labels.initial');
   },
   execute: async (context: ToolExecutionContext<NoteDeleteToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { file_path, confirm_deletion = false } = params;
     
-    context.setLabel(t('tools.noteDelete.inProgress', { path: file_path }));
+    context.setLabel(t('tools.noteDelete.labels.inProgress', { path: file_path }));
 
     try {
       // Safety check - require confirmation
       if (!confirm_deletion) {
-        context.setLabel(t('tools.noteDelete.requiresConfirmation'));
+        context.setLabel(t('tools.noteDelete.labels.requiresConfirmation'));
         throw new ToolExecutionError(t('tools.noteDelete.errors.confirmationRequired'));
       }
 
@@ -86,14 +86,14 @@ export const noteDeleteTool: ObsidianTool<NoteDeleteToolInput> = {
       // Check if source file exists
       const sourceExists = await fileExists(normalizedSourcePath, plugin.app);
       if (!sourceExists) {
-        context.setLabel(t('tools.noteDelete.failed', { path: file_path }));
+        context.setLabel(t('tools.noteDelete.labels.failed', { path: file_path }));
         throw new ToolExecutionError(t('tools.noteDelete.errors.fileNotFound', { path: file_path }));
       }
       
       // Get the source file
       const sourceFile = getFile(normalizedSourcePath, plugin.app);
       if (!sourceFile) {
-        context.setLabel(t('tools.noteDelete.failed', { path: file_path }));
+        context.setLabel(t('tools.noteDelete.labels.failed', { path: file_path }));
         throw new ToolExecutionError(t('tools.noteDelete.errors.cannotAccess', { path: file_path }));
       }
       
@@ -101,7 +101,7 @@ export const noteDeleteTool: ObsidianTool<NoteDeleteToolInput> = {
       const trashDirName = getTrashDirectoryName();
       
       // Create trash directory if it doesn't exist
-      context.progress(t('tools.noteDelete.creatingTrashDirectory', { dir: trashDirName }));
+              context.progress(t('tools.noteDelete.progress.creatingTrashDirectory', { dir: trashDirName }));
       await ensureDirectoryExists(trashDirName, plugin.app);
       
       // Generate unique path in trash directory
@@ -109,7 +109,7 @@ export const noteDeleteTool: ObsidianTool<NoteDeleteToolInput> = {
       const normalizedTrashPath = normalizePath(trashPath);
       
       // Perform the move operation to trash
-      context.progress(t('tools.noteDelete.movingToTrash', { source: file_path, destination: trashPath }));
+              context.progress(t('tools.noteDelete.progress.movingToTrash', { source: file_path, destination: trashPath }));
       await plugin.app.vault.rename(sourceFile, normalizedTrashPath);
       
       // Add navigation target to the file in trash
@@ -118,15 +118,15 @@ export const noteDeleteTool: ObsidianTool<NoteDeleteToolInput> = {
         description: t("tools.noteDelete.navigation.openDeletedFile")
       });
       
-      context.setLabel(t('tools.noteDelete.success', { path: file_path, trashDir: trashDirName }));
-      context.progress(t('tools.noteDelete.completed', { 
+      context.setLabel(t('tools.noteDelete.labels.success', { path: file_path, trashDir: trashDirName }));
+      context.progress(t('tools.noteDelete.progress.completed', { 
         source: file_path, 
         destination: trashPath,
         trashDir: trashDirName
       }));
       
     } catch (error) {
-      context.setLabel(t('tools.noteDelete.failed', { path: file_path }));
+      context.setLabel(t('tools.noteDelete.labels.failed', { path: file_path }));
       throw error;
     }
   }

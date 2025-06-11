@@ -28,13 +28,13 @@ export const dailyNoteTool: ObsidianTool<DailyNoteInput> = {
   icon: "calendar",
   sideEffects: false, // Read-only operation, safe for link expansion
   get initialLabel() {
-    return t('tools.dayNote.label');
+    return t('tools.dayNote.labels.initial');
   },
   execute: async (context: ToolExecutionContext<DailyNoteInput>): Promise<void> => {
     const { plugin, params } = context;
     const { offset } = params;
 
-    context.setLabel(t('tools.dayNote.inProgress', { offset }));
+    context.setLabel(t('tools.dayNote.labels.inProgress', { offset }));
 
     try {
       const dayNoteInfo = handleDayNoteLink(plugin.app, offset);
@@ -50,7 +50,7 @@ export const dailyNoteTool: ObsidianTool<DailyNoteInput> = {
         );
         
         if (expandedContent) {
-          context.setLabel(t('tools.dayNote.completed', { date: dayNoteInfo.descriptiveLabel }));
+          context.setLabel(t('tools.dayNote.labels.completed', { date: dayNoteInfo.descriptiveLabel }));
           context.progress(expandedContent);
           
           // Add navigation target
@@ -59,7 +59,7 @@ export const dailyNoteTool: ObsidianTool<DailyNoteInput> = {
             description: t('tools.navigation.openDayNote', { date: dayNoteInfo.descriptiveLabel })
           });
         } else {
-          context.setLabel(t('tools.dayNote.failed', { offset }));
+          context.setLabel(t('tools.dayNote.labels.failed', { offset }));
           context.progress(`<daily_note_missing date="${dayNoteInfo.dateStr}" label="${dayNoteInfo.descriptiveLabel}" offset="${dayNoteInfo.offset}" />`);
         }
       } else {
@@ -68,12 +68,12 @@ export const dailyNoteTool: ObsidianTool<DailyNoteInput> = {
         const descriptiveLabel = dayNoteInfo?.descriptiveLabel || "unknown";
         const offsetValue = dayNoteInfo?.offset || offset;
         
-        context.setLabel(t('tools.dayNote.notFound', { date: descriptiveLabel }));
+        context.setLabel(t('tools.dayNote.labels.notFound', { date: descriptiveLabel }));
         context.progress(`<daily_note_missing date="${dateStr}" label="${descriptiveLabel}" offset="${offsetValue}" />`);
       }
 
     } catch (error) {
-      context.setLabel(t('tools.dayNote.failed', { offset }));
+      context.setLabel(t('tools.dayNote.labels.failed', { offset }));
       throw error;
     }
   }

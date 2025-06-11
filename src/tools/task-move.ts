@@ -9,6 +9,7 @@ import { validateTasks } from 'src/utils/tasks/task-validation';
 import { createNavigationTargetsForTasks, createNavigationTarget, findTaskLineNumbers } from 'src/utils/tools/line-number-utils';
 import { t } from 'src/i18n';
 import { findTaskByDescription } from "src/utils/tools/note-utils";
+import { extractFilenameWithoutExtension } from "src/utils/text/string-sanitizer";
 
 const schema = {
   name: "task_move",
@@ -72,21 +73,21 @@ export const taskMoveTool: ObsidianTool<TaskMoveToolInput> = {
   icon: "move",
   sideEffects: true, // Modifies files by moving tasks
   get initialLabel() {
-    return t('tools.move.label');
+    return t('tools.move.labels.initial');
   },
   execute: async (context: ToolExecutionContext<TaskMoveToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos, position, reference_todo_text } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
-      context.setLabel(t('tools.actions.move.failed', { task: '' }));
+      context.setLabel(t('tools.move.labels.failed', { task: '' }));
       throw new ToolExecutionError("No to-do items provided");
     }
 
     const count = todos.length;
     const todoText = count === 1 ? todos[0].todo_text : `${count} todos`;
     
-    context.setLabel(t('tools.actions.move.inProgress', { task: todoText }));
+    context.setLabel(t('tools.move.labels.inProgress', { task: todoText }));
 
     const filePath = params.source_path;
     const targetFilePath = params.target_path;
@@ -167,14 +168,15 @@ export const taskMoveTool: ObsidianTool<TaskMoveToolInput> = {
         ? `"${todos[0].todo_text}"` 
         : `${todos.length} ${t('tools.tasks.plural')}`;
         
-      context.setLabel(t('tools.actions.move.success', { task: todoText }));
-      context.progress(t('tools.success.move', {
+      context.setLabel(t('tools.move.labels.success', { task: todoText, destination: extractFilenameWithoutExtension(targetFilePath) }));
+      context.progress(t('tools.move.progress.success', {
         task: tasksDescription,
-        position,
-        path: targetFilePath
+        source: filePath,
+        target: targetFilePath,
+        position
       }));
     } catch (error) {
-      context.setLabel(t('tools.actions.move.failed', { task: todoText }));
+      context.setLabel(t('tools.move.labels.failed', { task: todoText }));
       throw error;
     }
   }

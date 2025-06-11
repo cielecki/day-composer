@@ -52,21 +52,21 @@ export const taskRemoveTool: ObsidianTool<TaskRemoveToolInput> = {
   icon: "trash-2",
   sideEffects: true, // Modifies files by removing tasks
   get initialLabel() {
-    return t('tools.remove.label');
+    return t('tools.remove.labels.initial');
   },
   execute: async (context: ToolExecutionContext<TaskRemoveToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { todos } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
-      context.setLabel(t('tools.actions.remove.failed', { task: '' }));
+      context.setLabel(t('tools.remove.labels.failed', { task: '' }));
       throw new ToolExecutionError("No to-do items provided");
     }
 
     const count = todos.length;
     const todoText = count === 1 ? todos[0].todo_text : `${count} todos`;
     
-    context.setLabel(t('tools.actions.remove.inProgress', { task: todoText }));
+    context.setLabel(t('tools.remove.labels.inProgress', { task: todoText }));
     
     try {
       const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
@@ -148,13 +148,13 @@ ${originalTaskText}
         ? `"${removedTasks[0]}"`
         : `${removedTasks.length} ${t('tools.tasks.plural')}`;
         
-      context.setLabel(t('tools.actions.remove.success', { task: todoText }));
-      context.progress(t('tools.success.remove', {
+      context.setLabel(t('tools.remove.labels.success', { task: todoText }));
+      context.progress(t('tools.remove.progress.success', {
         task: tasksDescription,
-        path: filePath
+        name: filePath
       }));
     } catch (error) {
-      context.setLabel(t('tools.actions.remove.failed', { task: todoText }));
+      context.setLabel(t('tools.remove.labels.failed', { task: todoText }));
       throw error;
     }
   }

@@ -54,13 +54,13 @@ export const taskEditTool: ObsidianTool<TaskEditToolInput> = {
   icon: "edit",
   sideEffects: true, // Modifies files by editing tasks
   get initialLabel() {
-    return t('tools.edit.label');
+    return t('tools.editTodo.labels.initial');
   },
   execute: async (context: ToolExecutionContext<TaskEditToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { original_todo_text } = params;
     
-    context.setLabel(t('tools.actions.editTodo.inProgress', { task: original_todo_text }));
+    context.setLabel(t('tools.editTodo.labels.inProgress', { task: original_todo_text }));
     
     try {
       const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
@@ -125,20 +125,20 @@ export const taskEditTool: ObsidianTool<TaskEditToolInput> = {
       const statusText = params.replacement_status ? ` (status: ${params.replacement_status})` : '';
       const commentText = params.replacement_comment ? ` with comment` : '';
       
-      const resultMessage = t('tools.success.edit', {
+      const resultMessage = t('tools.editTodo.progress.success', {
         originalTask: original_todo_text,
         newTask: params.replacement_todo_text,
-        path: filePath,
+        name: filePath,
         details: `${statusText}${commentText}`
       });
 
       // Add navigation targets
       navigationTargets.forEach(target => context.addNavigationTarget(target));
 
-      context.setLabel(t('tools.actions.editTodo.completed', { task: params.replacement_todo_text }));
+      context.setLabel(t('tools.editTodo.labels.completed', { task: params.replacement_todo_text }));
       context.progress(resultMessage);
     } catch (error) {
-      context.setLabel(t('tools.actions.editTodo.failed', { task: original_todo_text }));
+      context.setLabel(t('tools.editTodo.labels.failed', { task: original_todo_text }));
       throw error;
     }
   }

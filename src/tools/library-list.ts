@@ -25,12 +25,12 @@ export const libraryListTool: ObsidianTool<LibraryListInput> = {
 	specification: schema,
 	icon: "library",
 	sideEffects: false, // Read-only operation, safe for link expansion
-	get initialLabel() {
-		return t('tools.library.list.label');
-	},
+	  get initialLabel() {
+    return t('tools.library.list.labels.initial');
+  },
 	execute: async (context: ToolExecutionContext<LibraryListInput>): Promise<void> => {
 		try {
-			context.setLabel(t('tools.library.list.inProgress'));
+			context.setLabel(t('tools.library.list.labels.inProgress'));
 
 			let indexContent: string;
 			let sourceInfo: string;
@@ -53,10 +53,10 @@ export const libraryListTool: ObsidianTool<LibraryListInput> = {
 			const enhancedContent = indexContent + sourceInfo;
 
 			context.progress(enhancedContent);
-			context.setLabel(t('tools.library.list.completed'));
+			context.setLabel(t('tools.library.list.labels.completed'));
 
 		} catch (error) {
-			context.setLabel(t('tools.library.list.failed'));
+			context.setLabel(t('tools.library.list.labels.failed'));
 			const errorMessage = error instanceof Error ? error.message : String(error);
 			context.progress(`❌ Error: ${errorMessage}`);
 			throw error instanceof ToolExecutionError ? error : new ToolExecutionError(errorMessage);

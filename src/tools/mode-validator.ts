@@ -138,29 +138,29 @@ export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
   icon: "shield-check",
   sideEffects: false, // Read-only validation and analysis tool
   get initialLabel() {
-    return t('tools.modeValidator.label');
+    return t('tools.modeValidator.labels.initial');
   },
   execute: async (context: ToolExecutionContext<ModeValidatorInput>): Promise<void> => {
     const { plugin, params } = context;
     const { file_path, type = "auto" } = params;
 
-    context.setLabel(t('tools.modeValidator.inProgress', { filePath: file_path }));
+    context.setLabel(t('tools.modeValidator.labels.inProgress', { filePath: file_path }));
 
     try {
       const file = plugin.app.vault.getAbstractFileByPath(file_path);
       
       if (!file) {
-        context.setLabel(t('tools.modeValidator.failed', { filePath: file_path }));
+        context.setLabel(t('tools.modeValidator.labels.failed', { filePath: file_path }));
         throw new ToolExecutionError(`File not found: ${file_path}`);
       }
       
       if (!(file instanceof TFile)) {
-        context.setLabel(t('tools.modeValidator.failed', { filePath: file_path }));
+        context.setLabel(t('tools.modeValidator.labels.failed', { filePath: file_path }));
         throw new ToolExecutionError(`Path is not a file: ${file_path}`);
       }
 
       if (file.extension !== 'md') {
-        context.setLabel(t('tools.modeValidator.failed', { filePath: file_path }));
+        context.setLabel(t('tools.modeValidator.labels.failed', { filePath: file_path }));
         throw new ToolExecutionError(`Files must be markdown files (.md extension): ${file_path}`);
       }
 
@@ -179,7 +179,7 @@ export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
         } else if (normalizedTags.includes("ln-tool")) {
           fileType = "tool";
         } else {
-          context.setLabel(t('tools.modeValidator.failed', { filePath: file_path }));
+          context.setLabel(t('tools.modeValidator.labels.failed', { filePath: file_path }));
           throw new ToolExecutionError(`Could not determine file type. File must have 'ln-mode' or 'ln-tool' tag.`);
         }
       }
@@ -306,7 +306,7 @@ export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
 
       context.progress(report);
     } catch (error) {
-      context.setLabel(t('tools.modeValidator.failed', { filePath: file_path }));
+      context.setLabel(t('tools.modeValidator.labels.failed', { filePath: file_path }));
       throw error;
     }
   }
