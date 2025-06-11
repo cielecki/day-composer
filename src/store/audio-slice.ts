@@ -246,17 +246,19 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         targetLanguageForApi = targetLanguageForApi.split('-')[0];
       }
 
+      /*
       const expandedPrompt = (await expandLinks(window.app, promptToUse)).fullContent;
       const trimmedPrompt = expandedPrompt.length > MAX_AUDIO_PROMPT_LENGTH 
         ? expandedPrompt.substring(0, Math.floor(MAX_AUDIO_PROMPT_LENGTH / 2)) + "..." + expandedPrompt.substring(expandedPrompt.length - Math.floor(MAX_AUDIO_PROMPT_LENGTH / 2))
         : expandedPrompt;
 
       console.debug(`Transcribing audio. Language for API: ${targetLanguageForApi}. Using prompt:`, trimmedPrompt);
-      
+      */
+
       const transcription = await openai.audio.transcriptions.create({
         file: file,
-        model: 'gpt-4o-transcribe',
-        prompt: trimmedPrompt,
+        model: 'whisper-1',
+        prompt: "",
         language: targetLanguageForApi,
       }, { signal });
 
