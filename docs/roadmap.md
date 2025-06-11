@@ -54,6 +54,12 @@ Implement a comprehensive calendar system that combines external calendar integr
 - Support event creation, editing, scheduling, and recurring event management
 - Allow users to maintain their own calendar events while leveraging external calendar data
 
+**Google Drive Integration:**
+Implement Google Drive integration within Life Navigator to enable seamless sharing of Obsidian vault content. Through Google Drive's API, users could automatically sync and share specific files or folders from their Obsidian vault to Google Drive for external collaboration and access. This would allow selective sharing of notes, research, or project files while maintaining the core workflow within Obsidian. The integration could include automatic synchronization of designated files, sharing permissions management, and the ability to collaborate on documents that remain integrated with the Life Navigator ecosystem.
+
+**Enhanced API Error Handling and Rate Limiting:**
+Improve error handling and user communication for API-related issues, particularly Anthropic's "Overloaded" errors and rate limiting problems faced by Tier 1 organizations and heavy Life Navigator users. Implement intelligent error interpretation that provides meaningful, user-friendly error messages instead of technical stack traces, automatic retry mechanisms with exponential backoff, and graceful degradation when services are temporarily unavailable. Include comprehensive rate limiting management with intelligent request queuing, rate limit detection and prevention, usage monitoring and alerts, and user notifications when approaching limits. This system would help organizations manage their API usage more effectively while maintaining a smooth user experience even under high-usage scenarios.
+
 **Automatic Update Notifications:**
 Implement periodic scanning for plugin updates with a hovering dialog that displays "update available" notifications. This would improve user experience by keeping users informed about new versions. Investigation needed to determine if this is feasible within Obsidian's plugin architecture and API limitations.
 
@@ -84,8 +90,8 @@ Implement aliases for AI models to allow users to use custom or simplified model
 **Fire and forget chat workflow:**
 Rethink the concept of creating a new chat for each voice message without automatically switching to it.
 
-**Boomerang Tasks:**
-Implement a framework for handling tasks that "boomerang" back to the user on a framework like agents 2.0.
+**Composable Workflow Framework:**
+Redesign the task handoff system to create a proper framework for seamless integration between various modes and agents. Replace the current inadequate handoff mechanism with a function calling-like architecture that allows building composable workflows on top of each other. This would enable modes to call other modes as functions, chain operations naturally, and create sophisticated multi-agent workflows without the current awkward handoff system. The new framework should support nested operations, proper state management between modes, and intuitive task delegation that feels more like native function composition than manual task passing.
 
 **Audio Feedback System:**
 Add audio signals/sounds to Life Navigator for various actions (task completion, end of speech, start of transcription processing) to provide better user feedback and interaction cues.
