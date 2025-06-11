@@ -2,7 +2,13 @@ import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
-import { requestUrl } from "obsidian";
+import { 
+  isLocalDevelopmentMode, 
+  getPluginVersion, 
+  readLocalLibraryContent, 
+  fetchRemoteLibraryContent 
+} from '../utils/library/library-access';
+import { extractFilenameWithoutExtension } from "src/utils/text/string-sanitizer";
 
 const schema = {
   name: "library_read",
@@ -23,10 +29,6 @@ type LibraryReadInput = {
   path: string;
 };
 
-// Life Navigator repository configuration
-const LIFE_NAVIGATOR_REPO = 'cielecki/life-navigator';
-const LIBRARY_PATH = 'library';
-
 export const libraryReadTool: ObsidianTool<LibraryReadInput> = {
   specification: schema,
   icon: "file-text",
@@ -44,42 +46,37 @@ export const libraryReadTool: ObsidianTool<LibraryReadInput> = {
       // Clean up the path
       const cleanPath = path.replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
       
-      // Construct the full raw GitHub URL
-      const [owner, repo] = LIFE_NAVIGATOR_REPO.split('/');
-      const fullPath = `${LIBRARY_PATH}/${cleanPath}`;
-      const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${fullPath}`;
-
-      context.progress(`Fetching content from library: ${cleanPath}`);
-
-      // Download content from URL
-      const response = await requestUrl({
-        url: rawUrl,
-        method: 'GET',
-        headers: {
-          'User-Agent': 'Life Navigator Obsidian Plugin'
-        }
-      });
-
-      // Check if request was successful
-      if (response.status !== 200) {
-        context.setLabel(t('tools.library.read.failed', { path: cleanPath }));
-        throw new ToolExecutionError(`Failed to download ${cleanPath}. Status: ${response.status} (file may not exist)`);
+      let content: string;
+      let sourceInfo: string;
+      
+      // Check if we're in local development mode
+      const isLocalDev = await isLocalDevelopmentMode();
+      
+      if (isLocalDev) {
+        console.debug(`Reading from local library: ${cleanPath}`);
+        content = await readLocalLibraryContent(cleanPath);
+        sourceInfo = "**Source:** Local development library";
+      } else {
+        console.debug(`Fetching from remote library: ${cleanPath}`);
+        content = await fetchRemoteLibraryContent(cleanPath);
+        const pluginVersion = await getPluginVersion();
+        sourceInfo = `**Source:** GitHub repository (version ${pluginVersion})`;
       }
 
-      const content = response.text;
       const fileName = cleanPath.split('/').pop() || 'library-content.md';
 
-      context.progress(`Downloaded: ${fileName} (${content.length} characters)`);
+      console.debug(`Loaded: ${fileName} (${content.length} characters)`);
 
       // Display the content with basic formatting
       let formattedContent = `# ${fileName}\n\n`;
       formattedContent += `**Path:** ${cleanPath}\n`;
+      formattedContent += `${sourceInfo}\n`;
       formattedContent += `**Size:** ${content.length} characters\n\n`;
       formattedContent += `---\n\n`;
       formattedContent += content;
 
       // Display the formatted content
-      context.setLabel(t('tools.library.read.completed', { path: cleanPath }));
+      context.setLabel(t('tools.library.read.completed', { path: extractFilenameWithoutExtension(cleanPath) }));
       context.progress(formattedContent);
 
     } catch (error) {
@@ -87,7 +84,7 @@ export const libraryReadTool: ObsidianTool<LibraryReadInput> = {
       if (error instanceof ToolExecutionError) {
         throw error;
       }
-      throw new ToolExecutionError(`Failed to download ${path}: ${error.message || String(error)}`);
+      throw new ToolExecutionError(`Failed to read ${path}: ${error.message || String(error)}`);
     }
   }
 }; 

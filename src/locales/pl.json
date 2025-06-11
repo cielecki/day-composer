@@ -44,7 +44,7 @@
       "notFound": "Nie znaleziono pliku w {{path}}"
     },
     "helpButton": "Pomoc",
-    "helpPrompt": "Napotkałem błąd podczas używania trybu {{mode}}:\n```{{error}}```\nCzy możesz mi pomóc?",
+    "helpPrompt": "Napotkałem błąd podczas używania trybu {{mode}}:\n'''{{error}}'''\nCzy możesz mi pomóc?",
     "linkExpansion": {
       "couldNotResolve": "Nie można znaleźć celu linku \"{{linkPath}}\""
     },
@@ -100,7 +100,7 @@
       "title": "Ustawienia zaawansowane"
     },
     "prompts": {
-      "defaultPrompt": "# Domena\nKomunikat lub komenda głosowa wydawana przez użytkownika asystentowi AI.\n\n# Słowniczek\n`🧭 current_file_and_selection()`\n`🧭 current_chat()`\n\nPoczątek transkrypcji:",
+      "defaultPrompt": "# Domena\nKomunikat lub komenda głosowa wydawana przez użytkownika asystentowi AI.\n\n# Słowniczek\n'🧭 current_file_and_selection()'\n'🧭 current_chat()'\n\nPoczątek transkrypcji:",
       "speechToTextPrompt": "Prompt dla zamiany mowy na tekst",
       "speechToTextPromptDesc": "Prompt, który zostanie wysłany do silnika zamiany mowy na tekst. Dostarcza kontekstu dla modelu AI. Możesz użyć <a href='https://github.com/cielecki/life-navigator/blob/main/library/Docs/Link%20Expansion.md'>rozszerzania linków</a>."
     },
@@ -206,14 +206,14 @@
         "success": "Porzucono zadanie {{task}}"
       },
       "add": {
-        "failed": "Nie udało się dodać todo {{task}} do `{{filename}}`",
+        "failed": "Nie udało się dodać todo {{task}} do '{{filename}}'",
         "inProgress": "Dodawanie todo...",
-        "success": "Dodano {{task}} do `{{filename}}`"
+        "success": "Dodano {{task}} do '{{filename}}'"
       },
       "check": {
-        "failed": "Nie udało się oznaczyć `{{task}}`",
-        "inProgress": "Oznaczanie `{{task}}` ...",
-        "success": "Oznaczono `{{task}}`"
+        "failed": "Nie udało się oznaczyć '{{task}}'",
+        "inProgress": "Oznaczanie '{{task}}' ...",
+        "success": "Oznaczono '{{task}}'"
       },
       "createCompleted": {
         "failed": "Nie udało się utworzyć ukończonego todo {{task}}",
@@ -221,10 +221,9 @@
         "success": "Utworzono ukończone todo {{task}}"
       },
       "createDocument": {
-        "completed": "Utworzono {{path}}",
-        "default": "Utwórz {{path}}",
-        "failed": "Nie udało się utworzyć {{path}}",
-        "inProgress": "Tworzenie {{path}}..."
+        "completed": "Utworzono '{{path}}'",
+        "failed": "Nie udało się utworzyć '{{path}}'",
+        "inProgress": "Tworzenie '{{path}}'..."
       },
       "editTodo": {
         "completed": "Edytowano todo {{task}}",
@@ -288,9 +287,10 @@
       "label": "Tworzę ukończone todo ..."
     },
     "createDocument": {
+      "label": "Tworzę dokument ...",
       "progress": {
-        "success": "Pomyślnie utworzono dokument w {{path}}",
-        "versionedPath": "Plik już istnieje. Tworzenie wersjonowanego pliku: {{originalPath}} → {{versionedPath}}"
+        "success": "Pomyślnie utworzono dokument w '{{path}}'",
+        "versionedPath": "Plik już istnieje. Tworzenie wersjonowanego pliku: '{{originalPath}}' → '{{versionedPath}}'"
       }
     },
     "currentChat": {
@@ -328,12 +328,12 @@
       "label": "Edytowanie todo ..."
     },
     "fileMove": {
-      "completed": "Przeniesiono plik z {{source}} do {{destination}}",
+      "completed": "Przeniesiono plik z '{{source}}' do '{{destination}}'",
       "creatingDirectories": "Tworzenie katalogu docelowego: {{dir}}",
-      "failed": "Nie udało się przenieść pliku {{source}}",
-      "inProgress": "Przenoszenie pliku z {{source}} do {{destination}}...",
+      "failed": "Nie udało się przenieść pliku '{{source}}'",
+      "inProgress": "Przenoszenie pliku z '{{source}}' do '{{destination}}'...",
       "label": "Przenoszenie pliku ...",
-      "moving": "Przenoszenie {{source}} do {{destination}}",
+      "moving": "Przenoszenie '{{source}}' do '{{destination}}'",
       "navigation": {
         "openMovedFile": "Otwórz przeniesiony plik"
       },
@@ -370,9 +370,9 @@
         "label": "Przeglądam bibliotekę Life Navigator ..."
       },
       "read": {
-        "completed": "Odczytano zawartość biblioteki `{{path}}`",
-        "failed": "Nie udało się odczytać zawartości biblioteki `{{path}}`",
-        "inProgress": "Odczytywanie zawartości biblioteki `{{path}}`...",
+        "completed": "Odczytano '{{path}}' z biblioteki",
+        "failed": "Nie udało się odczytać '{{path}}' z biblioteki",
+        "inProgress": "Odczytywanie '{{path}}' z biblioteki ...",
         "label": "Odczytuję zawartość biblioteki ..."
       }
     },

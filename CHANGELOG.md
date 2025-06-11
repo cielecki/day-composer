@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 
 
+
 ## [0.11.2] - 2025-01-10
 
 ### 🚀 Performance & Reliability Improvements
@@ -390,3 +391,26 @@ change: enforce thinking in claude, as it's needed for handover to work
   - Step 3: Where to paste the key in Life Navigator
   - Visual guidance with prominent action buttons
   - Helpful tips about what to expect on each website
+
+### 🚀 Enhanced Library Access System
+
+- **Smart library source detection**: Life Navigator now automatically detects if you're in a development environment and reads library content from local files instead of GitHub. This makes development much faster and more reliable.
+
+- **Version-synchronized library content**: When using released versions, library tools now fetch content from the matching GitHub release tag instead of the main branch. This ensures you always get library content that's compatible with your installed plugin version.
+
+- **Intelligent fallback system**: If a specific version tag doesn't have library content, the system automatically falls back to the main branch to ensure compatibility and reliability.
+
+### 🎯 What This Means for You
+
+These improvements work seamlessly in the background:
+- **Faster development**: Local developers get instant access to library content without network requests
+- **Better version consistency**: Production users get library content tested with their specific plugin version  
+- **Improved reliability**: Automatic fallback ensures library access always works, even for older versions
+
+### 🔧 Technical Details
+
+- Library tools now check for local `library/` folder in plugin directory first
+- Remote access uses plugin version from `manifest.json` (e.g., `0.11.2`) for GitHub URLs
+- Fallback to `main` branch if version-specific content unavailable
+- Source information displayed in tool outputs for transparency
+- Refactored shared library utilities to eliminate code duplication between tools

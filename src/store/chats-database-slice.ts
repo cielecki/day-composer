@@ -108,9 +108,10 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         });
 
         // Handle title generation if needed (async operation)
-        console.debug("Generating title", get().chats.current.storedConversation.titleGenerated, get().chats.current.storedConversation.messages.length);
         if (!get().chats.current.storedConversation.titleGenerated && 
           get().chats.current.storedConversation.messages.length >= 2) {
+            console.debug("Generating title", get().chats.current.storedConversation.messages.length);
+        
             const generatedTitle = await generateChatTitle(
               get().chats.current.storedConversation.messages
             );

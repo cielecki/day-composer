@@ -4,6 +4,7 @@ import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
+import { extractFilenameWithoutExtension } from "src/utils/text/string-sanitizer";
 
 const schema = {
   name: "note_create",
@@ -56,14 +57,15 @@ export const noteCreateTool: ObsidianTool<NoteCreateToolInput> = {
   icon: "file-plus",
   sideEffects: true, // Creates files, has side effects
 	get initialLabel() {
-		return t('tools.actions.createDocument.default', { path: '' });
+		return t('tools.createDocument.label');
 	},
   execute: async (context: ToolExecutionContext<NoteCreateToolInput>): Promise<void> => {
     const { plugin, params } = context;
     const { path, content, auto_version = false } = params;
     const documentContent = content || ''; // Default to empty string if content is undefined
+    const filename = extractFilenameWithoutExtension(path);
 
-    context.setLabel(t('tools.actions.createDocument.inProgress', { path: `"${path}"` }));
+    context.setLabel(t('tools.actions.createDocument.inProgress', { path: filename }));
 
     // Check if the file already exists
     const exists = await fileExists(path, plugin.app);
@@ -76,7 +78,7 @@ export const noteCreateTool: ObsidianTool<NoteCreateToolInput> = {
         finalPath = await getVersionedPath(path, plugin.app);
         context.progress(t('tools.createDocument.progress.versionedPath', { originalPath: path, versionedPath: finalPath }));
       } else {
-        context.setLabel(t('tools.actions.createDocument.failed', { path: `"${path}"` }));
+        context.setLabel(t('tools.actions.createDocument.failed', { path: filename }));
         throw new ToolExecutionError(`File already exists at ${path}. Set auto_version to true to create a versioned file.`);
       }
     }
@@ -90,7 +92,7 @@ export const noteCreateTool: ObsidianTool<NoteCreateToolInput> = {
       description: t("tools.navigation.openCreatedDocument")
     });
 
-    context.setLabel(t('tools.actions.createDocument.completed', { path: `"${finalPath}"` }));
+    context.setLabel(t('tools.actions.createDocument.completed', { path: filename }));
     context.progress(t('tools.createDocument.progress.success', { path: finalPath }));
   }
 };

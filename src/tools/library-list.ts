@@ -2,6 +2,12 @@ import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
+import { 
+	isLocalDevelopmentMode, 
+	getPluginVersion, 
+	readLocalLibraryIndex, 
+	fetchRemoteLibraryIndex 
+} from '../utils/library/library-access';
 
 const schema = {
 	name: 'library_list',
@@ -15,10 +21,6 @@ const schema = {
 
 type LibraryListInput = Record<string, never>;
 
-// Life Navigator repository configuration
-const LIFE_NAVIGATOR_REPO = 'cielecki/life-navigator';
-const INDEX_PATH = 'library/index.md';
-
 export const libraryListTool: ObsidianTool<LibraryListInput> = {
 	specification: schema,
 	icon: "library",
@@ -30,19 +32,27 @@ export const libraryListTool: ObsidianTool<LibraryListInput> = {
 		try {
 			context.setLabel(t('tools.library.list.inProgress'));
 
-			const [owner, repo] = LIFE_NAVIGATOR_REPO.split('/');
+			let indexContent: string;
+			let sourceInfo: string;
 
-			// Fetch the index.md file directly
-			const indexUrl = `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/${INDEX_PATH}`;
-			const response = await fetch(indexUrl);
+			// Check if we're in local development mode
+			const isLocalDev = false; // await isLocalDevelopmentMode();
 
-			if (!response.ok) {
-				throw new ToolExecutionError(`Failed to access library index (HTTP ${response.status})`);
+			if (isLocalDev) {
+				console.debug("Reading from local library index...");
+				indexContent = await readLocalLibraryIndex();
+				sourceInfo = "\n\n**Source:** Local development library\n";
+			} else {
+				console.debug("Fetching from remote library index...");
+				indexContent = await fetchRemoteLibraryIndex();
+				const pluginVersion = await getPluginVersion();
+				sourceInfo = `\n\n**Source:** GitHub repository (version ${pluginVersion})\n`;
 			}
 
-			const indexContent = await response.text();
+			// Add source information to the content
+			const enhancedContent = indexContent + sourceInfo;
 
-			context.progress(indexContent);
+			context.progress(enhancedContent);
 			context.setLabel(t('tools.library.list.completed'));
 
 		} catch (error) {
