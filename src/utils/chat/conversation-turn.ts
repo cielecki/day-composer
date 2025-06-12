@@ -76,7 +76,7 @@ export const runConversationTurn = async (
 					currentModeId = currentStore.modes.activeId;
 					
 					// Generate system prompt
-					systemPrompt = await currentStore.getSystemPrompt();
+					systemPrompt = await currentStore.getSystemPrompt(currentModeId);
 					
 					systemPromptCalculated = true;
 					console.debug('[CONVERSATION-TURN] Recalculated system prompt for mode:', currentModeId);

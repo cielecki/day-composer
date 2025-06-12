@@ -63,14 +63,14 @@ export const CostAnalysisApp: React.FC<CostAnalysisAppProps> = ({
 
                 setConversationData({
                     id: targetConversationId,
-                    title: conversationMeta.title || t('costAnalysis.untitledConversation'),
+                    title: conversationMeta.title || t('chat.titles.newChat'),
                     costData: storedConversation?.costData,
                     filePath: conversationMeta.filePath,
                     updatedAt: conversationMeta.updatedAt
                 });
 
                 if (onTitleChange) {
-                    onTitleChange(conversationMeta.title || t('costAnalysis.untitledConversation'));
+                    onTitleChange(conversationMeta.title || t('chat.titles.newChat'));
                 }
             } catch (error) {
                 console.error('Failed to load conversation data:', error);
@@ -97,21 +97,14 @@ export const CostAnalysisApp: React.FC<CostAnalysisAppProps> = ({
 
     return (
         <div className="cost-analysis-container">
-            <div className="cost-analysis-header">
-                <h1 className="cost-analysis-title">
-                    <LucideIcon name="dollar-sign" size={24} />
-                    {t('costAnalysis.titleWithName', { title: conversationData?.title || t('costAnalysis.untitledConversation') })}
-                </h1>
-                <button
-                    className="cost-analysis-refresh-btn"
-                    onClick={handleRefresh}
-                    disabled={isRefreshing || isLoading}
-                    title={t('costAnalysis.refreshTooltip')}
-                >
-                    <LucideIcon name={isRefreshing ? "loader-2" : "refresh-cw"} size={16} />
-                </button>
-            </div>
-
+            <button
+                className="ln-floating-action-button"
+                onClick={handleRefresh}
+                disabled={isRefreshing || isLoading}
+                title={t('costAnalysis.refreshTooltip')}
+            >
+                <LucideIcon name={isRefreshing ? "loader-2" : "refresh-cw"} size={16} />
+            </button>
 
             {isLoading && <div className="cost-analysis-loading">
                 <LucideIcon name="loader-2" size={24} className="animate-spin" />

@@ -35,43 +35,6 @@ import { ConversationMeta } from "src/utils/chat/conversation";
 
 // Global Window interface now handled in reveal-file-handler.ts
 
-function openSimpleObsidianModal(app: import('obsidian').App, title: string, text: string) {
-	class SimpleObsidianModal extends Modal {
-		constructor(app: import('obsidian').App) {
-			super(app);
-		}
-		onOpen() {
-			const { contentEl } = this;
-			contentEl.empty();
-
-			// Create main container with flexbox layout
-			const container = contentEl.createEl("div", { cls: "ln-simple-modal-container" });
-
-			// Header section (always visible)
-			const header = container.createEl("div", { cls: "ln-simple-modal-header" });
-			header.createEl("h2", { text: title });
-
-			// Content section (scrollable)
-			const content = container.createEl("div", { cls: "ln-simple-modal-content" });
-			const pre = content.createEl("pre", { cls: "ln-pre-code" });
-			pre.innerText = text;
-
-			// Footer section (always visible)
-			const footer = container.createEl("div", { cls: "ln-simple-modal-footer" });
-			const button = footer.createEl("button", { text: t('ui.modal.copyToClipboard'), cls: "mod-cta" });
-			button.onclick = () => {
-				navigator.clipboard.writeText(text);
-				button.textContent = t('ui.modal.copied');
-				setTimeout(() => (button.textContent = t('ui.modal.copyToClipboard')), 1200);
-			};
-		}
-		onClose() {
-			this.contentEl.empty();
-		}
-	}
-	new SimpleObsidianModal(app).open();
-}
-
 export const LifeNavigatorApp: React.FC = () => {
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const modeIndicatorRef = useRef<HTMLDivElement>(null);
@@ -522,27 +485,20 @@ export const LifeNavigatorApp: React.FC = () => {
 										<LucideIcon name="settings" size={16} color="var(--text-normal)" /> 
 										{t('ui.mode.viewSettings')}
 									</div> */}
-									<div
-										className="ln-mode-action-item"
-										onClick={async () => {
-											try {
-												const systemPrompt = await getSystemPrompt();
-												openSimpleObsidianModal(
-													window.app,
-													t('ui.modal.systemPrompt').replace('{{modeName}}', activeMode.name),
-													systemPrompt.fullContent || ""
-												);
-											} catch (error) {
-												// Show notice for unresolved links
-												const errorMessage = error instanceof Error ? error.message : String(error);
-												new Notice(t('ui.modal.systemPromptErrorMessage', { error: errorMessage }), 8000);
-											}
-											setDropdownOpen(false);
-										}}
-									>
-										<LucideIcon name="terminal" size={16} color="var(--text-normal)" />
-										{t('ui.mode.viewSystemPrompt')}
-									</div>
+																<div
+								className="ln-mode-action-item"
+								onClick={async () => {
+									const plugin = LifeNavigatorPlugin.getInstance();
+									if (plugin) {
+										const activeModeId = usePluginStore.getState().modes.activeId;
+										await plugin.openSystemPrompt(activeModeId);
+									}
+									setDropdownOpen(false);
+								}}
+							>
+								<LucideIcon name="terminal" size={16} color="var(--text-normal)" />
+								{t('ui.mode.viewSystemPrompt')}
+							</div>
 
 									{/* Separator */}
 									<div className="ln-separator" />

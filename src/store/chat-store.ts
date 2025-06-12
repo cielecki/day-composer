@@ -60,7 +60,7 @@ export interface ChatSlice {
   addUserMessage: (userMessage: string, images?: AttachedImage[]) => Promise<void>;
   editUserMessage: (messageIndex: number, newContent: string, images?: AttachedImage[]) => Promise<void>;
   getCurrentConversationId: () => string | null;
-  getSystemPrompt: () => Promise<SystemPromptParts>;
+  getSystemPrompt: (modeId: string) => Promise<SystemPromptParts>;
   startEditingMessage: (messageIndex: number) => void;
   cancelEditingMessage: () => void;
   runConversationTurnWithContext: () => Promise<void>;
@@ -245,10 +245,10 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
     }),
     
     // Business Logic Implementation
-    getSystemPrompt: async () => {
+    getSystemPrompt: async (modeId: string) => {
       const state = get();
       
-      const currentActiveMode = state.modes.available[state.modes.activeId];
+      const currentActiveMode = state.modes.available[modeId];
       const plugin = LifeNavigatorPlugin.getInstance();
       
       if (!currentActiveMode || !plugin) {

@@ -55,10 +55,7 @@
       "outputTokens": "Tokeny wyjściowe",
       "title": "Podsumowanie",
       "totalCost": "Całkowity koszt"
-    },
-    "title": "Analiza kosztów",
-    "titleWithName": "Analiza kosztów: {{title}}",
-    "untitledConversation": "Rozmowa bez tytułu"
+    }
   },
   "dateTime": {
     "current": "Aktualna Data i Czas"
@@ -197,6 +194,31 @@
       "title": "Narzędzia Zdefiniowane przez Użytkownika"
     }
   },
+  "systemPrompt": {
+    "commands": {
+      "openSystemPrompt": "Otwórz Prompt Systemowy"
+    },
+    "copy": {
+      "button": "Kopiuj",
+      "copied": "Skopiowano!",
+      "copiedFull": "Pełny prompt skopiowany!",
+      "error": "Nie udało się skopiować do schowka",
+      "fullPrompt": "Kopiuj Pełny Prompt"
+    },
+    "empty": "Brak dostępnego promptu systemowego.",
+    "error": {
+      "message": "Nie można wyświetlić promptu systemowego: {{error}}. Sprawdź plik trybu i upewnij się, że wszystkie linkowane pliki istnieją.",
+      "title": "Błąd Ładowania Promptu Systemowego"
+    },
+    "errors": {
+      "failedToOpen": "Nie udało się otworzyć widoku promptu systemowego: {{error}}"
+    },
+    "loading": "Ładowanie promptu systemowego...",
+    "view": {
+      "title": "Prompt Systemowy {{modeName}}",
+      "titleGeneric": "Prompt Systemowy"
+    }
+  },
   "tasks": {
     "format": {
       "abandonedAt": " (porzucone o '{{time}}')",
@@ -254,10 +276,10 @@
         "failed": "Nie udało się dodać '{{task}}' do '{{filename}}'",
         "inProgress": "Dodawanie zadania...",
         "initial": "Dodawanie zadania ...",
-        "success": "Dodano '{{task}}' do '{{filename}}'"
+        "success": "Dodano {{task}} do '{{filename}}'"
       },
       "progress": {
-        "success": "Dodano '{{task}}' do '{{filename}}'"
+        "success": "Dodano {{task}} do '{{filename}}'"
       }
     },
     "check": {
@@ -606,14 +628,10 @@
       "speak": "Przeczytaj na głos"
     },
     "modal": {
-      "copied": "Skopiowano!",
-      "copyToClipboard": "Kopiuj do schowka",
       "modeSettings": "Ustawienia trybu: '{{modeName}}'",
       "reloadButton": "Uruchom ponownie Obsidian",
       "reloadRequiredMessageWithVersions": "Wtyczka zaktualizowana z wersji '{{currentVersion}}' do '{{latestVersion}}'.\nCzy chcesz ponownie uruchomić Obsidian, aby zastosować zmiany?",
-      "reloadRequiredTitle": "Wymagane ponowne uruchomienie",
-      "systemPrompt": "Prompt systemowy: '{{modeName}}'",
-      "systemPromptErrorMessage": "Nie można wyświetlić promptu systemowego: '{{error}}'. Sprawdź plik trybu i upewnij się, że wszystkie linkowane pliki istnieją, lub usuń emoji 🧭 z linków, które nie powinny być rozwijane."
+      "reloadRequiredTitle": "Wymagane ponowne uruchomienie"
     },
     "mode": {
       "loading": "Ładowanie...",

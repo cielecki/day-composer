@@ -1,8 +1,9 @@
-import { Plugin, Notice, requestUrl } from 'obsidian';
+import { Plugin, Notice, requestUrl, WorkspaceLeaf, MarkdownView } from 'obsidian';
 import { ConfirmReloadModal } from './components/ConfirmReloadModal';
 import { initI18n, t } from './i18n';
 import { LifeNavigatorView, LIFE_NAVIGATOR_VIEW_TYPE } from './views/life-navigator-view';
 import { CostAnalysisView, COST_ANALYSIS_VIEW_TYPE } from './views/cost-analysis-view';
+import { SystemPromptView, SYSTEM_PROMPT_VIEW_TYPE, SystemPromptViewState } from './views/system-prompt-view';
 import { checkForAvailableUpdate, checkForUpdatesOnStartup } from './utils/auto-update/auto-update';
 import { getObsidianTools, resetObsidianTools } from './obsidian-tools';
 import { LifeNavigatorSettingTab } from './components/LifeNavigatorSettingTab';
@@ -12,7 +13,7 @@ import { usePluginStore, getStore } from './store/plugin-store';
 
 export class LifeNavigatorPlugin extends Plugin {
 	private static _instance: LifeNavigatorPlugin | null = null;
-	
+
 	userToolManager: UserDefinedToolManager | null = null;
 	private setupChangeSubscription: (() => void) | null = null;
 
@@ -22,6 +23,96 @@ export class LifeNavigatorPlugin extends Plugin {
 		}
 
 		return LifeNavigatorPlugin._instance;
+	}
+
+	/**
+	 * Opens a view with standard Obsidian behavior that mimics how files are opened.
+	 * This includes:
+	 * - Reusing existing instances when appropriate
+	 * - Using current tab if it's empty or should be replaced
+	 * - Creating new tabs when current tab has content that shouldn't be replaced
+	 * - Respecting user's tab behavior preferences
+	 * 
+	 * @param viewType The type of view to open
+	 * @param state Optional state to pass to the view
+	 * @param matcher Optional function to find existing views that match (defaults to any view of the same type)
+	 * @param openMode Optional mode: 'current' (reuse current), 'tab' (new tab), 'split' (split), 'right' (right sidebar)
+	 * @returns The WorkspaceLeaf containing the view
+	 */
+	async openViewWithStandardBehavior(
+		viewType: string,
+		state?: any,
+		matcher?: (leaf: WorkspaceLeaf) => boolean,
+		openMode?: 'current' | 'tab' | 'split' | 'right'
+	): Promise<WorkspaceLeaf | null> {
+		try {
+			// 1. First check if any existing view of this type is currently active
+			// If so, just update its state instead of creating/finding another view
+			const allLeavesOfType = this.app.workspace.getLeavesOfType(viewType);
+			const activeViewLeaf = allLeavesOfType.find(leaf => {
+				// Check if this leaf is currently active/focused
+				// We can check this by seeing if the tab header has the 'is-active' class
+				try {
+					const tabHeaderEl = (leaf as any).tabHeaderEl;
+					return tabHeaderEl && tabHeaderEl.classList.contains('is-active');
+				} catch (e) {
+					return false;
+				}
+			});
+
+			if (activeViewLeaf) {
+				// Active tab is same type - update its state
+				await activeViewLeaf.setViewState({
+					type: viewType,
+					active: true,
+					state: state || {}
+				});
+				return activeViewLeaf;
+			}
+
+
+
+			// 2. Determine how to open the new view
+			let targetLeaf: WorkspaceLeaf | null = null;
+
+			if (openMode === 'right') {
+				// Force open in right sidebar
+				targetLeaf = this.app.workspace.getRightLeaf(false);
+			} else if (openMode === 'split') {
+				// Force split
+				targetLeaf = this.app.workspace.getLeaf('split');
+			} else if (openMode === 'tab') {
+				// Force new tab
+				targetLeaf = this.app.workspace.getLeaf('tab');
+			} else if (openMode === 'current') {
+				// Force current leaf
+				targetLeaf = this.app.workspace.getLeaf(false);
+			} else {
+				// Default behavior - create new tab
+				// Since we already handled updating the active tab if it's the same type,
+				// and we already handled existing views, just create a new tab
+				targetLeaf = this.app.workspace.getLeaf('tab');
+			}
+
+			if (!targetLeaf) {
+				console.error('Failed to get target leaf for view:', viewType);
+				return null;
+			}
+
+			// 3. Set view state and reveal
+			await targetLeaf.setViewState({
+				type: viewType,
+				active: true,
+				state: state || {}
+			});
+
+			this.app.workspace.revealLeaf(targetLeaf);
+			return targetLeaf;
+
+		} catch (error) {
+			console.error('Error opening view with standard behavior:', error);
+			return null;
+		}
 	}
 
 	async onload() {
@@ -47,7 +138,7 @@ export class LifeNavigatorPlugin extends Plugin {
 		this.app.workspace.onLayoutReady(() => {
 			const store = getStore();
 			const needsSetup = !store.getObsidianLanguageConfigured();
-			
+
 			if (needsSetup) {
 				console.debug("Auto-opening Life Navigator for setup");
 				// Small delay to ensure UI is stable
@@ -94,6 +185,10 @@ export class LifeNavigatorPlugin extends Plugin {
 			return new CostAnalysisView(leaf);
 		});
 
+		this.registerView(SYSTEM_PROMPT_VIEW_TYPE, (leaf) => {
+			return new SystemPromptView(leaf);
+		});
+
 		// Add command to reset tutorial
 		this.addCommand({
 			id: "reset-tutorial",
@@ -127,35 +222,28 @@ export class LifeNavigatorPlugin extends Plugin {
 			},
 		});
 
+		// Add command to open system prompt
+		this.addCommand({
+			id: 'open-system-prompt',
+			name: t('systemPrompt.commands.openSystemPrompt'),
+			callback: async () => {
+				const activeModeId = usePluginStore.getState().modes.activeId;
+				await this.openSystemPrompt(activeModeId);
+			}
+		});
+
 		// Add a ribbon icon for the Life Navigator
 		this.addRibbonIcon("compass", t("tools.openLifeNavigator"), async (evt: MouseEvent) => {
 			console.debug("Starting Life Navigator session");
 
 			try {
-				// Check if the view is already open in a leaf
-				const leaves = this.app.workspace.getLeavesOfType(LIFE_NAVIGATOR_VIEW_TYPE);
+				const state = {
+					initialMessages: [],
+				};
 
-				if (leaves.length > 0) {
-					// View is already open, just focus on it
-					const viewLeaf = leaves[0];
-					this.app.workspace.revealLeaf(viewLeaf);
-				} else {
-					// Open the view in a new leaf
-					const rightLeaf = this.app.workspace.getRightLeaf(false);
-					if (rightLeaf) {
-						// Get context before setting view state - using the AIAgent
-						await rightLeaf.setViewState({
-							type: LIFE_NAVIGATOR_VIEW_TYPE,
-							active: true,
-							state: {
-								initialMessages: [],
-							},
-						});
+				// Ribbon icons traditionally open in right sidebar
+				await this.openViewWithStandardBehavior(LIFE_NAVIGATOR_VIEW_TYPE, state, undefined, 'right');
 
-						// Reveal the leaf
-						this.app.workspace.revealLeaf(rightLeaf);
-					}
-				}
 			} catch (error) {
 				console.error("Error in runAICoach:", error);
 				new Notice(
@@ -258,59 +346,42 @@ export class LifeNavigatorPlugin extends Plugin {
 
 	async onunload() {
 		console.debug("Unloading Life Navigator plugin");
-		
+
 		// Save any pending changes immediately before unloading
 		await usePluginStore.getState().saveImmediatelyIfNeeded(false);
-		
+
 		// Cleanup setup change subscription
 		if (this.setupChangeSubscription) {
 			this.setupChangeSubscription();
 			this.setupChangeSubscription = null;
 		}
-		
+
 		// Cleanup user-defined tools manager
 		if (this.userToolManager) {
 			this.userToolManager.cleanup();
 		}
-		
+
 		cleanupStore();
-		
+
 		// Clear the static instance reference
 		if (LifeNavigatorPlugin._instance) {
 			LifeNavigatorPlugin._instance = null;
 		} else {
 			throw new Error('LifeNavigatorPlugin instance not found');
 		}
-		
+
 		resetObsidianTools();
 	}
 
 	private async autoOpenForSetup(): Promise<void> {
 		try {
-			// Check if the view is already open in a leaf
-			const leaves = this.app.workspace.getLeavesOfType(LIFE_NAVIGATOR_VIEW_TYPE);
+			const state = {
+				initialMessages: [],
+			};
 
-			if (leaves.length > 0) {
-				// View is already open, just focus on it
-				const viewLeaf = leaves[0];
-				this.app.workspace.revealLeaf(viewLeaf);
-				return;
-			}
+			// For setup, always open in the right sidebar for less intrusive experience
+			await this.openViewWithStandardBehavior(LIFE_NAVIGATOR_VIEW_TYPE, state, undefined, 'right');
 
-			// Open the view in a new leaf
-			const rightLeaf = this.app.workspace.getRightLeaf(false);
-			if (rightLeaf) {
-				await rightLeaf.setViewState({
-					type: LIFE_NAVIGATOR_VIEW_TYPE,
-					active: true,
-					state: {
-						initialMessages: [],
-					},
-				});
-
-				// Reveal the leaf
-				this.app.workspace.revealLeaf(rightLeaf);
-			}
 		} catch (error) {
 			console.error("Error auto-opening Life Navigator for setup:", error);
 			// Fail silently to avoid disrupting user experience
@@ -321,7 +392,7 @@ export class LifeNavigatorPlugin extends Plugin {
 		try {
 			// Determine target conversation ID
 			let targetConversationId: string;
-			
+
 			if (conversationId) {
 				targetConversationId = conversationId;
 			} else {
@@ -334,38 +405,53 @@ export class LifeNavigatorPlugin extends Plugin {
 				targetConversationId = currentConversation.meta.id;
 			}
 
+			// Use standardized behavior - match existing views by conversation ID
+			const state = {
+				conversationId: targetConversationId,
+				conversationTitle: t('chat.titles.newChat')
+			};
 
-			// Check if a cost analysis view for this conversation is already open
-			const leaves = this.app.workspace.getLeavesOfType(COST_ANALYSIS_VIEW_TYPE);
-			const existingLeaf = leaves.find(leaf => {
+			const matcher = (leaf: WorkspaceLeaf) => {
 				const view = leaf.view as CostAnalysisView;
 				return view.getState()?.conversationId === targetConversationId;
-			});
+			};
 
-			if (existingLeaf) {
-				// View for this conversation is already open, just focus on it
-				this.app.workspace.revealLeaf(existingLeaf);
-				return;
-			}
+			// Open in main area using standard behavior
+			await this.openViewWithStandardBehavior(COST_ANALYSIS_VIEW_TYPE, state, matcher);
 
-			// Open a new view in the center workspace (main area)
-			const mainLeaf = this.app.workspace.getLeaf(false);
-			if (mainLeaf) {
-				await mainLeaf.setViewState({
-					type: COST_ANALYSIS_VIEW_TYPE,
-					active: true,
-					state: {
-						conversationId: targetConversationId,
-						conversationTitle: t("costAnalysis.title")
-					},
-				});
-
-				// Reveal the leaf
-				this.app.workspace.revealLeaf(mainLeaf);
-			}
 		} catch (error) {
 			console.error("Error opening cost analysis view:", error);
 			new Notice(t('costAnalysis.errors.failedToOpen', { error: error instanceof Error ? error.message : String(error) }));
+		}
+	}
+
+	async openSystemPrompt(modeId: string): Promise<void> {
+		try {
+			const state: SystemPromptViewState = {
+				modeId: modeId
+			};
+
+			// Match existing system prompt views for the same mode
+			const matcher = (leaf: WorkspaceLeaf) => {
+				const view = leaf.view as SystemPromptView;
+				// Check if this view is for the same mode
+				return view && view.getState().modeId === modeId;
+			};
+
+			// Use standard behavior, but prefer split mode for system prompts as they're often reference material
+			const resultLeaf = await this.openViewWithStandardBehavior(SYSTEM_PROMPT_VIEW_TYPE, state, matcher);
+
+			// Set mode ID on the view if successful
+			if (resultLeaf) {
+				const view = resultLeaf.view as SystemPromptView;
+				view.setState({ modeId: modeId }, null);
+			}
+
+		} catch (error) {
+			console.error("Error opening system prompt view:", error);
+			new Notice(t('systemPrompt.errors.failedToOpen', {
+				error: error instanceof Error ? error.message : String(error)
+			}));
 		}
 	}
 }

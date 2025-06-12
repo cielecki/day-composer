@@ -1,12 +1,12 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import * as ReactDOM from "react-dom/client";
-import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { t } from '../i18n';
 import { CostAnalysisApp } from "src/components/CostAnalysisApp";
+import { updateLeafTitle } from "src/utils/ui/leaf-title-updater";
 
-export interface CostAnalysisViewProps {
-	plugin: LifeNavigatorPlugin;
+export interface CostAnalysisViewState extends Record<string, unknown> {
 	conversationId: string;
+	conversationTitle: string;
 }
 
 export const COST_ANALYSIS_VIEW_TYPE = "cost-analysis-view";
@@ -71,15 +71,7 @@ export class CostAnalysisView extends ItemView {
 
         const setConversationTitle = (title: string): void => {
             this.conversationTitle = title;
-            
-            this.leaf.setViewState({
-                type: COST_ANALYSIS_VIEW_TYPE,
-                active: true,
-                state: {
-                    conversationId: this.conversationId,
-                    conversationTitle: title
-                }
-            });
+            updateLeafTitle(this.leaf, title);
         };
 
 		// Render the cost analysis app
@@ -101,12 +93,5 @@ export class CostAnalysisView extends ItemView {
 			this.renderComponent();
 		}
 		return super.setState(state, result);
-	}
-
-	// Method to set conversation ID and title programmatically
-	setConversationId(conversationId: string | null, conversationTitle?: string): void {
-		this.conversationId = conversationId;
-		this.conversationTitle = conversationTitle || "";
-		this.renderComponent();
 	}
 } 

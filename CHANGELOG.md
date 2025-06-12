@@ -2,6 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
+
 ## [0.11.3] - 2025-01-11
 
 ### 🚀 New Chat Menu - Everything You Need in One Place
@@ -400,3 +401,13 @@ change: enforce thinking in claude, as it's needed for handover to work
 - Standardized naming from "Starter Pack" to "Starter Kit" throughout the codebase for consistency
 
 ## [0.6.6] - 2025-05-22
+
+## [Unreleased]
+
+### 🚀 New System Prompt View
+
+**View system prompts in a dedicated view instead of modal for a much better experience:**
+
+### 🚀 Improved View Opening Behavior
+
+**Life Navigator now opens views (system prompts, cost analysis,etc.) just like Obsidian opens files - smart, consistent, and user-friendly**

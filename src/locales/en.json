@@ -55,10 +55,7 @@
       "outputTokens": "Output Tokens",
       "title": "Summary",
       "totalCost": "Total Cost"
-    },
-    "title": "Cost Analysis",
-    "titleWithName": "Cost Analysis: {{title}}",
-    "untitledConversation": "Untitled Conversation"
+    }
   },
   "dateTime": {
     "current": "Current Date and Time"
@@ -195,6 +192,31 @@
         "warning": "User-defined tools execute JavaScript code with full access to your vault, file system, and network requests. Each tool requires individual approval before execution. Always review tool code carefully before approving, and only approve tools from trusted sources."
       },
       "title": "User-Defined Tools"
+    }
+  },
+  "systemPrompt": {
+    "commands": {
+      "openSystemPrompt": "Open System Prompt"
+    },
+    "copy": {
+      "button": "Copy to clipboard",
+      "copied": "Copied!",
+      "copiedFull": "Full prompt copied!",
+      "error": "Failed to copy to clipboard",
+      "fullPrompt": "Copy Full Prompt"
+    },
+    "empty": "No system prompt available",
+    "error": {
+      "message": "Error: {error}",
+      "title": "Failed to load system prompt"
+    },
+    "errors": {
+      "failedToOpen": "Failed to open system prompt view: {error}"
+    },
+    "loading": "Loading system prompt...",
+    "view": {
+      "title": "{{modeName}} System Prompt",
+      "titleGeneric": "System Prompt"
     }
   },
   "tasks": {
@@ -606,14 +628,10 @@
       "speak": "Read aloud"
     },
     "modal": {
-      "copied": "Copied!",
-      "copyToClipboard": "Copy to clipboard",
       "modeSettings": "Settings for mode '{{modeName}}'",
       "reloadButton": "Restart Obsidian",
       "reloadRequiredMessageWithVersions": "Plugin updated from version '{{currentVersion}}' to '{{latestVersion}}'.\nWould you like to restart Obsidian to apply changes?",
-      "reloadRequiredTitle": "Reload Required",
-      "systemPrompt": "System prompt for '{{modeName}}'",
-      "systemPromptErrorMessage": "Cannot display system prompt: '{{error}}'. Check your mode file and ensure all linked files exist, or remove the 🧭 emoji from links that should not be expanded."
+      "reloadRequiredTitle": "Reload Required"
     },
     "mode": {
       "loading": "Loading...",
