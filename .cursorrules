@@ -408,57 +408,22 @@ This approach will make the styles much more maintainable, reusable, and easier 
 
 The following commands trigger specific workflow phases for structured task implementation:
 
-#### "go" Command - Task Implementation Workflow
-When the user types "go", execute this complete workflow:
+#### "go" Command - Task Disposer
+When the user types "go", execute the task disposer script:
 
-1. **Task Discovery Phase**
-   - Ask the task disposer/user: "What task would you like me to work on?"
-   - Wait for the user to provide the task description
-   - Read and understand the full task requirements
+1. **Run Task Disposer**
+   - Execute `node scripts/task-disposer.mjs` to fetch the next available task from the backlog
+   - The script will:
+     - Find the first unclaimed task in the backlog.md file (tasks with `- [ ]`)
+     - Mark it as claimed by changing `- [ ]` to `- [?]` and adding project identification
+     - Create a `task.md` file with the task content
+     - Display the claimed task for the user to work on
 
-2. **Repository Sync Phase**
-   - Pull latest changes from the repository to ensure working with current codebase
-   - Check for any conflicts or issues that need resolution before proceeding
-
-3. **Research & Planning Phase**
-   - Conduct comprehensive research on the task
-   - Analyze existing codebase for relevant patterns, components, and implementations
-   - Check for existing similar functionality that can be reused or extended
-   - Review documentation, translation files, and related features
-   - Identify all files that need to be modified
-   - Plan the implementation approach step by step
-
-4. **Plan Presentation Phase**
-   - Present a detailed implementation plan including:
-     - Summary of what will be implemented
-     - List of files to be created/modified
-     - Key implementation decisions and rationale
-     - Potential challenges and how they'll be addressed
-     - Expected impact on existing functionality
-   - **ALWAYS ASK FOR USER ACCEPTANCE BEFORE PROCEEDING**
-   - Wait for explicit user approval: "Do you approve this plan? Type 'yes' to proceed."
-
-5. **Task Documentation Setup**
-   - Create task.md file with:
-     - Original task description
-     - Implementation plan details
-     - Progress tracking section
-     - Implementation notes section
-     - Changes and alterations log
-
-6. **Implementation Phase** (only after user approval)
-   - Implement the approved plan
-   - **Update task.md throughout implementation with:**
-     - Progress updates on each major step
-     - Any alterations or deviations from the original plan
-     - Implementation notes and decisions made
-     - Challenges encountered and solutions applied
+2. **Post-Task Setup**
+   - Read the created `task.md` file to understand the task requirements
+   - Begin implementation planning and research based on the task content
    - Follow all existing code guidelines (styles, changelog, documentation)
-   - **Include cursor rules modifications if the task affects development workflow**
-   - Test the implementation
-   - Update CHANGELOG.md if it's a user-facing feature
-   - Update documentation as needed
-   - Clean up translation files if necessary
+   - **ALWAYS ASK FOR USER ACCEPTANCE BEFORE STARTING TO MODIFY ANYTHING**
 
 #### "r" Command - Final Review & Commit Preparation
 When the user types "r", execute this review workflow:
@@ -497,14 +462,11 @@ When the user types "r", execute this review workflow:
    - Present the proposed commit message to the user
    - Example format: `feat: add task management workflow commands to cursor rules`
 
-#### "c" Command - Commit Execution
-When the user types "c":
-
-1. **Final Confirmation**
+6. **Final Confirmation**
    - Show the commit message one final time
    - Ask: "Ready to commit with this message? Type 'yes' to proceed."
 
-2. **Commit Process**
+7. **Commit Process**
    - Execute the git commit with the prepared message
    - Provide confirmation of successful commit
    - Delete the task.md file to clean up the workspace

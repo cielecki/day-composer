@@ -73,6 +73,12 @@ function getJournalPath() {
   return customPath || envPath || DEFAULT_JOURNAL_PATH;
 }
 
+// Get backlog file path - looks for Life Navigator Backlog.md in the Journal directory
+function getBacklogPath() {
+  const journalPath = getJournalPath();
+  return path.join(journalPath, 'Life Navigator Backlog.md');
+}
+
 // Find all markdown files in the Journal directory
 function findMarkdownFiles(journalPath) {
   if (!fs.existsSync(journalPath)) {
