@@ -1,12 +1,13 @@
 import { LNMode } from '../types/mode';
 import type { ImmerStateCreator } from './plugin-store';
+import { expandLinks, SystemPromptParts } from 'src/utils/links/expand-links';
+import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 
 // Modes slice interface
 export interface ModesSlice {
   // State
   modes: {
     available: Record<string, LNMode>;
-    activeId: string;
     isLoading: boolean;
     fileWatcherActive: boolean;
   };
@@ -19,12 +20,13 @@ export interface ModesSlice {
   
   // Actions
   setAvailableModes: (modes: Record<string, LNMode>) => void;
-  setActiveMode: (modeId: string) => void;
-  setActiveModeWithPersistence: (modeId: string) => Promise<void>;
   updateMode: (modeId: string, mode: LNMode) => void;
   removeMode: (modeId: string) => void;
   setModesLoading: (loading: boolean) => void;
   setFileWatcherActive: (active: boolean) => void;
+  
+  // Business logic
+  getSystemPrompt: (modeId: string) => Promise<SystemPromptParts>;
   
   // Validation actions
   setInvalidModes: (modeIds: string[]) => void;
@@ -35,12 +37,13 @@ export interface ModesSlice {
   removeInvalidTool: (toolId: string) => void;
   clearModeValidationErrors: () => void;
   clearToolValidationErrors: () => void;
+  
+  // No longer needed - use DEFAULT_MODE_ID constant instead
 }
 
 export const createModesSlice: ImmerStateCreator<ModesSlice> = (set, get) => ({
   modes: {
     available: {},
-    activeId: '',
     isLoading: false,
     fileWatcherActive: false
   },
@@ -53,22 +56,6 @@ export const createModesSlice: ImmerStateCreator<ModesSlice> = (set, get) => ({
   setAvailableModes: (modes) => set((state) => {
     state.modes.available = modes;
   }),
-  
-  setActiveMode: (modeId) => set((state) => {
-    state.modes.activeId = modeId;
-  }),
-  
-  setActiveModeWithPersistence: async (modeId) => {
-    // Update store state
-    set((state) => {
-      state.modes.activeId = modeId;
-    });
-    
-    // Persist to settings
-    const store = get();
-    store.updateSettings({ activeModeId: modeId });
-    await store.saveSettings();
-  },
   
   updateMode: (modeId, mode) => set((state) => {
     state.modes.available[modeId] = mode;
@@ -85,6 +72,35 @@ export const createModesSlice: ImmerStateCreator<ModesSlice> = (set, get) => ({
   setFileWatcherActive: (active) => set((state) => {
     state.modes.fileWatcherActive = active;
   }),
+
+  // Business Logic Implementation
+  getSystemPrompt: async (modeId: string) => {
+    const state = get();
+    
+    const currentActiveMode = state.modes.available[modeId];
+    const plugin = LifeNavigatorPlugin.getInstance();
+    
+    if (!currentActiveMode || !plugin) {
+      return {
+        staticSection: '',
+        semiDynamicSection: '',
+        dynamicSection: '',
+        fullContent: ''
+      };
+    }
+    
+    // Conditionally expand links based on mode setting
+    if (currentActiveMode.expand_links) {
+      return (await expandLinks(plugin.app, currentActiveMode.system_prompt));
+    } else {
+      return {
+        staticSection: currentActiveMode.system_prompt.trim(),
+        semiDynamicSection: '',
+        dynamicSection: '',
+        fullContent: currentActiveMode.system_prompt.trim()
+      };
+    }
+  },
   
   // Validation actions
   setInvalidModes: (modeIds) => set((state) => {
@@ -121,5 +137,7 @@ export const createModesSlice: ImmerStateCreator<ModesSlice> = (set, get) => ({
 
   clearToolValidationErrors: () => set((state) => {
     state.validation.invalidTools = [];
-  })
+  }),
+  
+  // No longer needed - use DEFAULT_MODE_ID constant instead
 }); 

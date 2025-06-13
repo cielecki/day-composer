@@ -180,6 +180,7 @@ export class ObsidianTools {
 		toolName: string,
 		toolInput: Record<string, unknown>,
 		signal: AbortSignal,
+		chatId: string,
 		onProgress: (message: string) => void,
 		onNavigationTarget: (target: NavigationTarget) => void,
 		onLabelUpdate?: (label: string) => void
@@ -224,6 +225,7 @@ export class ObsidianTools {
 				plugin: LifeNavigatorPlugin.getInstance(),
 				params: input,
 				signal,
+				chatId,
 				progress: (message: string) => {
 					progressMessages.push(message);
 					onProgress(message);

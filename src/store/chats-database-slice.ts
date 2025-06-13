@@ -8,6 +8,7 @@ import { normalizePath } from 'obsidian';
 import { ensureDirectoryExists } from 'src/utils/fs/ensure-directory-exists';
 import { escapeFilename } from 'src/utils/fs/escape-filename';
 import { chatFileNameToIdAndTitle } from 'src/utils/chat/chat-file-name-to-id-and-title';
+import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
 
 // Database slice interface
 export interface ChatsDatabaseSlice {
@@ -18,11 +19,11 @@ export interface ChatsDatabaseSlice {
   
   // Database Actions (migrated from ConversationDatabase)
   initializeDatabase: () => Promise<void>;
-  saveConversation: () => Promise<string | null>;
+  saveConversation: (chatId?: string) => Promise<string | null>;
   loadConversation: (conversationId: string) => Promise<boolean>;
   loadConversationData: (conversationId: string) => Promise<StoredConversation | null>;
   deleteConversation: (conversationId: string) => Promise<boolean>;
-  autoSaveConversation: () => Promise<void>;
+  autoSaveConversation: (chatId?: string) => Promise<void>;
   listConversations: () => Promise<ConversationMeta[]>;
   searchConversations: (query: string) => Promise<ConversationMeta[]>;
   updateConversationTitle: (conversationId: string, title: string) => Promise<boolean>;
@@ -96,40 +97,68 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
       }
     },
 
-    saveConversation: async () => {
+    saveConversation: async (chatId?: string) => {
       try {
         const app = getApp();
         const conversationsDir = getConversationsDir();
 
+        // If no chatId provided, we need to determine which chat to save
+        // For backward compatibility, we could save all loaded chats, but that's expensive
+        // For now, require explicit chatId
+        if (!chatId) {
+          console.error('[DATABASE] saveConversation requires a chatId parameter');
+          return null;
+        }
+
+        console.debug(`[DATABASE] saveConversation called for chat ${chatId}`);
+        const chatState = get().getChatState(chatId);
+        if (!chatState) {
+          console.error(`[DATABASE] Chat ${chatId} not found in loaded chats`);
+          return null;
+        }
+        
+        console.debug(`[DATABASE] Chat ${chatId} found, conversation ID: ${chatState.chat.meta.id}, messages: ${chatState.chat.storedConversation.messages.length}`);
+
         // Prepare the conversation within the store action
         set((state) => {
-          // Set the mode ID
-          state.chats.current.storedConversation.modeId = state.modes.activeId;
+          const chatState = state.chats.loaded.get(chatId);
+          if (chatState) {
+            // Set the mode ID to this chat's specific mode (not global mode)
+            chatState.chat.storedConversation.modeId = chatState.activeModeId || DEFAULT_MODE_ID;
+          }
         });
 
         // Handle title generation if needed (async operation)
-        if (!get().chats.current.storedConversation.titleGenerated && 
-          get().chats.current.storedConversation.messages.length >= 2) {
-            console.debug("Generating title", get().chats.current.storedConversation.messages.length);
+        if (!chatState.chat.storedConversation.titleGenerated && 
+          chatState.chat.storedConversation.messages.length >= 2) {
+            console.debug("Generating title", chatState.chat.storedConversation.messages.length);
         
             const generatedTitle = await generateChatTitle(
-              get().chats.current.storedConversation.messages
+              chatState.chat.storedConversation.messages
             );
             
             set((state) => {
-              state.chats.current.meta.title = generatedTitle;
-              state.chats.current.storedConversation.titleGenerated = true;
+              const chatState = state.chats.loaded.get(chatId);
+              if (chatState) {
+                chatState.chat.meta.title = generatedTitle;
+                chatState.chat.storedConversation.titleGenerated = true;
+              }
             });
           }
 
         // Get the prepared conversation and save it
-        const finalState = get();
-        const conversation = finalState.chats.current;
+        const finalChatState = get().getChatState(chatId);
+        if (!finalChatState) {
+          console.error(`Chat ${chatId} not found after preparation`);
+          return null;
+        }
+        
+        const conversation = finalChatState.chat;
 
         // Check for existing conversation and clean up old files
         let existingConversation: StoredConversation | null = null;
         try {
-          existingConversation = await finalState.loadConversationData(conversation.meta.id);
+          existingConversation = await get().loadConversationData(conversation.meta.id);
         } catch (error) {
           // Conversation doesn't exist yet, which is fine
         }
@@ -168,7 +197,10 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         console.debug(`Successfully saved conversation: ${fileName}`);
 
         set((state) => {
-          state.chats.current.meta.filePath = fileName;
+          const chatState = state.chats.loaded.get(chatId);
+          if (chatState) {
+            chatState.chat.meta.filePath = fileName;
+          }
         });
         
         return conversation.meta.id;
@@ -204,14 +236,36 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
       }
     },
 
-    autoSaveConversation: async () => {
+    autoSaveConversation: async (chatId?: string) => {
+      // For backward compatibility, if no chatId provided, save all loaded chats
+      if (!chatId) {
+        const loadedChats = get().chats.loaded;
+        for (const [id, chatState] of loadedChats) {
+          // Only auto-save if there are messages and not currently generating
+          if (chatState.chat.storedConversation.messages.length === 0 || chatState.isGenerating) {
+            continue;
+          }
+          
+          try {
+            const conversationId = await get().saveConversation(id);
+            if (conversationId) {
+              console.debug(`Auto-saved conversation: ${conversationId}`);
+            }
+          } catch (error) {
+            console.error(`Failed to auto-save conversation ${id}:`, error);
+          }
+        }
+        return;
+      }
+
       // Only auto-save if there are messages and not currently generating
-      if (get().chats.current.storedConversation.messages.length === 0 || get().chats.isGenerating) {
+      const chatState = get().getChatState(chatId);
+      if (!chatState || chatState.chat.storedConversation.messages.length === 0 || chatState.isGenerating) {
         return;
       }
       
       try {
-        const conversationId = await get().saveConversation();
+        const conversationId = await get().saveConversation(chatId);
         if (conversationId) {
           console.debug(`Auto-saved conversation: ${conversationId}`);
         }
@@ -223,17 +277,19 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
     loadConversation: async (conversationId) => {
       try {
         // Check if the requested conversation is already loaded
-        const currentConversationId = get().getCurrentConversationId();
-        if (currentConversationId === conversationId) {
-          console.debug(`Conversation ${conversationId} is already loaded, skipping disk load`);
-          return true;
+        const loadedChats = get().chats.loaded;
+        for (const [chatId, chatState] of loadedChats) {
+          if (chatState.chat.meta.id === conversationId) {
+            console.debug(`Conversation ${conversationId} is already loaded as chat ${chatId}, skipping disk load`);
+            return true;
+          }
         }
 
         // Load the stored conversation data
         const storedConversation = await get().loadConversationData(conversationId);
         
         if (!storedConversation) {
-          new Notice(t('ui.chat.conversationNotFound'));
+          console.warn(`Conversation ${conversationId} not found`);
           return false;
         }
 
@@ -241,7 +297,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         const meta = await get().getConversationMeta(conversationId);
         
         if (!meta) {
-          new Notice(t('ui.chat.conversationMetadataNotFound'));
+          console.warn(`Conversation ${conversationId} metadata not found`);
           return false;
         }
 
@@ -251,8 +307,8 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
           storedConversation: storedConversation
         };
 
-        // Load the conversation into the current state using existing action
-        get().setCurrentChat(chat);
+        // Load the conversation into a new chat using the conversation ID as chat ID
+        get().setCurrentChat(conversationId, chat);
         
         return true;
       } catch (error) {
@@ -280,10 +336,12 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         const filepath = `${conversationsDir}/${targetFile}`;
         await app.vault.adapter.remove(filepath);
         
-        // If we just deleted the current conversation, clear the chat
-        const currentState = get();
-        if (currentState.chats.current.meta.id === conversationId) {
-          currentState.clearChat();
+        // If we have any loaded chats with this conversation ID, unload them
+        const loadedChats = get().chats.loaded;
+        for (const [chatId, chatState] of loadedChats) {
+          if (chatState.chat.meta.id === conversationId) {
+            await get().unloadChat(chatId);
+          }
         }
         
         new Notice(t('ui.chat.conversationDeleted'));
@@ -429,12 +487,17 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
           await app.vault.adapter.remove(oldFilepath);
         }
         
-        // If this is the current conversation, update the local state too
-        const currentState = get();
-        if (currentState.chats.current.meta.id === conversationId) {
-          set((state) => {
-            state.chats.current.meta.title = title;
-          });
+        // If this conversation is loaded in any chat, update the local state too
+        const loadedChats = get().chats.loaded;
+        for (const [chatId, chatState] of loadedChats) {
+          if (chatState.chat.meta.id === conversationId) {
+            set((state) => {
+              const chatState = state.chats.loaded.get(chatId);
+              if (chatState) {
+                chatState.chat.meta.title = title;
+              }
+            });
+          }
         }
         
         new Notice(t('ui.chat.conversationTitleUpdated'));

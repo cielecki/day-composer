@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ContentBlock } from '../types/message';
-import { NavigationTarget } from '../obsidian-tools';
 import { ThinkingCollapsibleBlock, RedactedThinkingBlock as RedactedThinking, ToolBlock } from 'src/components/CollapsibleBlock';
 import { getObsidianTools } from '../obsidian-tools';
 import { usePluginStore } from '../store/plugin-store';
 import { t } from 'src/i18n';
 import { LucideIcon } from './LucideIcon';
+import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
 import { ToolResultBlock } from '../types/message';
 import { MarkdownRenderer } from './MarkdownRenderer';
 
@@ -16,6 +16,7 @@ interface MessageDisplayProps {
   messageIndex?: number;
   isLastMessage?: boolean;
   isGeneratingResponse?: boolean;
+  chatId?: string;
 }
 
 /**
@@ -24,15 +25,16 @@ interface MessageDisplayProps {
 const FixWithGuideButton: React.FC<{
   helpPrompt: string;
   buttonText: string;
-}> = ({ helpPrompt, buttonText }) => {
-  const { setActiveModeWithPersistence, addUserMessage } = usePluginStore();
+  chatId?: string;
+}> = ({ helpPrompt, buttonText, chatId }) => {
+  const { setActiveModeForChat, addUserMessage } = usePluginStore();
 
   const handleButtonClick = async () => {
-    // Switch to guide mode
-    await setActiveModeWithPersistence(':prebuilt:guide');
-    
-    // Send the fix prompt
-    await addUserMessage(helpPrompt, []);
+    // Switch only this chat to guide mode - don't affect other chats
+    if (chatId) {
+      setActiveModeForChat(chatId, ':prebuilt:guide');
+      await addUserMessage(chatId, helpPrompt, []);
+    }
   };
 
   return (
@@ -50,13 +52,13 @@ const FixWithGuideButton: React.FC<{
 /**
  * Component for rendering retry buttons
  */
-const RetryButton: React.FC<{ messageIndex?: number }> = ({ messageIndex }) => {
+const RetryButton: React.FC<{ messageIndex?: number; chatId?: string }> = ({ messageIndex, chatId }) => {
   const { retryFromMessage } = usePluginStore();
 
   const handleRetryClick = async () => {
-    if (messageIndex !== undefined) {
+    if (messageIndex !== undefined && chatId) {
       // Retry from the specified message index
-      await retryFromMessage(messageIndex);
+      await retryFromMessage(chatId, messageIndex);
     }
   };
 
@@ -90,11 +92,16 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   messageIndex,
   isLastMessage = false,
   isGeneratingResponse = false,
+  chatId,
 }) => {
   // Get specific state slices from Zustand store with granular subscriptions
   const isRecording = usePluginStore(state => state.audio.isRecording);
-  const currentModeId = usePluginStore(state => state.modes.activeId);
-  const currentMode = usePluginStore(state => state.modes.available[state.modes.activeId]);
+  const chatState = usePluginStore(state => chatId ? state.getChatState(chatId) : null);
+  const availableModes = usePluginStore(state => state.modes.available);
+  
+  // Get current mode - use chat-specific mode if available, otherwise default
+  const currentModeId = chatState?.activeModeId || DEFAULT_MODE_ID;
+  const currentMode = availableModes[currentModeId];
   
   // Extract individual values from TTS state - updated property names
   const isSpeaking = usePluginStore(state => state.audio.isSpeaking);
@@ -167,8 +174,8 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
 
   // Handle edit message button click
   const handleEditClick = () => {
-    if (role === 'user' && messageIndex !== undefined) {
-      startEditingMessage(messageIndex);
+    if (role === 'user' && messageIndex !== undefined && chatId) {
+      startEditingMessage(chatId, messageIndex);
     }
   };
 
@@ -194,7 +201,8 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
         // Otherwise start playing the text
         const textToSpeak = getPlainTextContent(contentBlocksToRender);
         if (textToSpeak) {
-          speakingStart(textToSpeak);
+          // Use the chat's specific mode for TTS settings
+          speakingStart(textToSpeak, currentModeId);
         }
       }
     }
@@ -316,10 +324,11 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
             <div className="error-message-content">
               <MarkdownRenderer content={errorBlock.text} />
               <div className="error-message-actions">
-                <RetryButton messageIndex={messageIndex} />
+                <RetryButton messageIndex={messageIndex} chatId={chatId} />
                 <FixWithGuideButton 
                   helpPrompt={helpPrompt}
                   buttonText={t('errors.helpButton')}
+                  chatId={chatId}
                 />
               </div>
             </div>
@@ -423,7 +432,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
                       <LucideIcon name={copyIcon} size={18} />
                     </button>
                   )}
-                  <RetryButton messageIndex={messageIndex} />
+                  <RetryButton messageIndex={messageIndex} chatId={chatId} />
                 </>
               )}
             </>}

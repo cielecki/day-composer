@@ -4,7 +4,7 @@ import { getDefaultLNMode } from 'src/utils/modes/ln-mode-defaults';
 import { Notice } from 'obsidian';
 import { t } from 'src/i18n';
 import OpenAI from 'openai';
-import { expandLinks } from 'src/utils/links/expand-links';
+import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
 
 export type TTSVoice = "alloy" | "ash" | "ballad" | "coral" | "echo" | "fable" | "onyx" | "nova" | "sage" | "shimmer" | "verse";
 export const TTS_VOICES: TTSVoice[] = ['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer', 'verse'];
@@ -30,7 +30,7 @@ export interface AudioSlice {
     lastTranscription: string | null;
   };
 
-  speakingStart: (text: string) => Promise<void>;
+  speakingStart: (text: string, modeId?: string) => Promise<void>;
   speakingPause: () => void;
   speakingResume: () => void;
   speakingClearCache: () => void;
@@ -54,9 +54,10 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
   let mediaRecorder: MediaRecorder | null = null;
   let audioChunks: Blob[] = [];
   
-  const getCurrentTTSSettings = () => {
+  const getCurrentTTSSettings = (modeId?: string) => {
     const state = get();
-    const currentMode = state.modes.available[state.modes.activeId];
+    const effectiveModeId = modeId || DEFAULT_MODE_ID;
+    const currentMode = state.modes.available[effectiveModeId];
     const defaultMode = getDefaultLNMode();
     
     return {
@@ -66,9 +67,9 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
     };
   };
 
-  const initializeStreamingService = () => {
+  const initializeStreamingService = (modeId?: string) => {
     const apiKey = get().getSecret('OPENAI_API_KEY');
-    const settings = getCurrentTTSSettings();
+    const settings = getCurrentTTSSettings(modeId);
     
     if (apiKey && !streamingServiceRef) {
       streamingServiceRef = new TTSStreamingService(
@@ -403,7 +404,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
     },
     
     // Business Logic Implementation
-    speakingStart: async (text: string): Promise<void> => {
+    speakingStart: async (text: string, modeId?: string): Promise<void> => {
       if (get().audio.isRecording || get().audio.isTranscribing) {
         return;
       }
@@ -414,7 +415,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
       // Now create a new controller for this audio generation
       currentAudioController = new AbortController();
       const signal = currentAudioController.signal;
-      const ttsSettings = getCurrentTTSSettings();
+      const ttsSettings = getCurrentTTSSettings(modeId);
 
       const store = get();
 

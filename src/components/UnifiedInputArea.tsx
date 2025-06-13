@@ -9,8 +9,13 @@ const WAVEFORM_HISTORY_LENGTH = 120; // 4 seconds at 30 samples per second
 
 export const UnifiedInputArea: React.FC<{
   editingMessage?: { index: number; content: string; images?: AttachedImage[] } | null;
-}> = ({ editingMessage }) => {
-  const isGeneratingResponse = usePluginStore(state => state.chats.isGenerating);
+  chatId?: string;
+  onSendMessage?: (message: string, images?: AttachedImage[]) => Promise<void>;
+}> = ({ editingMessage, chatId, onSendMessage }) => {
+  const getChatState = usePluginStore(state => state.getChatState);
+  const chatState = chatId ? getChatState(chatId) : null;
+  const isGeneratingResponse = chatState?.isGenerating || false;
+
   const isGeneratingSpeech = usePluginStore(state => state.audio.isGeneratingSpeech);
   const isSpeaking = usePluginStore(state => state.audio.isSpeaking);
   const isSpeakingPaused = usePluginStore(state => state.audio.isSpeakingPaused);
@@ -23,22 +28,36 @@ export const UnifiedInputArea: React.FC<{
   const addUserMessage = usePluginStore(state => state.addUserMessage);
   const editUserMessage = usePluginStore(state => state.editUserMessage);
   const cancelEditingMessage = usePluginStore(state => state.cancelEditingMessage);
-  const startRecording = usePluginStore(state => state.recordingStart);
+  const recordingStart = usePluginStore(state => state.recordingStart);
   const finalizeRecording = usePluginStore(state => state.recordingToTranscribing);
   const audioStop = usePluginStore(state => state.audioStop);
   const chatStop = usePluginStore(state => state.chatStop);
 
-  // Watch for chat ID changes to reset input state
-  const currentChatId = usePluginStore(state => state.chats.current.meta.id);
-  const prevChatIdRef = useRef(currentChatId);
+  const currentChatId = chatId || 'default';
 
-  // Input state
-  const [message, setMessage] = useState("");
-  const [attachedImages, setAttachedImages] = useState<AttachedImage[]>([]);
+  const updateInputState = usePluginStore(state => state.updateInputState);
+  const getInputState = usePluginStore(state => state.getInputState);
+  const clearInputState = usePluginStore(state => state.clearInputState);
+
+  const inputState = chatId ? getInputState(chatId) : { text: '', attachedImages: [] };
+  const message = inputState.text;
+  const attachedImages = inputState.attachedImages;
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Audio visualization state
+  const setMessage = (text: string) => {
+    if (chatId) {
+      updateInputState(chatId, { text });
+    }
+  };
+
+  const setAttachedImages = (images: AttachedImage[]) => {
+    if (chatId) {
+      updateInputState(chatId, { attachedImages: images });
+    }
+  };
+
   const [waveformData, setWaveformData] = useState<number[]>(
     Array(WAVEFORM_HISTORY_LENGTH).fill(0),
   );
@@ -48,15 +67,12 @@ export const UnifiedInputArea: React.FC<{
   const streamRef = useRef<MediaStream | null>(null);
   const waveformIntervalRef = useRef<number | null>(null);
 
-  // Volume level state
   const [volumeLevel, setVolumeLevel] = useState(0);
 
-  // Initialize editing state when editingMessage changes
   useEffect(() => {
     if (editingMessage) {
       setMessage(editingMessage.content);
       setAttachedImages(editingMessage.images || []);
-      // Focus the textarea after a brief delay to ensure proper rendering
       setTimeout(() => {
         if (textareaRef.current) {
           textareaRef.current.focus();
@@ -64,58 +80,28 @@ export const UnifiedInputArea: React.FC<{
         }
       }, 100);
     } else {
-      // Reset state when exiting editing mode
       setMessage("");
       setAttachedImages([]);
     }
   }, [editingMessage]);
 
-  // Reset input state when chat ID changes (new chat or loaded conversation)
   useEffect(() => {
-    if (prevChatIdRef.current !== currentChatId) {
-      // Don't reset state if we're currently editing a message
-      if (!editingMessage) {
-        setMessage("");
-        setAttachedImages([]);
-        setWaveformData(Array(WAVEFORM_HISTORY_LENGTH).fill(0));
-        setVolumeLevel(0);
-        
-        // Reset textarea height
-        if (textareaRef.current) {
-          textareaRef.current.style.height = "auto";
-          textareaRef.current.classList.add("ln-textarea-auto");
-        }
-      }
-      
-      // Update the ref with the new chat ID
-      prevChatIdRef.current = currentChatId;
-    }
-  }, [currentChatId, editingMessage]);
-
-  // Effect to handle transcription completion and insert text into input
-  useEffect(() => {
-    // Detect when transcription completes (transition from true to false)
     if (
-      prevIsTranscribingRef.current &&
-      !isTranscribing &&
+      isTranscribing === false &&
       lastTranscription
     ) {
-      // Add the transcription to the message (append to existing text)
       const newMessage = message.trim()
         ? `${message} ${lastTranscription}`
         : lastTranscription;
             
-      // Immediately clear images to prevent flash before auto-send
       const imagesToSend = [...attachedImages];
       setAttachedImages([]);
       
-      // Set the message and then send it in the next tick
       setMessage(newMessage);
       setTimeout(() => {
-        // Send/save the message with proper handling of both text and images
         const messageToSend = newMessage;
 
-        if (usePluginStore.getState().chats.isGenerating) {
+        if (usePluginStore.getState().getChatState(currentChatId)?.isGenerating) {
           return;
         }
         
@@ -123,30 +109,23 @@ export const UnifiedInputArea: React.FC<{
           return;
         }
 
-        // Handle editing vs new message
         if (editingMessage) {
-          // For editing mode, save the edit
           console.debug("Auto-saving edit after transcription");
-          editUserMessage(editingMessage.index, messageToSend, imagesToSend);
+          editUserMessage(currentChatId, editingMessage.index, messageToSend, imagesToSend);
         } else {
-          // For new message mode, send as new message
           console.debug("Auto-sending new message after transcription");
           if (imagesToSend.length > 0) {
-            addUserMessage(messageToSend, imagesToSend);
+            addUserMessage(currentChatId, messageToSend, imagesToSend);
           } else {
-            addUserMessage(messageToSend);
+            addUserMessage(currentChatId, messageToSend);
           }
         }
 
-        // Reset state
         setMessage("");
       }, 10);
     }
-    // Update ref with current value for next comparison
-    prevIsTranscribingRef.current = isTranscribing;
-  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, isSpeaking, isGeneratingSpeech, message, addUserMessage, editUserMessage, attachedImages, editingMessage]);
+  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, isSpeaking, isGeneratingSpeech, message, addUserMessage, editUserMessage, attachedImages, editingMessage, currentChatId]);
 
-  // Add ResizeObserver to ensure textarea is properly sized
   useEffect(() => {
     if (textareaRef.current) {
       const resizeObserver = new ResizeObserver(() => {
@@ -162,19 +141,15 @@ export const UnifiedInputArea: React.FC<{
     }
   }, [message]);
 
-  // Setup audio analyzer when recording starts
   useEffect(() => {
     if (isRecording) {
-      // Immediately reset waveform data to prevent showing old/noise data
       setWaveformData(Array(WAVEFORM_HISTORY_LENGTH).fill(0));
       
       setupAudioAnalyzer();
-      // Start collecting waveform data at higher frequency (30 samples per second)
       waveformIntervalRef.current = window.setInterval(() => {
         updateWaveformData();
-      }, 33); // ~30fps
+      }, 33);
     } else {
-      // Clean up when recording stops
       cleanup();
     }
 
@@ -182,13 +157,11 @@ export const UnifiedInputArea: React.FC<{
   }, [isRecording]);
 
   const cleanup = () => {
-    // Clear waveform interval
     if (waveformIntervalRef.current) {
       clearInterval(waveformIntervalRef.current);
       waveformIntervalRef.current = null;
     }
 
-    // Clean up audio context and analyzer
     if (analyserRef.current) {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -214,7 +187,6 @@ export const UnifiedInputArea: React.FC<{
 
   const setupAudioAnalyzer = async () => {
     try {
-      // Clean up any existing contexts or streams first
       if (
         audioContextRef.current &&
         audioContextRef.current.state !== "closed"
@@ -228,17 +200,14 @@ export const UnifiedInputArea: React.FC<{
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
 
-      // Reset refs
       audioContextRef.current = null;
       analyserRef.current = null;
       streamRef.current = null;
 
-      // Create audio context
       const audioContext = new (window.AudioContext ||
         (window as any).webkitAudioContext)();
       audioContextRef.current = audioContext;
 
-      // Get microphone stream
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -249,13 +218,11 @@ export const UnifiedInputArea: React.FC<{
 
       streamRef.current = stream;
 
-      // Create analyzer node
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 256;
       analyser.smoothingTimeConstant = 0;
       analyserRef.current = analyser;
 
-      // Connect microphone to analyzer
       const source = audioContext.createMediaStreamSource(stream);
       source.connect(analyser);
     } catch (error) {
@@ -270,113 +237,98 @@ export const UnifiedInputArea: React.FC<{
     analyserRef.current.smoothingTimeConstant = 0;
     analyserRef.current.getByteFrequencyData(dataArray);
 
-    // Calculate volume level (average of frequency data)
     let volume =
       dataArray.reduce((acc, val) => Math.max(acc, val), 0) / 255;
 
-    // Apply threshold and normalize
     const threshold = 0.3;
     volume -= threshold;
     volume = Math.max(0, volume / (1 - threshold));
     volume *= 100;
 
-    // Normalize to 0-100 range
     const normalizedLevel = Math.min(100, Math.max(0, volume));
 
-    // Update waveform data (shift left and add new value)
     setWaveformData((prevData) => [...prevData.slice(1), normalizedLevel]);
   };
 
-  // Handle message submission
-  const handleSendMessage = () => {
-    if (message.trim() === "" && attachedImages.length === 0) return;
+  const handleStartRecording = async () => {
+    try {
+      if (chatId && isGeneratingResponse) {
+        chatStop(chatId);
+      } else if (usePluginStore.getState().getChatState(currentChatId)?.isGenerating) {
+        chatStop(currentChatId);
+      }
+      
+      await recordingStart();
+    } catch (error) {
+      console.error('Failed to start recording:', error);
+    }
+  };
 
-    // If in editing mode, save the edit instead of sending new message
-    if (editingMessage) {
-      const finalMessage = message;
+  const handleSubmit = async () => {
+    if (!message.trim() && attachedImages.length === 0) return;
 
-      if (attachedImages.length > 0) {
-        // For editing, pass both text and images
-        editUserMessage(editingMessage.index, finalMessage, attachedImages);
+    try {
+      const messageToSend = message.trim();
+      const imagesToSend = [...attachedImages];
+
+      if (editingMessage) {
+        if (chatId) {
+          await editUserMessage(chatId, editingMessage.index, messageToSend, imagesToSend);
+        }
       } else {
-        // Just save text message
-        editUserMessage(editingMessage.index, finalMessage);
+        if (onSendMessage) {
+          await onSendMessage(messageToSend, imagesToSend);
+        } else if (chatId) {
+          await addUserMessage(chatId, messageToSend, imagesToSend);
+        }
       }
 
-      // Reset state after editing
       setMessage("");
       setAttachedImages([]);
-      return;
-    }
-
-    // Regular message sending logic
-    const finalMessage = message;
-
-    if (attachedImages.length > 0) {
-      // Add the images to the message
-      addUserMessage(
-        finalMessage,
-        attachedImages,
-      );
-    } else {
-      // Just send text message
-      addUserMessage(finalMessage);
-    }
-
-    setMessage("");
-    setAttachedImages([]);
-
-    // Reset textarea height
-    if (textareaRef.current) {
-      textareaRef.current.classList.add("ln-textarea-auto");
+    } catch (error) {
+      console.error("Failed to send message:", error);
     }
   };
 
-  // Handle cancel editing
   const handleCancelEdit = () => {
-    setMessage("");
-    setAttachedImages([]);
-    cancelEditingMessage();
+    if (chatId) {
+      cancelEditingMessage(chatId);
+    }
   };
 
-  // Handle Enter key to send message (Shift+Enter for new line)
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
 
-      // If a response is being generated, abort it first before sending new message
       if (isGeneratingResponse || isGeneratingSpeech) {
-        chatStop();
+        if (chatId) {
+          chatStop(chatId);
+        }
         audioStop();
         
-        // Use setTimeout to ensure abort is processed before sending the new message
         setTimeout(() => {
-          handleSendMessage();
+          handleSubmit();
         }, 100);
       } else {
-        handleSendMessage();
+        handleSubmit();
       }
     }
   };
 
-  // Auto-resize textarea based on content
   const handleTextareaChange = (
     e: React.ChangeEvent<HTMLTextAreaElement>,
   ) => {
     setMessage(e.target.value);
 
-    // Auto-resize
     const textarea = e.target;
     textarea.classList.add("ln-textarea-auto");
     textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
   };
 
-  // Generate a unique ID for each image (kept for compatibility)
   const generateId = () => {
     return Math.random().toString(36).substring(2, 11);
   };
 
-  // Handle paste events to capture images (kept for compatibility)
   const handlePaste = (e: React.ClipboardEvent) => {
     const items = e.clipboardData.items;
 
@@ -391,12 +343,11 @@ export const UnifiedInputArea: React.FC<{
               const base64Data = event.target.result.toString();
               const newImage: AttachedImage = {
                 id: generateId(),
-                name:
-                  file.name ||
-                  t("ui.attachments.pastedImage"),
+                name: file.name || t("ui.attachments.pastedImage"),
                 src: base64Data,
               };
-              setAttachedImages((prev) => [...prev, newImage]);
+              const newImages = [...attachedImages, newImage];
+              setAttachedImages(newImages);
             }
           };
 
@@ -408,7 +359,6 @@ export const UnifiedInputArea: React.FC<{
     }
   };
 
-  // Handle file selection from the file input (kept for compatibility)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -425,7 +375,8 @@ export const UnifiedInputArea: React.FC<{
               name: file.name,
               src: base64Data,
             };
-            setAttachedImages((prev) => [...prev, newImage]);
+            const newImages = [...attachedImages, newImage];
+            setAttachedImages(newImages);
           }
         };
 
@@ -433,57 +384,93 @@ export const UnifiedInputArea: React.FC<{
       }
     });
 
-    // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  // Handle removing an image (kept for compatibility)
   const handleRemoveImage = (imageId: string) => {
-    setAttachedImages((prev) => prev.filter((img) => img.id !== imageId));
+    const newImages = attachedImages.filter((img) => img.id !== imageId);
+    setAttachedImages(newImages);
   };
 
-  // Handle microphone button click
   const handleMicrophoneClick = () => {
-    // Stop any playing audio when starting to record
     if (isSpeaking || isGeneratingSpeech) {
       console.debug("Stopping audio playback before starting recording");
       audioStop();
     }
     
-    startRecording();
+    handleStartRecording();
   };
 
-  // Unified stop handler for all operations
   const handleStopAll = () => {
     audioStop();
-    chatStop();
+    if (chatId) {
+      chatStop(chatId);
+    }
   };
 
-  // Reset the volume after a short duration of silence
   useEffect(() => {
     if (!isRecording) return;
     const timer = setTimeout(() => {
       if (volumeLevel === 0) {
-        // Reset to a tiny baseline level for visual aesthetics
         setVolumeLevel(2);
       }
     }, 300);
     return () => clearTimeout(timer);
   }, [volumeLevel, isRecording]);
 
-  // Clear waveform data when transcription completes
   useEffect(() => {
-    // Detect when transcription completes (transition from true to false)
     if (!isTranscribing) {
       setWaveformData(Array(WAVEFORM_HISTORY_LENGTH).fill(0));
     }
   }, [isTranscribing]);
 
+  const handleSendButtonClick = async () => {
+    if (isRecording) {
+      try {
+        await audioStop();
+      } catch (error) {
+        console.error('Failed to stop recording:', error);
+      }
+    } else if (editingMessage) {
+      const messageToSend = message.trim();
+      if (messageToSend || attachedImages.length > 0) {
+        if (chatId) {
+          await editUserMessage(chatId, editingMessage.index, messageToSend, attachedImages);
+        }
+        setMessage("");
+        setAttachedImages([]);
+      }
+    } else {
+      const finalMessage = message.trim();
+      
+      if (finalMessage || attachedImages.length > 0) {
+        if (onSendMessage) {
+          await onSendMessage(finalMessage, attachedImages);
+        } else if (chatId) {
+          await addUserMessage(chatId, finalMessage, attachedImages);
+        }
+        setMessage("");
+        setAttachedImages([]);
+      }
+    }
+  };
+
+  const handleStopGeneration = () => {
+    if (chatId) {
+      chatStop(chatId);
+    }
+  };
+
+  const handleStopClick = () => {
+    if (chatId) {
+      chatStop(chatId);
+    }
+  };
+
   return (
     <div className="unified-input-container">
-      {/* Hidden file input for image selection */}
       <input
         type="file"
         ref={fileInputRef}
@@ -494,7 +481,6 @@ export const UnifiedInputArea: React.FC<{
         disabled={isRecording || isTranscribing}
       />
 
-      {/* Editing header - shown when editing a message */}
       {editingMessage && (
         <div className="editing-header">
           <div className="editing-label">
@@ -512,7 +498,6 @@ export const UnifiedInputArea: React.FC<{
       )}
 
       <div className="unified-input-area">
-        {/* Image preview area - hidden during transcription */}
         {attachedImages.length > 0 && !isTranscribing && (
           <div className="attached-images-preview">
             {attachedImages.map((image) => (
@@ -552,9 +537,7 @@ export const UnifiedInputArea: React.FC<{
           </div>
         )}
 
-        {/* Full-width input area with text input or waveform */}
         <div className="input-wrapper">
-          {/* Text area - always present but can be visually hidden during recording */}
           <textarea
             ref={textareaRef}
             className={`unified-input-textarea ${isRecording || isTranscribing ? "recording" : ""}`}
@@ -567,7 +550,6 @@ export const UnifiedInputArea: React.FC<{
             disabled={isRecording || isTranscribing}
           />
 
-          {/* Waveform visualization */}
           {(isRecording || isTranscribing) && (
             <div className="waveform-container">
               <div className="waveform">
@@ -580,7 +562,7 @@ export const UnifiedInputArea: React.FC<{
                       opacity: Math.max(
                         0.3,
                         index / WAVEFORM_HISTORY_LENGTH,
-                      ), // Fade out older samples - dynamic values that can't be in CSS
+                      ),
                     }}
                   />
                 ))}
@@ -589,11 +571,8 @@ export const UnifiedInputArea: React.FC<{
           )}
         </div>
 
-        {/* Button controls below input, aligned left and right */}
         <div className="input-controls-bottom">
-          {/* Left-aligned controls */}
           <div className="input-controls-left">
-            {/* Image attach button - hidden during recording */}
             {!isRecording && (
               <button
                 className="input-control-button"
@@ -630,7 +609,6 @@ export const UnifiedInputArea: React.FC<{
               </button>
             )}
             
-            {/* Cancel recording button - visible only during recording (not transcription) */}
             {isRecording && !isTranscribing && (
               <button
                 className="input-control-button"
@@ -655,11 +633,8 @@ export const UnifiedInputArea: React.FC<{
             )}
           </div>
 
-          {/* Right-aligned controls */}
           <div className="input-controls-right">
-            {/* Regular mode controls - show even when editing to allow voice recording and normal send */}
             <>
-              {/* Microphone button to START recording - visible when not currently recording */}
               {!isRecording && !isTranscribing && (
                 <button
                   className="input-control-button primary"
@@ -705,10 +680,9 @@ export const UnifiedInputArea: React.FC<{
                 </button>
               )}
               
-              {/* Button visible DURING recording - Finish Recording button */}
               {isRecording && !isTranscribing && (
                 <>
-                  <button // This is the "Finish Recording" button
+                  <button
                     className="input-control-button primary"
                     onClick={finalizeRecording}
                     disabled={false}
@@ -731,7 +705,6 @@ export const UnifiedInputArea: React.FC<{
                 </>
               )}
 
-              {/* Stop button - visible for generation, audio playback, and transcription (but NOT basic recording) */}
               {(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isSpeakingPaused) && !isRecording && (
                 <button
                   className="input-control-button primary"
@@ -751,11 +724,10 @@ export const UnifiedInputArea: React.FC<{
                 </button>
               )}
 
-              {/* Send button - visible when not recording, AND nothing is being generated */}
               {!isTranscribing && !isRecording && !(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isSpeakingPaused) && (
                 <button
                   className="input-control-button primary"
-                  onClick={handleSendMessage}
+                  onClick={handleSendButtonClick}
                   aria-label={editingMessage ? t("ui.input.save") : t("ui.input.send")}
                   disabled={message.trim() === "" && attachedImages.length === 0}
                 >

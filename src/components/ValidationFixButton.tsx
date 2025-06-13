@@ -28,9 +28,6 @@ export const ValidationFixButton: React.FC<ValidationFixButtonProps> = ({
 	if (type === 'specific-mode' && modeId && !invalidModes.includes(modeId)) return null;
 	
 	const handleClick = () => {
-		// Switch to guide mode
-		store.setActiveModeWithPersistence(':prebuilt:guide');
-		
 		// Create appropriate message based on type
 		let message = '';
 		switch (type) {
@@ -68,8 +65,9 @@ export const ValidationFixButton: React.FC<ValidationFixButtonProps> = ({
 				break;
 		}
 		
-		// Send the message
-		store.addUserMessage(message);
+		// Send the message - create a new chat with guide mode for this
+		const newChatId = store.createNewChat(':prebuilt:guide');
+		store.addUserMessage(newChatId, message);
 	};
 	
 	// Get button text based on type

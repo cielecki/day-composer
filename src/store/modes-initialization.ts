@@ -2,6 +2,7 @@ import { TFile } from 'obsidian';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { getStore } from './plugin-store';
 import { getPrebuiltModes } from '../utils/modes/prebuilt-modes';
+import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
 import { extractLNModeFromFile } from '../utils/modes/extract-mode-from-file';
 import { LNMode } from '../types/mode';
 import { validateModeFile } from '../utils/validation/mode-validation';
@@ -104,21 +105,7 @@ async function loadLNModes(): Promise<void> {
       console.warn(`Found ${invalidModes.length} invalid modes:`, invalidModes);
     }
     
-
-    
-    // Set the active mode from settings, regardless of whether it exists yet
-    // This preserves user's choice and allows UI to show loading state if needed
-    const store = getStore();
-    const desiredModeId = store.settings.activeModeId;
-    
-    if (desiredModeId) {
-      // Always set the user's desired mode - UI will handle loading state if mode doesn't exist
-      state.setActiveMode(desiredModeId);
-    } else if (Object.keys(modesMap).length > 0) {
-      // No preference set - use first available mode
-      const firstModeId = Object.keys(modesMap)[0] || "";
-      state.setActiveMode(firstModeId);
-    }
+    // No longer setting a global active mode - each chat manages its own mode
     
   } catch (error) {
     console.error("Error loading LN modes:", error);
@@ -152,24 +139,20 @@ function setupModeFileWatcher(): void {
 }
 
 /**
- * Handle mode changes from external sources and persist to settings
+ * Update settings with a new default mode preference for future new chats
+ * @deprecated - No longer needed, DEFAULT_MODE_ID is always used
  */
-export async function handleModeChange(modeId: string): Promise<void> {
-  const store = getStore();
-  store.setActiveMode(modeId);
-  
-  // Save to plugin settings
-  store.updateSettings({ activeModeId: modeId });
-  await store.saveSettings();
+export async function updateDefaultMode(modeId: string): Promise<void> {
+  // No-op - we always use the guide mode as default
+  console.debug('updateDefaultMode called but is deprecated - always using guide mode');
 }
 
 /**
- * Get current active mode
+ * Get current default mode for new chats
+ * @deprecated - Use DEFAULT_MODE_ID constant directly
  */
-export function getCurrentActiveMode(): LNMode | null {
-  const state = getStore();
-  const currentState = state.modes;
-  return currentState.available[currentState.activeId] || null;
+export function getDefaultModeId(): string {
+  return DEFAULT_MODE_ID;
 }
 
 /**
@@ -179,8 +162,6 @@ export function getAllModes(): Record<string, LNMode> {
   const state = getStore();
   return state.modes.available;
 }
-
-
 
 /**
  * Clean up modes-related resources

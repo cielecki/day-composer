@@ -324,10 +324,9 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 				}
 			});
 			
-			fixBtn.addEventListener('click', () => {
-				// Set active mode and add message first
-				store.setActiveModeWithPersistence(':prebuilt:guide');
-				
+			fixBtn.addEventListener('click', async () => {
+				// Note: No need to set mode - guide mode is always the default
+							
 				// Format file paths nicely - show first 5 and indicate if there are more
 				const toolPathsFormatted = invalidTools.length <= 5 
 					? invalidTools.join(', ')
@@ -341,7 +340,9 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 					filePaths: toolPathsFormatted,
 				}));
 
-				store.addUserMessage(fixToolsMessage);
+				// Send the fix prompt - create a new chat for this
+				const newChatId = store.createNewChat();
+				store.addUserMessage(newChatId, fixToolsMessage);
 				
 				// Close the settings modal properly
 				closeCurrentSettingsModal();

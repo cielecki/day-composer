@@ -1,5 +1,4 @@
 import { Anthropic, APIUserAbortError } from "@anthropic-ai/sdk";
-import { MessageCreateParamsStreaming } from "@anthropic-ai/sdk/resources/messages/messages";
 import { Message, ToolResultBlock } from "../../types/message";
 import { formatMessagesForAPI } from "./api-formatting";
 import { processAnthropicStream, StreamProcessorCallbacks } from "./stream-processor";
@@ -11,26 +10,36 @@ import { getDefaultLNMode, resolveAutoModel } from '../../utils/modes/ln-mode-de
 import type { ObsidianTool } from "../../obsidian-tools";
 import { usePluginStore } from "../../store/plugin-store";
 import { SystemPromptParts } from "../links/expand-links";
+import { DEFAULT_MODE_ID } from '../modes/ln-mode-defaults';
 
 /**
  * Runs a complete conversation turn with the AI, handling tool calls and streaming
  */
 export const runConversationTurn = async (
 	tools: ObsidianTool<Record<string, unknown>>[],
-	signal: AbortSignal
+	signal: AbortSignal,
+	chatId: string,
+	chatModeId: string
 ): Promise<Message | null> => {
 	const store = usePluginStore.getState();
 	
-	// Manage loading state within this function
-	store.setIsGenerating(true);
+	// Get the specific chat state
+	const chatState = store.getChatState(chatId);
+	if (!chatState) {
+		console.error(`Chat ${chatId} not found for conversation turn`);
+		return null;
+	}
+	
+	// Manage loading state for this specific chat
+	store.setIsGenerating(chatId, true);
 	let currentTurnAborted = false;
 	let finalAssistantMessageForTTS: Message | null = null;
 
 	// Clear any previous aborted tool results when starting a new turn
-	store.clearLiveToolResults();
+	store.clearLiveToolResults(chatId);
 
-	// Track current mode for system prompt optimization
-	let currentModeId: string = store.modes.activeId;
+	// Track current mode for system prompt optimization - start with chat's mode or default
+	let currentModeId: string = chatModeId || chatState.activeModeId || DEFAULT_MODE_ID;
 	let systemPrompt: SystemPromptParts = {
 		staticSection: '',
 		semiDynamicSection: '',
@@ -40,8 +49,8 @@ export const runConversationTurn = async (
 	let systemPromptCalculated = false;
 
 	try {
-		// Get current messages array
-		const messages = [...store.chats.current.storedConversation.messages];
+		// Get current messages array for this specific chat
+		const messages = [...chatState.chat.storedConversation.messages];
 		
 		// Validate messages array before starting
 		if (!Array.isArray(messages)) {
@@ -61,19 +70,26 @@ export const runConversationTurn = async (
 				const apiCallId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 				const apiCallStartTime = Date.now();
 
-				// Create a stable reference to messages for API formatting
-				const currentMessages = [...usePluginStore.getState().chats.current.storedConversation.messages];
+				// Create a stable reference to messages for API formatting from this specific chat
+				const currentChatState = usePluginStore.getState().getChatState(chatId);
+				if (!currentChatState) {
+					console.error(`Chat ${chatId} not found during API formatting`);
+					return null;
+				}
+				
+				const currentMessages = [...currentChatState.chat.storedConversation.messages];
 				const messagesForAPI = formatMessagesForAPI(currentMessages);
 
 				const defaultMode = getDefaultLNMode();
 
 				// Get API parameters from active mode or defaults
 				const currentStore = usePluginStore.getState();
-				const currentActiveMode = currentStore.modes.available[currentStore.modes.activeId];
+				const activeModeId = chatModeId || DEFAULT_MODE_ID;
+				const currentActiveMode = currentStore.modes.available[activeModeId];
 				
 				// Only recalculate system prompt if mode changed or not yet calculated
-				if (!systemPromptCalculated || currentModeId !== currentStore.modes.activeId) {
-					currentModeId = currentStore.modes.activeId;
+				if (!systemPromptCalculated || currentModeId !== activeModeId) {
+					currentModeId = activeModeId;
 					
 					// Generate system prompt
 					systemPrompt = await currentStore.getSystemPrompt(currentModeId);
@@ -145,11 +161,14 @@ export const runConversationTurn = async (
 
 				const stream = await anthropicClient.beta.messages.create(params, { signal: signal });
 
-				// Set up stream processor callbacks
+				// Set up stream processor callbacks for this specific chat
 				const callbacks: StreamProcessorCallbacks = {
 					onMessageStart: () => {
+						console.debug(`[CONVERSATION-TURN] onMessageStart called for chat ${chatId}`);
 						assistantMessage = { role: "assistant", content: [] };
-						usePluginStore.getState().addMessage(assistantMessage);
+						console.debug(`[CONVERSATION-TURN] Adding assistant message to chat ${chatId}:`, assistantMessage);
+						usePluginStore.getState().addMessage(chatId, assistantMessage);
+						console.debug(`[CONVERSATION-TURN] Assistant message added to chat ${chatId}`);
 					},
 					onMessageUpdate: (message: Message) => {
 						// Validate message before updating
@@ -157,11 +176,12 @@ export const runConversationTurn = async (
 							console.warn("Invalid message in stream update, skipping");
 							return;
 						}
+						console.debug(`[CONVERSATION-TURN] onMessageUpdate called for chat ${chatId}, content length:`, Array.isArray(message.content) ? message.content.length : 'not array');
 						assistantMessage = message;
 						const currentStore = usePluginStore.getState();
-						const messages = currentStore.chats.current.storedConversation.messages;
-						if (messages.length > 0) {
-							currentStore.updateMessage(messages.length - 1, message);
+						const currentChatState = currentStore.getChatState(chatId);
+						if (currentChatState && currentChatState.chat.storedConversation.messages.length > 0) {
+							currentStore.updateMessage(chatId, currentChatState.chat.storedConversation.messages.length - 1, message);
 						}
 					},
 					onMessageStop: (finalMessage: Message) => {
@@ -170,8 +190,18 @@ export const runConversationTurn = async (
 							console.warn("Invalid final message in stream stop, skipping");
 							return;
 						}
+						console.debug(`[CONVERSATION-TURN] onMessageStop called for chat ${chatId}, content length:`, Array.isArray(finalMessage.content) ? finalMessage.content.length : 'not array', finalMessage);
 						assistantMessage = finalMessage;
-						usePluginStore.getState().saveConversation();
+						
+						// CRITICAL: Update the final message in the store before saving
+						const currentStore = usePluginStore.getState();
+						const currentChatState = currentStore.getChatState(chatId);
+						if (currentChatState && currentChatState.chat.storedConversation.messages.length > 0) {
+							console.debug(`[CONVERSATION-TURN] Updating final message in store for chat ${chatId}`);
+							currentStore.updateMessage(chatId, currentChatState.chat.storedConversation.messages.length - 1, finalMessage);
+						}
+						
+						usePluginStore.getState().saveConversation(chatId);
 					},
 					onAbort: () => {
 						currentTurnAborted = true;
@@ -180,7 +210,7 @@ export const runConversationTurn = async (
 						// Calculate and store cost data when usage information is received
 						const apiCallDuration = Date.now() - apiCallStartTime;
 						const store = usePluginStore.getState();
-						store.updateCostEntry(model, usage, apiCallStartTime, apiCallDuration, apiCallId);
+						store.updateCostEntry(chatId, model, usage, apiCallStartTime, apiCallDuration, apiCallId);
 					}
 				};
 
@@ -189,7 +219,7 @@ export const runConversationTurn = async (
 
 				if (turnResult.aborted || signal.aborted) {
 					// Handle cleanup for aborted stream
-					handleStreamAbortCleanup();
+					handleStreamAbortCleanup(chatId);
 					currentTurnAborted = true;
 					break; // Exit the while loop
 				}
@@ -210,28 +240,29 @@ export const runConversationTurn = async (
 						const obsidianTools = getObsidianTools();
 						
 						// Clear any previous live tool results when starting new tool execution
-						usePluginStore.getState().clearLiveToolResults();
+						usePluginStore.getState().clearLiveToolResults(chatId);
 						
 						const { toolResults, abortedDuringProcessing } = await processToolUseBlocks(
 							toolUseBlocks,
 							obsidianTools,
 							signal,
+							chatId,
 							(toolId: string, updatedResult: ToolResultBlock) => {
-								// Update the live tool results for real-time UI display
-								usePluginStore.getState().updateLiveToolResult(toolId, updatedResult);
+								// Update the live tool results for real-time UI display for this specific chat
+								usePluginStore.getState().updateLiveToolResult(chatId, toolId, updatedResult);
 							}
 						);
 
 						if (abortedDuringProcessing || signal.aborted) {
 							// Handle cleanup for aborted tool processing
-							handleStreamAbortCleanup();
+							handleStreamAbortCleanup(chatId);
 							currentTurnAborted = true;
 							break; // Exit the while loop
 						}
 
 						// Add tool results message (as 'user' role for the next API call)
 						const toolResultsMessage: Message = { role: "user", content: toolResults };
-						usePluginStore.getState().addMessage(toolResultsMessage);
+						usePluginStore.getState().addMessage(chatId, toolResultsMessage);
 						// Continue the while loop
 					} else {
 						// No tool calls, this is the final message for this turn
@@ -243,9 +274,12 @@ export const runConversationTurn = async (
 					console.warn("API call completed but no final content received.");
 					// Remove the empty message from the conversation if it was added
 					if (assistantMessage) {
-						const currentMessages = usePluginStore.getState().chats.current.storedConversation.messages;
-						const cleanedMessages = cleanupLastMessage(currentMessages);
-						// Note: This would need message cleanup in the store
+						const currentChatState = usePluginStore.getState().getChatState(chatId);
+						if (currentChatState) {
+							const currentMessages = currentChatState.chat.storedConversation.messages;
+							const cleanedMessages = cleanupLastMessage(currentMessages);
+							// Note: This would need message cleanup in the store
+						}
 					}
 					currentTurnAborted = true; // Treat as an issue, stop the loop
 					break;
@@ -255,7 +289,7 @@ export const runConversationTurn = async (
 				// Catch errors from API/stream/tool handling
 				
 				// Handle cleanup for aborted requests
-				handleStreamAbortCleanup();
+				handleStreamAbortCleanup(chatId);
 
 				if (!(error instanceof APIUserAbortError)) {
 					throw error;
@@ -268,15 +302,15 @@ export const runConversationTurn = async (
 
 		return finalAssistantMessageForTTS;
 	} finally {
-		usePluginStore.getState().setIsGenerating(false);
+		usePluginStore.getState().setIsGenerating(chatId, false);
 		
-		// Save immediately after generation completes (successful or aborted)
-		usePluginStore.getState().saveImmediatelyIfNeeded(false);
+		// Save immediately after generation completes (successful or aborted) for this specific chat
+		usePluginStore.getState().saveImmediatelyIfNeeded(chatId, false);
 		
 		// Only clear live tool results if the turn completed successfully
 		// If there were aborted tool calls, keep the live results to show their aborted status
 		if (!currentTurnAborted && !signal.aborted) {
-			usePluginStore.getState().clearLiveToolResults();
+			usePluginStore.getState().clearLiveToolResults(chatId);
 		}
 	}
 };
@@ -284,9 +318,12 @@ export const runConversationTurn = async (
 /**
  * Handles cleanup when a stream is aborted or encounters an error
  */
-const handleStreamAbortCleanup = (): void => {
+const handleStreamAbortCleanup = (chatId: string): void => {
 	const store = usePluginStore.getState();
-	const messages = store.chats.current.storedConversation.messages;
+	const chatState = store.getChatState(chatId);
+	if (!chatState) return;
+	
+	const messages = chatState.chat.storedConversation.messages;
 	const lastMessage = messages[messages.length - 1];
 	
 	if (lastMessage?.role === "assistant") {
@@ -298,7 +335,7 @@ const handleStreamAbortCleanup = (): void => {
 		if (hasIncompleteThink) {
 			const updatedContent = clearThinkingInProgress(contentBlocks);
 			const updatedMessage = { ...lastMessage, content: updatedContent };
-			store.updateMessage(messages.length - 1, updatedMessage);
+			store.updateMessage(chatId, messages.length - 1, updatedMessage);
 		}
 		
 		// Mark any incomplete live tool results as complete to stop pulsing animation
@@ -320,7 +357,7 @@ const handleStreamAbortCleanup = (): void => {
 					is_complete: true,
 					navigation_targets: []
 				};
-				store.updateLiveToolResult(toolId, abortedResult);
+				store.updateLiveToolResult(chatId, toolId, abortedResult);
 			}
 		}
 		

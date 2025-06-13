@@ -1,12 +1,13 @@
 import type { ImmerStateCreator } from '../store/plugin-store';
 import { Message, ToolResultBlock } from '../types/message';
 import { AttachedImage } from 'src/types/attached-image';
-import { Chat, CURRENT_SCHEMA_VERSION } from 'src/utils/chat/conversation';
+import { Chat, CURRENT_SCHEMA_VERSION, ChatWithState, InputState } from 'src/utils/chat/conversation';
 import { generateChatId } from 'src/utils/chat/generate-conversation-id';
 import { createUserMessage, extractUserMessageContent } from 'src/utils/chat/message-builder';
 import { runConversationTurn } from 'src/utils/chat/conversation-turn';
 import { getObsidianTools } from '../obsidian-tools';
-import { expandLinks, SystemPromptParts } from 'src/utils/links/expand-links';
+import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
+
 import { Notice } from 'obsidian';
 import { t } from 'src/i18n';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
@@ -27,128 +28,251 @@ const generateMessageId = () => {
 
 // Helper to ensure message has ID
 const ensureMessageId = (message: Message): MessageWithId => {
-  // Create a new object to avoid mutating the original
-  const messageWithId: MessageWithId = { ...message };
+  const messageWithId = message as MessageWithId;
   if (!messageWithId.messageId) {
     messageWithId.messageId = generateMessageId();
   }
   return messageWithId;
 };
 
-// Chat slice interface
-export interface ChatSlice {
-  // State
-  chats: {
-    current: Chat;
-    isGenerating: boolean;
-    editingMessage: { index: number; content: string; images?: AttachedImage[] } | null;
-    liveToolResults: Map<string, ToolResultBlock>;
-  };
-  
-  // Basic Actions
-  addMessage: (message: Message) => void;
-  updateMessage: (index: number, message: Message) => void;
-  clearChat: () => void;
-  reset: () => void; // Alias for clearChat to match AIAgentContext
-  setIsGenerating: (generating: boolean) => void;
-  setEditingMessage: (editing: { index: number; content: string; images?: AttachedImage[] } | null) => void;
-  updateLiveToolResult: (toolId: string, result: ToolResultBlock) => void;
-  clearLiveToolResults: () => void;
-  setCurrentChat: (chat: Chat) => void;
-  
-  // Business Logic Actions
-  addUserMessage: (userMessage: string, images?: AttachedImage[]) => Promise<void>;
-  editUserMessage: (messageIndex: number, newContent: string, images?: AttachedImage[]) => Promise<void>;
-  getCurrentConversationId: () => string | null;
-  getSystemPrompt: (modeId: string) => Promise<SystemPromptParts>;
-  startEditingMessage: (messageIndex: number) => void;
-  cancelEditingMessage: () => void;
-  runConversationTurnWithContext: () => Promise<void>;
-  retryFromMessage: (messageIndex: number) => Promise<void>;
-  chatStop: () => void;
-  saveImmediatelyIfNeeded: (force?: boolean) => Promise<void>;
-  
-  // Cost tracking
-  updateCostEntry: (model: string, usage: ApiUsageData, timestamp: number, duration?: number, apiCallId?: string) => void;
-}
-
-// Create conversation slice - now get() returns full PluginStore type
-export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
-  let abortController: AbortController | null = null;
-  let saveTimeout: NodeJS.Timeout | null = null;
-  
-  // Debounced save function - cancels previous save and schedules new one
-  const debouncedSave = () => {
-    // Clear any existing timeout
-    if (saveTimeout) {
-      clearTimeout(saveTimeout);
-    }
-    
-    // Schedule new save after 2 seconds
-    saveTimeout = setTimeout(async () => {
-      const state = get();
-      
-      // Only save if there are messages and not currently generating
-      if (state.chats.current.storedConversation.messages.length > 0 && 
-          !state.chats.isGenerating) {
-        try {
-          await state.autoSaveConversation();
-          console.debug('Auto-saved conversation after 2s debounce');
-        } catch (error) {
-          console.error('Failed to auto-save conversation:', error);
+// Helper to create initial chat with state
+const createInitialChatWithState = (): ChatWithState => {
+  return {
+    chat: {
+      meta: {
+        id: generateChatId(),
+        title: t('chat.titles.newChat'),
+        filePath: '',
+        updatedAt: 0
+      },
+      storedConversation: {
+        version: CURRENT_SCHEMA_VERSION,
+        modeId: '',
+        titleGenerated: false,
+        messages: [],
+        costData: {
+          total_cost: 0,
+          total_input_tokens: 0,
+          total_output_tokens: 0,
+          total_cache_write_tokens: 0,
+          total_cache_read_tokens: 0,
+          entries: [],
         }
       }
+    },
+    isGenerating: false,
+    editingMessage: null,
+    liveToolResults: new Map(),
+    abortController: null,
+    saveTimeout: null,
+    activeModeId: '',
+    inputState: {
+      text: '',
+      attachedImages: []
+    },
+    hasBackingFile: false
+  };
+};
+
+// Chat slice interface
+export interface ChatSlice {
+  // State - now manages multiple loaded chats
+  chats: {
+    loaded: Map<string, ChatWithState>;
+  };
+  
+  // Core chat management
+  loadChat: (chatId: string) => Promise<boolean>;
+  unloadChat: (chatId: string) => Promise<void>;
+  createNewChat: (inheritModeId?: string) => string;
+  getChatState: (chatId: string) => ChatWithState | null;
+  getAllLoadedChats: () => Map<string, ChatWithState>;
+  
+  // Per-chat message operations
+  addMessage: (chatId: string, message: Message) => void;
+  updateMessage: (chatId: string, index: number, message: Message) => void;
+  clearChat: (chatId: string) => void;
+  
+  // Per-chat state management
+  setIsGenerating: (chatId: string, generating: boolean) => void;
+  setEditingMessage: (chatId: string, editing: { index: number; content: string; images?: AttachedImage[] } | null) => void;
+  updateLiveToolResult: (chatId: string, toolId: string, result: ToolResultBlock) => void;
+  clearLiveToolResults: (chatId: string) => void;
+  setCurrentChat: (chatId: string, chat: Chat) => void;
+  
+  // Per-chat business logic
+  addUserMessage: (chatId: string, userMessage: string, images?: AttachedImage[]) => Promise<void>;
+  editUserMessage: (chatId: string, messageIndex: number, newContent: string, images?: AttachedImage[]) => Promise<void>;
+  startEditingMessage: (chatId: string, messageIndex: number) => void;
+  cancelEditingMessage: (chatId: string) => void;
+  runConversationTurnWithContext: (chatId: string) => Promise<void>;
+  retryFromMessage: (chatId: string, messageIndex: number) => Promise<void>;
+  chatStop: (chatId: string) => void;
+  saveImmediatelyIfNeeded: (chatId: string, force?: boolean) => Promise<void>;
+  
+  // Cost tracking
+  updateCostEntry: (chatId: string, model: string, usage: ApiUsageData, timestamp: number, duration?: number, apiCallId?: string) => void;
+  
+  // Backward compatibility helpers (these will need a chatId from component)
+  getCurrentConversationId: (chatId: string) => string | null;
+  reset: (chatId: string) => void; // Alias for clearChat
+  
+  // New methods
+  setActiveModeForChat: (chatId: string, modeId: string) => void;
+  getActiveModeForChat: (chatId: string) => string | null;
+  updateInputState: (chatId: string, inputState: Partial<InputState>) => void;
+  getInputState: (chatId: string) => InputState;
+  clearInputState: (chatId: string) => void;
+  markChatAsHavingBackingFile: (chatId: string) => void;
+}
+
+// Create conversation slice
+export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
+  
+  // Debounced save function per chat
+  const createDebouncedSave = (chatId: string) => {
+    return () => {
+      const chatState = get().getChatState(chatId);
+      if (!chatState) return;
       
-      saveTimeout = null;
-    }, 2000);
+      // Clear any existing timeout
+      if (chatState.saveTimeout) {
+        clearTimeout(chatState.saveTimeout);
+      }
+      
+      // Schedule new save after 2 seconds
+      const timeout = setTimeout(async () => {
+        const currentChatState = get().getChatState(chatId);
+        if (!currentChatState) return;
+        
+        // Only save if there are messages and not currently generating
+        if (currentChatState.chat.storedConversation.messages.length > 0 && 
+            !currentChatState.isGenerating) {
+          try {
+            await get().autoSaveConversation(chatId);
+            console.debug(`Auto-saved conversation ${chatId} after 2s debounce`);
+          } catch (error) {
+            console.error(`Failed to auto-save conversation ${chatId}:`, error);
+          }
+        }
+        
+        // Clear timeout reference
+        set((state) => {
+          const chatState = state.chats.loaded.get(chatId);
+          if (chatState) {
+            chatState.saveTimeout = null;
+          }
+        });
+      }, 2000);
+      
+      // Store timeout reference
+      set((state) => {
+        const chatState = state.chats.loaded.get(chatId);
+        if (chatState) {
+          chatState.saveTimeout = timeout;
+        }
+      });
+    };
   };
   
   return {
     chats: {
-      current: {
-        meta: {
-          id: generateChatId(),
-          title: '',
-          filePath: '',
-          updatedAt: 0
-        },
-        storedConversation: {
-          version: CURRENT_SCHEMA_VERSION,
-          modeId: '',
-          titleGenerated: false,
-          messages: [],
-          costData: {
-            total_cost: 0,
-            total_input_tokens: 0,
-            total_output_tokens: 0,
-            total_cache_write_tokens: 0,
-            total_cache_read_tokens: 0,
-            entries: [],
-          }
-        }
-      },
-      isGenerating: false,
-      editingMessage: null,
-      liveToolResults: new Map(),
+      loaded: new Map(),
     },
     
-    addMessage: (message) => {
+    loadChat: async (chatId: string) => {
+      // Check if already loaded
+      if (get().chats.loaded.has(chatId)) {
+        return true;
+      }
+      
+      try {
+        // Try to load from database
+        const success = await get().loadConversation(chatId);
+        return success;
+      } catch (error) {
+        console.error(`Failed to load chat ${chatId}:`, error);
+        return false;
+      }
+    },
+    
+    unloadChat: async (chatId: string) => {
+      const chatState = get().getChatState(chatId);
+      if (!chatState) return;
+      
+      // Save if needed before unloading
+      await get().saveImmediatelyIfNeeded(chatId, false);
+      
+      // Stop any ongoing generation
+      get().chatStop(chatId);
+      
+      // Clear any pending save timeout
+      if (chatState.saveTimeout) {
+        clearTimeout(chatState.saveTimeout);
+      }
+      
+      // Remove from loaded chats
       set((state) => {
+        state.chats.loaded.delete(chatId);
+      });
+    },
+    
+    createNewChat: (inheritModeId?: string) => {
+      const chatId = generateChatId();
+      const modeId = inheritModeId || DEFAULT_MODE_ID;
+      
+      const newChatState = createInitialChatWithState();
+      newChatState.chat.meta.id = chatId;
+      newChatState.activeModeId = modeId;
+      newChatState.chat.storedConversation.modeId = modeId;
+      
+      set((state) => {
+        state.chats.loaded.set(chatId, newChatState);
+      });
+      
+      console.debug(`Created new chat with ID: ${chatId}, mode: ${modeId}`);
+      return chatId;
+    },
+    
+    getChatState: (chatId: string) => {
+      return get().chats.loaded.get(chatId) || null;
+    },
+    
+    getAllLoadedChats: () => {
+      return new Map(get().chats.loaded);
+    },
+    
+    addMessage: (chatId: string, message: Message) => {
+      console.debug(`[CHAT-STORE] addMessage called for chat ${chatId}:`, message);
+      set((state) => {
+        const chatState = state.chats.loaded.get(chatId);
+        if (!chatState) {
+          console.error(`[CHAT-STORE] Chat ${chatId} not found in addMessage`);
+          return;
+        }
+        
+        console.debug(`[CHAT-STORE] Chat ${chatId} found, current messages:`, chatState.chat.storedConversation.messages.length);
+        
         // Ensure message has a unique ID for React reconciliation
         const messageWithId = ensureMessageId(message);
         
         // Create a new messages array to avoid proxy issues
-        const newMessages = [...state.chats.current.storedConversation.messages, messageWithId];
-        state.chats.current.storedConversation.messages = newMessages;
+        const newMessages = [...chatState.chat.storedConversation.messages, messageWithId];
+        chatState.chat.storedConversation.messages = newMessages;
+        
+        console.debug(`[CHAT-STORE] Message added to chat ${chatId}, new count:`, newMessages.length);
       });
       
       // Trigger debounced autosave after content change
-      get().saveImmediatelyIfNeeded(true);
+      get().saveImmediatelyIfNeeded(chatId, true);
     },
     
-    updateMessage: (index, message) => {
+    updateMessage: (chatId: string, index: number, message: Message) => {
       set((state) => {
-        const messages = state.chats.current.storedConversation.messages;
+        const chatState = state.chats.loaded.get(chatId);
+        if (!chatState) return;
+        
+        const messages = chatState.chat.storedConversation.messages;
         if (index >= 0 && index < messages.length) {
           // Ensure message has ID (preserve existing ID if available)
           const existingMessage = messages[index] as MessageWithId;
@@ -160,32 +284,31 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
           // Create new messages array to avoid proxy issues
           const newMessages = [...messages];
           newMessages[index] = messageWithId;
-          state.chats.current.storedConversation.messages = newMessages;
+          chatState.chat.storedConversation.messages = newMessages;
         }
       });
       
       // Trigger debounced autosave after content change
+      const debouncedSave = createDebouncedSave(chatId);
       debouncedSave();
     },
     
-    clearChat: () => {
-      get().chatStop();
+    clearChat: (chatId: string) => {
+      get().chatStop(chatId);
 
-      if (get().audio.isSpeaking || get().audio.isGeneratingSpeech) {
-        get().audioStop();
-      }
-
-      // Cancel any pending autosave
-      if (saveTimeout) {
-        clearTimeout(saveTimeout);
-        saveTimeout = null;
+      const chatState = get().getChatState(chatId);
+      if (chatState?.saveTimeout) {
+        clearTimeout(chatState.saveTimeout);
       }
 
       set((state) => {
-        state.chats.current = {
+        const chatState = state.chats.loaded.get(chatId);
+        if (!chatState) return;
+        
+        chatState.chat = {
           meta: {
-            id: generateChatId(),
-            title: '',
+            id: chatId, // Use the same chatId, don't generate a new one
+            title: t('chat.titles.newChat'),
             filePath: '',
             updatedAt: 0
           },
@@ -204,33 +327,45 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
             }
           }
         };
-        state.chats.liveToolResults.clear();
-        state.chats.editingMessage = null;
-      })
+        chatState.liveToolResults.clear();
+        chatState.editingMessage = null;
+        chatState.isGenerating = false;
+      });
     },
     
-    reset: () => {
-      const state = get();
-      state.clearChat();
+    reset: (chatId: string) => {
+      get().clearChat(chatId);
     },
     
-    setIsGenerating: (generating) => set((state) => {
-      state.chats.isGenerating = generating;
+    setIsGenerating: (chatId: string, generating: boolean) => set((state) => {
+      const chatState = state.chats.loaded.get(chatId);
+      if (chatState) {
+        chatState.isGenerating = generating;
+      }
     }),
     
-    setEditingMessage: (editing) => set((state) => {
-      state.chats.editingMessage = editing;
+    setEditingMessage: (chatId: string, editing: { index: number; content: string; images?: AttachedImage[] } | null) => set((state) => {
+      const chatState = state.chats.loaded.get(chatId);
+      if (chatState) {
+        chatState.editingMessage = editing;
+      }
     }),
     
-    updateLiveToolResult: (toolId, result) => set((state) => {
-      state.chats.liveToolResults.set(toolId, result);
+    updateLiveToolResult: (chatId: string, toolId: string, result: ToolResultBlock) => set((state) => {
+      const chatState = state.chats.loaded.get(chatId);
+      if (chatState) {
+        chatState.liveToolResults.set(toolId, result);
+      }
     }),
     
-    clearLiveToolResults: () => set((state) => {
-      state.chats.liveToolResults.clear();
+    clearLiveToolResults: (chatId: string) => set((state) => {
+      const chatState = state.chats.loaded.get(chatId);
+      if (chatState) {
+        chatState.liveToolResults.clear();
+      }
     }),
     
-    setCurrentChat: (chat) => set((state) => {
+    setCurrentChat: (chatId: string, chat: Chat) => set((state) => {
       // Ensure all messages have IDs when loading conversation
       const messagesWithIds = chat.storedConversation.messages.map(msg => ensureMessageId(msg));
       const conversationWithIds = {
@@ -241,172 +376,199 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         }
       };
       
-      state.chats.current = conversationWithIds;
+      // Create or update the chat state
+      let chatState = state.chats.loaded.get(chatId);
+      if (!chatState) {
+        chatState = createInitialChatWithState();
+        state.chats.loaded.set(chatId, chatState);
+      }
+      
+      chatState.chat = conversationWithIds;
+      
+      // CRITICAL: Set the chat's active mode from the stored conversation
+      if (chat.storedConversation.modeId) {
+        chatState.activeModeId = chat.storedConversation.modeId;
+      }
     }),
     
-    // Business Logic Implementation
-    getSystemPrompt: async (modeId: string) => {
-      const state = get();
-      
-      const currentActiveMode = state.modes.available[modeId];
-      const plugin = LifeNavigatorPlugin.getInstance();
-      
-      if (!currentActiveMode || !plugin) {
-        return {
-          staticSection: '',
-          semiDynamicSection: '',
-          dynamicSection: '',
-          fullContent: ''
-        };
-      }
-      
-      // Conditionally expand links based on mode setting
-      if (currentActiveMode.expand_links) {
-        return (await expandLinks(plugin.app, currentActiveMode.system_prompt));
-      } else {
-        return {
-          staticSection: currentActiveMode.system_prompt.trim(),
-          semiDynamicSection: '',
-          dynamicSection: '',
-          fullContent: currentActiveMode.system_prompt.trim()
-        };
-      }
+
+    
+    getCurrentConversationId: (chatId: string) => {
+      const chatState = get().getChatState(chatId);
+      return chatState?.chat.meta.id || null;
     },
     
-    getCurrentConversationId: () => {
-      const state = get();
-      return state.chats.current?.meta.id || null;
-    },
-    
-    addUserMessage: async (userMessage, images) => {
-      if (get().audio.isSpeaking || get().audio.isGeneratingSpeech) {
-        get().audioStop();
+    addUserMessage: async (chatId: string, userMessage: string, images?: AttachedImage[]) => {
+      console.debug(`[CHAT-STORE] addUserMessage called for chat ${chatId}`);
+      const chatState = get().chats.loaded.get(chatId);
+      if (!chatState) {
+        console.error(`[CHAT-STORE] Chat ${chatId} not found in addUserMessage`);
+        return;
       }
       
-      try {
-        // Create and add user message
-        const newMessage = createUserMessage(userMessage, images);
-        if (newMessage.content.length > 0) {
-          get().addMessage(newMessage);
-          get().setIsGenerating(true);
-          await get().runConversationTurnWithContext();
-        }
-      } catch (error) {
-        console.error("Error preparing conversation turn:", error);
-        new Notice(t('errors.setup', { error: error instanceof Error ? error.message : "Unknown error" }));
-        get().setIsGenerating(false);
+      console.debug(`[CHAT-STORE] Chat ${chatId} found in addUserMessage, conversation ID: ${chatState.chat.meta.id}`);
+
+      // Clear input state since message is being sent
+      get().clearInputState(chatId);
+
+      // Check if this is the first message
+      const isFirstMessage = chatState.chat.storedConversation.messages.length === 0;
+
+      // Create user message
+      const userMessage_ = createUserMessage(userMessage, images);
+      
+      // Add to conversation
+      get().addMessage(chatId, userMessage_);
+
+      // Mark as having backing file on first message
+      if (isFirstMessage) {
+        get().markChatAsHavingBackingFile(chatId);
       }
+
+      // If this is the first message and no title is set, generate a better one from the message
+      if (isFirstMessage && chatState.chat.meta.title === t('chat.titles.newChat')) {
+        const generatedTitle = userMessage.length > 50 ? 
+          userMessage.substring(0, 47) + '...' : 
+          userMessage;
+        
+        set((state) => {
+          const chatToUpdate = state.chats.loaded.get(chatId);
+          if (chatToUpdate) {
+            chatToUpdate.chat.meta.title = generatedTitle;
+            chatToUpdate.chat.meta.updatedAt = Date.now();
+          }
+        });
+      }
+
+      // Save conversation if it has a backing file
+      if (chatState.hasBackingFile || isFirstMessage) {
+        await get().saveImmediatelyIfNeeded(chatId);
+      }
+
+      // Run AI response
+      await get().runConversationTurnWithContext(chatId);
     },
     
-    editUserMessage: async (messageIndex, newContent, images) => {
+    editUserMessage: async (chatId: string, messageIndex: number, newContent: string, images?: AttachedImage[]) => {
+      const chatState = get().getChatState(chatId);
+      if (!chatState) return;
+      
       if (get().audio.isSpeaking || get().audio.isGeneratingSpeech) {
         get().audioStop();
       }
       
       // Validate message index
-      if (messageIndex < 0 || messageIndex >= get().chats.current.storedConversation.messages.length) {
+      if (messageIndex < 0 || messageIndex >= chatState.chat.storedConversation.messages.length) {
         console.error(`Invalid message index for editing: ${messageIndex}`);
         return;
       }
 
-      const targetMessage = get().chats.current.storedConversation.messages[messageIndex];
+      const targetMessage = chatState.chat.storedConversation.messages[messageIndex];
       if (targetMessage.role !== "user") {
         console.error(`Can only edit user messages. Message at index ${messageIndex} has role: ${targetMessage.role}`);
         return;
       }
 
       // Abort current generation if any
-      if (get().chats.isGenerating) {
-        get().setIsGenerating(false);
+      if (chatState.isGenerating) {
+        get().setIsGenerating(chatId, false);
       }
 
       // Truncate conversation and update the edited message
-      const conversationUpToEdit = get().chats.current.storedConversation.messages.slice(0, messageIndex + 1);
+      const conversationUpToEdit = chatState.chat.storedConversation.messages.slice(0, messageIndex + 1);
       const newMessage = createUserMessage(newContent, images);
       conversationUpToEdit[messageIndex] = newMessage;
       
       set((state) => {
-        state.chats.current.storedConversation.messages = conversationUpToEdit;
-        state.chats.editingMessage = null;
+        const chatState = state.chats.loaded.get(chatId);
+        if (chatState) {
+          chatState.chat.storedConversation.messages = conversationUpToEdit;
+          chatState.editingMessage = null;
+        }
       });
 
       // Trigger debounced autosave after content change
-      get().saveImmediatelyIfNeeded(true);
+      get().saveImmediatelyIfNeeded(chatId, true);
 
       // Trigger new AI response if there's content
       if (newMessage.content.length > 0) {
-        get().setIsGenerating(true);
-        await get().runConversationTurnWithContext();
+        get().setIsGenerating(chatId, true);
+        await get().runConversationTurnWithContext(chatId);
       }
     },
     
-    startEditingMessage: (messageIndex) => {
-      const state = get();
-      if (messageIndex < 0 || messageIndex >= state.chats.current.storedConversation.messages.length) {
+    startEditingMessage: (chatId: string, messageIndex: number) => {
+      const chatState = get().getChatState(chatId);
+      if (!chatState) return;
+      
+      if (messageIndex < 0 || messageIndex >= chatState.chat.storedConversation.messages.length) {
         console.error(`Invalid message index for editing: ${messageIndex}`);
         return;
       }
 
-      const targetMessage = state.chats.current.storedConversation.messages[messageIndex];
+      const targetMessage = chatState.chat.storedConversation.messages[messageIndex];
       if (targetMessage.role !== "user") {
         console.error(`Can only edit user messages. Message at index ${messageIndex} has role: ${targetMessage.role}`);
         return;
       }
 
       const { text, images } = extractUserMessageContent(targetMessage);
-      state.setEditingMessage({
+      get().setEditingMessage(chatId, {
         index: messageIndex,
         content: text,
         images: images
       });
     },
     
-    cancelEditingMessage: () => {
-      const state = get();
-      state.setEditingMessage(null);
+    cancelEditingMessage: (chatId: string) => {
+      get().setEditingMessage(chatId, null);
     },
-    
-    // Helper method for conversation turn logic
-    runConversationTurnWithContext: async () => {
-      abortController = new AbortController();
-      const signal = abortController.signal;
+
+    runConversationTurnWithContext: async (chatId: string) => {
+      console.debug(`[CHAT-STORE] runConversationTurnWithContext called for chat ${chatId}`);
+      const chatState = get().getChatState(chatId);
+      if (!chatState) {
+        console.error(`[CHAT-STORE] Chat ${chatId} not found in runConversationTurnWithContext`);
+        return;
+      }
+      
+      console.debug(`[CHAT-STORE] Chat ${chatId} found, conversation ID: ${chatState.chat.meta.id}`);
+      
       try {
-        // Prepare context and tools
-        const plugin = LifeNavigatorPlugin.getInstance();
+        // Create abort controller for this chat
+        const newAbortController = new AbortController();
         
-        if (!plugin) {
-          throw new Error('Plugin instance not available');
-        }
-        
-        const obsidianTools = getObsidianTools();
-        
-        const currentActiveMode = get().modes.available[get().modes.activeId];
-        
-        // Get tools asynchronously
-        const tools = currentActiveMode 
-          ? await obsidianTools.getToolsForMode(currentActiveMode)
-          : await obsidianTools.getTools();
+        set((state) => {
+          const chatState = state.chats.loaded.get(chatId);
+          if (chatState) {
+            chatState.abortController = newAbortController;
+          }
+        });
 
-        // Run conversation turn with direct store access
-        const finalAssistantMessage = await runConversationTurn(
-          tools,
-          signal
-        );
+                 // Get tools for the current mode
+         const plugin = LifeNavigatorPlugin.getInstance();
+         if (!plugin) {
+           throw new Error('Plugin instance not available');
+         }
+         
+                 const obsidianTools = getObsidianTools();
+        const chatActiveModeId = chatState.activeModeId || DEFAULT_MODE_ID;
+        const currentActiveMode = get().modes.available[chatActiveModeId];
+         const tools = currentActiveMode 
+           ? await obsidianTools.getToolsForMode(currentActiveMode)
+           : await obsidianTools.getTools();
 
-        if (!finalAssistantMessage) return;
-        if (signal.aborted) return;
-	
-        const contentBlocks = ensureContentBlocks(finalAssistantMessage.content);
-        const textForTTS = extractTextForTTS(contentBlocks);
+         console.debug(`[CHAT-STORE] Calling runConversationTurn with chatId: ${chatId}`);
+         await runConversationTurn(tools, newAbortController.signal, chatId, chatActiveModeId);
         
-        // Get current mode and check autoplay setting
-        const defaultMode = getDefaultLNMode();
-        const autoplayEnabled = !!currentActiveMode?.voice_autoplay;
-        
-        // Only auto-play if both the global setting and the mode-specific autoplay are enabled
-        if (autoplayEnabled && textForTTS.trim().length > 0) {
-          get().speakingStart(textForTTS);
-        }
+        // Clear abort controller on success
+        set((state) => {
+          const chatState = state.chats.loaded.get(chatId);
+          if (chatState) {
+            chatState.abortController = null;
+          }
+        });
+
       } catch (error) {
         console.error("Error in conversation turn:", error);
 
@@ -419,40 +581,53 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
           }]
         };
         
-        get().addMessage(errorMessage);
-       
+        get().addMessage(chatId, errorMessage);
         
         // Ensure generating state is cleared even on error
-        const currentState = get();
-        currentState.setIsGenerating(false);
+        get().setIsGenerating(chatId, false);
       }
     },
 
-    chatStop: () => {
-      if (abortController) {
-        abortController.abort();
-        abortController = null;
+    chatStop: (chatId: string) => {
+      const chatState = get().getChatState(chatId);
+      if (chatState?.abortController) {
+        chatState.abortController.abort();
+        set((state) => {
+          const chatState = state.chats.loaded.get(chatId);
+          if (chatState) {
+            chatState.abortController = null;
+          }
+        });
       }
     },
 
-    saveImmediatelyIfNeeded: async (force?: boolean) => {
-      const needsToBeSaved = saveTimeout || force;
+    saveImmediatelyIfNeeded: async (chatId: string, force?: boolean) => {
+      const chatState = get().getChatState(chatId);
+      if (!chatState) return;
       
-      if (saveTimeout) {
-        clearTimeout(saveTimeout);
-        saveTimeout = null;
+      const needsToBeSaved = chatState.saveTimeout || force;
+      
+      if (chatState.saveTimeout) {
+        clearTimeout(chatState.saveTimeout);
+        set((state) => {
+          const chatState = state.chats.loaded.get(chatId);
+          if (chatState) {
+            chatState.saveTimeout = null;
+          }
+        });
       }
 
       if (needsToBeSaved) {
-        await get().autoSaveConversation();
+        await get().autoSaveConversation(chatId);
       }
     },
 
-    retryFromMessage: async (messageIndex: number) => {
-      const state = get();
+    retryFromMessage: async (chatId: string, messageIndex: number) => {
+      const chatState = get().getChatState(chatId);
+      if (!chatState) return;
       
       // Validate message index
-      const currentMessages = state.chats.current.storedConversation.messages;
+      const currentMessages = chatState.chat.storedConversation.messages;
       if (messageIndex < 0 || messageIndex >= currentMessages.length) {
         console.error(`Invalid message index for retry: ${messageIndex}`);
         return;
@@ -463,22 +638,28 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       
       // Update the conversation without the message and everything after it
       set((state) => {
-        state.chats.current.storedConversation.messages = messagesUpToRetry;
+        const chatState = state.chats.loaded.get(chatId);
+        if (chatState) {
+          chatState.chat.storedConversation.messages = messagesUpToRetry;
+        }
       });
       
       // Trigger debounced autosave after content change
-      state.saveImmediatelyIfNeeded(true);
+      get().saveImmediatelyIfNeeded(chatId, true);
       
       // Retry the conversation
-      await state.runConversationTurnWithContext();
+      await get().runConversationTurnWithContext(chatId);
     },
 
     // Cost tracking implementation
-    updateCostEntry: (model: string, usage: ApiUsageData, timestamp: number, duration?: number, apiCallId?: string) => {
+    updateCostEntry: (chatId: string, model: string, usage: ApiUsageData, timestamp: number, duration?: number, apiCallId?: string) => {
       set((state) => {
+        const chatState = state.chats.loaded.get(chatId);
+        if (!chatState) return;
+        
         // Initialize cost data if it doesn't exist
-        if (!state.chats.current.storedConversation.costData) {
-          state.chats.current.storedConversation.costData = {
+        if (!chatState.chat.storedConversation.costData) {
+          chatState.chat.storedConversation.costData = {
             total_cost: 0,
             total_input_tokens: 0,
             total_output_tokens: 0,
@@ -492,7 +673,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         const costEntry = calculateApiCallCost(model, usage, timestamp, duration, apiCallId);
         
         // Update the existing entry with new values
-        const existingEntry = state.chats.current.storedConversation.costData?.entries.find(entry => 
+        const existingEntry = chatState.chat.storedConversation.costData?.entries.find(entry => 
           entry.id === costEntry.id
         );
 
@@ -505,16 +686,63 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
           existingEntry.duration = costEntry.duration;
           existingEntry.usage = costEntry.usage;
         } else {
-          state.chats.current.storedConversation.costData?.entries.push(costEntry);
+          chatState.chat.storedConversation.costData?.entries.push(costEntry);
         }
 
         // Recalculate totals
-        const newTotals = calculateChatCostData(state.chats.current.storedConversation.costData.entries);
-        state.chats.current.storedConversation.costData = newTotals;
+        const newTotals = calculateChatCostData(chatState.chat.storedConversation.costData.entries);
+        chatState.chat.storedConversation.costData = newTotals;
       });
       
       // Save the conversation with the new cost data
-      get().saveImmediatelyIfNeeded(true);
+      get().saveImmediatelyIfNeeded(chatId, true);
+    },
+
+    setActiveModeForChat: (chatId: string, modeId: string) => {
+      set((state) => {
+        const chatState = state.chats.loaded.get(chatId);
+        if (chatState) {
+          chatState.activeModeId = modeId;
+          chatState.chat.storedConversation.modeId = modeId;
+        }
+      });
+    },
+
+    getActiveModeForChat: (chatId: string) => {
+      const chatState = get().chats.loaded.get(chatId);
+      return chatState?.activeModeId || null;
+    },
+
+    updateInputState: (chatId: string, inputState: Partial<InputState>) => {
+      set((state) => {
+        const chatState = state.chats.loaded.get(chatId);
+        if (chatState) {
+          Object.assign(chatState.inputState, inputState);
+        }
+      });
+    },
+
+    getInputState: (chatId: string) => {
+      const chatState = get().chats.loaded.get(chatId);
+      return chatState?.inputState || { text: '', attachedImages: [] };
+    },
+
+    clearInputState: (chatId: string) => {
+      set((state) => {
+        const chatState = state.chats.loaded.get(chatId);
+        if (chatState) {
+          chatState.inputState = { text: '', attachedImages: [] };
+        }
+      });
+    },
+
+    markChatAsHavingBackingFile: (chatId: string) => {
+      set((state) => {
+        const chatState = state.chats.loaded.get(chatId);
+        if (chatState) {
+          chatState.hasBackingFile = true;
+        }
+      });
     }
   }
 }; 

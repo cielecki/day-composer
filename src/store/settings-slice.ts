@@ -22,7 +22,6 @@ export interface SettingsSlice {
   settings: {
     secrets: Record<string, string>;
     speechToTextPrompt: string;
-    activeModeId: string;
     tutorial: TutorialSettings;
     isLoading: boolean;
   };
@@ -30,7 +29,6 @@ export interface SettingsSlice {
   // Actions - moved and expanded from LifeNavigatorSettings class
   updateSettings: (updates: Partial<{
     speechToTextPrompt: string;
-    activeModeId: string;
     tutorial: TutorialSettings;
   }>) => void;
   setSecret: (key: string, value: string) => Promise<void>;
@@ -114,7 +112,6 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
     settings: {
       secrets: {},
       speechToTextPrompt: '',
-      activeModeId: '',
       tutorial: {
         obsidianLanguageConfigured: false,
         openaiKeySkipped: false
@@ -153,7 +150,6 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
     resetSettings: () => set((state) => {
       state.settings.secrets = {};
       state.settings.speechToTextPrompt = '';
-      state.settings.activeModeId = '';
       state.settings.tutorial = {
         obsidianLanguageConfigured: false,
         openaiKeySkipped: false

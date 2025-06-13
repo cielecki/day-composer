@@ -79,7 +79,8 @@ export const processAnthropicStream = async (
 					}
 					
 					callbacks.onMessageStart?.();
-					callbacks.onMessageUpdate?.(localMessage);
+					// Create a fresh copy for the callback to avoid proxy issues
+					callbacks.onMessageUpdate?.({ ...localMessage });
 					break;
 
 				case "content_block_start": {
@@ -136,7 +137,8 @@ export const processAnthropicStream = async (
 					if (localMessage) {
 						finalContent = newContent;
 						localMessage.content = newContent;
-						callbacks.onMessageUpdate?.(localMessage);
+						// Create a fresh copy for the callback to avoid proxy issues
+						callbacks.onMessageUpdate?.({ ...localMessage, content: [...newContent] });
 					}
 					break;
 				}
@@ -176,7 +178,8 @@ export const processAnthropicStream = async (
 
 					finalContent = updatedContent;
 					localMessage.content = updatedContent;
-					callbacks.onMessageUpdate?.(localMessage);
+					// Create a fresh copy for the callback to avoid proxy issues
+					callbacks.onMessageUpdate?.({ ...localMessage, content: [...updatedContent] });
 					break;
 				}
 				case "content_block_stop": {
@@ -196,7 +199,8 @@ export const processAnthropicStream = async (
 							finalContent = contentCopy;
 							localMessage.content = contentCopy;
 							delete thinkingBlocksInProgress[stopIndex]; // Remove from tracking
-							callbacks.onMessageUpdate?.(localMessage);
+							// Create a fresh copy for the callback to avoid proxy issues
+							callbacks.onMessageUpdate?.({ ...localMessage, content: [...contentCopy] });
 						}
 					}
 
@@ -213,7 +217,8 @@ export const processAnthropicStream = async (
 									contentCopy[stopIndex] = toolBlock;
 									finalContent = contentCopy;
 									localMessage.content = contentCopy;
-									callbacks.onMessageUpdate?.(localMessage);
+									// Create a fresh copy for the callback to avoid proxy issues
+									callbacks.onMessageUpdate?.({ ...localMessage, content: [...contentCopy] });
 								}
 							} catch (e) {
 								console.error(`JSON parse error for block ${stopIndex}`, e);
@@ -242,10 +247,12 @@ export const processAnthropicStream = async (
 						if (hasChanges) {
 							finalContent = finalContentCopy;
 							localMessage.content = finalContentCopy;
-							callbacks.onMessageUpdate?.(localMessage);
+							// Create a fresh copy for the callback to avoid proxy issues
+							callbacks.onMessageUpdate?.({ ...localMessage, content: [...finalContentCopy] });
 						}
 
-						callbacks.onMessageStop?.(localMessage);
+						// Create a fresh copy for the callback to avoid proxy issues
+						callbacks.onMessageStop?.({ ...localMessage, content: [...finalContent] });
 					}
 
 					thinkingBlocksInProgress = {};
@@ -293,7 +300,8 @@ export const processAnthropicStream = async (
 			if (hasChanges) {
 				finalContent = finalContentCopy;
 				localMessage.content = finalContentCopy;
-				callbacks.onMessageUpdate?.(localMessage);
+				// Create a fresh copy for the callback to avoid proxy issues
+				callbacks.onMessageUpdate?.({ ...localMessage, content: [...finalContentCopy] });
 			}
 		}
 	}

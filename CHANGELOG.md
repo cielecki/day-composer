@@ -2,12 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-
-### Developer Experience
-- Automated final review workflow using AI-powered script instead of manual 7-step process
-
-
 ## [0.11.3] - 2025-01-11
 
 ### 🚀 New Chat Menu - Everything You Need in One Place
@@ -161,8 +155,6 @@ Have your ai use `` `🧭 tools_list()` `` to see all available tools for your c
 ---
 
 **Ready to Upgrade?** Life Navigator will guide you through the process. Look for the fix buttons and let the AI help you migrate your content to the new, more powerful format!
-
-
 
 ## [0.10.6] - 2025-06-06
 
@@ -409,6 +401,20 @@ change: enforce thinking in claude, as it's needed for handover to work
 
 ## [Unreleased]
 
+### 🚀 Performance Improvements
+
+- **Lightning-fast conversation history**: Completely redesigned the conversation history dropdown with virtual scrolling and smart lazy loading. Opening the dropdown is now instant even with hundreds of conversations, and titles load progressively as you scroll. Conversations are intelligently preloaded into memory for instant switching when you hover near them.
+
+### 🎯 Visual Feedback for Active Chats
+
+- **Pulsating active chat indicator**: Chat history now shows a subtle pulsating animation for any conversation that is currently generating a response. When you have multiple chats running simultaneously, you can easily see which ones are actively working just by glancing at the chat history dropdown.
+
+### 🔄 Automatic Conversation Migration
+
+- **Seamless old conversation access**: Old conversation files from previous versions are now automatically migrated when accessed. No need to run migration scripts - just open any old conversation and it will be seamlessly converted to the new format in the background. Your old chats remain fully accessible while benefiting from the improved performance of the new file format.
+
+- **Simplified file storage**: Conversation files now use simple ID-based names (like `conv_123456.json`) instead of complex title-based names. All metadata including titles and read status is stored inside the file contents, eliminating file renaming operations and improving reliability. This makes the system faster and more robust, especially when managing large numbers of conversations.
+
 ### 🚀 New System Prompt View
 
 **View system prompts in a dedicated view instead of modal for a much better experience:**
@@ -416,3 +422,57 @@ change: enforce thinking in claude, as it's needed for handover to work
 ### 🚀 Improved View Opening Behavior
 
 **Life Navigator now opens views (system prompts, cost analysis,etc.) just like Obsidian opens files - smart, consistent, and user-friendly**
+
+### Added
+- **Multiple Chat Support**: Life Navigator now supports loading and managing multiple conversations simultaneously
+  - Each view can maintain its own active chat without affecting other views
+  - Chat state (messages, generation status, editing state) is now isolated per chat
+  - Added `loadChat`, `unloadChat`, and `createNewChat` functions to the store
+  - Conversation database now works with specific chat IDs
+  - Chat stop and autosave functions are now per-chat
+
+### Changed
+- **Chat Store Architecture**: Completely refactored to support multiple loaded chats
+  - Replaced single `current` chat with a `loaded` Map of chat ID → ChatWithState
+  - All chat-related actions now require a `chatId` parameter
+  - Per-chat state includes: isGenerating, editingMessage, liveToolResults, abortController, saveTimeout
+  - The `activeId` is now managed at the component level instead of globally
+
+### Technical Details
+- Extended `Chat` interface with new `ChatWithState` type for runtime state management
+- Updated `runConversationTurn` to work with specific chat IDs
+- Modified database slice to handle chat ID-based operations
+- Component-level state management for active chat selection
+
+
+### 🚀 Critical Multi-Chat System Fixes
+
+- **Fixed chat loading from history**: Resolved issue where loading conversations from the history dropdown would fail to properly initialize chat state, causing assistant messages to not appear and conversations to become unresponsive
+- **Fixed missing mode state in loaded chats**: When loading conversations from history, the chat's active mode is now properly restored from the saved conversation data instead of using the global mode
+- **Enhanced chat initialization**: Added robust chat loading verification to ensure chats are properly loaded before use, with automatic fallback for missing chats
+- **Improved conversation selection**: History dropdown now properly opens conversations in new tabs using the plugin's standardized view management system
+- **Better error handling**: Chat loading failures now provide clear feedback and graceful degradation instead of silent failures
+- **Fixed chat interruption on view switching**: Chats now continue running in the background when switching between conversations, allowing multiple chats to operate independently without interrupting each other
+- **Added "Open in New Tab" option**: New menu item in the 3-dot menu allows you to open the current chat in a new tab for better multi-chat workflow
+
+### 🎯 What This Means for You
+
+The multi-chat system now works reliably:
+- Loading conversations from history works properly and maintains their original mode settings
+- Assistant messages appear correctly in loaded conversations
+- Each chat maintains its own independent state and mode configuration
+- Conversation selection opens properly in new tabs for better organization
+- Chats continue running in the background when you switch views, so you can have multiple conversations going simultaneously
+- Easy access to open any chat in a new tab via the 3-dot menu for better workspace organization
+
+### Improved
+- **Ribbon icon behavior**: Clicking the Life Navigator ribbon icon now focuses existing views in the right sidebar instead of always creating new ones, preventing duplicate panels and providing better workspace management
+- **Simplified default mode system**: Replaced complex `getDefaultModeId()` logic with a simple constant that always defaults to the Guide mode, eliminating user confusion and simplifying the codebase significantly
+
+### Fixed
+- **Conversation history dropdown sizing**: Fixed virtual dropdown list where skeleton items (loading placeholders) had different heights than loaded items, causing jarring size changes when items loaded. The dropdown now shows consistent item heights throughout the loading process for a smoother experience.
+- **Task text handling**: All task-related tools now consistently handle todo text by removing task markers (e.g. '- [ ]') and cleaning up whitespace. This ensures uniform behavior across all task operations.
+
+### Developer Experience
+- Automated final review workflow using AI-powered script instead of manual 7-step process
+

@@ -2,6 +2,12 @@ import { LNMode } from 'src/types/mode';
 import { TTS_VOICES, TTSVoice } from "src/store/audio-slice";
 import { ANTHROPIC_MODELS, AnthropicModel } from 'src/types/anthropic-models';
 
+/**
+ * Default mode ID - the guide mode is always used as the default
+ * This replaces the complex getDefaultModeId logic
+ */
+export const DEFAULT_MODE_ID = ':prebuilt:guide'; 
+
 // Re-export for backward compatibility
 export { ANTHROPIC_MODELS };
 export type { AnthropicModel };

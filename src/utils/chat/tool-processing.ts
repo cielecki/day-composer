@@ -13,6 +13,7 @@ export const processToolUseBlocks = async (
 	toolUseBlocks: ToolUseBlock[],
 	obsidianTools: ReturnType<typeof import("../../obsidian-tools").getObsidianTools>,
 	signal: AbortSignal,
+	chatId: string,
 	onToolResultUpdate?: (toolId: string, result: ToolResultBlock) => void
 ): Promise<ToolProcessingResult> => {
 	const toolResults: ToolResultBlock[] = [];
@@ -42,6 +43,7 @@ export const processToolUseBlocks = async (
 				toolUseBlock.name,
 				toolUseBlock.input,
 				signal,
+				chatId,
 				(message: string) => {
 					// Create new result object with updated content (immutable)
 					const newContent = currentResult.content ? `${currentResult.content}\n${message}` : message;

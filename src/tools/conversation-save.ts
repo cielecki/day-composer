@@ -1,5 +1,5 @@
 import { ObsidianTool } from "../obsidian-tools";
-import { ToolResultBlock } from '../types/message';
+import { ToolResultBlock, Message, ContentBlock } from '../types/message';
 import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { getStore } from "../store/plugin-store";
@@ -7,6 +7,7 @@ import { formatConversationContent } from "../utils/chat/conversation-formatter"
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { t } from 'src/i18n';
+import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
 
 const schema = {
   name: "conversation_save",
@@ -80,16 +81,22 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
     return t('tools.conversationSave.labels.initial');
   },
   execute: async (context: ToolExecutionContext<ConversationSaveToolInput>): Promise<void> => {
-    const { plugin, params } = context;
+    const { plugin, params, chatId } = context;
     const { path, title, include_metadata = true, auto_version = true } = params;
 
     context.setLabel(t('tools.conversationSave.labels.inProgress'));
 
     try {
-      // Get the current conversation from the store
+      // Get the current conversation from the store using chatId
       const store = getStore();
-      const conversation = store.chats.current.storedConversation.messages;
-      const conversationTitle = title || store.chats.current.meta.title || 'Untitled Conversation';
+      const chatState = store.getChatState(chatId);
+      
+      if (!chatState) {
+        throw new ToolExecutionError(`Chat ${chatId} not found`);
+      }
+      
+      const conversation = chatState.chat.storedConversation.messages;
+      const conversationTitle = title || chatState.chat.meta.title || t('chat.titles.newChat');
 
       if (!conversation || conversation.length === 0) {
         throw new ToolExecutionError(t('tools.conversationSave.progress.empty'));
@@ -112,12 +119,13 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
       }
 
       // Create a conversation with up-to-date tool results by merging live tool results
-      const conversationWithLiveResults = conversation.map(message => {
+      const conversationWithLiveResults = conversation.map((message: Message) => {
         if (Array.isArray(message.content)) {
-          const updatedContent = message.content.map(block => {
+          const updatedContent = message.content.map((block: ContentBlock) => {
             // If this is a tool_result block, check if we have a newer version in live results
             if (block.type === 'tool_result') {
-              const liveResult = store.chats.liveToolResults.get(block.tool_use_id);
+              const toolResultBlock = block as ToolResultBlock;
+              const liveResult = chatState.liveToolResults.get(toolResultBlock.tool_use_id);
               if (liveResult && liveResult.is_complete) {
                 // Use the live result which has the most up-to-date label
                 return liveResult;
@@ -138,7 +146,8 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
       
       if (include_metadata) {
         const currentDate = new Date().toLocaleString();
-        const activeMode = store.modes.available[store.modes.activeId];
+        const activeModeId = chatState.activeModeId || DEFAULT_MODE_ID;
+        const activeMode = store.modes.available[activeModeId];
         const modeName = activeMode ? activeMode.name : 'Unknown';
         
         noteContent += `# ${conversationTitle}\n\n`;

@@ -87,7 +87,6 @@
 .life-navigator-view .message.user {
   align-self: flex-end;
   max-width: 80%;
-  background-color: var(--background-secondary);
   color: var(--text-normal);
 }
 

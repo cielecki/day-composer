@@ -23,19 +23,22 @@ import { MessageWithId } from '../store/chat-store';
 import { useAutoscroll } from '../hooks/useAutoscroll';
 import { ValidationFixButton } from './ValidationFixButton';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
+import { LIFE_NAVIGATOR_VIEW_TYPE, ChatView } from '../views/chat-view';
 import { handleDeleteConversation } from 'src/utils/chat/delete-conversation-handler';
 import { revealFileInSystem } from 'src/utils/chat/reveal-file-handler';
 import { PlatformUtils } from 'src/utils/platform';
+import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
 
 // Add Zustand store imports
 import {
 	usePluginStore
 } from "../store/plugin-store";
-import { ConversationMeta } from "src/utils/chat/conversation";
 
-// Global Window interface now handled in reveal-file-handler.ts
+interface ChatAppProps {
+	chatId: string;
+}
 
-export const LifeNavigatorApp: React.FC = () => {
+export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const modeIndicatorRef = useRef<HTMLDivElement>(null);
 	const dropdownRef = useRef<HTMLDivElement>(null);
@@ -45,45 +48,43 @@ export const LifeNavigatorApp: React.FC = () => {
 	const [conversationHistoryOpen, setConversationHistoryOpen] = useState(false);
 	const conversationHistoryContainerRef = useRef<HTMLDivElement>(null);
 
-	// Access specific state slices from the store with granular subscriptions
-	// Use stable selectors to prevent infinite loops
-	const rawConversation = usePluginStore(
-		useCallback((state) => state.chats.current.storedConversation.messages, [])
+	// Access all store state in a consistent order
+	const chatState = usePluginStore(
+		useCallback((state) => state.getChatState(chatId), [chatId])
 	);
-	const isGeneratingResponse = usePluginStore(state => state.chats.isGenerating);
-	const editingMessage = usePluginStore(state => state.chats.editingMessage);
-	const liveToolResults = usePluginStore(state => state.chats.liveToolResults);
 	const availableModes = usePluginStore(state => state.modes.available);
-	const activeModeId = usePluginStore(state => state.modes.activeId);
 	const isModesLoading = usePluginStore(state => state.modes.isLoading);
 	const isSpeaking = usePluginStore(state => state.audio.isSpeaking);
+	const isGeneratingSpeech = usePluginStore(state => state.audio.isGeneratingSpeech);
 	const audioStop = usePluginStore(state => state.audioStop);
 	const chatStop = usePluginStore(state => state.chatStop);
+	
+	// Derive values from store state (no additional hooks)
+	const chatActiveModeId = chatState?.activeModeId || DEFAULT_MODE_ID;
+	const rawConversation = chatState?.chat.storedConversation.messages || [];
+	const isGeneratingResponse = chatState?.isGenerating || false;
+	const editingMessage = chatState?.editingMessage || null;
+	const liveToolResults = chatState?.liveToolResults || new Map();
+	const currentConversationMeta = chatState?.chat.meta || null;
 
+	// Store methods that now require chatId
+	const loadConversation = usePluginStore(state => state.loadConversation);
+	const deleteConversation = usePluginStore(state => state.deleteConversation);
+	const loadChat = usePluginStore(state => state.loadChat);
+	const createNewChat = usePluginStore(state => state.createNewChat);
 
 	// Create a stable reference to the conversation to prevent proxy issues
-	// Only recreate when the conversation content actually changes
 	const stableConversation = useMemo(() => {
-		// Create a new array reference to avoid proxy issues
 		return rawConversation ? [...rawConversation] : [];
 	}, [rawConversation]);
 
-	// Actions
+	// Actions that now require chatId
 	const clearChat = usePluginStore(state => state.clearChat);
-	const setActiveModeWithPersistence = usePluginStore(state => state.setActiveModeWithPersistence);
-
-	// Use actual store methods instead of placeholder functions
+	const setActiveModeForChat = usePluginStore(state => state.setActiveModeForChat);
 	const addUserMessage = usePluginStore(state => state.addUserMessage);
-	const loadConversation = usePluginStore(state => state.loadConversation);
-	const deleteConversation = usePluginStore(state => state.deleteConversation);
-	const currentConversationId = usePluginStore(state => state.getCurrentConversationId());
-	const getSystemPrompt = usePluginStore(state => state.getSystemPrompt);
 
-	const currentConversationMeta = usePluginStore(state => state.chats.current.meta);
-
-
-	// Get active mode
-	const activeMode = availableModes[activeModeId];
+	// Get active mode (chat-specific or global fallback)
+	const activeMode = availableModes[chatActiveModeId];
 
 	const conversationContainerRef = useRef<HTMLDivElement>(null);
 
@@ -215,14 +216,36 @@ export const LifeNavigatorApp: React.FC = () => {
 		}
 	}, [autoscrollRef]);
 
+	// CRITICAL: Ensure chat is loaded when component mounts
+	useEffect(() => {
+		const ensureChatLoaded = async () => {
+			// If chat state doesn't exist, try to load it
+			if (!chatState) {
+				console.debug(`Chat ${chatId} not found, attempting to load or create...`);
+				
+				// Try to load from database first
+				const loaded = await loadChat(chatId);
+				
+				if (!loaded) {
+					// If loading failed, this might be a new chat ID that needs to be created
+					console.debug(`Failed to load chat ${chatId}, this might be a new chat`);
+					// Note: We don't create here as it could cause ID conflicts
+					// The ChatView should handle creating new chats
+				}
+			}
+		};
+
+		ensureChatLoaded();
+	}, [chatId, chatState, loadChat]);
+
 	// Check if the active mode is actually available
-	const isModeLoading = activeModeId && !availableModes[activeModeId];
+	const isModeLoading = chatActiveModeId && !availableModes[chatActiveModeId];
 
 	const toggleDropdown = useCallback(() => {
 		setDropdownOpen(!dropdownOpen);
 	}, [dropdownOpen]);
 
-	// Handle clicks outside the dropdown to close it
+	// Handle clicks outside dropdowns and menus to close them
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
@@ -277,18 +300,53 @@ export const LifeNavigatorApp: React.FC = () => {
 		};
 	}, [conversationHistoryOpen]);
 
+	// Handle mode switching for this specific chat
+	const handleModeSwitch = useCallback(async (modeId: string) => {
+		// Only update this chat's mode - don't affect global mode or other chats
+		setActiveModeForChat(chatId, modeId);
+	}, [setActiveModeForChat, chatId]);
+
+	// Handle user message with chat ID
+	const handleAddUserMessage = useCallback(async (message: string, images?: any[]) => {
+		await addUserMessage(chatId, message, images);
+	}, [addUserMessage, chatId]);
+
+	// Handle clear chat for this specific chat
+	const handleClearChat = useCallback(() => {
+		clearChat(chatId);
+	}, [clearChat, chatId]);
+
+	// Handle chat stop for this specific chat
+	const handleChatStop = useCallback(() => {
+		chatStop(chatId);
+	}, [chatStop, chatId]);
+
+	// Handle conversation selection (for history dropdown)
 	const handleConversationSelect = async (conversationId: string) => {
 		try {
-			if (isSpeaking || isGeneratingResponse) {
+			// Only stop audio, don't stop the chat generation
+			if (isSpeaking || isGeneratingSpeech) {
 				audioStop();
 			}
-			chatStop();
-			await loadConversation(conversationId);
+			
+			// Load the conversation and update the current view's state
+			const success = await loadConversation(conversationId);
+			
+			if (success) {
+				// Find the current ChatView and update its chatId
+				const plugin = LifeNavigatorPlugin.getInstance();
+				const activeLeaf = plugin.app.workspace.activeLeaf;
+				
+				if (activeLeaf && activeLeaf.view.getViewType() === LIFE_NAVIGATOR_VIEW_TYPE) {
+					const chatView = activeLeaf.view as ChatView;
+					chatView.updateChatId(conversationId);
+				}
+			}
+			
 		} catch (error) {
 			console.error('Failed to load conversation:', error);
 		}
 	};
-
 
 	// Render empty conversation content
 	const renderEmptyConversation = () => {
@@ -324,7 +382,7 @@ export const LifeNavigatorApp: React.FC = () => {
 
 												// Wait a short moment before sending to ensure state updates have propagated
 												setTimeout(() => {
-													addUserMessage(usage);
+													handleAddUserMessage(usage);
 												}, 100);
 											}
 										}}
@@ -371,7 +429,7 @@ export const LifeNavigatorApp: React.FC = () => {
 				<div
 					className="chat-bar-title ln-relative ln-overflow-visible"
 				>
-					{/* Flex row for dropdown and menu button */}
+					{/* Flex row for dropdown and new chat button */}
 					<div className="ln-flex ln-items-center ln-gap-1">
 						<div
 							className={`ln-mode-indicator ${dropdownOpen ? 'open' : ''}`}
@@ -471,34 +529,19 @@ export const LifeNavigatorApp: React.FC = () => {
 											{t('ui.mode.openInEditor')}
 										</div>
 									)}
-									{/* <div
+									<div
 										className="ln-mode-action-item"
-										onClick={() => {
-											openSimpleObsidianModal(
-												window.app,
-												t('ui.modal.modeSettings').replace('{{modeName}}', activeMode.ln_name),
-												JSON.stringify(activeMode, null, 2)
-											);
+										onClick={async () => {
+											const plugin = LifeNavigatorPlugin.getInstance();
+											if (plugin && chatActiveModeId) {
+												await plugin.openSystemPrompt(chatActiveModeId);
+											}
 											setDropdownOpen(false);
 										}}
 									>
-										<LucideIcon name="settings" size={16} color="var(--text-normal)" /> 
-										{t('ui.mode.viewSettings')}
-									</div> */}
-																<div
-								className="ln-mode-action-item"
-								onClick={async () => {
-									const plugin = LifeNavigatorPlugin.getInstance();
-									if (plugin) {
-										const activeModeId = usePluginStore.getState().modes.activeId;
-										await plugin.openSystemPrompt(activeModeId);
-									}
-									setDropdownOpen(false);
-								}}
-							>
-								<LucideIcon name="terminal" size={16} color="var(--text-normal)" />
-								{t('ui.mode.viewSystemPrompt')}
-							</div>
+										<LucideIcon name="terminal" size={16} color="var(--text-normal)" />
+										{t('ui.mode.viewSystemPrompt')}
+									</div>
 
 									{/* Separator */}
 									<div className="ln-separator" />
@@ -518,7 +561,7 @@ export const LifeNavigatorApp: React.FC = () => {
 											key={index}
 											className={`ln-mode-list-item ${mode.path === activeMode?.path ? 'active' : ''}`}
 											onClick={async () => {
-												await setActiveModeWithPersistence(mode.path);
+												await handleModeSwitch(mode.path);
 												setDropdownOpen(false);
 											}}
 										>
@@ -548,8 +591,8 @@ export const LifeNavigatorApp: React.FC = () => {
 						aria-label={t('ui.chat.new')}
 						onClick={async () => {
 							// Save current conversation immediately before starting new chat
-							await usePluginStore.getState().saveImmediatelyIfNeeded(false);
-							clearChat();
+							await usePluginStore.getState().saveImmediatelyIfNeeded(chatId, false);
+							handleClearChat();
 						}}
 					>
 						<LucideIcon name="square-pen" size={18} />
@@ -572,7 +615,7 @@ export const LifeNavigatorApp: React.FC = () => {
 								onConversationSelect={handleConversationSelect}
 								isOpen={conversationHistoryOpen}
 								onToggle={() => setConversationHistoryOpen(false)}
-								currentConversationId={currentConversationId}
+								currentConversationId={currentConversationMeta?.id || null}
 							/>
 						)}
 					</div>
@@ -592,7 +635,25 @@ export const LifeNavigatorApp: React.FC = () => {
 								<div className="ln-chat-menu-item" onClick={async () => {
 									try {
 										const plugin = LifeNavigatorPlugin.getInstance();
-										await plugin.openCostAnalysis(currentConversationId || undefined);
+										await plugin.openViewWithStandardBehavior(
+											LIFE_NAVIGATOR_VIEW_TYPE,
+											{ chatId: chatId },
+											undefined,
+											'tab'
+										);
+									} catch (error) {
+										console.error('Failed to open chat in new tab:', error);
+									}
+									setMenuOpen(false);
+								}}>
+									<LucideIcon name="external-link" size={16} />
+									<span>{t('ui.chat.openInNewTab')}</span>
+								</div>
+								<div className="ln-separator" />
+								<div className="ln-chat-menu-item" onClick={async () => {
+									try {
+										const plugin = LifeNavigatorPlugin.getInstance();
+										await plugin.openCostAnalysis(currentConversationMeta?.id || undefined);
 									} catch (error) {
 										console.error('Failed to open cost analysis:', error);
 									}
@@ -604,7 +665,7 @@ export const LifeNavigatorApp: React.FC = () => {
 								{currentConversationMeta && currentConversationMeta.filePath && (
 									<>
 										<div className="ln-chat-menu-item" onClick={async () => {
-											if (currentConversationId) {
+											if (currentConversationMeta?.id) {
 												try {
 													if (currentConversationMeta && currentConversationMeta.filePath) {
 														await revealFileInSystem(currentConversationMeta.filePath);
@@ -619,8 +680,8 @@ export const LifeNavigatorApp: React.FC = () => {
 											<span>{PlatformUtils.getRevealLabel()}</span>
 										</div>
 										<div className="ln-chat-menu-item" onClick={async () => {
-											if (currentConversationId) {
-												await handleDeleteConversation(currentConversationId, deleteConversation);
+											if (currentConversationMeta?.id) {
+												await handleDeleteConversation(currentConversationMeta.id, deleteConversation);
 											}
 											setMenuOpen(false);
 										}}>
@@ -672,6 +733,7 @@ export const LifeNavigatorApp: React.FC = () => {
 						messageIndex={messageIndexMap[index].originalIndex}
 						isLastMessage={index === filteredConversation.length - 1}
 						isGeneratingResponse={isGeneratingResponse}
+						chatId={chatId}
 					/>
 				))}
 
@@ -689,11 +751,10 @@ export const LifeNavigatorApp: React.FC = () => {
 				<div className="button-container">
 					<UnifiedInputArea
 						editingMessage={editingMessage}
+						chatId={chatId}
 					/>
 				</div>
 			</div>}
-
-
 		</div>
 	);
 };

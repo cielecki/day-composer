@@ -36,4 +36,4 @@ export function getPrebuiltModes(): LNMode[] {
  */
 export function isPrebuiltMode(modePath: string): boolean {
 	return modePath.startsWith(':prebuilt:');
-} 
+}

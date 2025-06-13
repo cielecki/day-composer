@@ -8,6 +8,7 @@ export interface ToolExecutionContext<TInput = Record<string, unknown>> {
 	plugin: LifeNavigatorPlugin;
 	params: TInput;
 	signal: AbortSignal;
+	chatId: string; // Current chat ID for per-chat operations
 
 	// Progress reporting (final message serves as result)
 	progress(message: string): void;

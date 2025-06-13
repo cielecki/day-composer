@@ -1,7 +1,7 @@
-import { Plugin, Notice, requestUrl, WorkspaceLeaf, MarkdownView } from 'obsidian';
+import { Plugin, Notice, requestUrl, WorkspaceLeaf } from 'obsidian';
 import { ConfirmReloadModal } from './components/ConfirmReloadModal';
 import { initI18n, t } from './i18n';
-import { LifeNavigatorView, LIFE_NAVIGATOR_VIEW_TYPE } from './views/life-navigator-view';
+import { ChatView, LIFE_NAVIGATOR_VIEW_TYPE } from './views/chat-view';
 import { CostAnalysisView, COST_ANALYSIS_VIEW_TYPE } from './views/cost-analysis-view';
 import { SystemPromptView, SYSTEM_PROMPT_VIEW_TYPE, SystemPromptViewState } from './views/system-prompt-view';
 import { checkForAvailableUpdate, checkForUpdatesOnStartup } from './utils/auto-update/auto-update';
@@ -10,6 +10,7 @@ import { LifeNavigatorSettingTab } from './components/LifeNavigatorSettingTab';
 import { UserDefinedToolManager } from './services/UserDefinedToolManager';
 import { cleanupStore, initializeStore } from './store/store-initialization';
 import { usePluginStore, getStore } from './store/plugin-store';
+import { DEFAULT_MODE_ID } from './utils/modes/ln-mode-defaults';
 
 export class LifeNavigatorPlugin extends Plugin {
 	private static _instance: LifeNavigatorPlugin | null = null;
@@ -46,71 +47,53 @@ export class LifeNavigatorPlugin extends Plugin {
 		openMode?: 'current' | 'tab' | 'split' | 'right'
 	): Promise<WorkspaceLeaf | null> {
 		try {
-			// 1. First check if any existing view of this type is currently active
-			// If so, just update its state instead of creating/finding another view
-			const allLeavesOfType = this.app.workspace.getLeavesOfType(viewType);
-			const activeViewLeaf = allLeavesOfType.find(leaf => {
-				// Check if this leaf is currently active/focused
-				// We can check this by seeing if the tab header has the 'is-active' class
-				try {
-					const tabHeaderEl = (leaf as any).tabHeaderEl;
-					return tabHeaderEl && tabHeaderEl.classList.contains('is-active');
-				} catch (e) {
-					return false;
-				}
-			});
+			let resultLeaf: WorkspaceLeaf | null = null;
 
-			if (activeViewLeaf) {
-				// Active tab is same type - update its state
-				await activeViewLeaf.setViewState({
-					type: viewType,
-					active: true,
-					state: state || {}
+			// Try to find an existing leaf that matches the criteria
+			if (matcher) {
+				this.app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
+					if (leaf.view.getViewType() === viewType && matcher(leaf)) {
+						resultLeaf = leaf;
+						return false; // Stop iteration
+					}
 				});
-				return activeViewLeaf;
 			}
 
+			// If found, reuse the existing leaf
+			if (resultLeaf) {
+				this.app.workspace.setActiveLeaf(resultLeaf);
+				if (state) {
+					await (resultLeaf as WorkspaceLeaf).view.setState(state, { history: true });
+				}
+				return resultLeaf;
+			}
 
-
-			// 2. Determine how to open the new view
-			let targetLeaf: WorkspaceLeaf | null = null;
-
+			// Create a new leaf based on openMode
+			let targetLeaf: WorkspaceLeaf;
+			
 			if (openMode === 'right') {
-				// Force open in right sidebar
-				targetLeaf = this.app.workspace.getRightLeaf(false);
+				targetLeaf = this.app.workspace.getRightLeaf(false) || this.app.workspace.getLeaf('split');
 			} else if (openMode === 'split') {
-				// Force split
 				targetLeaf = this.app.workspace.getLeaf('split');
 			} else if (openMode === 'tab') {
-				// Force new tab
 				targetLeaf = this.app.workspace.getLeaf('tab');
-			} else if (openMode === 'current') {
-				// Force current leaf
+			} else { // 'current' or default
 				targetLeaf = this.app.workspace.getLeaf(false);
-			} else {
-				// Default behavior - create new tab
-				// Since we already handled updating the active tab if it's the same type,
-				// and we already handled existing views, just create a new tab
-				targetLeaf = this.app.workspace.getLeaf('tab');
 			}
 
-			if (!targetLeaf) {
-				console.error('Failed to get target leaf for view:', viewType);
-				return null;
-			}
-
-			// 3. Set view state and reveal
+			// Set the view type
 			await targetLeaf.setViewState({
 				type: viewType,
-				active: true,
 				state: state || {}
 			});
 
-			this.app.workspace.revealLeaf(targetLeaf);
+			// Set as active
+			this.app.workspace.setActiveLeaf(targetLeaf);
+			
 			return targetLeaf;
 
 		} catch (error) {
-			console.error('Error opening view with standard behavior:', error);
+			console.error(`Error opening view ${viewType}:`, error);
 			return null;
 		}
 	}
@@ -178,7 +161,8 @@ export class LifeNavigatorPlugin extends Plugin {
 
 		// Register the view types
 		this.registerView(LIFE_NAVIGATOR_VIEW_TYPE, (leaf) => {
-			return new LifeNavigatorView(leaf);
+			// For chat views, we'll handle chatId during setState
+			return new ChatView(leaf);
 		});
 
 		this.registerView(COST_ANALYSIS_VIEW_TYPE, (leaf) => {
@@ -227,8 +211,7 @@ export class LifeNavigatorPlugin extends Plugin {
 			id: 'open-system-prompt',
 			name: t('systemPrompt.commands.openSystemPrompt'),
 			callback: async () => {
-				const activeModeId = usePluginStore.getState().modes.activeId;
-				await this.openSystemPrompt(activeModeId);
+				await this.openSystemPrompt(DEFAULT_MODE_ID);
 			}
 		});
 
@@ -241,8 +224,24 @@ export class LifeNavigatorPlugin extends Plugin {
 					initialMessages: [],
 				};
 
-				// Ribbon icons traditionally open in right sidebar
-				await this.openViewWithStandardBehavior(LIFE_NAVIGATOR_VIEW_TYPE, state, undefined, 'right');
+				// Matcher function to find existing Life Navigator views in the right sidebar
+				const matcher = (leaf: WorkspaceLeaf) => {
+					// Check if this leaf is in the right sidebar by checking its DOM structure
+					const leafEl = (leaf as any).containerEl;
+					const isInRightSidebar = leafEl?.closest('.workspace-split.mod-right-split') !== null;
+					// Also check if it's a Life Navigator view
+					const isLifeNavigatorView = leaf.view.getViewType() === LIFE_NAVIGATOR_VIEW_TYPE;
+					console.debug("Checking view:", {
+						viewType: leaf.view.getViewType(),
+						leafEl: leafEl,
+						isInRightSidebar,
+						isLifeNavigatorView
+					});
+					return isInRightSidebar && isLifeNavigatorView;
+				};
+
+				// Ribbon icons should prioritize right sidebar and reuse existing views
+				await this.openViewWithStandardBehavior(LIFE_NAVIGATOR_VIEW_TYPE, state, matcher, 'right');
 
 			} catch (error) {
 				console.error("Error in runAICoach:", error);
@@ -342,13 +341,28 @@ export class LifeNavigatorPlugin extends Plugin {
 
 		// Check for updates on startup
 		await checkForUpdatesOnStartup(this);
+
+		// Initialize with a default chat if none exists
+		const store = usePluginStore.getState();
+		const loaded = store.chats.loaded;
+		if (loaded.size === 0) {
+			// No chats loaded, create a new one
+			const newChatId = store.createNewChat();
+		}
+
+		// Remove duplicate store declarations and unsupported calls
+		// The store will handle cleanup automatically
 	}
 
 	async onunload() {
 		console.debug("Unloading Life Navigator plugin");
 
 		// Save any pending changes immediately before unloading
-		await usePluginStore.getState().saveImmediatelyIfNeeded(false);
+		// Save all loaded chats before shutdown
+		const store = usePluginStore.getState();
+		for (const [chatId] of store.chats.loaded) {
+			await store.saveImmediatelyIfNeeded(chatId);
+		}
 
 		// Cleanup setup change subscription
 		if (this.setupChangeSubscription) {
@@ -396,13 +410,14 @@ export class LifeNavigatorPlugin extends Plugin {
 			if (conversationId) {
 				targetConversationId = conversationId;
 			} else {
-				// Use current conversation ID if none provided
-				const currentConversation = usePluginStore.getState().chats.current;
-				if (!currentConversation.meta.id) {
+				// Use first loaded conversation if any
+				const store = usePluginStore.getState();
+				const firstChatEntry = Array.from(store.chats.loaded.entries())[0];
+				if (!firstChatEntry) {
 					new Notice(t('costAnalysis.errors.noConversationAvailable'));
 					return;
 				}
-				targetConversationId = currentConversation.meta.id;
+				targetConversationId = firstChatEntry[1].chat.meta.id;
 			}
 
 			// Use standardized behavior - match existing views by conversation ID
@@ -452,6 +467,37 @@ export class LifeNavigatorPlugin extends Plugin {
 			new Notice(t('systemPrompt.errors.failedToOpen', {
 				error: error instanceof Error ? error.message : String(error)
 			}));
+		}
+	}
+
+	/**
+	 * Opens a chat view with a specific conversation loaded
+	 * @param conversationId The ID of the conversation to load
+	 * @param openMode Where to open the view (defaults to 'tab')
+	 */
+	async openChatWithConversation(conversationId: string, openMode: 'current' | 'tab' | 'split' | 'right' = 'tab'): Promise<void> {
+		try {
+			// Create state with the conversation ID as the chat ID
+			const state = {
+				chatId: conversationId
+			};
+
+			// Match existing views that already have this conversation loaded
+			const matcher = (leaf: WorkspaceLeaf) => {
+				const view = leaf.view as ChatView;
+				return view.getChatId() === conversationId;
+			};
+
+			await this.openViewWithStandardBehavior(
+				LIFE_NAVIGATOR_VIEW_TYPE,
+				state,
+				matcher,
+				openMode
+			);
+
+		} catch (error) {
+			console.error(`Error opening chat with conversation ${conversationId}:`, error);
+			new Notice(t('ui.chat.conversationLoadFailed'));
 		}
 	}
 }

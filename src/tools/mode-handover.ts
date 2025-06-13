@@ -2,6 +2,7 @@ import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import { getStore } from "src/store/plugin-store";
+import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
 
 type HandoverModeToolInput = {
 	mode_id: string;
@@ -15,8 +16,9 @@ export const modeHandoverTool: ObsidianTool<HandoverModeToolInput> = {
 		let modeDescriptions = "";
 		
 		const modes = Object.values(getStore().modes.available);
-		const currentModeId = getStore().modes.activeId
-		availableModes = modes.filter(mode => mode.path !== currentModeId).map(mode => mode.path);
+		// For the specification, we show all modes. The actual filtering will happen
+		// during execution when we have access to the current chat's mode via context
+		availableModes = modes.map(mode => mode.path);
 		
 		// Build a description that includes all available modes and their purposes
 		if (modes.length > 0) {
@@ -46,9 +48,11 @@ export const modeHandoverTool: ObsidianTool<HandoverModeToolInput> = {
     return t('tools.handover.labels.initial');
   },
 	execute: async (context: ToolExecutionContext<HandoverModeToolInput>): Promise<void> => {
-		const { params } = context;
+		const { params, chatId } = context;
 		const { mode_id } = params;
-		const originalModeId = getStore().modes.activeId;
+		// Get the current mode for this specific chat
+		const chatState = getStore().getChatState(chatId);
+		const originalModeId = chatState?.activeModeId || DEFAULT_MODE_ID;
 
 		// Get mode names for display
 		const modes = Object.values(getStore().modes.available);
@@ -61,8 +65,8 @@ export const modeHandoverTool: ObsidianTool<HandoverModeToolInput> = {
 		context.setLabel(t('tools.handover.labels.inProgress', { mode: targetModeName }));
 
 		try {
-			// Use the mode manager service to switch modes
-			await getStore().setActiveModeWithPersistence(mode_id);
+			// Use per-chat mode switching - only affects the current chat, not other chats
+			getStore().setActiveModeForChat(context.chatId, mode_id);
 			
 			context.setLabel(t('tools.handover.labels.completed', { mode: targetModeName }));
 			        context.progress(t('tools.handover.progress.completedFull', { mode: targetModeName, fromMode: originalModeName }));

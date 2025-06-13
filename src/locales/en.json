@@ -601,6 +601,7 @@
       "historyNoResults": "No conversations found",
       "historySearchPlaceholder": "Search conversations...",
       "new": "New Chat",
+      "openInNewTab": "Open in New Tab",
       "revealFailed": "Failed to reveal conversation file",
       "revealInExplorer": "Reveal in Explorer",
       "revealInFileManager": "Reveal in File Manager",
