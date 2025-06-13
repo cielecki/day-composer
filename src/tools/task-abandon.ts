@@ -4,7 +4,7 @@ import { t } from 'src/i18n';
 import { updateNote, readNote } from 'src/utils/tools/note-utils';
 import { getDailyNotePath } from "../utils/daily-notes/get-daily-note-path";
 import { getCurrentTime } from "../utils/time/get-current-time";
-import { appendComment, Task } from 'src/utils/tasks/task-utils';
+import { appendComment, Task, cleanTodoText } from 'src/utils/tasks/task-utils';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { validateTasks } from 'src/utils/tasks/task-validation';
 import { moveTaskToPosition } from 'src/utils/tasks/move-task-to-position';
@@ -25,7 +25,7 @@ const schema = {
           properties: {
             todo_text: {
               type: "string",
-              description: "The complete text of the to-do item to abandon. This should include all formatting, emojis, time markers, and any other specific formatting.",
+              description: "The complete text of the to-do item to abandon, without the task marker (e.g. '- [ ]'). This should include all formatting, emojis, time markers, and any other specific formatting.",
             },
             comment: {
               type: "string",
@@ -106,10 +106,11 @@ export const taskAbandonTool: ObsidianTool<TaskAbandonToolInput> = {
       
       // Process each to-do item
       for (const todo of todos) {
-        const { todo_text, comment } = todo;
+        const todo_text = cleanTodoText(todo.todo_text);
+        const comment = todo.comment;
         
-        // We already validated all tasks exist
-        const task = findTaskByDescription(updatedNote, todo_text, (task) => task.status !== 'abandoned');
+        // Find the task to abandon
+        const task = findTaskByDescription(updatedNote, todo_text, (task) => task.status === 'pending');
         
         // Update status
         task.status = 'abandoned';

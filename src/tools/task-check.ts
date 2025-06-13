@@ -10,6 +10,7 @@ import { validateTasks } from 'src/utils/tasks/task-validation';
 import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-utils';
 import { t } from 'src/i18n';
 import { findTaskByDescription } from "src/utils/tools/note-utils";
+import { cleanTodoText } from 'src/utils/tasks/task-utils';
 
 
 const schema = {
@@ -26,7 +27,7 @@ const schema = {
           properties: {
             todo_text: {
               type: "string",
-              description: "The exact text of the to-do item to mark as completed"
+              description: "The complete text of the to-do item to check off, without the task marker (e.g. '- [ ]'). This should include all formatting, emojis, time markers, and any other specific formatting."
             },
             comment: {
               type: "string",
@@ -104,7 +105,8 @@ export const taskCheckTool: ObsidianTool<TaskCheckToolInput> = {
       
       // Process all tasks (we know they're all valid at this point)
       for (const todo of todos) {
-        const { todo_text, comment } = todo;
+        const todo_text = cleanTodoText(todo.todo_text);
+        const comment = todo.comment;
         
         // We already validated tasks, so we can directly find and process them
         const task = findTaskByDescription(updatedNote, todo_text, (task) => task.status === 'pending');

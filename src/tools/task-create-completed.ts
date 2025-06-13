@@ -4,11 +4,12 @@ import { t } from 'src/i18n';
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { getCurrentTime } from "../utils/time/get-current-time";
-import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { findCurrentSpot, readNote, updateNote } from 'src/utils/tools/note-utils';
 import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';
 import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-utils';
 import { appendComment, insertTaskAtPosition, Task } from "src/utils/tasks/task-utils";
+import { cleanTodoText } from 'src/utils/tasks/task-utils';
+import { ToolExecutionError } from "src/types/tool-execution-error";
 
 const schema = {
   name: "task_create_completed",
@@ -18,7 +19,7 @@ const schema = {
     properties: {
       todo_text: {
         type: "string",
-        description: "The complete text of the to-do item. This should contain all formatting, emojis, time markers, and any other specific formatting you want to include. (defaults to 'Note' if not provided)",
+        description: "The complete text of the to-do item to create as completed, without the task marker (e.g. '- [ ]'). This should include all formatting, emojis, time markers, and any other specific formatting.",
       },
       comment: {
         type: "string",
@@ -53,7 +54,11 @@ export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput>
   },
   execute: async (context: ToolExecutionContext<TaskCreateCompletedToolInput>): Promise<void> => {
     const { plugin, params } = context;
-    const { todo_text, comment, file_path, completion_time } = params;
+    const completion_time = params.completion_time ? getCurrentTime(params.completion_time) : getCurrentTime();
+    const todo_text = cleanTodoText(params.todo_text);
+    const comment = params.comment;
+    const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
+
 
     if (!todo_text) {
       context.setLabel(t('tools.createCompleted.labels.failed', { task: '' }));
@@ -61,9 +66,7 @@ export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput>
     }
 
     context.setLabel(t('tools.createCompleted.labels.inProgress', { task: todo_text }));
-
-    const filePath = file_path ? file_path : await getDailyNotePath(plugin.app);
-
+    
     try {
       // Check if file exists, create if it doesn't
       const exists = await fileExists(filePath, plugin.app);
@@ -79,14 +82,12 @@ export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput>
 
       // Create completed task object and insert it at the current spot
       let updatedNote = JSON.parse(JSON.stringify(note));
-      
-      // Format the completion time if provided
-      const currentTime = getCurrentTime(completion_time);
-      
+
+      // Create task object
       let task: Task = {
         type: "task",
         status: "completed",
-        todoText: todo_text + (currentTime ? t('tasks.format.completedAt', { time: currentTime }) : ''),
+        todoText: todo_text + (completion_time ? t('tasks.format.completedAt', { time: completion_time }) : ''),
         comment: "",
         lineIndex: -1, // Will be updated when the note is saved
       };
@@ -118,7 +119,7 @@ export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput>
       context.setLabel(t('tools.createCompleted.labels.success', { task: todo_text }));
       context.progress(t('tools.createCompleted.progress.success', {
         task: todo_text,
-        time: currentTime ? ` ${currentTime}` : '',
+        time: ` ${completion_time}`,
         name: filePath
       }));
     } catch (error) {

@@ -7,7 +7,7 @@ import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-utils';
 import { t } from 'src/i18n';
 import { findTaskByDescription } from "src/utils/tools/note-utils";
-import { appendComment } from 'src/utils/tasks/task-utils';
+import { appendComment, cleanTodoText } from 'src/utils/tasks/task-utils';
 
 const schema = {
   name: "task_uncheck",
@@ -17,7 +17,7 @@ const schema = {
     properties: {
       todo_text: {
         type: "string",
-        description: "The complete text of the to-do item to uncheck. This should include all formatting, emojis, time markers, and any other specific formatting.",
+        description: "The complete text of the to-do item to uncheck, without the task marker (e.g. '- [ ]'). This should include all formatting, emojis, time markers, and any other specific formatting.",
       },
       file_path: {
         type: "string",
@@ -47,7 +47,7 @@ export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
   },
   execute: async (context: ToolExecutionContext<TaskUncheckToolInput>): Promise<void> => {
     const { plugin, params } = context;
-    const todoDescription = params.todo_text;
+    const todoDescription = cleanTodoText(params.todo_text);
     const comment = params.comment;
     
     context.setLabel(t('tools.uncheck.labels.inProgress', { task: todoDescription }));

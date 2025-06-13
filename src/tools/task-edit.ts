@@ -3,9 +3,8 @@ import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import { readNote, updateNote, NoteNode } from 'src/utils/tools/note-utils';
 import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';
-import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { validateTasks } from 'src/utils/tasks/task-validation';
-import { removeTaskFromDocument, insertTaskAtPosition, appendComment } from 'src/utils/tasks/task-utils';
+import { removeTaskFromDocument, insertTaskAtPosition, appendComment, cleanTodoText } from 'src/utils/tasks/task-utils';
 import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-utils';
 import { findTaskByDescription } from "src/utils/tools/note-utils";
 
@@ -58,7 +57,8 @@ export const taskEditTool: ObsidianTool<TaskEditToolInput> = {
   },
   execute: async (context: ToolExecutionContext<TaskEditToolInput>): Promise<void> => {
     const { plugin, params } = context;
-    const { original_todo_text } = params;
+    const original_todo_text = cleanTodoText(params.original_todo_text);
+    const replacement_todo_text = cleanTodoText(params.replacement_todo_text);
     
     context.setLabel(t('tools.editTodo.labels.inProgress', { task: original_todo_text }));
     
@@ -89,7 +89,7 @@ export const taskEditTool: ObsidianTool<TaskEditToolInput> = {
       updatedNote = removeTaskFromDocument(updatedNote, taskToUpdate);
       
       // Update task properties
-      taskToUpdate.todoText = params.replacement_todo_text;
+      taskToUpdate.todoText = replacement_todo_text;
       
       if (params.replacement_status) {
         taskToUpdate.status = params.replacement_status;

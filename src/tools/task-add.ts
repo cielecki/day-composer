@@ -14,6 +14,7 @@ import { insertTaskAtPosition } from 'src/utils/tasks/task-utils';
 import { calculateLineNumberForNode, createNavigationTarget } from 'src/utils/tools/line-number-utils';
 import { extractFilenameWithoutExtension, truncateText } from 'src/utils/text/string-sanitizer';
 import { t } from 'src/i18n';
+import { cleanTodoText } from 'src/utils/tasks/task-utils';
 
 const schema = {
 	name: "task_add",
@@ -31,7 +32,7 @@ const schema = {
 						todo_text: {
 							type: "string",
 							description:
-								"The complete text of the to-do item. This should contain all formatting, emojis, time markers, and any other specific formatting you want to include.",
+								"The complete text of the to-do item, without the task marker (e.g. '- [ ]'). This should contain all formatting, emojis, time markers, and any other specific formatting you want to include.",
 						},
 					},
 					required: ["todo_text"],
@@ -78,17 +79,17 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 	},
 	execute: async (context: ToolExecutionContext<TaskAddToolInput>): Promise<void> => {
 		const { plugin, params } = context;
-		const { todos, path, position, reference_todo_text } = params;
+		const { todos: tasks, path, position, reference_todo_text } = params;
 
-		if (!todos || !Array.isArray(todos) || todos.length === 0) {
+		if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
 			context.setLabel(t('tools.add.labels.failed', { task: '' }));
 			throw new ToolExecutionError("No to-do items provided");
 		}
 
-		const todoCount = todos.length;
+		const todoCount = tasks.length;
 
 		const taskDescriptionShort = todoCount === 1 
-			? `'${truncateText(todos[0].todo_text, 30)}'` 
+			? `'${truncateText(tasks[0].todo_text, 30)}'` 
 			: `${todoCount} ${t('tools.tasks.plural')}`;
 
 		context.setLabel(t('tools.add.labels.inProgress', { task: taskDescriptionShort }));
@@ -117,12 +118,12 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 			const addedTasks: string[] = [];
 			const addedTaskObjects: Task[] = [];
 
-			for (let i = 0; i < todos.length; i++) {
-				const todo = todos[i];
+			for (let i = 0; i < tasks.length; i++) {
+				const todo = tasks[i];
 				const task: Task = {
 					type: "task",
 					status: "pending",
-					todoText: todo.todo_text,
+					todoText: cleanTodoText(todo.todo_text),
 					comment: "",
 					lineIndex: -1, // Will be updated when the note is saved
 				};

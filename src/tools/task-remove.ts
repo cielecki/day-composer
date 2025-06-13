@@ -5,7 +5,7 @@ import { updateNote, readNote, NoteNode, TextBlock } from 'src/utils/tools/note-
 import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { validateTasks } from 'src/utils/tasks/task-validation';
-import { removeTaskFromDocument, formatTask } from 'src/utils/tasks/task-utils';
+import { removeTaskFromDocument, formatTask, cleanTodoText } from 'src/utils/tasks/task-utils';
 import { calculateLineNumberForNode, createNavigationTarget } from 'src/utils/tools/line-number-utils';
 import { findTaskByDescription } from "src/utils/tools/note-utils";
 
@@ -23,7 +23,7 @@ const schema = {
           properties: {
             todo_text: {
               type: "string",
-              description: "The complete text of the to-do item to remove. This should include all formatting, emojis, time markers, and any other specific formatting.",
+              description: "The complete text of the to-do item to remove, without the task marker (e.g. '- [ ]'). This should include all formatting, emojis, time markers, and any other specific formatting.",
             }
           },
           required: ["todo_text"]
@@ -89,7 +89,7 @@ export const taskRemoveTool: ObsidianTool<TaskRemoveToolInput> = {
       
       // Process each to-do item
       for (const todo of todos) {
-        const { todo_text } = todo;
+        const todo_text = cleanTodoText(todo.todo_text);
         
         // Find the task to remove
         const taskToRemove = findTaskByDescription(updatedNote, todo_text, (task) => true);

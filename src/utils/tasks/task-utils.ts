@@ -139,3 +139,17 @@ export function removeTaskFromDocument(document: Note, taskToRemove: Task): Note
     .replace('{{task}}', taskToRemove.todoText));
 }
 
+/**
+ * Strips the Markdown task marker and trims the todo text. Use only for task text comming from an LLM.
+ * @param todoText The todo text that may contain a Markdown task marker
+ * @returns The cleaned todo text
+ */
+export function cleanTodoText(todoText: string): string {
+  // First trim the input string to handle leading/trailing spaces
+  const trimmedText = todoText.trim();
+  // Remove the task marker pattern if it exists (e.g. "- [ ] " or "- [x] ")
+  const cleanedText = trimmedText.replace(/^-\s+\[[ x\->]\]\s*/, '');
+  // Return the cleaned text (no need to trim again since we already trimmed the input)
+  return cleanedText;
+}
+
