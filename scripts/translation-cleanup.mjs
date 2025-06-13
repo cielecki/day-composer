@@ -66,6 +66,23 @@ function getNestedValue(obj, path) {
   return path.split('.').reduce((current, key) => current?.[key], obj);
 }
 
+// Extract parameters from translation string
+function extractTranslationParameters(translationString) {
+  if (!translationString || typeof translationString !== 'string') {
+    return [];
+  }
+  
+  const parameterRegex = /\{\{([^}]+)\}\}/g;
+  const parameters = [];
+  let match;
+  
+  while ((match = parameterRegex.exec(translationString)) !== null) {
+    parameters.push(match[1].trim());
+  }
+  
+  return parameters;
+}
+
 // Compare translation key consistency
 function compareTranslationKeys(en, pl, enPath, plPath) {
   log(colors.blue, colors.bold, '\n🔍 Checking translation key consistency...\n');
@@ -190,15 +207,16 @@ function isValidTranslationKey(key) {
   return true;
 }
 
-// Extract translation keys used in t() calls
-function extractUsedKeys() {
-  log(colors.blue, colors.bold, '\n🔍 Extracting used translation keys from source code...\n');
+// Extract translation keys used in t() calls and detect parameter mismatches
+function extractUsedKeysAndDetectMismatches(enValues, plValues) {
+  log(colors.blue, colors.bold, '\n🔍 Extracting used translation keys and detecting parameter mismatches...\n');
   
   const sourceFiles = findSourceFiles();
   const usedKeys = new Set();
   const tCallsWithoutKeys = [];
-  const problematicTCalls = []; // New: track t() calls that don't follow expected pattern
-  const keyUsageMap = new Map(); // Track where each key is used
+  const problematicTCalls = [];
+  const parameterMismatches = []; // NEW: Track parameter mismatches
+  const keyUsageMap = new Map();
   
   sourceFiles.forEach(filePath => {
     try {
@@ -206,7 +224,6 @@ function extractUsedKeys() {
       const relativePath = path.relative(projectRoot, filePath);
       
       // Skip files that are obviously not using translations
-      // Check for various import patterns and t() function usage
       const hasI18nImport = content.includes('from \'../i18n\'') || 
                            content.includes('from \'./i18n\'') || 
                            content.includes('from \'../../i18n\'') || 
@@ -224,66 +241,118 @@ function extractUsedKeys() {
         return;
       }
       
-      // Skip i18n files themselves as they define the translation system
-      const isI18nFile = relativePath.includes('i18n.ts') || relativePath.includes('i18n.js') || relativePath.endsWith('/i18n.ts') || relativePath.endsWith('/i18n.js');
+      // Skip i18n files themselves
+      const isI18nFile = relativePath.includes('i18n.ts') || relativePath.includes('i18n.js') || 
+                        relativePath.endsWith('/i18n.ts') || relativePath.endsWith('/i18n.js');
       
-      // Find ALL t() calls (not just the ones with static strings)
-      const allTCallsRegex = /\bt\s*\([^)]*\)/g;
+      // Find ALL t() calls with comprehensive parameter parsing
+      const tCallRegex = /\bt\s*\(\s*(['"`])([^'"`\n]+?)\1\s*(?:,\s*\{([^}]+)\})?\s*\)/g;
       let match;
       
-      while ((match = allTCallsRegex.exec(content)) !== null) {
+      while ((match = tCallRegex.exec(content)) !== null) {
         const fullCall = match[0];
+        const key = match[2];
+        const parametersString = match[3];
         const lineNumber = content.substring(0, match.index).split('\n').length;
         
-        // Extract ALL string literals from this t() call (to handle nested t() calls)
-        const stringLiteralsRegex = /(['"`])([^'"`\n]+?)\1/g;
-        let stringMatch;
-        let foundValidKey = false;
-        
-        while ((stringMatch = stringLiteralsRegex.exec(fullCall)) !== null) {
-          const key = stringMatch[2];
-          
-          if (isValidTranslationKey(key)) {
-            // This is a valid translation key
-            usedKeys.add(key);
-            if (!keyUsageMap.has(key)) {
-              keyUsageMap.set(key, []);
-            }
-            keyUsageMap.get(key).push({
-              file: relativePath,
-              line: lineNumber,
-              call: fullCall.trim()
-            });
-            foundValidKey = true;
+        if (isValidTranslationKey(key)) {
+          usedKeys.add(key);
+          if (!keyUsageMap.has(key)) {
+            keyUsageMap.set(key, []);
           }
-        }
-        
-        // If we didn't find any valid keys, check if this is a problematic t() call
-        if (!foundValidKey && !isI18nFile) {
-          // Check if this follows the expected pattern: t('static.key') or t("static.key")
-          const staticKeyMatch = fullCall.match(/\bt\s*\(\s*(['"`])([^'"`\n]+?)\1[^)]*\)/);
+          keyUsageMap.get(key).push({
+            file: relativePath,
+            line: lineNumber,
+            call: fullCall.trim()
+          });
           
-          if (staticKeyMatch) {
-            const key = staticKeyMatch[2];
+          // NEW: Check for parameter mismatches
+          if (parametersString) {
+            const usedParameters = [];
             
-            // Static key but not a valid translation key format
-            if (key.includes('.') && key.length > 3 && !/^(import|export|from|const|let|var|function|class)/.test(key)) {
-              tCallsWithoutKeys.push({
+            // FIXED: Extract parameter names from the parameters object
+            // Handle both explicit syntax (key: value) and ES6 shorthand (key)
+            const explicitParamRegex = /(\w+)\s*:/g;
+            // Fixed: Only match valid JavaScript identifiers (start with letter/underscore/dollar)
+            const shorthandParamRegex = /(?:^|[,\s])([a-zA-Z_$][a-zA-Z0-9_$]*)(?=\s*[,}]|$)/g;
+            
+            let paramMatch;
+            
+            // Extract explicit parameters (key: value)
+            while ((paramMatch = explicitParamRegex.exec(parametersString)) !== null) {
+              usedParameters.push(paramMatch[1]);
+            }
+            
+            // Extract shorthand parameters ({ key } which means { key: key })
+            const paramStringCopy = parametersString.replace(/\w+\s*:/g, ''); // Remove explicit params
+            while ((paramMatch = shorthandParamRegex.exec(paramStringCopy)) !== null) {
+              const paramName = paramMatch[1];
+              // Avoid JavaScript keywords and common non-parameter words
+              if (!['const', 'let', 'var', 'true', 'false', 'null', 'undefined', 'this'].includes(paramName)) {
+                usedParameters.push(paramName);
+              }
+            }
+            
+            // Get expected parameters from translation strings
+            const enTranslation = enValues.get(key);
+            const plTranslation = plValues.get(key);
+            
+            const expectedEnParams = extractTranslationParameters(enTranslation);
+            const expectedPlParams = extractTranslationParameters(plTranslation);
+            
+            // Check for mismatches
+            const allExpectedParams = new Set([...expectedEnParams, ...expectedPlParams]);
+            const allUsedParams = new Set(usedParameters);
+            
+            const missingParams = [...allExpectedParams].filter(p => !allUsedParams.has(p));
+            const extraParams = [...allUsedParams].filter(p => !allExpectedParams.has(p));
+            
+            if (missingParams.length > 0 || extraParams.length > 0) {
+              parameterMismatches.push({
                 file: relativePath,
                 line: lineNumber,
                 call: fullCall.trim(),
-                key: key
+                key,
+                expectedParams: [...allExpectedParams],
+                usedParams: usedParameters,
+                missingParams,
+                extraParams,
+                enTranslation,
+                plTranslation
               });
             }
-          } else {
-            // This t() call doesn't follow the static pattern - it's problematic
-            problematicTCalls.push({
+          }
+        } else if (!isI18nFile) {
+          // Handle suspicious calls as before
+          if (key.includes('.') && key.length > 3 && !/^(import|export|from|const|let|var|function|class)/.test(key)) {
+            tCallsWithoutKeys.push({
               file: relativePath,
               line: lineNumber,
               call: fullCall.trim(),
-              reason: 'Non-static translation key usage'
+              key: key
             });
           }
+        }
+      }
+      
+      // Find problematic t() calls (non-static patterns)
+      const allTCallsRegex = /\bt\s*\([^)]*\)/g;
+      let allMatch;
+      
+      while ((allMatch = allTCallsRegex.exec(content)) !== null) {
+        const fullCall = allMatch[0];
+        const lineNumber = content.substring(0, allMatch.index).split('\n').length;
+        
+        // Check if this follows static pattern
+        const staticKeyMatch = fullCall.match(/\bt\s*\(\s*(['"`])([^'"`\n]+?)\1[^)]*\)/);
+        
+        if (!staticKeyMatch && !isI18nFile) {
+          problematicTCalls.push({
+            file: relativePath,
+            line: lineNumber,
+            call: fullCall.trim(),
+            reason: 'Non-static translation key usage'
+          });
         }
       }
       
@@ -292,11 +361,72 @@ function extractUsedKeys() {
     }
   });
   
-  return { usedKeys: Array.from(usedKeys), tCallsWithoutKeys, problematicTCalls, keyUsageMap };
+  return { 
+    usedKeys: Array.from(usedKeys), 
+    tCallsWithoutKeys, 
+    problematicTCalls, 
+    parameterMismatches, // NEW: Return parameter mismatches
+    keyUsageMap 
+  };
 }
 
-// Find unused translation keys
-function findUnusedKeys(allKeys, usedKeys, enValues) {
+// NEW: Analyze parameter mismatches
+function analyzeParameterMismatches(parameterMismatches) {
+  if (parameterMismatches.length === 0) {
+    log(colors.green, '✅ No parameter mismatches found in translation calls');
+    return;
+  }
+  
+  log(colors.red, colors.bold, '\n🚨 CRITICAL: TRANSLATION PARAMETER MISMATCHES DETECTED!');
+  log(colors.red, colors.bold, 'These translation calls have parameter mismatches:');
+  console.log();
+  
+  parameterMismatches.forEach((mismatch, index) => {
+    log(colors.red, `${index + 1}. ${mismatch.file}:${mismatch.line}`);
+    log(colors.dim, `   Call: ${mismatch.call}`);
+    log(colors.dim, `   Key: "${mismatch.key}"`);
+    log(colors.dim, `   EN Translation: "${mismatch.enTranslation}"`);
+    log(colors.dim, `   PL Translation: "${mismatch.plTranslation}"`);
+    
+    if (mismatch.expectedParams.length > 0) {
+      log(colors.yellow, `   Expected parameters: ${mismatch.expectedParams.join(', ')}`);
+    }
+    if (mismatch.usedParams.length > 0) {
+      log(colors.cyan, `   Used parameters: ${mismatch.usedParams.join(', ')}`);
+    }
+    
+    if (mismatch.missingParams.length > 0) {
+      log(colors.red, `   ❌ Missing parameters: ${mismatch.missingParams.join(', ')}`);
+      log(colors.white, `   💡 Add these parameters to the t() call: { ${mismatch.missingParams.map(p => `${p}: value`).join(', ')} }`);
+    }
+    
+    if (mismatch.extraParams.length > 0) {
+      log(colors.yellow, `   ⚠️  Extra parameters: ${mismatch.extraParams.join(', ')}`);
+      log(colors.white, `   💡 These parameters are not used in the translation strings`);
+    }
+    
+    log(colors.cyan, `   🔧 FIX REQUIRED:`);
+    if (mismatch.missingParams.length > 0) {
+      log(colors.white, `   • Change parameter names in code to match translation: ${mismatch.missingParams.join(', ')}`);
+    }
+    if (mismatch.extraParams.length > 0) {
+      log(colors.white, `   • OR update translation strings to use these parameters: ${mismatch.extraParams.join(', ')}`);
+    }
+    
+    console.log();
+  });
+  
+  log(colors.red, colors.bold, '💥 WHY THIS IS CRITICAL:');
+  log(colors.red, '• Parameter mismatches cause {{placeholders}} to not be replaced');
+  log(colors.red, '• Users see raw template syntax like "{{name}}" instead of actual values');
+  log(colors.red, '• This breaks the user experience and looks unprofessional');
+  log(colors.red, '• These are easy to fix but critical for proper functionality');
+  
+  console.log();
+}
+
+// Report unused keys (but don't delete them)
+function reportUnusedKeys(allKeys, usedKeys, enValues) {
   log(colors.blue, colors.bold, '\n🔍 Checking for unused translation keys...\n');
   
   const usedKeysSet = new Set(usedKeys);
@@ -304,20 +434,22 @@ function findUnusedKeys(allKeys, usedKeys, enValues) {
   
   if (unusedKeys.length > 0) {
     log(colors.yellow, colors.bold, '⚠️  POTENTIALLY UNUSED TRANSLATION KEYS:');
+    log(colors.yellow, colors.bold, '(These are flagged for manual review - NOT automatically deleted)');
     console.log();
     
     unusedKeys.forEach((key, index) => {
       const value = enValues.get(key);
       log(colors.yellow, `${index + 1}. Key: "${key}"`);
       log(colors.dim, `   Value: "${value}"`);
-      log(colors.cyan, `   💡 Suggestions:`);
+      log(colors.cyan, `   💡 Manual review needed:`);
       log(colors.white, `   • Search codebase for dynamic usage: grep -r "${key}" src/`);
-      log(colors.white, `   • If truly unused, remove from both en.json and pl.json`);
+      log(colors.white, `   • If truly unused, manually remove from both en.json and pl.json`);
       log(colors.white, `   • Check if this key should be used in similar contexts`);
       console.log();
     });
     
     log(colors.cyan, `📊 Found ${unusedKeys.length} potentially unused keys out of ${allKeys.length} total keys`);
+    log(colors.yellow, '⚠️  These keys are NOT automatically deleted - manual review required');
   } else {
     log(colors.green, '✅ All translation keys are being used');
   }
@@ -325,8 +457,8 @@ function findUnusedKeys(allKeys, usedKeys, enValues) {
   return unusedKeys;
 }
 
-// Find translation keys that might be missing
-function findMissingKeys(allKeys, usedKeys, keyUsageMap) {
+// Find missing keys (but don't add them automatically)
+function reportMissingKeys(allKeys, usedKeys, keyUsageMap) {
   log(colors.blue, colors.bold, '\n🔍 Checking for missing translation keys...\n');
   
   const allKeysSet = new Set(allKeys);
@@ -334,6 +466,7 @@ function findMissingKeys(allKeys, usedKeys, keyUsageMap) {
   
   if (missingKeys.length > 0) {
     log(colors.red, colors.bold, '❌ TRANSLATION KEYS USED IN CODE BUT MISSING FROM TRANSLATION FILES:');
+    log(colors.red, colors.bold, '(These need to be manually added - NOT automatically added)');
     console.log();
     
     missingKeys.forEach((key, index) => {
@@ -349,10 +482,12 @@ function findMissingKeys(allKeys, usedKeys, keyUsageMap) {
         log(colors.dim, `   • ... and ${usages.length - 3} more locations`);
       }
       
-      log(colors.cyan, `   💡 Add to both en.json and pl.json:`);
+      log(colors.cyan, `   💡 Manually add to both en.json and pl.json:`);
       log(colors.white, `   "${key}": "[ADD TRANSLATION]"`);
       console.log();
     });
+    
+    log(colors.red, '⚠️  These keys are NOT automatically added - manual addition required');
   } else {
     log(colors.green, '✅ All used translation keys exist in translation files');
   }
@@ -364,7 +499,7 @@ function findMissingKeys(allKeys, usedKeys, keyUsageMap) {
 function analyzeSuspiciousCalls(tCallsWithoutKeys) {
   if (tCallsWithoutKeys.length === 0) return;
   
-  log(colors.red, colors.bold, '\n❌ SUSPICIOUS T() CALLS THAT NEED REVIEW:');
+  log(colors.red, colors.bold, '\n❌ SUSPICIOUS T() CALLS THAT NEED MANUAL REVIEW:');
   console.log();
   
   tCallsWithoutKeys.slice(0, 20).forEach((call, index) => {
@@ -372,8 +507,7 @@ function analyzeSuspiciousCalls(tCallsWithoutKeys) {
     log(colors.dim, `   Call: ${call.call}`);
     log(colors.dim, `   Key: "${call.key}"`);
     
-    // Provide specific suggestions based on the key pattern
-    log(colors.cyan, `   💡 Suggestions:`);
+    log(colors.cyan, `   💡 Manual review suggestions:`);
     
     if (call.key.includes('${')) {
       log(colors.white, `   • This appears to be a dynamic translation key`);
@@ -399,12 +533,12 @@ function analyzeSuspiciousCalls(tCallsWithoutKeys) {
   }
 }
 
-// Analyze problematic t() calls that don't follow expected patterns
+// Analyze problematic t() calls
 function analyzeProblematicTCalls(problematicTCalls) {
   if (problematicTCalls.length === 0) return;
   
   log(colors.red, colors.bold, '\n🚨 CRITICAL: DYNAMIC TRANSLATION KEYS DETECTED!');
-  log(colors.red, colors.bold, 'These calls use dynamic keys and MUST be refactored:');
+  log(colors.red, colors.bold, 'These calls use dynamic keys and MUST be manually refactored:');
   console.log();
   
   problematicTCalls.slice(0, 20).forEach((call, index) => {
@@ -412,13 +546,12 @@ function analyzeProblematicTCalls(problematicTCalls) {
     log(colors.dim, `   Call: ${call.call}`);
     log(colors.dim, `   Issue: ${call.reason}`);
     
-    log(colors.yellow, colors.bold, `   ⚠️  IMMEDIATE ACTION REQUIRED:`);
+    log(colors.yellow, colors.bold, `   ⚠️  MANUAL ACTION REQUIRED:`);
     log(colors.white, `   • Refactor to use static translation keys: t('static.key')`);
     log(colors.white, `   • Avoid dynamic key construction like: t(variable), t(key + '.suffix'), t(\`template\`)`);
     log(colors.white, `   • If you need dynamic content, use interpolation: t('static.key', { param })`);
     log(colors.white, `   • If this is a variable assignment, replace with the actual key value`);
     
-    // Provide specific suggestions based on the call pattern
     if (call.call.includes('`')) {
       log(colors.red, `   🔴 Template literals in t() break static analysis!`);
     } else if (call.call.includes('+')) {
@@ -442,18 +575,12 @@ function analyzeProblematicTCalls(problematicTCalls) {
   log(colors.red, '• Runtime errors will occur if translations are missing');
   log(colors.red, '• Code becomes unmaintainable and error-prone');
   
-  log(colors.cyan, colors.bold, '\n🚀 YOUR NEXT STEPS:');
-  log(colors.cyan, '1. Fix ALL dynamic translation calls shown above (this is mandatory)');
-  log(colors.cyan, '2. Use static keys like t("section.key") instead of dynamic construction');
-  log(colors.cyan, '3. For dynamic content, use interpolation: t("key", { value })');
-  log(colors.cyan, '4. Run this script again to verify all dynamic keys are eliminated');
-  log(colors.cyan, '5. Only proceed with development after fixing these critical issues');
   console.log();
 }
 
-// Generate summary report
+// Generate enhanced summary report
 function generateSummary(results) {
-  log(colors.blue, colors.bold, '\n📋 SUMMARY REPORT\n');
+  log(colors.blue, colors.bold, '\n📋 ENHANCED SUMMARY REPORT\n');
   
   const issues = [];
   
@@ -466,104 +593,86 @@ function generateSummary(results) {
   }
   
   if (results.unusedKeys.length > 0) {
-    issues.push(`${results.unusedKeys.length} potentially unused keys`);
+    issues.push(`${results.unusedKeys.length} potentially unused keys (manual review needed)`);
   }
   
   if (results.missingKeys.length > 0) {
-    issues.push(`${results.missingKeys.length} missing translation keys`);
+    issues.push(`${results.missingKeys.length} missing translation keys (manual addition needed)`);
   }
   
   if (results.tCallsWithoutKeys.length > 0) {
-    issues.push(`${results.tCallsWithoutKeys.length} suspicious t() calls`);
+    issues.push(`${results.tCallsWithoutKeys.length} suspicious t() calls (manual review needed)`);
   }
   
   if (results.problematicTCalls && results.problematicTCalls.length > 0) {
-    issues.push(`${results.problematicTCalls.length} problematic t() calls that need refactoring`);
+    issues.push(`${results.problematicTCalls.length} problematic t() calls (manual refactoring needed)`);
   }
   
-  // Show modifications if they were applied
-  if (results.modificationsApplied && (results.addedEntries?.length > 0 || results.removedEntries?.length > 0)) {
-    log(colors.green, colors.bold, '🎉 TRANSLATION ISSUES AUTOMATICALLY FIXED!');
-    
-    const operationsPerformed = [];
-    
-    if (results.addedEntries?.length > 0) {
-      operationsPerformed.push(`Added ${results.addedEntries.length} translation entries`);
-      
-      const addedByLang = results.addedEntries.reduce((acc, entry) => {
-        if (entry.lang === 'both') {
-          acc.en = (acc.en || 0) + 1;
-          acc.pl = (acc.pl || 0) + 1;
-        } else {
-          acc[entry.lang] = (acc[entry.lang] || 0) + 1;
-        }
-        return acc;
-      }, {});
-      
-      if (addedByLang.en) operationsPerformed.push(`  • ${addedByLang.en} English translations`);
-      if (addedByLang.pl) operationsPerformed.push(`  • ${addedByLang.pl} Polish translations`);
-    }
-    
-    if (results.removedEntries?.length > 0) {
-      operationsPerformed.push(`Removed ${results.removedEntries.length} unused translation keys`);
-    }
-    
-    operationsPerformed.push('Sorted all translation keys alphabetically');
-    
-    operationsPerformed.forEach(op => log(colors.green, op));
-    
-    console.log();
-  } else if (results.modificationsApplied) {
-    log(colors.green, colors.bold, '🎉 TRANSLATION FILES ORGANIZED!');
-    log(colors.green, 'Translation keys have been sorted alphabetically for better organization.');
-  } else if (issues.length === 0) {
+  // NEW: Parameter mismatch reporting
+  if (results.parameterMismatches && results.parameterMismatches.length > 0) {
+    issues.push(`${results.parameterMismatches.length} parameter mismatches (manual fixing needed)`);
+  }
+  
+  if (issues.length === 0) {
     log(colors.green, colors.bold, '🎉 ALL TRANSLATION CHECKS PASSED!');
     log(colors.green, 'No issues found. Your translation files are in excellent shape!');
   } else {
-    log(colors.red, colors.bold, `❌ FOUND ${issues.length} TYPE(S) OF ISSUES:`);
+    log(colors.red, colors.bold, `❌ FOUND ${issues.length} TYPE(S) OF ISSUES REQUIRING MANUAL REVIEW:`);
     issues.forEach(issue => log(colors.red, '  •', issue));
     
     console.log();
     
-    // Special handling for critical dynamic key issues
+    // Prioritize parameter mismatches and dynamic keys
+    const criticalIssues = [];
+    if (results.parameterMismatches && results.parameterMismatches.length > 0) {
+      criticalIssues.push(`🔴 CRITICAL: Fix ${results.parameterMismatches.length} parameter mismatches first!`);
+    }
     if (results.problematicTCalls && results.problematicTCalls.length > 0) {
+      criticalIssues.push(`🔴 CRITICAL: Fix ${results.problematicTCalls.length} dynamic translation calls!`);
+    }
+    
+    if (criticalIssues.length > 0) {
       log(colors.red, colors.bold, '🚨 STOP: Critical issues must be fixed first!');
-      log(colors.red, colors.bold, '⚠️  DO NOT PROCEED until dynamic translation keys are eliminated!');
+      criticalIssues.forEach(issue => log(colors.red, '  •', issue));
+      log(colors.red, colors.bold, '⚠️  DO NOT DEPLOY until critical issues are resolved!');
       console.log();
     }
     
-    log(colors.cyan, colors.bold, '🚀 YOUR REQUIRED ACTIONS (DO THESE IN ORDER):');
+    log(colors.cyan, colors.bold, '🚀 MANUAL ACTIONS REQUIRED (DO THESE IN ORDER):');
     let stepNumber = 1;
+    
+    if (results.parameterMismatches && results.parameterMismatches.length > 0) {
+      log(colors.red, `${stepNumber++}. 🔴 CRITICAL: Fix all ${results.parameterMismatches.length} parameter mismatches (see details above)`);
+    }
     
     if (results.problematicTCalls && results.problematicTCalls.length > 0) {
       log(colors.red, `${stepNumber++}. 🔴 CRITICAL: Fix all ${results.problematicTCalls.length} dynamic translation calls (see details above)`);
-      log(colors.red, `${stepNumber++}. 🔴 CRITICAL: Use only static keys like t("section.key")`);
     }
     
     if (results.missingInPl.length > 0 || results.missingInEn.length > 0) {
-      log(colors.cyan, `${stepNumber++}. Add missing translation keys between EN/PL files`);
+      log(colors.cyan, `${stepNumber++}. Manually add missing translation keys between EN/PL files`);
     }
     
     if (results.missingKeys.length > 0) {
-      log(colors.cyan, `${stepNumber++}. Add ${results.missingKeys.length} missing translation keys used in code`);
+      log(colors.cyan, `${stepNumber++}. Manually add ${results.missingKeys.length} missing translation keys used in code`);
     }
     
     if (results.unusedKeys.length > 0) {
-      log(colors.cyan, `${stepNumber++}. Review and remove ${results.unusedKeys.length} potentially unused translation keys`);
+      log(colors.cyan, `${stepNumber++}. Manually review and remove ${results.unusedKeys.length} potentially unused translation keys`);
     }
     
     if (results.tCallsWithoutKeys.length > 0) {
-      log(colors.cyan, `${stepNumber++}. Review ${results.tCallsWithoutKeys.length} suspicious t() calls`);
+      log(colors.cyan, `${stepNumber++}. Manually review ${results.tCallsWithoutKeys.length} suspicious t() calls`);
     }
     
     log(colors.cyan, `${stepNumber++}. Run this script again to verify ALL issues are resolved`);
     log(colors.cyan, `${stepNumber++}. Test the application thoroughly to ensure translations work`);
     log(colors.cyan, `${stepNumber++}. Commit changes only after all issues are fixed`);
     
-    if (results.problematicTCalls && results.problematicTCalls.length > 0) {
+    if (criticalIssues.length > 0) {
       console.log();
-      log(colors.red, colors.bold, '⚠️  Remember: Dynamic translation keys are critical errors!');
-      log(colors.red, 'The codebase is not safe to use until these are fixed.');
+      log(colors.red, colors.bold, '⚠️  Remember: Parameter mismatches and dynamic keys are critical errors!');
+      log(colors.red, 'The application will not work correctly until these are fixed.');
     }
   }
   
@@ -575,249 +684,22 @@ function generateSummary(results) {
   log(colors.blue, `  • Files scanned: ${findSourceFiles().length}`);
   log(colors.blue, `  • Translation coverage: ${Math.round((results.usedKeys.length / results.allEnKeys.length) * 100)}%`);
   
-  if (results.modificationsApplied) {
-    if (results.addedEntries?.length > 0) {
-      log(colors.green, `  • Translation entries added: ${results.addedEntries.length}`);
-    }
-    if (results.removedEntries?.length > 0) {
-      log(colors.green, `  • Translation entries removed: ${results.removedEntries.length}`);
-    }
-    log(colors.green, `  • Translation files sorted and organized`);
+  // NEW: Parameter mismatch statistics
+  if (results.parameterMismatches && results.parameterMismatches.length > 0) {
+    log(colors.red, `  • Parameter mismatches found: ${results.parameterMismatches.length}`);
   }
+  
+  log(colors.yellow, colors.bold, '\n🔒 SAFETY NOTICE:');
+  log(colors.yellow, 'This script NO LONGER automatically modifies files.');
+  log(colors.yellow, 'All issues require manual review and fixing for safety.');
+  log(colors.yellow, 'This prevents accidental deletion of important translations.');
 }
 
-// Set nested value in object using dot notation
-function setNestedValue(obj, path, value) {
-  const keys = path.split('.');
-  let current = obj;
-  
-  for (let i = 0; i < keys.length - 1; i++) {
-    const key = keys[i];
-    if (!(key in current) || typeof current[key] !== 'object' || Array.isArray(current[key])) {
-      current[key] = {};
-    }
-    current = current[key];
-  }
-  
-  current[keys[keys.length - 1]] = value;
-}
-
-// Add missing translation keys to both files
-function addMissingTranslations(missingInPl, missingInEn, enValues, plValues, en, pl) {
-  if (missingInPl.length === 0 && missingInEn.length === 0) {
-    return { en, pl, added: [] };
-  }
-  
-  log(colors.blue, colors.bold, '\n🔧 Adding missing translation keys...\n');
-  
-  const newEn = JSON.parse(JSON.stringify(en));
-  const newPl = JSON.parse(JSON.stringify(pl));
-  const added = [];
-  
-  // Add keys missing in Polish
-  missingInPl.forEach(key => {
-    const enValue = enValues.get(key);
-    if (enValue) {
-      const plValue = `[TRANSLATE] ${enValue}`;
-      setNestedValue(newPl, key, plValue);
-      added.push({ key, lang: 'pl', value: plValue });
-      log(colors.green, `✓ Added to PL: ${key} = "${plValue}"`);
-    }
-  });
-  
-  // Add keys missing in English
-  missingInEn.forEach(key => {
-    const plValue = plValues.get(key);
-    if (plValue) {
-      const enValue = `[TRANSLATE] ${plValue}`;
-      setNestedValue(newEn, key, enValue);
-      added.push({ key, lang: 'en', value: enValue });
-      log(colors.green, `✓ Added to EN: ${key} = "${enValue}"`);
-    }
-  });
-  
-  return { en: newEn, pl: newPl, added };
-}
-
-// Add missing keys that are used in code but don't exist in translation files
-function addMissingUsedKeys(missingKeys, keyUsageMap, en, pl) {
-  if (missingKeys.length === 0) {
-    return { en, pl, added: [] };
-  }
-  
-  log(colors.blue, colors.bold, '\n🔧 Adding missing translation keys used in code...\n');
-  
-  const newEn = JSON.parse(JSON.stringify(en));
-  const newPl = JSON.parse(JSON.stringify(pl));
-  const added = [];
-  
-  missingKeys.forEach(key => {
-    // Generate a placeholder translation based on the key
-    const keyParts = key.split('.');
-    const lastPart = keyParts[keyParts.length - 1];
-    
-    // Convert camelCase to human readable
-    const humanReadable = lastPart
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase())
-      .trim();
-    
-    const enValue = `[TODO] ${humanReadable}`;
-    const plValue = `[TRANSLATE] ${humanReadable}`;
-    
-    setNestedValue(newEn, key, enValue);
-    setNestedValue(newPl, key, plValue);
-    
-    added.push({ key, lang: 'both', enValue, plValue });
-    
-    const usages = keyUsageMap.get(key) || [];
-    log(colors.green, `✓ Added missing key: ${key}`);
-    log(colors.dim, `  EN: "${enValue}"`);
-    log(colors.dim, `  PL: "${plValue}"`);
-    log(colors.dim, `  Used in ${usages.length} location(s)`);
-  });
-  
-  return { en: newEn, pl: newPl, added };
-}
-
-// Remove unused keys from translation files
-function removeUnusedKeys(unusedKeys, enPath, plPath, en, pl) {
-  if (unusedKeys.length === 0) {
-    return { en, pl, removed: [] };
-  }
-  
-  log(colors.blue, colors.bold, '\n🧹 Removing unused translation keys...\n');
-  
-  const newEn = JSON.parse(JSON.stringify(en));
-  const newPl = JSON.parse(JSON.stringify(pl));
-  const removed = [];
-  
-  unusedKeys.forEach(key => {
-    const keyParts = key.split('.');
-    
-    // Remove from English
-    let currentEn = newEn;
-    let currentPl = newPl;
-    
-    // Navigate to parent object
-    for (let i = 0; i < keyParts.length - 1; i++) {
-      if (currentEn[keyParts[i]]) {
-        currentEn = currentEn[keyParts[i]];
-      }
-      if (currentPl[keyParts[i]]) {
-        currentPl = currentPl[keyParts[i]];
-      }
-    }
-    
-    // Remove the final key
-    const finalKey = keyParts[keyParts.length - 1];
-    if (currentEn && currentEn[finalKey] !== undefined) {
-      delete currentEn[finalKey];
-      removed.push(key);
-      log(colors.green, `✓ Removed from EN: ${key}`);
-    }
-    if (currentPl && currentPl[finalKey] !== undefined) {
-      delete currentPl[finalKey];
-      log(colors.green, `✓ Removed from PL: ${key}`);
-    }
-  });
-  
-  // Clean up empty parent objects
-  function cleanEmptyObjects(obj) {
-    Object.keys(obj).forEach(key => {
-      if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-        cleanEmptyObjects(obj[key]);
-        if (Object.keys(obj[key]).length === 0) {
-          delete obj[key];
-          log(colors.dim, `  Cleaned empty section: ${key}`);
-        }
-      }
-    });
-  }
-  
-  cleanEmptyObjects(newEn);
-  cleanEmptyObjects(newPl);
-  
-  return { en: newEn, pl: newPl, removed };
-}
-
-// Save translation files
-function saveTranslationFiles(enPath, plPath, en, pl) {
-  try {
-    fs.writeFileSync(enPath, JSON.stringify(en, null, 2) + '\n', 'utf8');
-    fs.writeFileSync(plPath, JSON.stringify(pl, null, 2) + '\n', 'utf8');
-    log(colors.green, `✅ Translation files updated successfully`);
-    log(colors.dim, `  • ${path.relative(projectRoot, enPath)}`);
-    log(colors.dim, `  • ${path.relative(projectRoot, plPath)}`);
-    return true;
-  } catch (error) {
-    log(colors.red, `❌ Error saving translation files: ${error.message}`);
-    return false;
-  }
-}
-
-// Sort translation keys alphabetically (recursive)
-function sortTranslationKeys(obj) {
-  if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
-    return obj;
-  }
-  
-  const sorted = {};
-  const keys = Object.keys(obj).sort();
-  
-  for (const key of keys) {
-    sorted[key] = sortTranslationKeys(obj[key]);
-  }
-  
-  return sorted;
-}
-
-// Interactive cleanup prompt
-async function promptForModifications(missingInPl, missingInEn, missingKeys, unusedKeys) {
-  log(colors.yellow, colors.bold, '\n🤔 AUTO-MODIFICATION DECISION\n');
-  
-  const modifications = [];
-  
-  if (missingInPl.length > 0) {
-    modifications.push(`Add ${missingInPl.length} missing keys to Polish translation with [TRANSLATE] prefix`);
-  }
-  
-  if (missingInEn.length > 0) {
-    modifications.push(`Add ${missingInEn.length} missing keys to English translation with [TRANSLATE] prefix`);
-  }
-  
-  if (missingKeys.length > 0) {
-    modifications.push(`Add ${missingKeys.length} missing keys used in code to both translation files`);
-  }
-  
-  if (unusedKeys.length > 0) {
-    modifications.push(`Remove ${unusedKeys.length} unused translation keys from both files`);
-  }
-  
-  modifications.push('Sort all translation keys alphabetically');
-  
-  if (modifications.length > 1) { // More than just sorting
-    log(colors.cyan, 'The script will automatically:');
-    modifications.forEach(mod => log(colors.cyan, `  • ${mod}`));
-    log(colors.dim, '\nThis helps maintain translation consistency, prevents runtime errors, and keeps files organized.');
-    return true;
-  }
-  
-  // If only sorting is needed
-  if (modifications.length === 1) {
-    log(colors.cyan, 'The script will automatically sort all translation keys alphabetically.');
-    log(colors.dim, 'This keeps translation files organized and easier to maintain.');
-    return true;
-  }
-  
-  return false;
-}
-
-// Main function
+// Main function (ENHANCED - no automatic modifications)
 async function main() {
-  log(colors.magenta, colors.bold, '🌍 Life Navigator Translation Cleanup & Repair Tool');
-  log(colors.magenta, '='.repeat(55));
-  log(colors.dim, 'Analyzing and fixing translation files and codebase inconsistencies...\n');
+  log(colors.magenta, colors.bold, '🌍 Life Navigator Translation Analysis & Issue Detection Tool');
+  log(colors.magenta, '='.repeat(65));
+  log(colors.dim, 'Analyzing translation files and detecting issues (READ-ONLY MODE)...\n');
   
   try {
     // Load translations
@@ -826,114 +708,34 @@ async function main() {
     // Compare keys
     const keyComparison = compareTranslationKeys(en, pl, enPath, plPath);
     
-    // Extract used keys
-    const { usedKeys, tCallsWithoutKeys, problematicTCalls, keyUsageMap } = extractUsedKeys();
+    // Extract used keys and detect parameter mismatches
+    const { usedKeys, tCallsWithoutKeys, problematicTCalls, parameterMismatches, keyUsageMap } = 
+      extractUsedKeysAndDetectMismatches(keyComparison.enValues, keyComparison.plValues);
     
-    // Find unused keys (using English as reference)
-    const unusedKeys = findUnusedKeys(keyComparison.allEnKeys, usedKeys, keyComparison.enValues);
+    // NEW: Analyze parameter mismatches first (most critical)
+    analyzeParameterMismatches(parameterMismatches);
     
-    // Find missing keys
-    const missingKeys = findMissingKeys(keyComparison.allEnKeys, usedKeys, keyUsageMap);
+    // Report unused keys (but don't delete them)
+    const unusedKeys = reportUnusedKeys(keyComparison.allEnKeys, usedKeys, keyComparison.enValues);
+    
+    // Report missing keys (but don't add them)
+    const missingKeys = reportMissingKeys(keyComparison.allEnKeys, usedKeys, keyUsageMap);
     
     // Analyze suspicious calls
     analyzeSuspiciousCalls(tCallsWithoutKeys);
     
-    // Analyze problematic t() calls that don't follow expected patterns
+    // Analyze problematic t() calls
     analyzeProblematicTCalls(problematicTCalls);
     
-    // Prompt for modifications
-    const shouldModify = await promptForModifications(
-      keyComparison.missingInPl, 
-      keyComparison.missingInEn, 
-      missingKeys, 
-      unusedKeys
-    );
-    
-    let modificationResults = { en, pl, added: [], removed: [] };
-    let filesModified = false;
-    
-    if (shouldModify) {
-      // Add missing translations between EN and PL
-      if (keyComparison.missingInPl.length > 0 || keyComparison.missingInEn.length > 0) {
-        const translationResults = addMissingTranslations(
-          keyComparison.missingInPl,
-          keyComparison.missingInEn,
-          keyComparison.enValues,
-          keyComparison.plValues,
-          modificationResults.en,
-          modificationResults.pl
-        );
-        modificationResults.en = translationResults.en;
-        modificationResults.pl = translationResults.pl;
-        modificationResults.added.push(...translationResults.added);
-        filesModified = true;
-      }
-      
-      // Add missing keys used in code
-      if (missingKeys.length > 0) {
-        const usedKeyResults = addMissingUsedKeys(
-          missingKeys,
-          keyUsageMap,
-          modificationResults.en,
-          modificationResults.pl
-        );
-        modificationResults.en = usedKeyResults.en;
-        modificationResults.pl = usedKeyResults.pl;
-        modificationResults.added.push(...usedKeyResults.added);
-        filesModified = true;
-      }
-      
-      // Remove unused keys
-      if (unusedKeys.length > 0) {
-        const cleanupResults = removeUnusedKeys(
-          unusedKeys, 
-          enPath, 
-          plPath, 
-          modificationResults.en, 
-          modificationResults.pl
-        );
-        modificationResults.en = cleanupResults.en;
-        modificationResults.pl = cleanupResults.pl;
-        modificationResults.removed = cleanupResults.removed;
-        filesModified = true;
-      }
-      
-      // Sort translation keys alphabetically
-      log(colors.blue, colors.bold, '\n🔤 Sorting translation keys alphabetically...\n');
-      modificationResults.en = sortTranslationKeys(modificationResults.en);
-      modificationResults.pl = sortTranslationKeys(modificationResults.pl);
-      log(colors.green, '✓ Translation keys sorted alphabetically');
-      filesModified = true;
-      
-      // Save modified files
-      if (filesModified) {
-        const saved = saveTranslationFiles(enPath, plPath, modificationResults.en, modificationResults.pl);
-        if (saved) {
-          log(colors.green, colors.bold, '\n✅ Translation files have been updated!');
-          if (modificationResults.added.length > 0) {
-            log(colors.cyan, `Added ${modificationResults.added.length} translation entries`);
-          }
-          if (modificationResults.removed.length > 0) {
-            log(colors.cyan, `Removed ${modificationResults.removed.length} unused translation keys`);
-          }
-          log(colors.cyan, 'Translation keys sorted alphabetically');
-        }
-      }
-    }
-    
-    // Generate summary
+    // Generate enhanced summary
     generateSummary({
       ...keyComparison,
-      unusedKeys: shouldModify ? [] : unusedKeys, // Show as resolved if modified
-      missingKeys: shouldModify ? [] : missingKeys, // Show as resolved if modified
+      unusedKeys,
+      missingKeys,
       usedKeys,
       tCallsWithoutKeys,
       problematicTCalls,
-      modificationsApplied: shouldModify && filesModified,
-      addedEntries: modificationResults.added,
-      removedEntries: modificationResults.removed,
-      missingInPl: shouldModify ? [] : keyComparison.missingInPl,
-      missingInEn: shouldModify ? [] : keyComparison.missingInEn
+      parameterMismatches // NEW: Include parameter mismatches in summary
     });
     
   } catch (error) {
