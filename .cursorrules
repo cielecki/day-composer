@@ -416,7 +416,11 @@ When the user types "go", execute this complete workflow:
    - Wait for the user to provide the task description
    - Read and understand the full task requirements
 
-2. **Research & Planning Phase**
+2. **Repository Sync Phase**
+   - Pull latest changes from the repository to ensure working with current codebase
+   - Check for any conflicts or issues that need resolution before proceeding
+
+3. **Research & Planning Phase**
    - Conduct comprehensive research on the task
    - Analyze existing codebase for relevant patterns, components, and implementations
    - Check for existing similar functionality that can be reused or extended
@@ -424,7 +428,7 @@ When the user types "go", execute this complete workflow:
    - Identify all files that need to be modified
    - Plan the implementation approach step by step
 
-3. **Plan Presentation Phase**
+4. **Plan Presentation Phase**
    - Present a detailed implementation plan including:
      - Summary of what will be implemented
      - List of files to be created/modified
@@ -434,9 +438,23 @@ When the user types "go", execute this complete workflow:
    - **ALWAYS ASK FOR USER ACCEPTANCE BEFORE PROCEEDING**
    - Wait for explicit user approval: "Do you approve this plan? Type 'yes' to proceed."
 
-4. **Implementation Phase** (only after user approval)
+5. **Task Documentation Setup**
+   - Create task.md file with:
+     - Original task description
+     - Implementation plan details
+     - Progress tracking section
+     - Implementation notes section
+     - Changes and alterations log
+
+6. **Implementation Phase** (only after user approval)
    - Implement the approved plan
+   - **Update task.md throughout implementation with:**
+     - Progress updates on each major step
+     - Any alterations or deviations from the original plan
+     - Implementation notes and decisions made
+     - Challenges encountered and solutions applied
    - Follow all existing code guidelines (styles, changelog, documentation)
+   - **Include cursor rules modifications if the task affects development workflow**
    - Test the implementation
    - Update CHANGELOG.md if it's a user-facing feature
    - Update documentation as needed
@@ -450,19 +468,27 @@ When the user types "r", execute this review workflow:
    - If task.md exists, use it to understand the task requirements and scope
    - If task.md doesn't exist, ask the user what task they want reviewed
 
-2. **Code Review Phase**
+2. **Task Documentation Final Update**
+   - Update task.md with final implementation status
+   - Add completion notes and final alterations made
+   - Document any remaining issues or future considerations
+   - Mark task as completed in the progress section
+
+3. **Code Review Phase**
    - Review all changes made during the implementation
    - Check for code quality, adherence to style guidelines
    - Verify that all requirements from the original task are met
    - Ensure no regressions were introduced
    - Validate that tests pass (run `npm run build` if needed)
+   - **Review cursor rules changes if applicable**
 
-3. **Documentation Review**
+4. **Documentation Review**
    - Verify CHANGELOG.md is updated appropriately
    - Check that documentation in docs/ and library/Docs/ is current
    - Ensure translation files are clean and consistent
+   - **Verify task.md contains complete implementation history**
 
-4. **Commit Message Preparation**
+5. **Commit Message Preparation**
    - Generate a clear, descriptive commit message following conventional commits format
    - Include:
      - Type of change (feat, fix, docs, style, refactor, etc.)
@@ -481,7 +507,7 @@ When the user types "c":
 2. **Commit Process**
    - Execute the git commit with the prepared message
    - Provide confirmation of successful commit
-   - Optionally suggest next steps (push, create PR, etc.)
+   - Delete the task.md file to clean up the workspace
 
 ### Workflow Rules
 
@@ -490,6 +516,43 @@ When the user types "c":
 - **Comprehensive Planning**: The "go" command must include thorough research and planning
 - **Quality Assurance**: The "r" command ensures code quality and completeness
 - **Clean Commits**: The "c" command creates well-documented commits
+
+### Task.md File Format
+
+The task.md file should follow this structure:
+
+```markdown
+# Task: [Task Title]
+
+## Original Task Description
+[Initial task request from user]
+
+## Implementation Plan
+[Detailed plan as presented to user]
+
+## Progress Tracking
+- [ ] Research and planning
+- [ ] Implementation started
+- [ ] Core functionality complete
+- [ ] Testing complete
+- [ ] Documentation updated
+- [ ] Task completed
+
+## Implementation Notes
+[Ongoing notes during implementation]
+- [Timestamp] Decision: [description]
+- [Timestamp] Challenge: [problem and solution]
+- [Timestamp] Alteration: [change from original plan]
+
+## Changes and Alterations
+[Major changes from original plan]
+- Original: [what was planned]
+- Changed to: [what was actually implemented]
+- Reason: [why the change was made]
+
+## Completion Notes
+[Final notes, remaining issues, future considerations]
+```
 
 ### Example Usage
 
@@ -500,16 +563,16 @@ User: Add a new button component with primary and secondary variants
 Assistant: [conducts research and planning]
 Assistant: Here's my implementation plan... Do you approve this plan? Type 'yes' to proceed.
 User: yes
-Assistant: [implements the feature]
+Assistant: [creates task.md and implements the feature while updating progress]
 
 User: r
-Assistant: [reviews implementation and prepares commit message]
+Assistant: [reviews implementation, updates task.md with completion notes, and prepares commit message]
 Assistant: Proposed commit message: "feat: add reusable button component with primary/secondary variants"
 
 User: c
 Assistant: Ready to commit with this message? Type 'yes' to proceed.
 User: yes
-Assistant: [commits the changes]
+Assistant: [commits the changes and deletes task.md]
 ```
 
 ## Rembember
