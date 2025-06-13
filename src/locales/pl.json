@@ -201,9 +201,7 @@
     "copy": {
       "button": "Kopiuj",
       "copied": "Skopiowano!",
-      "copiedFull": "Pełny prompt skopiowany!",
-      "error": "Nie udało się skopiować do schowka",
-      "fullPrompt": "Kopiuj Pełny Prompt"
+      "error": "Nie udało się skopiować do schowka"
     },
     "empty": "Brak dostępnego promptu systemowego.",
     "error": {

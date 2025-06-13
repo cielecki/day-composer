@@ -26,3 +26,9 @@ conversations/
 
 # workspace
 *.code-workspace
+
+# env
+.env
+
+# task.md
+task.md

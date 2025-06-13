@@ -402,6 +402,116 @@ Remove unused styles and consolidate duplicates.
 
 This approach will make the styles much more maintainable, reusable, and easier to understand. The utility-first approach reduces specificity conflicts and makes the code more predictable. 
 
+## Task Management Workflow
+
+### Workflow Commands
+
+The following commands trigger specific workflow phases for structured task implementation:
+
+#### "go" Command - Task Implementation Workflow
+When the user types "go", execute this complete workflow:
+
+1. **Task Discovery Phase**
+   - Ask the task disposer/user: "What task would you like me to work on?"
+   - Wait for the user to provide the task description
+   - Read and understand the full task requirements
+
+2. **Research & Planning Phase**
+   - Conduct comprehensive research on the task
+   - Analyze existing codebase for relevant patterns, components, and implementations
+   - Check for existing similar functionality that can be reused or extended
+   - Review documentation, translation files, and related features
+   - Identify all files that need to be modified
+   - Plan the implementation approach step by step
+
+3. **Plan Presentation Phase**
+   - Present a detailed implementation plan including:
+     - Summary of what will be implemented
+     - List of files to be created/modified
+     - Key implementation decisions and rationale
+     - Potential challenges and how they'll be addressed
+     - Expected impact on existing functionality
+   - **ALWAYS ASK FOR USER ACCEPTANCE BEFORE PROCEEDING**
+   - Wait for explicit user approval: "Do you approve this plan? Type 'yes' to proceed."
+
+4. **Implementation Phase** (only after user approval)
+   - Implement the approved plan
+   - Follow all existing code guidelines (styles, changelog, documentation)
+   - Test the implementation
+   - Update CHANGELOG.md if it's a user-facing feature
+   - Update documentation as needed
+   - Clean up translation files if necessary
+
+#### "r" Command - Final Review & Commit Preparation
+When the user types "r", execute this review workflow:
+
+1. **Task Context Recovery Phase**
+   - Automatically read the task.md file to understand the current task being worked on
+   - If task.md exists, use it to understand the task requirements and scope
+   - If task.md doesn't exist, ask the user what task they want reviewed
+
+2. **Code Review Phase**
+   - Review all changes made during the implementation
+   - Check for code quality, adherence to style guidelines
+   - Verify that all requirements from the original task are met
+   - Ensure no regressions were introduced
+   - Validate that tests pass (run `npm run build` if needed)
+
+3. **Documentation Review**
+   - Verify CHANGELOG.md is updated appropriately
+   - Check that documentation in docs/ and library/Docs/ is current
+   - Ensure translation files are clean and consistent
+
+4. **Commit Message Preparation**
+   - Generate a clear, descriptive commit message following conventional commits format
+   - Include:
+     - Type of change (feat, fix, docs, style, refactor, etc.)
+     - Brief description of what was implemented
+     - Any breaking changes or important notes
+   - Present the proposed commit message to the user
+   - Example format: `feat: add task management workflow commands to cursor rules`
+
+#### "c" Command - Commit Execution
+When the user types "c":
+
+1. **Final Confirmation**
+   - Show the commit message one final time
+   - Ask: "Ready to commit with this message? Type 'yes' to proceed."
+
+2. **Commit Process**
+   - Execute the git commit with the prepared message
+   - Provide confirmation of successful commit
+   - Optionally suggest next steps (push, create PR, etc.)
+
+### Workflow Rules
+
+- **Sequential Execution**: Commands must be used in order (go → r → c)
+- **User Approval Required**: Each phase requires explicit user approval before proceeding
+- **Comprehensive Planning**: The "go" command must include thorough research and planning
+- **Quality Assurance**: The "r" command ensures code quality and completeness
+- **Clean Commits**: The "c" command creates well-documented commits
+
+### Example Usage
+
+```
+User: go
+Assistant: What task would you like me to work on?
+User: Add a new button component with primary and secondary variants
+Assistant: [conducts research and planning]
+Assistant: Here's my implementation plan... Do you approve this plan? Type 'yes' to proceed.
+User: yes
+Assistant: [implements the feature]
+
+User: r
+Assistant: [reviews implementation and prepares commit message]
+Assistant: Proposed commit message: "feat: add reusable button component with primary/secondary variants"
+
+User: c
+Assistant: Ready to commit with this message? Type 'yes' to proceed.
+User: yes
+Assistant: [commits the changes]
+```
+
 ## Rembember
 
 REMEMBER ALWAYS ASK FOR USER ACCEPTANCE BEFORE STARTING TO MODIFY ANYTHING

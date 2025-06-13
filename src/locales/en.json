@@ -201,9 +201,7 @@
     "copy": {
       "button": "Copy to clipboard",
       "copied": "Copied!",
-      "copiedFull": "Full prompt copied!",
-      "error": "Failed to copy to clipboard",
-      "fullPrompt": "Copy Full Prompt"
+      "error": "Failed to copy to clipboard"
     },
     "empty": "No system prompt available",
     "error": {
