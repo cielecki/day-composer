@@ -426,50 +426,48 @@ When the user types "go", execute the task disposer script:
    - **ALWAYS ASK FOR USER ACCEPTANCE BEFORE STARTING TO MODIFY ANYTHING**
 
 #### "r" Command - Final Review & Commit Preparation
-When the user types "r", execute this review workflow:
+When the user types "r", execute the final review using the automated script:
 
-1. **Task Context Recovery Phase**
-   - Automatically read the task.md file to understand the current task being worked on
-   - If task.md exists, use it to understand the task requirements and scope
-   - If task.md doesn't exist, ask the user what task they want reviewed
+1. **Run Final Review Script**
+   - Execute `node scripts/final-review.mjs` to perform comprehensive automated review
+   - The script will:
+     - Read task.md file to understand the current task context
+     - Check for staged changes (exits if none found)
+     - Run build process (`npm run build`) to validate code
+     - Run translation cleanup (`node scripts/translation-cleanup.mjs`)
+     - Use Anthropic Claude AI to review staged changes for:
+       - Code quality and best practices
+       - Documentation compliance
+       - Translation handling
+       - Style consistency
+       - Changelog requirements
+       - Testing considerations
+       - Potential issues
+     - Generate AI-powered commit message based on changes and task context
+     - Provide comprehensive final summary with recommendations
 
-2. **Task Documentation Final Update**
-   - Update task.md with final implementation status
-   - Add completion notes and final alterations made
-   - Document any remaining issues or future considerations
-   - Mark task as completed in the progress section
+2. **Review Results**
+   - The script provides detailed feedback on:
+     - **Build Status**: Whether the code compiles successfully
+     - **Translation Status**: Any translation key issues
+     - **AI Review**: Comprehensive code analysis with recommendation (APPROVE/MINOR ISSUES/MAJOR ISSUES/REJECT)
+     - **Commit Message**: AI-generated commit message following project conventions
+   
+3. **Final Recommendations**
+   - **READY TO COMMIT**: All checks passed, ready to commit with suggested message
+   - **COMMIT WITH CAUTION**: Minor issues noted but not blocking
+   - **DO NOT COMMIT**: Critical issues must be resolved first
 
-3. **Code Review Phase**
-   - Review all changes made during the implementation
-   - Check for code quality, adherence to style guidelines
-   - Verify that all requirements from the original task are met
-   - Ensure no regressions were introduced
-   - Validate that tests pass (run `npm run build` if needed)
-   - **Review cursor rules changes if applicable**
+4. **Commit Process**
+   - If approved by the script, use the generated commit message
+   - Execute: `git commit -m "generated_commit_message"`
+   - Clean up task.md file after successful commit
 
-4. **Documentation Review**
-   - Verify CHANGELOG.md is updated appropriately
-   - Check that documentation in docs/ and library/Docs/ is current
-   - Ensure translation files are clean and consistent
-   - **Verify task.md contains complete implementation history**
-
-5. **Commit Message Preparation**
-   - Generate a clear, descriptive commit message following conventional commits format
-   - Include:
-     - Type of change (feat, fix, docs, style, refactor, etc.)
-     - Brief description of what was implemented
-     - Any breaking changes or important notes
-   - Present the proposed commit message to the user
-   - Example format: `feat: add task management workflow commands to cursor rules`
-
-6. **Final Confirmation**
-   - Show the commit message one final time
-   - Ask: "Ready to commit with this message? Type 'yes' to proceed."
-
-7. **Commit Process**
-   - Execute the git commit with the prepared message
-   - Provide confirmation of successful commit
-   - Delete the task.md file to clean up the workspace
+**Requirements for Final Review:**
+- Must have a `task.md` file describing the work done
+- Must have staged changes (`git add` your files first)
+- Requires ANTHROPIC_API_KEY environment variable for AI review
+- All critical issues must be resolved before committing
 
 ### Workflow Rules
 

@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Developer Experience
+- Automated final review workflow using AI-powered script instead of manual 7-step process
+
 
 ## [0.11.3] - 2025-01-11
 
