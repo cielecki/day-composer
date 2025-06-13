@@ -20,8 +20,8 @@ export const modeDelegateTool: ObsidianTool<DelegateToModeToolInput> = {
 		let modeDescriptions = "";
 		
 		const modes = Object.values(getStore().modes.available);
-		const currentModeId = getStore().modes.activeId;
-		availableModes = modes.filter(mode => mode.path !== currentModeId).map(mode => mode.path);
+		// Note: In the new multi-chat system, we don't filter by current mode since each chat can have different modes
+		availableModes = modes.map(mode => mode.path);
 		
 		// Build a description that includes all available modes and their purposes
 		if (modes.length > 0) {
@@ -70,25 +70,14 @@ export const modeDelegateTool: ObsidianTool<DelegateToModeToolInput> = {
 
 		context.setLabel(t('tools.modeDelegate.labels.inProgress', { mode: targetModeName }));
 
-		// Store original state to restore after delegation (declare outside try block)
-		const originalCurrentChat = store.chats.current;
-		const originalActiveMode = store.modes.activeId;
+		// Create new conversation with the delegated task
+		const newChatId = generateChatId();
 		
 		try {
 			// Validate that the target mode exists
 			if (!targetMode) {
 				throw new Error(`Mode '${mode_id}' not found`);
 			}
-
-			// Save current conversation immediately if it has content
-			const currentMessages = store.chats.current.storedConversation.messages;
-			if (currentMessages.length > 0) {
-				await store.saveImmediatelyIfNeeded(true);
-				context.progress(t('tools.modeDelegate.progress.savedCurrent'));
-			}
-			
-			// Create new conversation with the delegated task
-			const newChatId = generateChatId();
 			const taskMessage = createUserMessage(task);
 			
 			const newConversation = {
@@ -100,6 +89,8 @@ export const modeDelegateTool: ObsidianTool<DelegateToModeToolInput> = {
 				},
 				storedConversation: {
 					version: CURRENT_SCHEMA_VERSION,
+					title: title || t('chat.titles.newChat'),
+					isUnread: false, // New conversations start as read
 					modeId: mode_id, // Set the correct mode
 					titleGenerated: !title, // If no title provided, allow auto-generation
 					messages: [taskMessage],
@@ -114,25 +105,23 @@ export const modeDelegateTool: ObsidianTool<DelegateToModeToolInput> = {
 				}
 			};
 
-			// Switch to the new conversation and mode to process the AI response
-			store.setCurrentChat(newConversation);
-			store.setActiveMode(mode_id);
+			// Load the new conversation into a temporary chat slot
+			store.setCurrentChat(newChatId, newConversation);
+			store.setActiveModeForChat(newChatId, mode_id);
 			
 			context.progress(t('tools.modeDelegate.progress.processingTask', { mode: targetModeName }));
 			
 			// Process the AI response in the background
 			// This will add the AI response to the conversation
-			await store.runConversationTurnWithContext();
+			await store.runConversationTurnWithContext(newChatId);
 			
 			// Save the completed conversation with AI response
-			await store.saveConversation();
+			await store.saveConversation(newChatId);
 			
 			context.progress(t('tools.modeDelegate.progress.createdChat', { mode: targetModeName }));
 			
-			// Immediately restore the original conversation and mode
-			// This ensures the user sees their original conversation unchanged
-			store.setCurrentChat(originalCurrentChat);
-			store.setActiveMode(originalActiveMode);
+			// Clean up the temporary chat from memory (but keep the saved file)
+			await store.unloadChat(newChatId);
 			
 			context.setLabel(t('tools.modeDelegate.labels.completed', { mode: targetModeName }));
 			context.progress(t('tools.modeDelegate.progress.completedFull', { 
@@ -141,13 +130,13 @@ export const modeDelegateTool: ObsidianTool<DelegateToModeToolInput> = {
 			}));
 
 		} catch (error) {
-			// Make sure to restore original state even if there's an error
+			// Clean up any temporary chat that might have been created
 			try {
-				// Restore original conversation and mode
-				store.setCurrentChat(originalCurrentChat);
-				store.setActiveMode(originalActiveMode);
-			} catch (restoreError) {
-				console.error('Failed to restore original state after delegation error:', restoreError);
+				if (store.getChatState(newChatId)) {
+					await store.unloadChat(newChatId);
+				}
+			} catch (cleanupError) {
+				console.error('Failed to clean up temporary chat after delegation error:', cleanupError);
 			}
 			
 			context.setLabel(t('tools.modeDelegate.labels.failed', { mode: targetModeName }));
