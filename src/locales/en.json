@@ -277,7 +277,7 @@
         "success": "Added '{{task}}' to '{{filename}}'"
       },
       "progress": {
-        "success": "Added '{{task}}' to '{{filename}}'"
+        "success": "Added '{{task}}' to '{{name}}'"
       }
     },
     "check": {

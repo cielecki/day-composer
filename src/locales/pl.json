@@ -277,7 +277,7 @@
         "success": "Dodano {{task}} do '{{filename}}'"
       },
       "progress": {
-        "success": "Dodano {{task}} do '{{filename}}'"
+        "success": "Dodano {{task}} do '{{name}}'"
       }
     },
     "check": {
