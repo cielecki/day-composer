@@ -95,9 +95,6 @@ export const runConversationTurn = async (
 					systemPrompt = await currentStore.getSystemPrompt(currentModeId);
 					
 					systemPromptCalculated = true;
-					console.debug('[CONVERSATION-TURN] Recalculated system prompt for mode:', currentModeId);
-				} else {
-					console.debug('[CONVERSATION-TURN] Reusing system prompt for mode:', currentModeId);
 				}
 				
 				const rawModel = currentActiveMode?.model ?? defaultMode.model;
@@ -164,11 +161,8 @@ export const runConversationTurn = async (
 				// Set up stream processor callbacks for this specific chat
 				const callbacks: StreamProcessorCallbacks = {
 					onMessageStart: () => {
-						console.debug(`[CONVERSATION-TURN] onMessageStart called for chat ${chatId}`);
 						assistantMessage = { role: "assistant", content: [] };
-						console.debug(`[CONVERSATION-TURN] Adding assistant message to chat ${chatId}:`, assistantMessage);
 						usePluginStore.getState().addMessage(chatId, assistantMessage);
-						console.debug(`[CONVERSATION-TURN] Assistant message added to chat ${chatId}`);
 					},
 					onMessageUpdate: (message: Message) => {
 						// Validate message before updating
@@ -176,7 +170,6 @@ export const runConversationTurn = async (
 							console.warn("Invalid message in stream update, skipping");
 							return;
 						}
-						console.debug(`[CONVERSATION-TURN] onMessageUpdate called for chat ${chatId}, content length:`, Array.isArray(message.content) ? message.content.length : 'not array');
 						assistantMessage = message;
 						const currentStore = usePluginStore.getState();
 						const currentChatState = currentStore.getChatState(chatId);
@@ -190,14 +183,12 @@ export const runConversationTurn = async (
 							console.warn("Invalid final message in stream stop, skipping");
 							return;
 						}
-						console.debug(`[CONVERSATION-TURN] onMessageStop called for chat ${chatId}, content length:`, Array.isArray(finalMessage.content) ? finalMessage.content.length : 'not array', finalMessage);
 						assistantMessage = finalMessage;
 						
 						// CRITICAL: Update the final message in the store before saving
 						const currentStore = usePluginStore.getState();
 						const currentChatState = currentStore.getChatState(chatId);
 						if (currentChatState && currentChatState.chat.storedConversation.messages.length > 0) {
-							console.debug(`[CONVERSATION-TURN] Updating final message in store for chat ${chatId}`);
 							currentStore.updateMessage(chatId, currentChatState.chat.storedConversation.messages.length - 1, finalMessage);
 						}
 						

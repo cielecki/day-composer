@@ -96,7 +96,7 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
       }
       
       const conversation = chatState.chat.storedConversation.messages;
-      const conversationTitle = title || chatState.chat.meta.title || t('chat.titles.newChat');
+      const conversationTitle = title || chatState.chat.storedConversation.title || t('chat.titles.newChat');
 
       if (!conversation || conversation.length === 0) {
         throw new ToolExecutionError(t('tools.conversationSave.progress.empty'));

@@ -3,17 +3,29 @@ import { ChatCostData } from '../../types/cost-tracking';
 import { AttachedImage } from '../../types/attached-image';
 
 // Database schema version for migrations
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3; // Increment for new storage format
 
 export interface ConversationMeta {
 	id: string;
-	title: string;
 	filePath: string;
 	updatedAt: number;
 }
 
+export interface ConversationListItem {
+	id: string;
+	updatedAt: number;
+	filePath: string;
+	// Lazy-loaded metadata:
+	title?: string;
+	isUnread?: boolean;
+	isMetadataLoaded: boolean;
+	isFullyLoaded: boolean; // Full chat loaded in memory
+}
+
 export interface StoredConversation {
 	version: number;
+	title: string;
+	isUnread: boolean;
 	modeId: string;
 	titleGenerated: boolean;
 	messages: Message[];

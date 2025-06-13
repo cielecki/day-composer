@@ -13,7 +13,7 @@ import {
 } from '../types/message';
 import { LucideIcon } from "./LucideIcon";
 import { LNModePill } from '../components/LNModePills';
-import { TFile, Modal, Notice } from "obsidian";
+import { TFile } from "obsidian";
 import { t } from 'src/i18n';
 import { UnifiedInputArea } from "./UnifiedInputArea";
 import { SetupFlow } from "./setup/SetupFlow";
@@ -58,7 +58,9 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 	const isGeneratingSpeech = usePluginStore(state => state.audio.isGeneratingSpeech);
 	const audioStop = usePluginStore(state => state.audioStop);
 	const chatStop = usePluginStore(state => state.chatStop);
-	
+
+	const markChatAsRead = usePluginStore(state => state.markChatAsRead);
+
 	// Derive values from store state (no additional hooks)
 	const chatActiveModeId = chatState?.activeModeId || DEFAULT_MODE_ID;
 	const rawConversation = chatState?.chat.storedConversation.messages || [];
@@ -216,16 +218,109 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 		}
 	}, [autoscrollRef]);
 
+
+	// Mark chat as read when this component gains focus
+
+	// Handle workspace active leaf changes to detect when this chat gains focus
+	useEffect(() => {
+		const plugin = LifeNavigatorPlugin.getInstance();
+		if (!plugin) return;
+
+		const handleActiveLeafChange = () => {
+			const activeLeaf = plugin.app.workspace.activeLeaf;
+
+			console.debug(`[CHAT-APP] Active leaf changed. Current chatId: ${chatId}`);
+
+			if (activeLeaf && activeLeaf.view.getViewType() === LIFE_NAVIGATOR_VIEW_TYPE) {
+				const chatView = activeLeaf.view as ChatView;
+				const activeChatId = chatView.getChatId();
+
+				console.debug(`[CHAT-APP] Active leaf is chat view. Active chatId: ${activeChatId}, Current chatId: ${chatId}`);
+
+				// Only mark as read if this is the active chat
+				if (activeChatId === chatId) {
+					console.debug(`[CHAT-APP] Marking chat ${chatId} as read due to tab focus`);
+					markChatAsRead(chatId);
+				}
+			} else {
+				console.debug(`[CHAT-APP] Active leaf is not a chat view or is null`);
+			}
+		};
+
+		// Register the event listener
+		plugin.app.workspace.on('active-leaf-change', handleActiveLeafChange);
+
+		// Check initial state
+		console.debug(`[CHAT-APP] Checking initial active leaf state for chat ${chatId}`);
+		handleActiveLeafChange();
+
+		// Cleanup
+		return () => {
+			plugin.app.workspace.off('active-leaf-change', handleActiveLeafChange);
+		};
+	}, [chatId, markChatAsRead]);
+
+	// Additional fallback: mark as read when component becomes visible/focused
+	useEffect(() => {
+		const handleVisibilityChange = () => {
+			if (!document.hidden) {
+				// Document became visible, check if this chat is active
+				const plugin = LifeNavigatorPlugin.getInstance();
+				const activeLeaf = plugin?.app.workspace.activeLeaf;
+
+				if (activeLeaf && activeLeaf.view.getViewType() === LIFE_NAVIGATOR_VIEW_TYPE) {
+					const chatView = activeLeaf.view as ChatView;
+					const activeChatId = chatView.getChatId();
+
+					if (activeChatId === chatId) {
+						console.debug(`[CHAT-APP] Marking chat ${chatId} as read due to visibility change`);
+						markChatAsRead(chatId);
+					}
+				}
+			}
+		};
+
+		const handleWindowFocus = () => {
+			// Window gained focus, check if this chat is active
+			const plugin = LifeNavigatorPlugin.getInstance();
+			const activeLeaf = plugin?.app.workspace.activeLeaf;
+
+			if (activeLeaf && activeLeaf.view.getViewType() === LIFE_NAVIGATOR_VIEW_TYPE) {
+				const chatView = activeLeaf.view as ChatView;
+				const activeChatId = chatView.getChatId();
+
+				if (activeChatId === chatId) {
+					console.debug(`[CHAT-APP] Marking chat ${chatId} as read due to window focus`);
+					markChatAsRead(chatId);
+				}
+			}
+		};
+
+		document.addEventListener('visibilitychange', handleVisibilityChange);
+		window.addEventListener('focus', handleWindowFocus);
+
+		return () => {
+			document.removeEventListener('visibilitychange', handleVisibilityChange);
+			window.removeEventListener('focus', handleWindowFocus);
+		};
+	}, [chatId, markChatAsRead]);
+
+	// Handle chat switching
+	const prevChatIdRef = useRef<string | null>(null);
+	useEffect(() => {
+		prevChatIdRef.current = chatId;
+	}, [chatId]);
+
 	// CRITICAL: Ensure chat is loaded when component mounts
 	useEffect(() => {
 		const ensureChatLoaded = async () => {
 			// If chat state doesn't exist, try to load it
 			if (!chatState) {
 				console.debug(`Chat ${chatId} not found, attempting to load or create...`);
-				
+
 				// Try to load from database first
 				const loaded = await loadChat(chatId);
-				
+
 				if (!loaded) {
 					// If loading failed, this might be a new chat ID that needs to be created
 					console.debug(`Failed to load chat ${chatId}, this might be a new chat`);
@@ -328,21 +423,21 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 			if (isSpeaking || isGeneratingSpeech) {
 				audioStop();
 			}
-			
+
 			// Load the conversation and update the current view's state
 			const success = await loadConversation(conversationId);
-			
+
 			if (success) {
 				// Find the current ChatView and update its chatId
 				const plugin = LifeNavigatorPlugin.getInstance();
 				const activeLeaf = plugin.app.workspace.activeLeaf;
-				
+
 				if (activeLeaf && activeLeaf.view.getViewType() === LIFE_NAVIGATOR_VIEW_TYPE) {
 					const chatView = activeLeaf.view as ChatView;
 					chatView.updateChatId(conversationId);
 				}
 			}
-			
+
 		} catch (error) {
 			console.error('Failed to load conversation:', error);
 		}
@@ -590,9 +685,22 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 						className="clickable-icon"
 						aria-label={t('ui.chat.new')}
 						onClick={async () => {
-							// Save current conversation immediately before starting new chat
+
+							// Save current conversation immediately before creating new chat
 							await usePluginStore.getState().saveImmediatelyIfNeeded(chatId, false);
-							handleClearChat();
+
+							// Create a new chat with the current mode
+							const store = usePluginStore.getState();
+							const newChatId = store.createNewChat(chatActiveModeId);
+
+							// Update the current ChatView to use the new chat ID
+							const plugin = LifeNavigatorPlugin.getInstance();
+							const activeLeaf = plugin.app.workspace.activeLeaf;
+
+							if (activeLeaf && activeLeaf.view.getViewType() === LIFE_NAVIGATOR_VIEW_TYPE) {
+								const chatView = activeLeaf.view as ChatView;
+								chatView.updateChatId(newChatId);
+							}
 						}}
 					>
 						<LucideIcon name="square-pen" size={18} />
@@ -682,6 +790,7 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 										<div className="ln-chat-menu-item" onClick={async () => {
 											if (currentConversationMeta?.id) {
 												await handleDeleteConversation(currentConversationMeta.id, deleteConversation);
+
 											}
 											setMenuOpen(false);
 										}}>

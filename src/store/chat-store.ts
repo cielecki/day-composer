@@ -15,6 +15,7 @@ import { ensureContentBlocks, extractTextForTTS } from 'src/utils/chat/content-b
 import { getDefaultLNMode } from 'src/utils/modes/ln-mode-defaults';
 import { ApiUsageData } from 'src/types/cost-tracking';
 import { calculateApiCallCost, calculateChatCostData } from 'src/utils/cost/cost-calculator';
+import { isChatCurrentlyFocused } from 'src/utils/chat/chat-focus-utils';
 
 // Extend Message type to include unique ID for React keys
 export interface MessageWithId extends Message {
@@ -41,12 +42,13 @@ const createInitialChatWithState = (): ChatWithState => {
     chat: {
       meta: {
         id: generateChatId(),
-        title: t('chat.titles.newChat'),
         filePath: '',
-        updatedAt: 0
+        updatedAt: 0,
       },
       storedConversation: {
         version: CURRENT_SCHEMA_VERSION,
+        title: t('chat.titles.newChat'),
+        isUnread: false,
         modeId: '',
         titleGenerated: false,
         messages: [],
@@ -117,13 +119,17 @@ export interface ChatSlice {
   getCurrentConversationId: (chatId: string) => string | null;
   reset: (chatId: string) => void; // Alias for clearChat
   
-  // New methods
+  // Per-chat mode management
   setActiveModeForChat: (chatId: string, modeId: string) => void;
   getActiveModeForChat: (chatId: string) => string | null;
+  
+  // Per-chat input state management
   updateInputState: (chatId: string, inputState: Partial<InputState>) => void;
   getInputState: (chatId: string) => InputState;
   clearInputState: (chatId: string) => void;
   markChatAsHavingBackingFile: (chatId: string) => void;
+
+  markChatAsRead: (chatId: string) => void;
 }
 
 // Create conversation slice
@@ -260,6 +266,11 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         const newMessages = [...chatState.chat.storedConversation.messages, messageWithId];
         chatState.chat.storedConversation.messages = newMessages;
         
+        // Mark as unread if this is an assistant message AND the chat is not currently focused
+        if (message.role === 'assistant' && !isChatCurrentlyFocused(chatId)) {
+          chatState.chat.storedConversation.isUnread = true;
+        }
+
         console.debug(`[CHAT-STORE] Message added to chat ${chatId}, new count:`, newMessages.length);
       });
       
@@ -308,12 +319,13 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         chatState.chat = {
           meta: {
             id: chatId, // Use the same chatId, don't generate a new one
-            title: t('chat.titles.newChat'),
             filePath: '',
-            updatedAt: 0
+            updatedAt: 0,
           },
           storedConversation: {
             version: CURRENT_SCHEMA_VERSION,
+            title: t('chat.titles.newChat'),
+            isUnread: false,
             modeId: '',
             titleGenerated: false,
             messages: [],
@@ -391,8 +403,6 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       }
     }),
     
-
-    
     getCurrentConversationId: (chatId: string) => {
       const chatState = get().getChatState(chatId);
       return chatState?.chat.meta.id || null;
@@ -426,7 +436,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       }
 
       // If this is the first message and no title is set, generate a better one from the message
-      if (isFirstMessage && chatState.chat.meta.title === t('chat.titles.newChat')) {
+      if (isFirstMessage && chatState.chat.storedConversation.title === t('chat.titles.newChat')) {
         const generatedTitle = userMessage.length > 50 ? 
           userMessage.substring(0, 47) + '...' : 
           userMessage;
@@ -434,7 +444,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         set((state) => {
           const chatToUpdate = state.chats.loaded.get(chatId);
           if (chatToUpdate) {
-            chatToUpdate.chat.meta.title = generatedTitle;
+            chatToUpdate.chat.storedConversation.title = generatedTitle;
             chatToUpdate.chat.meta.updatedAt = Date.now();
           }
         });
@@ -743,6 +753,25 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
           chatState.hasBackingFile = true;
         }
       });
-    }
+
+    },
+
+    markChatAsRead: (chatId: string) => {
+      console.debug(`[CHAT-STORE] markChatAsRead called for chat ${chatId}`);
+      
+      set((state) => {
+        const chatState = state.chats.loaded.get(chatId);
+        if (chatState) {
+          const wasUnread = chatState.chat.storedConversation.isUnread;
+          chatState.chat.storedConversation.isUnread = false;
+          console.debug(`[CHAT-STORE] Chat ${chatId} marked as read. Was unread: ${wasUnread}`);
+        } else {
+          console.error(`[CHAT-STORE] Chat ${chatId} not found in markChatAsRead`);
+        }
+      });
+      
+      // Save to update the filename (remove -U suffix)
+      get().saveImmediatelyIfNeeded(chatId, false);
+    },
   }
 }; 

@@ -43,8 +43,8 @@ export class ChatView extends ItemView {
 		const store = usePluginStore.getState();
 		const chatState = store.getChatState(this._chatId);
 		
-		if (chatState && chatState.chat.meta.title) {
-			return chatState.chat.meta.title;
+		if (chatState && chatState.chat.storedConversation.title) {
+			return chatState.chat.storedConversation.title;
 		}
 		
 		return t('view.title');

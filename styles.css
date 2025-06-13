@@ -337,7 +337,6 @@
 
 .life-navigator-view .clickable-icon {
   width: 42px;
-  height: 42px;
   padding: 8px;
 }
 
@@ -1253,7 +1252,6 @@
   margin-top: 8px;
   gap: 2px;
   opacity: 0;
-  height: 24px;
   min-width: 54px;
   transition: opacity 0.2s ease;
 }
@@ -1777,6 +1775,10 @@
   background: var(--background-modifier-active-hover);
 }
 
+.life-navigator-view .conversation-history-dropdown .conversation-item.generating {
+  animation: block-pulse 1.5s infinite ease-in-out;
+}
+
 .life-navigator-view .conversation-history-dropdown .conversation-item:last-child {
   border-bottom: none;
 }
@@ -1787,11 +1789,19 @@
   font-size: 13px;
   margin-bottom: 2px;
   line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  -webkit-box-orient: vertical;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0; /* Allow flex shrinking */
+}
+
+/* Separate styling for the title text to handle truncation */
+.life-navigator-view .conversation-history-dropdown .conversation-title-text {
+  flex: 1;
+  min-width: 0; /* Allow text to shrink */
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .life-navigator-view .conversation-history-dropdown .conversation-meta {
@@ -1847,6 +1857,34 @@
   text-align: center;
   color: var(--text-muted);
   font-size: 13px;
+}
+
+/* Unread indicator styles */
+.ln-unread-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--interactive-accent);
+  display: inline-block;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Tab unread indicator */
+.workspace-tab-header.ln-tab-unread::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--interactive-accent);
+  z-index: 10;
+}
+
+.workspace-tab-header.ln-tab-unread {
+  position: relative;
 }
 
 /* Responsive adjustments */
@@ -3307,4 +3345,36 @@
 .ln-floating-action-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Pulse animation for highlighted text background only */
+@keyframes highlight-pulse {
+  0% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: var(--interactive-accent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Skeleton loading animation for virtual scrolling */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.life-navigator-view .conversation-history-dropdown .skeleton-line {
+  background-color: var(--background-modifier-border);
+  border-radius: 2px;
+  animation: pulse 1.5s ease-in-out infinite;
 }

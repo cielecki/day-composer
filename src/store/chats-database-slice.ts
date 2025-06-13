@@ -1,20 +1,21 @@
 import type { ImmerStateCreator } from './plugin-store';
-import { Chat, ConversationMeta, StoredConversation } from 'src/utils/chat/conversation';
-import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
-import { generateChatTitle } from 'src/utils/chat/generate-conversation-title';
+import { ConversationMeta, StoredConversation, Chat, ConversationListItem } from '../utils/chat/conversation';
+import { generateChatTitle } from '../utils/chat/generate-conversation-title';
 import { Notice } from 'obsidian';
-import { t } from 'src/i18n';
-import { normalizePath } from 'obsidian';
-import { ensureDirectoryExists } from 'src/utils/fs/ensure-directory-exists';
-import { escapeFilename } from 'src/utils/fs/escape-filename';
-import { chatFileNameToIdAndTitle } from 'src/utils/chat/chat-file-name-to-id-and-title';
+import { t } from '../i18n';
 import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
 
-// Database slice interface
 export interface ChatsDatabaseSlice {
   // State
   database: {
     isInitialized: boolean;
+  };
+  
+  // Global conversation list cache for virtual scrolling
+  conversationList: {
+    items: ConversationListItem[];
+    isLoaded: boolean;
+    lastRefreshTime: number;
   };
   
   // Database Actions (migrated from ConversationDatabase)
@@ -29,46 +30,45 @@ export interface ChatsDatabaseSlice {
   updateConversationTitle: (conversationId: string, title: string) => Promise<boolean>;
   getConversationMeta: (conversationId: string) => Promise<ConversationMeta | null>;
   
+  // New virtual scrolling methods
+  loadConversationMetadata: (conversationId: string) => Promise<ConversationMeta | null>;
+  
+  // Global conversation list management
+  refreshConversationList: () => Promise<void>;
+  updateConversationInList: (conversationId: string, updates: Partial<ConversationListItem>) => void;
+  markConversationMetadataLoaded: (conversationId: string, metadata: ConversationMeta) => void;
+  markConversationFullyLoaded: (conversationId: string) => void;
+  removeConversationFromList: (conversationId: string) => void;
+  
   // Helper methods
   getConversationDatabase: () => null; // Deprecated - functionality moved to this slice
 }
 
-// Create database slice - migrating all ConversationDatabase functionality
 export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (set, get) => {
   
-  // Helper functions (migrated from ConversationDatabase)
   const getApp = () => {
-    const plugin = LifeNavigatorPlugin.getInstance();
-    if (!plugin?.app) {
-      throw new Error('LifeNavigator plugin not initialized');
-    }
-    return plugin.app;
+    const app = (window as any).app;
+    if (!app) throw new Error('Obsidian app not available');
+    return app;
   };
 
   const getConversationsDir = () => {
-    const plugin = LifeNavigatorPlugin.getInstance();
-    if (!plugin) {
-      throw new Error('LifeNavigator plugin not initialized');
-    }
-    return normalizePath(`${plugin.manifest.dir}/conversations`);
+    const app = getApp();
+    const pluginDir = app.vault.configDir + '/plugins/life-navigator';
+    return pluginDir + '/conversations';
   };
 
   const getConversationFiles = async (): Promise<string[]> => {
+    const app = getApp();
+    const conversationsDir = getConversationsDir();
+    
     try {
-      const app = getApp();
-      const conversationsDir = getConversationsDir();
       const files = await app.vault.adapter.list(conversationsDir);
-      // Extract just the filename from the full path
-      const jsonFiles = files.files
-        .filter(file => file.endsWith('.json'))
-        .map(file => {
-          // Extract filename from full path
-          const parts = file.split('/');
-          return parts[parts.length - 1];
-        });
-      return jsonFiles;
+      return files.files
+        .filter((file: string) => file.endsWith('.json'))
+        .map((file: string) => file.split('/').pop() || file);
     } catch (error) {
-      console.error('Failed to list conversation files:', error);
+      console.warn('Conversations directory does not exist yet');
       return [];
     }
   };
@@ -76,6 +76,12 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
   return {
     database: {
       isInitialized: false,
+    },
+    
+    conversationList: {
+      items: [],
+      isLoaded: false,
+      lastRefreshTime: 0,
     },
 
     getConversationDatabase: () => {
@@ -85,10 +91,16 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
 
     initializeDatabase: async () => {
       try {
-        const conversationsDir = getConversationsDir();
         const app = getApp();
-        await ensureDirectoryExists(conversationsDir, app);
+        const conversationsDir = getConversationsDir();
         
+        // Ensure conversations directory exists
+        try {
+          await app.vault.adapter.stat(conversationsDir);
+        } catch (error) {
+          await app.vault.adapter.mkdir(conversationsDir);
+        }
+
         set((state) => {
           state.database.isInitialized = true;
         });
@@ -102,9 +114,6 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         const app = getApp();
         const conversationsDir = getConversationsDir();
 
-        // If no chatId provided, we need to determine which chat to save
-        // For backward compatibility, we could save all loaded chats, but that's expensive
-        // For now, require explicit chatId
         if (!chatId) {
           console.error('[DATABASE] saveConversation requires a chatId parameter');
           return null;
@@ -140,7 +149,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
             set((state) => {
               const chatState = state.chats.loaded.get(chatId);
               if (chatState) {
-                chatState.chat.meta.title = generatedTitle;
+                chatState.chat.storedConversation.title = generatedTitle;
                 chatState.chat.storedConversation.titleGenerated = true;
               }
             });
@@ -160,38 +169,19 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         try {
           existingConversation = await get().loadConversationData(conversation.meta.id);
         } catch (error) {
-          // Conversation doesn't exist yet, which is fine
+          // Ignore error if conversation doesn't exist yet
         }
 
-        // Generate filename and save
-        const escapedTitle = escapeFilename(conversation.meta.title);
-        const truncatedTitle = escapedTitle.substring(0, 100);
-        const fileName = `${conversationsDir}/${conversation.meta.id}-${truncatedTitle}.json`;
+        // Simple filename: just the ID
+        const fileName = `${conversationsDir}/${conversation.meta.id}.json`;
 
-        // If there's an existing conversation, clean up its files
-        if (existingConversation) {
-          const files = await getConversationFiles();
-          const oldFiles = files.filter(filename => {
-            const parsed = chatFileNameToIdAndTitle(filename);
-            return parsed?.id === conversation.meta.id;
-          });
-
-          // Remove all old files for this conversation
-          for (const oldFile of oldFiles) {
-            const oldFilepath = `${conversationsDir}/${oldFile}`;
-            if (oldFilepath !== fileName) { // Don't delete the new file
-              try {
-                await app.vault.adapter.remove(oldFilepath);
-                console.debug(`Removed old conversation file: ${oldFile}`);
-              } catch (error) {
-                console.warn(`Failed to remove old conversation file ${oldFile}:`, error);
-              }
-            }
-          }
-        }
+        // Ensure stored conversation has all metadata
+        const storedConversation: StoredConversation = {
+          ...conversation.storedConversation,
+        };
 
         // Save the conversation
-        const conversationData = JSON.stringify(conversation.storedConversation, null, 2);
+        const conversationData = JSON.stringify(storedConversation, null, 2);
         console.debug(`Attempting to save conversation to: ${fileName}`);
         await app.vault.adapter.write(fileName, conversationData);
         console.debug(`Successfully saved conversation: ${fileName}`);
@@ -200,7 +190,17 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
           const chatState = state.chats.loaded.get(chatId);
           if (chatState) {
             chatState.chat.meta.filePath = fileName;
+
+            chatState.chat.meta.updatedAt = Date.now();
           }
+        });
+        
+        // Update the conversation list with the new timestamp and title
+        get().updateConversationInList(conversation.meta.id, {
+          updatedAt: Date.now(),
+          title: conversation.storedConversation.title,
+          isUnread: conversation.storedConversation.isUnread,
+          filePath: fileName
         });
         
         return conversation.meta.id;
@@ -215,21 +215,78 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
       try {
         const app = getApp();
         const conversationsDir = getConversationsDir();
-        const files = await getConversationFiles();
-        const targetFile = files.find(filename => {
-          const parsed = chatFileNameToIdAndTitle(filename);
-          return parsed?.id === conversationId;
+        const newFormatPath = `${conversationsDir}/${conversationId}.json`;
+        
+        // First, try to load from new format
+        try {
+          const conversationData = await app.vault.adapter.read(newFormatPath);
+          const storedConversation: StoredConversation = JSON.parse(conversationData);
+          return storedConversation;
+        } catch (error) {
+          // New format file doesn't exist, look for old format files
+          console.debug(`New format file not found for ${conversationId}, checking for old format...`);
+        }
+        
+        // Look for old format files that start with this conversation ID
+        const files = await app.vault.adapter.list(conversationsDir);
+        const oldFormatFile = files.files?.find((file: string) => {
+          const filename = file.split('/').pop();
+          return filename?.startsWith(`${conversationId}-`) && filename.endsWith('.json');
         });
-
-        if (!targetFile) {
+        
+        if (!oldFormatFile) {
+          console.debug(`No old or new format file found for conversation ${conversationId}`);
           return null;
         }
-
-        const filepath = `${conversationsDir}/${targetFile}`;
-        const conversationData = await app.vault.adapter.read(filepath);
-        const storedConversation: StoredConversation = JSON.parse(conversationData);
         
-        return storedConversation;
+        // Parse old format filename to extract metadata
+        const filename = oldFormatFile.split('/').pop()!;
+        console.log(`🔄 Migrating old conversation file: ${filename}`);
+        
+        const nameWithoutExt = filename.slice(0, -5); // Remove .json
+        const dashIndex = nameWithoutExt.indexOf('-');
+        const remainingPart = nameWithoutExt.substring(dashIndex + 1);
+        
+        // Check if it ends with -U (unread flag)
+        let escapedTitle: string;
+        let isUnread = false;
+        
+        if (remainingPart.endsWith('-U')) {
+          escapedTitle = remainingPart.slice(0, -2); // Remove -U
+          isUnread = true;
+        } else {
+          escapedTitle = remainingPart;
+          isUnread = false;
+        }
+        
+        // Unescape title
+        const title = escapedTitle
+          .replace(/_/g, ' ')
+          .replace(/·/g, '.'); // Convert middle dots back to regular dots
+        
+        // Load the old format file
+        const oldConversationData = await app.vault.adapter.read(oldFormatFile);
+        const oldStoredConversation = JSON.parse(oldConversationData);
+        
+        // Create migrated conversation with metadata embedded
+        const migratedConversation: StoredConversation = {
+          ...oldStoredConversation,
+          id: conversationId,
+          title: title,
+          isUnread: isUnread,
+          version: 3 // Update to current schema version
+        };
+        
+        // Save in new format
+        await app.vault.adapter.write(newFormatPath, JSON.stringify(migratedConversation, null, 2));
+        console.log(`✅ Migrated conversation: ${filename} → ${conversationId}.json`);
+        
+        // Remove old format file
+        await app.vault.adapter.remove(oldFormatFile);
+        console.log(`🗑️ Removed old format file: ${filename}`);
+        
+        return migratedConversation;
+        
       } catch (error) {
         console.error(`Failed to load conversation ${conversationId}:`, error);
         return null;
@@ -293,13 +350,18 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
           return false;
         }
 
-        // Get metadata for the conversation
-        const meta = await get().getConversationMeta(conversationId);
-        
-        if (!meta) {
-          console.warn(`Conversation ${conversationId} metadata not found`);
-          return false;
-        }
+
+        // Extract metadata from stored conversation
+        const app = getApp();
+        const conversationsDir = getConversationsDir();
+        const filepath = `${conversationsDir}/${conversationId}.json`;
+        const stat = await app.vault.adapter.stat(filepath);
+
+        const meta: ConversationMeta = {
+          id: conversationId,
+          filePath: filepath,
+          updatedAt: stat?.mtime || 0,
+        };
 
         // Reconstruct the full conversation object and load it
         const chat: Chat = {
@@ -322,18 +384,8 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
       try {
         const app = getApp();
         const conversationsDir = getConversationsDir();
-        const files = await getConversationFiles();
-        const targetFile = files.find(filename => {
-          const parsed = chatFileNameToIdAndTitle(filename);
-          return parsed?.id === conversationId;
-        });
-
-        if (!targetFile) {
-          new Notice(t('ui.chat.conversationDeleteFailed'));
-          return false;
-        }
-
-        const filepath = `${conversationsDir}/${targetFile}`;
+        const filepath = `${conversationsDir}/${conversationId}.json`;
+        
         await app.vault.adapter.remove(filepath);
         
         // If we have any loaded chats with this conversation ID, unload them
@@ -343,6 +395,9 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
             await get().unloadChat(chatId);
           }
         }
+        
+        // Remove from conversation list
+        get().removeConversationFromList(conversationId);
         
         new Notice(t('ui.chat.conversationDeleted'));
         return true;
@@ -360,27 +415,20 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         const files = await getConversationFiles();
         const conversations: ConversationMeta[] = [];
 
-        // Process each file to get filesystem-level metadata
+        // Process each file to get metadata from file contents
         for (const filename of files) {
           try {
+            const conversationId = filename.replace('.json', '');
             const filepath = `${conversationsDir}/${filename}`;
             
-            // Get data from filename parsing
-            const filenameData = chatFileNameToIdAndTitle(filename);
-            if (!filenameData) {
-              console.warn(`Could not parse filename: ${filename}`);
-              continue;
-            }
-
             // Get filesystem metadata
             const stat = await app.vault.adapter.stat(filepath);
             
             // Create conversation metadata
             const meta: ConversationMeta = {
-              id: filenameData.id,
-              title: filenameData.title,
+              id: conversationId, // Fallback for old format
               filePath: filepath,
-              updatedAt: stat?.mtime || 0
+              updatedAt: stat?.mtime || 0,
             };
 
             conversations.push(meta);
@@ -403,36 +451,15 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
       try {
         const app = getApp();
         const conversationsDir = getConversationsDir();
-        const files = await getConversationFiles();
-        const targetFile = files.find(filename => {
-          const parsed = chatFileNameToIdAndTitle(filename);
-          return parsed?.id === conversationId;
-        });
-
-        if (!targetFile) {
-          return null;
-        }
-
-        const filepath = `${conversationsDir}/${targetFile}`;
+        const filepath = `${conversationsDir}/${conversationId}.json`;
         
-        // Get data from filename parsing
-        const filenameData = chatFileNameToIdAndTitle(targetFile);
-        if (!filenameData) {
-          return null;
-        }
-
         // Get filesystem metadata
         const stat = await app.vault.adapter.stat(filepath);
         
-        // For detailed metadata, we need to read the file content
-        const conversationData = await app.vault.adapter.read(filepath);
-        const storedConversation: StoredConversation = JSON.parse(conversationData);
-
         const meta: ConversationMeta = {
-          id: filenameData.id,
-          title: filenameData.title,
+          id: conversationId,
           filePath: filepath,
-          updatedAt: stat?.mtime || 0
+          updatedAt: stat?.mtime || 0,
         };
 
         return meta;
@@ -444,11 +471,11 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
 
     searchConversations: async (query) => {
       try {
-        const conversations = await get().listConversations();
+        const conversations = get().conversationList.items;
         const lowercaseQuery = query.toLowerCase();
         
         return conversations.filter(conv => 
-          conv.title.toLowerCase().includes(lowercaseQuery)
+          conv.title?.toLowerCase().includes(lowercaseQuery)
         );
       } catch (error) {
         console.error('Failed to search conversations:', error);
@@ -460,32 +487,17 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
       try {
         const app = getApp();
         const conversationsDir = getConversationsDir();
-        const files = await getConversationFiles();
-        const targetFile = files.find(filename => {
-          const parsed = chatFileNameToIdAndTitle(filename);
-          return parsed?.id === conversationId;
-        });
-
-        if (!targetFile) {
-          new Notice(t('ui.chat.conversationTitleUpdateFailed'));
-          return false;
-        }
-
-        const oldFilepath = `${conversationsDir}/${targetFile}`;
+        const filepath = `${conversationsDir}/${conversationId}.json`;
         
         // Read the conversation data
-        const conversationData = await app.vault.adapter.read(oldFilepath);
+        const conversationData = await app.vault.adapter.read(filepath);
+        const storedConversation: StoredConversation = JSON.parse(conversationData);
         
-        // Create new filename with updated title
-        const escapedTitle = escapeFilename(title);
-        const truncatedTitle = escapedTitle.substring(0, 100);
-        const newFilepath = `${conversationsDir}/${conversationId}-${truncatedTitle}.json`;
+        // Update title in stored conversation
+        storedConversation.title = title;
         
-        // Write to new location and remove old file
-        await app.vault.adapter.write(newFilepath, conversationData);
-        if (oldFilepath !== newFilepath) {
-          await app.vault.adapter.remove(oldFilepath);
-        }
+        // Write back to same file
+        await app.vault.adapter.write(filepath, JSON.stringify(storedConversation, null, 2));
         
         // If this conversation is loaded in any chat, update the local state too
         const loadedChats = get().chats.loaded;
@@ -494,11 +506,18 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
             set((state) => {
               const chatState = state.chats.loaded.get(chatId);
               if (chatState) {
-                chatState.chat.meta.title = title;
+                chatState.chat.storedConversation.title = title;
+                chatState.chat.meta.updatedAt = Date.now();
               }
             });
           }
         }
+
+        // Update the conversation list
+        get().updateConversationInList(conversationId, {
+          title: title,
+          updatedAt: Date.now()
+        });
         
         new Notice(t('ui.chat.conversationTitleUpdated'));
         return true;
@@ -507,6 +526,159 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         new Notice(t('ui.chat.conversationTitleUpdateFailed'));
         return false;
       }
+    },
+
+    loadConversationMetadata: async (conversationId: string): Promise<ConversationMeta | null> => {
+      try {
+        // First check if conversation is already loaded in memory
+        const loadedChats = get().chats.loaded;
+        for (const [chatId, chatState] of loadedChats) {
+          if (chatState.chat.meta.id === conversationId) {
+            return {
+              id: chatState.chat.meta.id,
+              filePath: chatState.chat.meta.filePath,
+              updatedAt: chatState.chat.meta.updatedAt
+            };
+          }
+        }
+        
+        // If not in memory, try to read from file
+        const app = getApp();
+        const conversationsDir = getConversationsDir();
+        const newFormatPath = `${conversationsDir}/${conversationId}.json`;
+        
+        // First, try to load from new format
+        try {
+          const conversationData = await app.vault.adapter.read(newFormatPath);
+          const storedConversation: StoredConversation = JSON.parse(conversationData);
+          const stat = await app.vault.adapter.stat(newFormatPath);
+          
+          return {
+            id: conversationId,
+            filePath: newFormatPath,
+            updatedAt: stat?.mtime || 0,
+          };
+        } catch (error) {
+          // New format file doesn't exist, look for old format files
+        }
+        
+        // Look for old format files that start with this conversation ID
+        const files = await app.vault.adapter.list(conversationsDir);
+        const oldFormatFile = files.files?.find((file: string) => {
+          const filename = file.split('/').pop();
+          return filename?.startsWith(`${conversationId}-`) && filename.endsWith('.json');
+        });
+        
+        if (!oldFormatFile) {
+          return null;
+        }
+        
+        // Parse old format filename to extract metadata (without loading the full file)
+        const filename = oldFormatFile.split('/').pop()!;
+        const nameWithoutExt = filename.slice(0, -5); // Remove .json
+        const dashIndex = nameWithoutExt.indexOf('-');
+        const remainingPart = nameWithoutExt.substring(dashIndex + 1);
+        
+        // Check if it ends with -U (unread flag)
+        let escapedTitle: string;
+        let isUnread = false;
+        
+        if (remainingPart.endsWith('-U')) {
+          escapedTitle = remainingPart.slice(0, -2); // Remove -U
+          isUnread = true;
+        } else {
+          escapedTitle = remainingPart;
+          isUnread = false;
+        }
+        
+        // Unescape title
+        const title = escapedTitle
+          .replace(/_/g, ' ')
+          .replace(/·/g, '.'); // Convert middle dots back to regular dots
+
+        const stat = await app.vault.adapter.stat(newFormatPath);
+
+        return {
+          id: conversationId,
+          filePath: newFormatPath,
+          updatedAt: stat?.mtime || 0,
+        };
+      } catch (error) {
+        console.error(`Failed to load conversation metadata ${conversationId}:`, error);
+        return null;
+      }
+    },
+
+    // Global conversation list management
+    refreshConversationList: async () => {
+      try {
+        const basicInfos = await get().listConversations();
+        const items: ConversationListItem[] = basicInfos.map(info => ({
+          ...info,
+          isMetadataLoaded: false,
+          isFullyLoaded: false
+        }));
+        
+        set((state) => {
+          state.conversationList.items = items;
+          state.conversationList.isLoaded = true;
+          state.conversationList.lastRefreshTime = Date.now();
+        });
+      } catch (error) {
+        console.error('Failed to refresh conversation list:', error);
+      }
+    },
+
+    updateConversationInList: (conversationId: string, updates: Partial<ConversationListItem>) => {
+      set((state) => {
+        const index = state.conversationList.items.findIndex(item => item.id === conversationId);
+        if (index !== -1) {
+          // Update existing conversation
+          Object.assign(state.conversationList.items[index], updates);
+        } else {
+          // Add new conversation if it doesn't exist
+          const newItem: ConversationListItem = {
+            id: conversationId,
+            updatedAt: updates.updatedAt || Date.now(),
+            filePath: updates.filePath || '',
+            title: updates.title,
+            isUnread: updates.isUnread,
+            isMetadataLoaded: updates.title !== undefined && updates.isUnread !== undefined,
+            isFullyLoaded: false,
+            ...updates
+          };
+          state.conversationList.items.unshift(newItem); // Add to beginning since it's newest
+        }
+        
+        // If updatedAt was changed, re-sort the list
+        if (updates.updatedAt) {
+          state.conversationList.items.sort((a, b) => b.updatedAt - a.updatedAt);
+        }
+      });
+    },
+
+    markConversationMetadataLoaded: (conversationId: string, metadata: ConversationMeta) => {
+      set((state) => {
+        const index = state.conversationList.items.findIndex(item => item.id === conversationId);
+        if (index !== -1) {
+          state.conversationList.items[index].isMetadataLoaded = true;
+        }
+      });
+    },
+
+    markConversationFullyLoaded: (conversationId: string) => {
+      set((state) => {
+        const index = state.conversationList.items.findIndex(item => item.id === conversationId);
+        if (index !== -1) {
+          state.conversationList.items[index].isFullyLoaded = true;
+        }
+      });
+    },
+
+    removeConversationFromList: (conversationId: string) => {
+      set((state) => {
+        state.conversationList.items = state.conversationList.items.filter(item => item.id !== conversationId);
+      });
     },
   };
 }; 

@@ -2,6 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
+
 ## [0.11.3] - 2025-01-11
 
 ### 🚀 New Chat Menu - Everything You Need in One Place
@@ -430,6 +431,7 @@ change: enforce thinking in claude, as it's needed for handover to work
   - Added `loadChat`, `unloadChat`, and `createNewChat` functions to the store
   - Conversation database now works with specific chat IDs
   - Chat stop and autosave functions are now per-chat
+  - unread indicator for chats
 
 ### Changed
 - **Chat Store Architecture**: Completely refactored to support multiple loaded chats
@@ -476,3 +478,5 @@ The multi-chat system now works reliably:
 ### Developer Experience
 - Automated final review workflow using AI-powered script instead of manual 7-step process
 
+### Fixed
+- **Conversation history dropdown styling**: Fixed long conversation titles being cut off by ellipsis hiding the unread indicator. Replaced non-portable webkit-box CSS with modern flexbox layout ensuring unread indicators are always visible regardless of title length. Moved unread indicator to the beginning of titles for better visual proximity.

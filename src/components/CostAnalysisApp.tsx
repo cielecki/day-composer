@@ -63,14 +63,14 @@ export const CostAnalysisApp: React.FC<CostAnalysisAppProps> = ({
 
                 setConversationData({
                     id: targetConversationId,
-                    title: conversationMeta.title || t('chat.titles.newChat'),
+                    title: storedConversation?.title || t('chat.titles.newChat'),
                     costData: storedConversation?.costData,
                     filePath: conversationMeta.filePath,
                     updatedAt: conversationMeta.updatedAt
                 });
 
                 if (onTitleChange) {
-                    onTitleChange(conversationMeta.title || t('chat.titles.newChat'));
+                    onTitleChange(storedConversation?.title || t('chat.titles.newChat'));
                 }
             } catch (error) {
                 console.error('Failed to load conversation data:', error);
