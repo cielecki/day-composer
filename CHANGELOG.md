@@ -2,7 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-
 ## [0.11.3] - 2025-01-11
 
 ### 🚀 New Chat Menu - Everything You Need in One Place
@@ -480,3 +479,10 @@ The multi-chat system now works reliably:
 
 ### Fixed
 - **Conversation history dropdown styling**: Fixed long conversation titles being cut off by ellipsis hiding the unread indicator. Replaced non-portable webkit-box CSS with modern flexbox layout ensuring unread indicators are always visible regardless of title length. Moved unread indicator to the beginning of titles for better visual proximity.
+
+### Added
+- **Task Delegation Tool**: New `mode_delegate` tool enables fire-and-forget delegation of self-contained tasks to specialized modes. Perfect for when you need a different mode to handle a specific task without switching your current conversation. The tool creates a new independent conversation in the target mode and immediately starts working on the delegated task.
+
+### Removed
+- **Handover Mode Tool**: Removed the old `handover_mode` tool which switched modes within the same conversation. The new `mode_delegate` tool provides a better approach by creating independent conversations for delegated tasks.
+

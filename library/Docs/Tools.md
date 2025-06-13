@@ -214,13 +214,14 @@ Frontmatter only: tag="important", include_content=false
 
 ## System Tools
 
-### Handover Mode
-**Tool:** `handover_mode`
-- Allows the AI to switch between different modes during conversations
-- Enables transitions between different personalities or specialized contexts
-- Useful for moving from planning to reflection or from general assistance to specific expertise
-- Provides clear handover instructions to the new mode to ensure smooth transitions
-- The new mode receives explicit instructions to take control and continue with the task
+### Delegate to Mode
+**Tool:** `mode_delegate`
+- Fire-and-forget task delegation to specialized modes
+- Creates a new independent conversation in the target mode with a self-contained task
+- Perfect for when you need a different mode to handle something specific without interrupting your current conversation
+- The delegated task must include ALL relevant context since the new conversation is completely separate
+- Target mode immediately starts working on the delegated task
+- Original conversation continues unaffected
 
 ## Tool Filtering
 

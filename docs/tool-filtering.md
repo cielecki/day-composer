@@ -13,8 +13,8 @@ tools_allowed:
   - "search_vault"  # Allow specific tool by exact name
 
 tools_disallowed:
-  - "handover_mode" # Disallow specific tool
-  - "*document*"    # Disallow all tools containing "document"
+  - "mode_delegate" # Disallow specific tool
+  - "*document*"       # Disallow all tools containing "document"
 ```
 
 ## Pattern Matching
@@ -53,7 +53,7 @@ Current tools in Life Navigator:
 - `show_todos` - Display todo items
 
 ### Mode Management
-- `handover_mode` - Switch between modes
+- `mode_delegate` - Fire-and-forget task delegation to specialized modes
 
 ## Example Configurations
 
@@ -64,7 +64,7 @@ tools_allowed:
   - "*document*"
   - "show_todos"
 tools_disallowed:
-  - "handover_mode"
+  - "mode_delegate"
 ```
 
 ### Reflection Mode (Read-only analysis)

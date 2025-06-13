@@ -11,7 +11,7 @@ import { taskUncheckTool } from './tools/task-uncheck';
 import { taskMoveTool } from './tools/task-move';
 import { taskAbandonTool } from './tools/task-abandon';
 import { taskCreateCompletedTool } from './tools/task-create-completed';
-import { modeHandoverTool } from './tools/mode-handover';
+
 import { taskEditTool } from './tools/task-edit';
 import { taskRemoveTool } from './tools/task-remove';
 import { vaultFindTool } from './tools/vault-find';
@@ -30,6 +30,7 @@ import { dailyNoteTool } from './tools/day-note';
 import { dailyNotesTool } from './tools/daily-notes';
 import { currentChatTool } from './tools/current-chat';
 import { currentFileAndSelectionTool } from './tools/current-file-and-selection';
+import { modeDelegateTool } from './tools/mode-delegate';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { t } from "./i18n";
 import { filterToolsByMode } from "./utils/tools/tool-filter";
@@ -100,7 +101,6 @@ export class ObsidianTools {
 		taskMoveTool,
 		taskAbandonTool,
 		taskCreateCompletedTool,
-		modeHandoverTool,
 		taskEditTool,
 		taskRemoveTool,
 		modeValidatorTool,
@@ -116,6 +116,7 @@ export class ObsidianTools {
 		dailyNotesTool,
 		currentChatTool,
 		currentFileAndSelectionTool,
+		modeDelegateTool,
 	];
 
 	/**

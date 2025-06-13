@@ -370,6 +370,20 @@
         "notFound": "Daily note not found for '{{date}}'"
       }
     },
+          "modeDelegate": {
+        "labels": {
+          "completed": "Task delegated to '{{mode}}' mode",
+          "failed": "Failed to delegate task to '{{mode}}' mode",
+          "inProgress": "Delegating task to '{{mode}}' mode...",
+          "initial": "Delegating task to specialized mode ..."
+        },
+        "progress": {
+          "completedFull": "Task successfully delegated to '{{mode}}' mode: {{task}}. The delegated conversation is saved and can be accessed from chat history.",
+          "createdChat": "Created independent conversation in '{{mode}}' mode",
+          "processingTask": "Processing task in '{{mode}}' mode...",
+          "savedCurrent": "Saved current conversation before delegation"
+        }
+      },
     "editTodo": {
       "labels": {
         "completed": "Edited '{{task}}'",
@@ -415,17 +429,6 @@
       "progress": {
         "foundFiles": "Found '{{count}}' files with tag '{{tag}}'",
         "noResults": "No files found with tag '{{tag}}'"
-      }
-    },
-    "handover": {
-      "labels": {
-        "completed": "Switched to '{{mode}}' mode",
-        "failed": "Failed to switch to '{{mode}}' mode",
-        "inProgress": "Switching to '{{mode}}' mode...",
-        "initial": "Handing over control ..."
-      },
-      "progress": {
-        "completedFull": "You are now in '{{mode}}' mode. Perform a given task, immediately after you are done, switch back to '{{fromMode}}' using the handover_mode tool."
       }
     },
     "library": {

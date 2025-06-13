@@ -372,6 +372,11 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         // Load the conversation into a new chat using the conversation ID as chat ID
         get().setCurrentChat(conversationId, chat);
         
+        // Restore the mode that was active for this conversation
+        if (storedConversation.modeId) {
+          get().setActiveModeForChat(conversationId, storedConversation.modeId);
+        }
+        
         return true;
       } catch (error) {
         console.error('Failed to load conversation:', error);

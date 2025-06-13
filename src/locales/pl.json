@@ -370,6 +370,20 @@
         "notFound": "Nie znaleziono dziennej notatki"
       }
     },
+          "modeDelegate": {
+        "labels": {
+          "completed": "Zadanie przekazane do trybu '{{mode}}'",
+          "failed": "Nie udało się przekazać zadania do trybu '{{mode}}'",
+          "inProgress": "Przekazywanie zadania do trybu '{{mode}}'...",
+          "initial": "Przekazywanie zadania do specjalistycznego trybu ..."
+        },
+        "progress": {
+          "completedFull": "Zadanie pomyślnie przekazane do trybu '{{mode}}': {{task}}. Delegowana rozmowa jest zapisana i można ją znaleźć w historii rozmów.",
+          "createdChat": "Utworzono niezależną rozmowę w trybie '{{mode}}'",
+          "processingTask": "Przetwarzanie zadania w trybie '{{mode}}'...",
+          "savedCurrent": "Zapisano bieżącą rozmowę przed przekazaniem"
+        }
+      },
     "editTodo": {
       "labels": {
         "completed": "Edytowano '{{task}}'",
@@ -415,17 +429,6 @@
       "progress": {
         "foundFiles": "Znaleziono '{{count}}' plików z tagiem '{{tag}}'",
         "noResults": "Nie znaleziono plików z tagiem '{{tag}}'"
-      }
-    },
-    "handover": {
-      "labels": {
-        "completed": "Przełączono na tryb '{{mode}}'",
-        "failed": "Nie udało się przełączyć na tryb '{{mode}}'",
-        "inProgress": "Przełączanie na tryb '{{mode}}'...",
-        "initial": "Przekazywanie kontroli ..."
-      },
-      "progress": {
-        "completedFull": "Jesteś teraz w trybie '{{mode}}'. Wykonaj powierzone zadanie, natychmiast po jego zakończeniu, przełącz się z powrotem do trybu '{{fromMode}}' używając narzędzia handover_mode."
       }
     },
     "library": {

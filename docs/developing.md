@@ -152,7 +152,7 @@ Life Navigator includes several built-in tools that provide core functionality:
 - **Task Create Completed** (`task_create_completed`): Creates pre-completed tasks
 
 #### System Tools
-- **Mode Handover** (`mode_handover`): Switches between different AI modes
+- **Delegate to Mode** (`mode_delegate`): Fire-and-forget task delegation to specialized modes
 - **Mode Validator** (`mode_validator`): Validates mode configurations
 - **Tool Validator** (`tool_validator`): Validates tool implementations
 - **Secret Save** (`secret_save`): Securely stores API keys and secrets

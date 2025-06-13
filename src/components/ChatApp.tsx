@@ -437,7 +437,6 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 					chatView.updateChatId(conversationId);
 				}
 			}
-
 		} catch (error) {
 			console.error('Failed to load conversation:', error);
 		}
