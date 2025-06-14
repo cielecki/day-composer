@@ -595,6 +595,7 @@
       "pastedImage": "Wklejony obraz"
     },
     "chat": {
+      "cancelEdit": "Anuluj edycję",
       "conversationDeleteFailed": "Nie udało się usunąć rozmowy",
       "conversationDeleted": "Rozmowa usunięta",
       "conversationLoadFailed": "Nie udało się wczytać rozmowy",
@@ -604,6 +605,8 @@
       "conversationTitleUpdated": "Tytuł rozmowy zaktualizowany",
       "delete": "Usuń rozmowę",
       "deleteConfirm": "Czy na pewno chcesz usunąć tę rozmowę?",
+      "editTitle": "Edytuj tytuł",
+      "editTitleInline": "Kliknij, aby edytować tytuł",
       "history": "Historia rozmów",
       "historyEmpty": "Brak rozmów",
       "historyLoading": "Ładowanie rozmów...",
@@ -615,7 +618,11 @@
       "revealInExplorer": "Pokaż w Eksploratorze",
       "revealInFileManager": "Pokaż w Menedżerze plików",
       "revealInFiles": "Pokaż w Plikach",
-      "revealInFinder": "Pokaż w Finder"
+      "revealInFinder": "Pokaż w Finder",
+      "saveTitle": "Zapisz tytuł",
+      "titlePlaceholder": "Tytuł...",
+      "unreadIndicator": "Nieprzeczytana rozmowa",
+      "untitledChat": "Rozmowa bez tytułu"
     },
     "input": {
       "attachImage": "Załącz obraz",

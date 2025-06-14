@@ -322,22 +322,96 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px;
-  margin: -10px -10px 10px -10px;
+  margin: -10px -10px 0px -10px;
 }
 
 .life-navigator-view .chat-bar-title {
   font-size: 16px;
   font-weight: 500;
   color: var(--text-normal);
+  flex: 1;
+  min-width: 0; /* Allow title to shrink */
 }
 
 .life-navigator-view .chat-bar-actions {
   display: flex;
+  flex-shrink: 0; /* Prevent action buttons from shrinking */
 }
+
+
 
 .life-navigator-view .clickable-icon {
   width: 42px;
   padding: 8px;
+}
+
+/* Chat Title - Dedicated styles for consistent display and editing */
+.life-navigator-view .ln-chat-title {
+  display: flex;
+  align-items: center;
+
+  
+  min-width: 0;
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-normal);
+  line-height: 1.2;
+}
+
+.life-navigator-view .ln-chat-title-button {
+  display:flex;
+  flex-direction: row;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content:start;
+  gap: 4px;
+  flex: 1;
+  box-shadow: none;
+  min-width: 0;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-normal);
+  line-height: 1.2;
+}
+
+.life-navigator-view .ln-chat-title-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1;
+}
+
+.life-navigator-view .ln-chat-title-icon {
+  margin-left: 4px;
+  opacity: 0;
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: opacity 0.15s ease;
+}
+
+.life-navigator-view .ln-chat-title-button:hover .ln-chat-title-icon {
+  opacity: 1;
+}
+
+.life-navigator-view .ln-chat-title-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-normal);
+  line-height: 1.2;
+  padding: 0;
+  box-shadow: none !important;
 }
 
 /* Add this to the end of the file */
@@ -1832,21 +1906,6 @@
 .life-navigator-view .conversation-history-dropdown .conversation-item:hover .conversation-actions {
   opacity: 1;
 }
-.life-navigator-view .conversation-history-dropdown .edit-input {
-  width: 100%;
-  background: var(--background-modifier-form-field);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 3px;
-  padding: 4px 6px;
-  font-size: 13px;
-  color: var(--text-normal);
-  font-weight: 500;
-}
-
-.life-navigator-view .conversation-history-dropdown .edit-input:focus {
-  outline: none;
-  border-color: var(--interactive-accent);
-}
 
 .life-navigator-view .conversation-history-dropdown .history-empty-state {
   padding: 32px 16px;
@@ -2376,6 +2435,14 @@
   font-size: 12px;
 }
 
+.ln-text-lg {
+  font-size: 18px;
+}
+
+.ln-font-semibold {
+  font-weight: 600;
+}
+
 .ln-whitespace-normal {
   white-space: normal;
 }
@@ -2479,6 +2546,10 @@
   transition: all 0.2s ease;
 }
 
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
 .ln-hover-bg-hover:hover {
   background-color: var(--background-modifier-hover);
 }
@@ -2522,6 +2593,10 @@
 
 .ln-flex-grow {
   flex-grow: 1;
+}
+
+.ln-min-w-0 {
+  min-width: 0;
 }
 
 /* Z-Index */

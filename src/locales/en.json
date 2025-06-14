@@ -595,6 +595,7 @@
       "pastedImage": "Pasted image"
     },
     "chat": {
+      "cancelEdit": "Cancel edit",
       "conversationDeleteFailed": "Failed to delete conversation",
       "conversationDeleted": "Conversation deleted",
       "conversationLoadFailed": "Failed to load conversation",
@@ -604,6 +605,8 @@
       "conversationTitleUpdated": "Conversation title updated",
       "delete": "Delete Chat",
       "deleteConfirm": "Are you sure you want to delete this conversation?",
+      "editTitle": "Edit Title",
+      "editTitleInline": "Click to edit title",
       "history": "Chat History",
       "historyEmpty": "No conversations yet",
       "historyLoading": "Loading conversations...",
@@ -615,7 +618,11 @@
       "revealInExplorer": "Reveal in Explorer",
       "revealInFileManager": "Reveal in File Manager",
       "revealInFiles": "Reveal in Files",
-      "revealInFinder": "Reveal in Finder"
+      "revealInFinder": "Reveal in Finder",
+      "saveTitle": "Save title",
+      "titlePlaceholder": "Title...",
+      "unreadIndicator": "Unread conversation",
+      "untitledChat": "Untitled Chat"
     },
     "input": {
       "attachImage": "Attach Image",

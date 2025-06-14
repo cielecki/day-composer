@@ -536,7 +536,6 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
           });
         }
         
-        new Notice(t('ui.chat.conversationTitleUpdated'));
         return true;
       } catch (error) {
         console.error('Failed to update conversation title:', error);

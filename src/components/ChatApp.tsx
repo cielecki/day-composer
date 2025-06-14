@@ -29,6 +29,7 @@ import { handleDeleteConversation } from 'src/utils/chat/delete-conversation-han
 import { revealFileInSystem } from 'src/utils/chat/reveal-file-handler';
 import { PlatformUtils } from 'src/utils/platform';
 import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
+import { ChatTitleEditor } from './ChatTitleEditor';
 
 // Add Zustand store imports
 import {
@@ -42,6 +43,7 @@ interface ChatAppProps {
 export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 	const [conversationHistoryOpen, setConversationHistoryOpen] = useState(false);
 	const conversationHistoryContainerRef = useRef<HTMLDivElement>(null);
+	const [isTitleEditing, setIsTitleEditing] = useState(false);
 
 	// Access all store state in a consistent order
 	const chatState = usePluginStore(
@@ -63,6 +65,10 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 	const editingMessage = chatState?.editingMessage || null;
 	const liveToolResults = chatState?.liveToolResults || new Map();
 	const currentConversationMeta = chatState?.chat.meta || null;
+	
+	// Chat title and unread status
+	const chatTitle = chatState?.chat.storedConversation.title || '';
+	const isUnread = chatState?.chat.storedConversation.isUnread || false;
 
 	// Store methods that now require chatId
 	const loadConversation = usePluginStore(state => state.loadConversation);
@@ -393,6 +399,11 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 		}
 	};
 
+	// Handler for the "Edit Title" menu option
+	const handleEditTitleFromMenu = useCallback(() => {
+		setIsTitleEditing(true);
+	}, []);
+
 	// Render empty conversation content
 	const renderEmptyConversation = () => {
 		if (
@@ -472,7 +483,14 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 		<div className="life-navigator-view-content">
 			<div className="chat-bar">
 				<div className="chat-bar-title">
-					{/* Title section without mode dropdown */}
+					<ChatTitleEditor
+						chatId={chatId}
+						title={chatTitle}
+						isUnread={isUnread}
+						forceEdit={isTitleEditing}
+						onStartEdit={() => setIsTitleEditing(true)}
+						onFinishEdit={() => setIsTitleEditing(false)}
+					/>
 				</div>
 				<div className="chat-bar-actions">
 					<button
@@ -531,6 +549,7 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 								await handleDeleteConversation(currentConversationMeta.id, deleteConversation);
 							}
 						}}
+						onEditTitle={handleEditTitleFromMenu}
 					/>
 				</div>
 			</div>

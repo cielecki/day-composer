@@ -509,3 +509,43 @@ The multi-chat system now works reliably:
 - **Auto-save conversations while typing**: Conversations now automatically save as you type or attach images, with a smart 2-second delay that prevents unnecessary saves while you're actively writing. Your work is protected without interrupting your flow.
 ### Changed
 - **Improved input area layout**: Moved the mode dropdown to the bottom left of the input area for easier access while typing. The dropdown is now more compact and cursor-like, showing both the mode icon and name. Image attachment button moved to the right side for better logical flow of controls.
+
+
+## [Unreleased]
+
+### 🚀 Interactive Chat Titles - Edit Your Conversations On-the-Go
+
+**Your chat titles are now fully interactive and editable, with mobile-optimized design:**
+
+- **Click to edit**: Simply click on any chat title to edit it inline with responsive touch targets
+- **Unread indicator**: See which conversations have new messages with a clear visual indicator
+- **Menu option**: Access "Edit Title" from the chat options menu for alternative editing
+- **Mobile-friendly**: Large touch targets (44px+) and responsive design ensure smooth editing on any device
+- **Keyboard shortcuts**: Press Enter to save or Escape to cancel your edits
+- **Auto-focus**: When editing starts, text is automatically selected for quick replacement
+
+### 🎯 What This Means for You
+
+You'll now have better control over organizing your conversations:
+- Personalize chat titles to remember what each conversation was about
+- Quickly identify unread conversations at a glance
+- Seamless editing experience across desktop and mobile devices
+- Consistent with modern app design patterns you're already familiar with
+
+
+### 🎯 Simplified Chat History Interface
+
+**Removed edit functionality from chat history dropdown for a cleaner, more focused experience:**
+
+- **Streamlined history view**: Chat history dropdown now focuses purely on browsing and selecting conversations
+- **One place to edit**: Title editing is now exclusively available from the chat header, providing a consistent editing experience
+- **Cleaner interface**: Removed edit buttons and inline editing from chat history items, reducing visual clutter and preventing accidental edits
+- **Header-based editing**: All title editing capabilities remain fully functional through the chat app header's inline editing and dropdown menu
+
+### 🎯 What This Means for You
+
+You'll enjoy a more focused chat history experience:
+- Chat history dropdown is now dedicated to finding and switching between conversations
+- No more accidentally triggering edit mode when browsing your chat history
+- Single, consistent place to edit chat titles (in the chat header)
+- Cleaner, less cluttered interface for better usability

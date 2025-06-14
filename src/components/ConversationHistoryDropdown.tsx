@@ -22,13 +22,7 @@ interface ConversationItemProps {
     onConversationClick: (id: string) => void;
     onLoadMetadata: (id: string) => void;
     onLoadFullChat: (id: string) => void;
-    onStartEdit: (item: Chat) => void;
     onDelete: (id: string) => void;
-    editingId: string | null;
-    editTitle: string;
-    onEditTitleChange: (title: string) => void;
-    onSaveEdit: (e: React.KeyboardEvent, id: string) => void;
-    onCancelEdit: () => void;
 }
 
 const ConversationSkeleton: React.FC<{ updatedAt: number }> = ({ updatedAt }) => {
@@ -58,13 +52,6 @@ const ConversationSkeleton: React.FC<{ updatedAt: number }> = ({ updatedAt }) =>
                     borderRadius: '2px',
                     animation: 'pulse 1.5s ease-in-out infinite'
                 }} />
-                <div className="skeleton-line" style={{ 
-                    width: '18px', 
-                    height: '18px', 
-                    backgroundColor: 'var(--background-modifier-border)', 
-                    borderRadius: '2px',
-                    animation: 'pulse 1.5s ease-in-out infinite'
-                }} />
             </div>
         </div>
     );
@@ -76,13 +63,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
     onConversationClick,
     onLoadMetadata,
     onLoadFullChat,
-    onStartEdit,
-    onDelete,
-    editingId,
-    editTitle,
-    onEditTitleChange,
-    onSaveEdit,
-    onCancelEdit
+    onDelete
 }) => {
     const itemRef = useRef<HTMLDivElement>(null);
     
@@ -133,24 +114,12 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
             {isMetadataLoaded(item) ? (
                 <div className="conversation-content">
                     <div className="conversation-main">
-                        {editingId === item.meta.id ? (
-                            <input
-                                type="text"
-                                value={editTitle}
-                                onChange={(e) => onEditTitleChange(e.target.value)}
-                                onKeyDown={(e) => onSaveEdit(e, item.meta.id)}
-                                onBlur={onCancelEdit}
-                                className="edit-input"
-                                autoFocus
-                            />
-                        ) : (
-                            <div className="conversation-title">
-                                <UnreadIndicator isUnread={chatState?.chat.storedConversation?.isUnread ?? item.storedConversation?.isUnread ?? false} />
-                                <span className="conversation-title-text">
-                                    {chatState?.chat.storedConversation?.title ?? item.storedConversation?.title ?? 'Loading...'}
-                                </span>
-                            </div>
-                        )}
+                        <div className="conversation-title">
+                            <UnreadIndicator isUnread={chatState?.chat.storedConversation?.isUnread ?? item.storedConversation?.isUnread ?? false} />
+                            <span className="conversation-title-text">
+                                {chatState?.chat.storedConversation?.title ?? item.storedConversation?.title ?? 'Loading...'}
+                            </span>
+                        </div>
                         
                         <div className="conversation-meta">
                             <span>{formatRelativeTime(chatState?.chat.meta.updatedAt ?? item.meta.updatedAt)}</span>
@@ -158,16 +127,6 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
                     </div>
 
                     <div className="conversation-actions">
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onStartEdit(item);
-                            }}
-                            className="clickable-icon"
-                            title="Edit title"
-                        >
-                            <LucideIcon name="pencil" size={18} />
-                        </button>
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -193,9 +152,6 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
     onToggle,
     currentConversationId
 }) => {
-    const [editingId, setEditingId] = useState<string | null>(null);
-    const [editTitle, setEditTitle] = useState('');
-
     // Subscribe to global conversation list
     const conversationList = usePluginStore(state => state.conversationList);
     const conversations = usePluginStore(state => state.conversations);
@@ -210,7 +166,6 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
     const markConversationFullyLoaded = usePluginStore(state => state.markConversationFullyLoaded);
     const getChatState = usePluginStore(state => state.getChatState);
     const deleteConversation = usePluginStore(state => state.deleteConversation);
-    const updateConversationTitle = usePluginStore(state => state.updateConversationTitle);
     const getConversationById = usePluginStore(state => state.getConversationById);
 
     // Track if we've already loaded all metadata to avoid repeated calls
@@ -312,28 +267,6 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
         onToggle();
     };
 
-    const handleStartEdit = (item: Chat) => {
-        setEditingId(item.meta.id);
-        setEditTitle(item.storedConversation?.title || '');
-    };
-
-    const handleSaveEdit = async (e: React.KeyboardEvent, conversationId: string) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            try {
-                await updateConversationTitle(conversationId, editTitle);
-                setEditingId(null);
-                setEditTitle('');
-                // Title will be updated automatically via the store
-            } catch (error) {
-                console.error('Failed to update conversation title:', error);
-            }
-        } else if (e.key === 'Escape') {
-            setEditingId(null);
-            setEditTitle('');
-        }
-    };
-
     const handleDelete = async (conversationId: string) => {
         await handleDeleteConversation(conversationId, deleteConversation);
     };
@@ -396,13 +329,7 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
                             onConversationClick={handleConversationClick}
                             onLoadMetadata={handleLoadMetadata}
                             onLoadFullChat={handleLoadFullChat}
-                            onStartEdit={handleStartEdit}
                             onDelete={handleDelete}
-                            editingId={editingId}
-                            editTitle={editTitle}
-                            onEditTitleChange={setEditTitle}
-                            onSaveEdit={handleSaveEdit}
-                            onCancelEdit={() => setEditingId(null)}
                         />
                     ))
                 )}

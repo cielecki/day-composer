@@ -12,13 +12,15 @@ interface ChatMenuDropdownProps {
   conversationMetaId?: string;
   conversationFilePath?: string;
   onDelete?: () => void;
+  onEditTitle?: () => void;
 }
 
 export const ChatMenuDropdown: React.FC<ChatMenuDropdownProps> = ({
   chatId,
   conversationMetaId,
   conversationFilePath,
-  onDelete
+  onDelete,
+  onEditTitle
 }) => {
   const dropdown = useDropdown();
 
@@ -39,6 +41,14 @@ export const ChatMenuDropdown: React.FC<ChatMenuDropdownProps> = ({
         } catch (error) {
           console.error('Failed to open chat in new tab:', error);
         }
+      }
+    },
+    {
+      id: 'edit-title',
+      label: t('ui.chat.editTitle'),
+      icon: 'edit-2',
+      onClick: () => {
+        onEditTitle?.();
       }
     },
     {
