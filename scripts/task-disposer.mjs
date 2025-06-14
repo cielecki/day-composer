@@ -169,13 +169,9 @@ function processFile(filePath) {
     const line = lines[i];
     const match = line.match(todoRegex);
     
+    console.log(line, match)
     if (match) {
       const [fullMatch, taskText] = match;
-      
-      // Skip tasks that already have identification (contain parentheses with content)
-      if (/\([^)]+\)/.test(taskText)) {
-        continue; // Skip this task, it already has identification
-      }
       
       // Found an unclaimed task without identification
       
