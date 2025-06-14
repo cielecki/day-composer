@@ -1,12 +1,29 @@
 import { App } from "obsidian";
+import { getDailyNoteSettings as getNativeDailyNoteSettings, appHasDailyNotesPluginLoaded } from "obsidian-daily-notes-interface";
 
 /**
  * Gets the daily notes settings from the vault configuration
+ * First tries to use Obsidian's native daily notes plugin settings,
+ * then falls back to custom configuration if the plugin is not available
  * @param app Obsidian app instance
  * @returns Promise resolving to the daily notes settings
  */
 
 export async function getDailyNotesSettings(app: App): Promise<DailyNotesSettings> {
+  // First, try to use Obsidian's native daily notes plugin settings
+  try {
+    if (appHasDailyNotesPluginLoaded()) {
+      const nativeSettings = getNativeDailyNoteSettings();
+      return {
+        folder: nativeSettings.folder || '',
+        format: nativeSettings.format || 'YYYY-MM-DD'
+      };
+    }
+  } catch (error) {
+    console.warn('Failed to load native daily notes settings, falling back to custom implementation:', error);
+  }
+
+  // Fall back to custom implementation if native plugin is not available
   // Default settings
   let settings: DailyNotesSettings = { folder: '', format: 'YYYY-MM-DD' };
 
@@ -21,7 +38,7 @@ export async function getDailyNotesSettings(app: App): Promise<DailyNotesSetting
       };
     }
   } catch (error) {
-    console.error('Error reading daily notes config:', error);
+    console.error('Error reading custom daily notes config:', error);
     // Continue with default settings if we can't read the config
   }
 
