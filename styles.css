@@ -366,7 +366,7 @@
 .life-navigator-view .ln-chat-title {
   display: flex;
   align-items: center;
-
+  gap: 8px;
   
   min-width: 0;
   flex: 1;
