@@ -90,7 +90,7 @@
     "retryButton": "Retry",
     "startingLifeNavigator": "Error starting Life Navigator",
     "tasks": {
-      "insertOutOfBounds": "Cannot insert task at index '{{index}}': Index out of bounds (document has '{{total}}' items)",
+              "insertOutOfBounds": "Cannot insert task at index {{index}}: Index out of bounds (document has {{total}} items)",
       "multipleFound": "Multiple tasks found with description '{{task}}' in '{{name}}'. Please make your task description more specific.",
       "notFound": "To-do item '{{task}}' not found in '{{name}}'. If the task is in another file, please specify it in the file_name parameter.",
       "removeNotFound": "Task '{{task}}' not found in document"
@@ -307,7 +307,7 @@
       "progress": {
         "empty": "No conversation to save - the current conversation is empty",
         "fileExists": "File already exists at '{{name}}'. Set auto_version to true to create a versioned file",
-        "success": "Successfully saved conversation with '{{count}}' messages to: '{{name}}'",
+        "success": "Successfully saved conversation with {{count}} messages to: '{{name}}'",
         "versionedFile": "Creating versioned file: '{{name}}'"
       }
     },
@@ -360,7 +360,7 @@
     },
     "dailyNotes": {
       "labels": {
-        "completed": "Retrieved '{{found}}'/'{{total}}' daily notes from '{{range}}'",
+        "completed": "Retrieved {{found}}/{{total}} daily notes from '{{range}}'",
         "failed": "Failed to get daily notes ('{{start}}' to '{{end}}')",
         "inProgress": "Getting daily notes ('{{start}}' to '{{end}}')...",
         "initial": "Getting daily notes range ..."
@@ -414,9 +414,17 @@
     },
     "find": {
       "empty": "Directory '{{name}}' is empty",
-      "header": "Contents of '{{name}}' ('{{count}}' items):",
+      "header": {
+        "singular": "Contents of '{{name}}' ({{count}} item):",
+        "few": "Contents of '{{name}}' ({{count}} items):",
+        "many": "Contents of '{{name}}' ({{count}} items):"
+      },
       "labels": {
-        "completed": "Found '{{count}}' items in '{{name}}'",
+        "completed": {
+          "singular": "Found {{count}} item in '{{name}}'",
+          "few": "Found {{count}} items in '{{name}}'",
+          "many": "Found {{count}} items in '{{name}}'"
+        },
         "failed": "Failed to find content in '{{name}}'",
         "inProgress": "Finding content in '{{name}}'...",
         "initial": "Find Files"
@@ -424,14 +432,22 @@
     },
     "findFilesByTag": {
       "labels": {
-        "completed": "Found '{{count}}' files with tag '{{tag}}'",
+        "completed": {
+          "singular": "Found {{count}} file with tag '{{tag}}'",
+          "few": "Found {{count}} files with tag '{{tag}}'",
+          "many": "Found {{count}} files with tag '{{tag}}'"
+        },
         "failed": "Failed to find files with tag '{{tag}}'",
         "inProgress": "Finding files with tag '{{tag}}'...",
         "initial": "Find Files by Tag",
         "noResults": "No files found with tag '{{tag}}'"
       },
       "progress": {
-        "foundFiles": "Found '{{count}}' files with tag '{{tag}}'",
+        "foundFiles": {
+          "singular": "Found {{count}} file with tag '{{tag}}'",
+          "few": "Found {{count}} files with tag '{{tag}}'",
+          "many": "Found {{count}} files with tag '{{tag}}'"
+        },
         "noResults": "No files found with tag '{{tag}}'"
       }
     },
@@ -544,7 +560,7 @@
         "inProgress": "Listing configured secrets..."
       },
       "progress": {
-        "header": "📋 Configured Secrets ('{{count}}' total)",
+        "header": "📋 Configured Secrets ({{count}} total)",
         "noSecrets": "No secrets are currently configured. Use the secret_save tool to add API keys and other secrets.",
         "securityNote": "🔒 Security Note: Secret values are hidden for security. Only names are shown above."
       }
@@ -718,7 +734,11 @@
       "noTodos": "No matching tasks found in '{{filename}}'",
       "readOnly": "Read only",
       "selectedFrom": "Selected tasks from '{{filename}}'",
-      "showMore": "Show '{{count}}' more items"
+      "showMore": {
+        "singular": "Show {{count}} more item",
+        "few": "Show {{count}} more items",
+        "many": "Show {{count}} more items"
+      }
     }
   },
   "validation": {
@@ -759,16 +779,16 @@
     },
     "results": {
       "mode": {
-        "completed": "Mode validation completed: '{{filePath}}' ('{{errorCount}}' errors, '{{warningCount}}' warnings)"
+        "completed": "Mode validation completed: '{{filePath}}' ({{errorCount}} errors, {{warningCount}} warnings)"
       },
       "tool": {
-        "completed": "Tool validation completed: '{{filePath}}' ('{{errorCount}}' errors, '{{warningCount}}' warnings)"
+        "completed": "Tool validation completed: '{{filePath}}' ({{errorCount}} errors, {{warningCount}} warnings)"
       }
     },
     "toolIssuesFound": {
-      "few": "'{{count}}' tools have validation issues",
-      "many": "'{{count}}' tools have validation issues",
-      "singular": "'{{count}}' tool has validation issues"
+      "few": "{{count}} tools have validation issues",
+      "many": "{{count}} tools have validation issues",
+      "singular": "{{count}} tool has validation issues"
     }
   },
   "view": {

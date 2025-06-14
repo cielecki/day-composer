@@ -90,7 +90,7 @@
     "retryButton": "Ponów",
     "startingLifeNavigator": "Błąd uruchamiania Life Navigator",
     "tasks": {
-      "insertOutOfBounds": "Nie można wstawić zadania w indeksie '{{index}}': Indeks poza zakresem (dokument ma '{{total}}' elementów)",
+      "insertOutOfBounds": "Nie można wstawić zadania w indeksie {{index}}: Indeks poza zakresem (dokument ma {{total}} elementów)",
       "multipleFound": "Znaleziono wiele zadań z opisem '{{task}}' w '{{name}}'. Proszę podać bardziej szczegółowy opis zadania.",
       "notFound": "Nie znaleziono zadania '{{task}}' w '{{name}}'. Jeśli zadanie znajduje się w innym pliku, określ go w parametrze file_name.",
       "removeNotFound": "Nie znaleziono zadania '{{task}}' w dokumencie"
@@ -307,7 +307,7 @@
       "progress": {
         "empty": "Brak rozmowy do zapisania - obecna rozmowa jest pusta",
         "fileExists": "Plik już istnieje w '{{name}}'. Ustaw auto_version na true, aby utworzyć plik z wersją",
-        "success": "Pomyślnie zapisano rozmowę z '{{count}}' wiadomościami do: '{{name}}'",
+        "success": "Pomyślnie zapisano rozmowę z {{count}} wiadomościami do: '{{name}}'",
         "versionedFile": "Tworzenie pliku z wersją: '{{name}}'"
       }
     },
@@ -360,7 +360,7 @@
     },
     "dailyNotes": {
       "labels": {
-        "completed": "Pobrano '{{found}}'/'{{total}}' dziennych notatek z '{{range}}'",
+        "completed": "Pobrano {{found}}/{{total}} dziennych notatek z '{{range}}'",
         "failed": "Nie udało się pobrać dziennych notatek ('{{start}}' do '{{end}}')",
         "inProgress": "Pobieranie dziennych notatek ('{{start}}' do '{{end}}')...",
         "initial": "Pobieranie zakresu dziennych notatek ..."
@@ -414,9 +414,17 @@
     },
     "find": {
       "empty": "Katalog '{{name}}' jest pusty",
-      "header": "Zawartość '{{name}}' ('{{count}}' elementów):",
+      "header": {
+        "singular": "Zawartość '{{name}}' ({{count}} element):",
+        "few": "Zawartość '{{name}}' ({{count}} elementy):",
+        "many": "Zawartość '{{name}}' ({{count}} elementów):"
+      },
       "labels": {
-        "completed": "Znaleziono '{{count}}' elementów w '{{name}}'",
+        "completed": {
+          "singular": "Znaleziono {{count}} element w '{{name}}'",
+          "few": "Znaleziono {{count}} elementy w '{{name}}'", 
+          "many": "Znaleziono {{count}} elementów w '{{name}}'"
+        },
         "failed": "Nie udało się znaleźć zawartości w '{{name}}'",
         "inProgress": "Wyszukiwanie zawartości w '{{name}}'...",
         "initial": "Znajdź pliki"
@@ -424,14 +432,22 @@
     },
     "findFilesByTag": {
       "labels": {
-        "completed": "Znaleziono '{{count}}' plików z tagiem '{{tag}}'",
+        "completed": {
+          "singular": "Znaleziono {{count}} plik z tagiem '{{tag}}'",
+          "few": "Znaleziono {{count}} pliki z tagiem '{{tag}}'",
+          "many": "Znaleziono {{count}} plików z tagiem '{{tag}}'"
+        },
         "failed": "Nie udało się znaleźć plików z tagiem '{{tag}}'",
         "inProgress": "Wyszukiwanie plików z tagiem '{{tag}}'...",
         "initial": "Znajdź pliki według tagu",
         "noResults": "Nie znaleziono plików z tagiem '{{tag}}'"
       },
       "progress": {
-        "foundFiles": "Znaleziono '{{count}}' plików z tagiem '{{tag}}'",
+        "foundFiles": {
+          "singular": "Znaleziono {{count}} plik z tagiem '{{tag}}'",
+          "few": "Znaleziono {{count}} pliki z tagiem '{{tag}}'",
+          "many": "Znaleziono {{count}} plików z tagiem '{{tag}}'"
+        },
         "noResults": "Nie znaleziono plików z tagiem '{{tag}}'"
       }
     },
@@ -544,7 +560,7 @@
         "inProgress": "Wyświetlanie skonfigurowanych sekretów..."
       },
       "progress": {
-        "header": "📋 Skonfigurowane sekrety ('{{count}}' łącznie)",
+        "header": "📋 Skonfigurowane sekrety ({{count}} łącznie)",
         "noSecrets": "Brak aktualnie skonfigurowanych sekretów. Użyj narzędzia secret_save, aby dodać klucze API i inne sekrety.",
         "securityNote": "🔒 Uwaga bezpieczeństwa: Wartości sekretów są ukryte ze względów bezpieczeństwa. Powyżej pokazano tylko nazwy."
       }
@@ -718,7 +734,11 @@
       "noTodos": "Nie znaleziono pasujących zadań w '{{filename}}'",
       "readOnly": "Tylko do odczytu",
       "selectedFrom": "Wybrane zadania z '{{filename}}'",
-      "showMore": "Pokaż '{{count}}' więcej elementów"
+      "showMore": {
+        "singular": "Pokaż {{count}} więcej element",
+        "few": "Pokaż {{count}} więcej elementy",
+        "many": "Pokaż {{count}} więcej elementów"
+      }
     }
   },
   "validation": {
@@ -759,16 +779,16 @@
     },
     "results": {
       "mode": {
-        "completed": "Walidacja trybu zakończona: '{{filePath}}' ('{{errorCount}}' błędów, '{{warningCount}}' ostrzeżeń)"
+        "completed": "Walidacja trybu zakończona: '{{filePath}}' ({{errorCount}} błędów, {{warningCount}} ostrzeżeń)"
       },
       "tool": {
-        "completed": "Walidacja narzędzia zakończona: '{{filePath}}' ('{{errorCount}}' błędów, '{{warningCount}}' ostrzeżeń)"
+        "completed": "Walidacja narzędzia zakończona: '{{filePath}}' ({{errorCount}} błędów, {{warningCount}} ostrzeżeń)"
       }
     },
     "toolIssuesFound": {
-      "few": "'{{count}}' narzędzia mają błędy walidacji",
-      "many": "'{{count}}' narzędzi ma błędy walidacji",
-      "singular": "'{{count}}' narzędzie ma błędy walidacji"
+      "few": "{{count}} narzędzia mają błędy walidacji",
+      "many": "{{count}} narzędzi ma błędy walidacji",
+      "singular": "{{count}} narzędzie ma błędy walidacji"
     }
   },
   "view": {

@@ -579,3 +579,8 @@ You'll enjoy a more focused chat history experience:
 
 ### Enhanced
 - **Improved transcription UI**: During voice transcription, the input area now shows a dedicated transcription interface with a clear "Transcribing..." indicator and centered stop button. This replaces the confusing spinning button and disabled attachment controls, making the transcription state much more obvious and user-friendly. The transcription overlay now properly contains itself within the input area and uses consistent Lucide icons matching the rest of the interface.
+
+### Fixed
+- Fixed Polish translation formatting by removing quotes around numbers in count displays
+- Improved Polish pluralization for better grammar (1 element vs 2-4 elementy vs 5+ elementów)
+- Applied proper Polish pluralization rules to file listings, search results, and UI elements

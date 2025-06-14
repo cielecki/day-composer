@@ -113,7 +113,14 @@ export const vaultFindFilesByTagTool: ObsidianTool<VaultFindFilesByTagToolInput>
       
       // Create formatted result
       const resultLines: string[] = [];
-      resultLines.push(t('tools.findFilesByTag.progress.foundFiles', { count: matchingFiles.length, tag }));
+      const foundFilesText = matchingFiles.length === 1 ? t('tools.findFilesByTag.progress.foundFiles.singular', { 
+        count: matchingFiles.length, tag 
+      }) : (matchingFiles.length >= 2 && matchingFiles.length <= 4 ? t('tools.findFilesByTag.progress.foundFiles.few', { 
+        count: matchingFiles.length, tag 
+      }) : t('tools.findFilesByTag.progress.foundFiles.many', { 
+        count: matchingFiles.length, tag 
+      }));
+      resultLines.push(foundFilesText);
       resultLines.push('');
       
       for (let i = 0; i < matchingFiles.length; i++) {
@@ -138,7 +145,14 @@ export const vaultFindFilesByTagTool: ObsidianTool<VaultFindFilesByTagToolInput>
       
       const resultText = resultLines.join('\n');
       
-      context.setLabel(t('tools.findFilesByTag.labels.completed', { count: matchingFiles.length, tag }));
+      const completedLabel = matchingFiles.length === 1 ? t('tools.findFilesByTag.labels.completed.singular', { 
+        count: matchingFiles.length, tag 
+      }) : (matchingFiles.length >= 2 && matchingFiles.length <= 4 ? t('tools.findFilesByTag.labels.completed.few', { 
+        count: matchingFiles.length, tag 
+      }) : t('tools.findFilesByTag.labels.completed.many', { 
+        count: matchingFiles.length, tag 
+      }));
+      context.setLabel(completedLabel);
       context.progress(resultText);
     } catch (error) {
       context.setLabel(t('tools.findFilesByTag.labels.failed', { tag }));

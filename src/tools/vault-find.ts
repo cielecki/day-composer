@@ -106,7 +106,8 @@ export const vaultFindTool: ObsidianTool<VaultFindToolInput> = {
       
       if (children.length === 0) {
         const emptyMessage = t('tools.find.empty', { name: targetPath || 'root' });
-        context.setLabel(t('tools.find.labels.completed', { count: 0, name: targetPath || 'root' }));
+        // For 0 items, use many form in Polish
+        context.setLabel(t('tools.find.labels.completed.many', { count: 0, name: targetPath || 'root' }));
         context.progress(emptyMessage);
         return;
       }
@@ -120,10 +121,14 @@ export const vaultFindTool: ObsidianTool<VaultFindToolInput> = {
       
       // Build the result
       const result: string[] = [];
-      result.push(t('tools.find.header', { 
-        name: targetPath || 'root',
-        count: children.length
+      const headerText = children.length === 1 ? t('tools.find.header.singular', { 
+        count: children.length, name: targetPath || 'root' 
+      }) : (children.length >= 2 && children.length <= 4 ? t('tools.find.header.few', { 
+        count: children.length, name: targetPath || 'root' 
+      }) : t('tools.find.header.many', { 
+        count: children.length, name: targetPath || 'root' 
       }));
+      result.push(headerText);
       result.push('');
       
       for (const child of sortedChildren) {
@@ -146,7 +151,14 @@ export const vaultFindTool: ObsidianTool<VaultFindToolInput> = {
       
       const resultText = result.join('\n');
       
-      context.setLabel(t('tools.find.labels.completed', { count: children.length, name: targetPath || 'root' }));
+      const completedLabel = children.length === 1 ? t('tools.find.labels.completed.singular', { 
+        count: children.length, name: targetPath || 'root' 
+      }) : (children.length >= 2 && children.length <= 4 ? t('tools.find.labels.completed.few', { 
+        count: children.length, name: targetPath || 'root' 
+      }) : t('tools.find.labels.completed.many', { 
+        count: children.length, name: targetPath || 'root' 
+      }));
+      context.setLabel(completedLabel);
       context.progress(resultText);
     } catch (error) {
       context.setLabel(t('tools.find.labels.failed', { name: directory_path || 'root' }));

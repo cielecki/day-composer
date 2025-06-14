@@ -121,7 +121,13 @@ export const TodoDisplay: React.FC<TodoDisplayProps> = ({
             className="todo-show-more-button"
             onClick={() => setIsExpanded(true)}
           >
-            {t('ui.todo.showMore').replace('{{count}}', (todos.length - initialLimit).toString())}
+            {(todos.length - initialLimit) === 1 ? t('ui.todo.showMore.singular', { 
+              count: todos.length - initialLimit 
+            }) : ((todos.length - initialLimit) >= 2 && (todos.length - initialLimit) <= 4 ? t('ui.todo.showMore.few', { 
+              count: todos.length - initialLimit 
+            }) : t('ui.todo.showMore.many', { 
+              count: todos.length - initialLimit 
+            }))}
           </button>
         )}
       </div>
