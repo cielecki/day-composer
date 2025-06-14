@@ -331,7 +331,8 @@ export class LifeNavigatorPlugin extends Plugin {
 					}, updateInfo.currentVersion, updateInfo.latestVersion).open();
 
 				} catch (e) {
-					new Notice(t("errors.failedToUpdatePlugin", { error: e instanceof Error ? e.message : String(e) }));
+					const errorMessage = e instanceof Error ? e.message : String(e);
+					new Notice(t("errors.failedToUpdatePlugin", { error: errorMessage }));
 				}
 			}
 		});
@@ -436,7 +437,8 @@ export class LifeNavigatorPlugin extends Plugin {
 
 		} catch (error) {
 			console.error("Error opening cost analysis view:", error);
-			new Notice(t('costAnalysis.errors.failedToOpen', { error: error instanceof Error ? error.message : String(error) }));
+			const errorMessage = error instanceof Error ? error.message : String(error);
+			new Notice(t('costAnalysis.errors.failedToOpen', { error: errorMessage }));
 		}
 	}
 
@@ -464,9 +466,8 @@ export class LifeNavigatorPlugin extends Plugin {
 
 		} catch (error) {
 			console.error("Error opening system prompt view:", error);
-			new Notice(t('systemPrompt.errors.failedToOpen', {
-				error: error instanceof Error ? error.message : String(error)
-			}));
+			const errorMessage = error instanceof Error ? error.message : String(error);
+			new Notice(t('systemPrompt.errors.failedToOpen', { error: errorMessage }));
 		}
 	}
 

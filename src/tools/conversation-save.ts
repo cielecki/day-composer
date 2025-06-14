@@ -8,6 +8,7 @@ import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
 import { t } from 'src/i18n';
 import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
+import { extractFilenameWithoutExtension } from "src/utils/text/string-sanitizer";
 
 const schema = {
   name: "conversation_save",
@@ -112,9 +113,9 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
       if (exists) {
         if (auto_version) {
           targetPath = await getVersionedPath(finalPath, plugin.app);
-          context.progress(t('tools.conversationSave.progress.versionedFile', { path: targetPath }));
+          context.progress(t('tools.conversationSave.progress.versionedFile', { name: extractFilenameWithoutExtension(targetPath) }));
         } else {
-          throw new ToolExecutionError(t('tools.conversationSave.progress.fileExists', { path: finalPath }));
+          throw new ToolExecutionError(t('tools.conversationSave.progress.fileExists', { name: extractFilenameWithoutExtension(finalPath) }));
         }
       }
 

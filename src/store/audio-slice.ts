@@ -187,7 +187,8 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         set((state) => {
           state.audio.isSpeaking = false;
         });
-        new Notice(t('errors.audio.playbackError', { error: err instanceof Error ? err.message : String(err) }));
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        new Notice(t('errors.audio.playbackError', { error: errorMessage }));
         reject(err);
       });
     });
@@ -280,8 +281,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
       // If not aborted, show error notice
       if (!signal.aborted) {
         console.error('Error during transcription:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error during transcription';
-        new Notice(t('errors.audio.transcriptionFailed', { error: errorMessage }));
+        new Notice(t('errors.audio.transcriptionFailed'));
         throw error;
       }
 

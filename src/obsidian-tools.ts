@@ -260,13 +260,16 @@ export class ObsidianTools {
 				finalLabel: currentLabel
 			};
 		} catch (error) {
-			const errorMessage =
-				error instanceof ToolExecutionError
-					? error.message
-					: t("errors.tools.execution", { 
-						tool: toolName, 
-						error: error.message || String(error) || "Unknown error" 
-					});
+			let errorMessage: string;
+			if (error instanceof ToolExecutionError) {
+				errorMessage = error.message;
+			} else {
+				const errorText = error instanceof Error ? error.message : String(error) || "Unknown error";
+				errorMessage = t("errors.tools.execution", { 
+					tool: toolName, 
+					error: errorText
+				});
+			}
 
 			console.error(errorMessage, error);
 			return { 
