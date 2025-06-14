@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { ConversationListItem } from 'src/utils/chat/conversation';
+import { Chat, isMetadataLoaded, isFullyLoaded } from 'src/utils/chat/conversation';
 import { LucideIcon } from './LucideIcon';
 import { UnreadIndicator } from './UnreadIndicator';
 import { usePluginStore } from '../store/plugin-store';
@@ -14,12 +14,12 @@ interface VirtualConversationHistoryDropdownProps {
 }
 
 interface ConversationItemProps {
-    item: ConversationListItem;
+    item: Chat;
     isCurrentConversation: boolean;
     onConversationClick: (id: string) => void;
     onLoadMetadata: (id: string) => void;
     onLoadFullChat: (id: string) => void;
-    onStartEdit: (item: ConversationListItem) => void;
+    onStartEdit: (item: Chat) => void;
     onDelete: (id: string) => void;
     editingId: string | null;
     editTitle: string;
@@ -99,7 +99,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
     
     // Properly subscribe to chat state changes
     const chatState = usePluginStore(
-        useCallback((state) => state.getChatState(item.id), [item.id])
+        useCallback((state) => state.getChatState(item.meta.id), [item.meta.id])
     );
     const isGenerating = chatState?.isGenerating || false;
 
@@ -124,13 +124,13 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
             ([entry]) => {
                 if (entry.isIntersecting) {
                     // Load metadata when scrolled into view
-                    if (!item.isMetadataLoaded) {
-                        onLoadMetadata(item.id);
+                    if (!isMetadataLoaded(item)) {
+                        onLoadMetadata(item.meta.id);
                     }
                     
                     // Preload full chat when more visible (for instant switching)
-                    if (!item.isFullyLoaded && entry.intersectionRatio > 0.3) {
-                        onLoadFullChat(item.id);
+                    if (!isFullyLoaded(item) && entry.intersectionRatio > 0.3) {
+                        onLoadFullChat(item.meta.id);
                     }
                 }
             },
@@ -145,39 +145,39 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
         }
 
         return () => observer.disconnect();
-    }, [item.id, item.isMetadataLoaded, item.isFullyLoaded, onLoadMetadata, onLoadFullChat]);
+    }, [item.meta.id, isMetadataLoaded(item), isFullyLoaded(item), onLoadMetadata, onLoadFullChat]);
 
     return (
         <div
             ref={itemRef}
             className={`conversation-item ${isCurrentConversation ? 'current' : ''} ${isGenerating ? 'generating' : ''}`}
-            onClick={() => onConversationClick(item.id)}
-            data-conversation-id={item.id}
+            onClick={() => onConversationClick(item.meta.id)}
+            data-conversation-id={item.meta.id}
         >
-            {item.isMetadataLoaded ? (
+            {isMetadataLoaded(item) ? (
                 <div className="conversation-content">
                     <div className="conversation-main">
-                        {editingId === item.id ? (
+                        {editingId === item.meta.id ? (
                             <input
                                 type="text"
                                 value={editTitle}
                                 onChange={(e) => onEditTitleChange(e.target.value)}
-                                onKeyDown={(e) => onSaveEdit(e, item.id)}
+                                onKeyDown={(e) => onSaveEdit(e, item.meta.id)}
                                 onBlur={onCancelEdit}
                                 className="edit-input"
                                 autoFocus
                             />
                         ) : (
                             <div className="conversation-title">
-                                <UnreadIndicator isUnread={chatState?.chat.storedConversation.isUnread ?? item.isUnread ?? false} />
+                                <UnreadIndicator isUnread={chatState?.chat.storedConversation?.isUnread ?? item.storedConversation?.isUnread ?? false} />
                                 <span className="conversation-title-text">
-                                    {chatState?.chat.storedConversation.title ?? item.title}
+                                    {chatState?.chat.storedConversation?.title ?? item.storedConversation?.title ?? 'Loading...'}
                                 </span>
                             </div>
                         )}
                         
                         <div className="conversation-meta">
-                            <span>{formatRelativeTime(chatState?.chat.meta.updatedAt ?? item.updatedAt)}</span>
+                            <span>{formatRelativeTime(chatState?.chat.meta.updatedAt ?? item.meta.updatedAt)}</span>
                         </div>
                     </div>
 
@@ -195,7 +195,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                onDelete(item.id);
+                                onDelete(item.meta.id);
                             }}
                             className="clickable-icon"
                             title="Delete conversation"
@@ -205,7 +205,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
                     </div>
                 </div>
             ) : (
-                <ConversationSkeleton updatedAt={item.updatedAt} />
+                <ConversationSkeleton updatedAt={item.meta.updatedAt} />
             )}
         </div>
     );
@@ -225,7 +225,8 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
 
     // Subscribe to global conversation list
     const conversationList = usePluginStore(state => state.conversationList);
-    const conversationItems = conversationList.items;
+    const conversations = usePluginStore(state => state.conversations);
+    const conversationItems = Array.from(conversations.values());
     const isLoaded = conversationList.isLoaded;
 
     // Store methods
@@ -237,12 +238,39 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
     const getChatState = usePluginStore(state => state.getChatState);
     const deleteConversation = usePluginStore(state => state.deleteConversation);
     const updateConversationTitle = usePluginStore(state => state.updateConversationTitle);
+    const getConversationById = usePluginStore(state => state.getConversationById);
+
+    // Track if we've already loaded all metadata to avoid repeated calls
+    const [hasLoadedAllMetadata, setHasLoadedAllMetadata] = useState(false);
+
+    // Load all conversation metadata for comprehensive search
+    const loadAllConversationMetadata = useCallback(async () => {
+        if (hasLoadedAllMetadata) return; // Skip if already loaded
+        
+        const allConversations = Array.from(conversations.values());
+        const unloadedConversations = allConversations.filter((chat: Chat) => !isMetadataLoaded(chat));
+        
+        if (unloadedConversations.length === 0) {
+            setHasLoadedAllMetadata(true);
+            return;
+        }
+        
+        // Load metadata for all unloaded conversations in parallel
+        const loadPromises = unloadedConversations.map((chat: Chat) => 
+            loadConversationMetadata(chat.meta.id)
+        );
+        
+        await Promise.all(loadPromises);
+        setHasLoadedAllMetadata(true);
+        console.debug('loadAllConversationMetadata - completed');
+    }, [conversations, loadConversationMetadata, hasLoadedAllMetadata]);
 
     // Load conversation list when dropdown opens (only if not already loaded)
     useEffect(() => {
         if (isOpen) {
             if (!isLoaded) {
                 refreshConversationList();
+                setHasLoadedAllMetadata(false); // Reset when refreshing list
             }
             // Focus search input when dropdown opens
             setTimeout(() => {
@@ -251,12 +279,21 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
         }
     }, [isOpen, isLoaded, refreshConversationList]);
 
+    // Debounced search effect - only trigger metadata loading after user stops typing
+    useEffect(() => {
+        if (!searchQuery.trim() || !isLoaded) return;
+        
+        const timeoutId = setTimeout(() => {
+            loadAllConversationMetadata();
+        }, 300); // 300ms debounce
+        
+        return () => clearTimeout(timeoutId);
+    }, [searchQuery, isLoaded, loadAllConversationMetadata]);
+
     const handleLoadMetadata = useCallback(async (conversationId: string) => {
-        const metadata = await loadConversationMetadata(conversationId);
-        if (metadata) {
-            markConversationMetadataLoaded(conversationId, metadata);
-        }
-    }, [loadConversationMetadata, markConversationMetadataLoaded]);
+        await loadConversationMetadata(conversationId);
+        // No need to call markConversationMetadataLoaded anymore - loadConversationMetadata does it
+    }, [loadConversationMetadata]);
 
     const handleLoadFullChat = useCallback(async (conversationId: string) => {
         // Skip if already loaded
@@ -278,9 +315,9 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
         onToggle();
     };
 
-    const handleStartEdit = (item: ConversationListItem) => {
-        setEditingId(item.id);
-        setEditTitle(item.title || '');
+    const handleStartEdit = (item: Chat) => {
+        setEditingId(item.meta.id);
+        setEditTitle(item.storedConversation?.title || '');
     };
 
     const handleSaveEdit = async (e: React.KeyboardEvent, conversationId: string) => {
@@ -310,12 +347,13 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
         
         const query = searchQuery.toLowerCase();
         return conversationItems.filter(item => {
-            // Only filter by title if metadata is loaded
-            if (item.isMetadataLoaded && item.title) {
-                return item.title.toLowerCase().includes(query);
+            // Only include conversations that have metadata loaded
+            if (!isMetadataLoaded(item) || !item.storedConversation?.title) {
+                return false; // Exclude conversations without loaded titles
             }
-            // For unloaded items, include them (they might match when loaded)
-            return true;
+            
+            // Search by title
+            return item.storedConversation.title.toLowerCase().includes(query);
         });
     }, [conversationItems, searchQuery]);
 
@@ -351,9 +389,9 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
                 ) : (
                     filteredConversations.map((item) => (
                         <ConversationItem
-                            key={item.id}
+                            key={item.meta.id}
                             item={item}
-                            isCurrentConversation={currentConversationId === item.id}
+                            isCurrentConversation={currentConversationId === item.meta.id}
                             onConversationClick={handleConversationClick}
                             onLoadMetadata={handleLoadMetadata}
                             onLoadFullChat={handleLoadFullChat}

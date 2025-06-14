@@ -1,5 +1,5 @@
 import type { ImmerStateCreator } from './plugin-store';
-import { ConversationMeta, StoredConversation, Chat, ConversationListItem } from '../utils/chat/conversation';
+import { ConversationMeta, StoredConversation, Chat, createPartialChat, createMetadataLoadedChat, createFullyLoadedChat, isMetadataLoaded, isFullyLoaded, CURRENT_SCHEMA_VERSION } from '../utils/chat/conversation';
 import { generateChatTitle } from '../utils/chat/generate-conversation-title';
 import { Notice } from 'obsidian';
 import { t } from '../i18n';
@@ -11,9 +11,9 @@ export interface ChatsDatabaseSlice {
     isInitialized: boolean;
   };
   
-  // Global conversation list cache for virtual scrolling
+  // Global conversation map for efficient lookups (replaces conversationList)
+  conversations: Map<string, Chat>;
   conversationList: {
-    items: ConversationListItem[];
     isLoaded: boolean;
     lastRefreshTime: number;
   };
@@ -33,12 +33,14 @@ export interface ChatsDatabaseSlice {
   // New virtual scrolling methods
   loadConversationMetadata: (conversationId: string) => Promise<ConversationMeta | null>;
   
-  // Global conversation list management
+  // Global conversation list management (now using Map)
   refreshConversationList: () => Promise<void>;
-  updateConversationInList: (conversationId: string, updates: Partial<ConversationListItem>) => void;
+  updateConversationInMap: (conversationId: string, updates: Partial<Chat>) => void;
   markConversationMetadataLoaded: (conversationId: string, metadata: ConversationMeta) => void;
   markConversationFullyLoaded: (conversationId: string) => void;
-  removeConversationFromList: (conversationId: string) => void;
+  removeConversationFromMap: (conversationId: string) => void;
+  getConversationById: (conversationId: string) => Chat | undefined;
+  getAllConversations: () => Chat[];
   
   // Helper methods
   getConversationDatabase: () => null; // Deprecated - functionality moved to this slice
@@ -78,8 +80,9 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
       isInitialized: false,
     },
     
+    conversations: new Map(),
+
     conversationList: {
-      items: [],
       isLoaded: false,
       lastRefreshTime: 0,
     },
@@ -121,21 +124,13 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
 
         console.debug(`[DATABASE] saveConversation called for chat ${chatId}`);
         const chatState = get().getChatState(chatId);
-        if (!chatState) {
-          console.error(`[DATABASE] Chat ${chatId} not found in loaded chats`);
+        if (!chatState || !chatState.chat.storedConversation) {
+          console.error(`[DATABASE] Chat ${chatId} not found or not fully loaded`);
           return null;
         }
         
         console.debug(`[DATABASE] Chat ${chatId} found, conversation ID: ${chatState.chat.meta.id}, messages: ${chatState.chat.storedConversation.messages.length}`);
 
-        // Prepare the conversation within the store action
-        set((state) => {
-          const chatState = state.chats.loaded.get(chatId);
-          if (chatState) {
-            // Set the mode ID to this chat's specific mode (not global mode)
-            chatState.chat.storedConversation.modeId = chatState.activeModeId || DEFAULT_MODE_ID;
-          }
-        });
 
         // Handle title generation if needed (async operation)
         if (!chatState.chat.storedConversation.titleGenerated && 
@@ -148,7 +143,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
             
             set((state) => {
               const chatState = state.chats.loaded.get(chatId);
-              if (chatState) {
+              if (chatState && chatState.chat.storedConversation) {
                 chatState.chat.storedConversation.title = generatedTitle;
                 chatState.chat.storedConversation.titleGenerated = true;
               }
@@ -157,11 +152,11 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
 
         // Get the prepared conversation and save it
         const finalChatState = get().getChatState(chatId);
-        if (!finalChatState) {
+        if (!finalChatState || !finalChatState.chat.storedConversation) {
           console.error(`Chat ${chatId} not found after preparation`);
           return null;
         }
-        
+
         const conversation = finalChatState.chat;
 
         // Check for existing conversation and clean up old files
@@ -176,9 +171,12 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         const fileName = `${conversationsDir}/${conversation.meta.id}.json`;
 
         // Ensure stored conversation has all metadata
-        const storedConversation: StoredConversation = {
-          ...conversation.storedConversation,
-        };
+        if (!conversation.storedConversation) {
+          console.error(`[DATABASE] Cannot save conversation ${chatId} - storedConversation is missing`);
+          return null;
+        }
+
+        const storedConversation: StoredConversation = conversation.storedConversation;
 
         // Save the conversation
         const conversationData = JSON.stringify(storedConversation, null, 2);
@@ -186,21 +184,24 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         await app.vault.adapter.write(fileName, conversationData);
         console.debug(`Successfully saved conversation: ${fileName}`);
 
+        // Update meta info after saving
         set((state) => {
           const chatState = state.chats.loaded.get(chatId);
           if (chatState) {
             chatState.chat.meta.filePath = fileName;
-
             chatState.chat.meta.updatedAt = Date.now();
           }
         });
+
+        console.debug(`[DATABASE] Conversation saved as ${fileName}, conversation ID: ${conversation.meta.id}`);
         
-        // Update the conversation list with the new timestamp and title
-        get().updateConversationInList(conversation.meta.id, {
-          updatedAt: Date.now(),
-          title: conversation.storedConversation.title,
-          isUnread: conversation.storedConversation.isUnread,
-          filePath: fileName
+        // Update the conversation map with the new timestamp and title
+        get().updateConversationInMap(conversation.meta.id, {
+          meta: {
+            ...conversation.meta,
+            updatedAt: Date.now()
+          },
+          storedConversation: conversation.storedConversation
         });
         
         return conversation.meta.id;
@@ -299,7 +300,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         const loadedChats = get().chats.loaded;
         for (const [id, chatState] of loadedChats) {
           // Only auto-save if there are messages and not currently generating
-          if (chatState.chat.storedConversation.messages.length === 0 || chatState.isGenerating) {
+          if (!chatState.chat.storedConversation || chatState.chat.storedConversation.messages.length === 0 || chatState.isGenerating) {
             continue;
           }
           
@@ -317,7 +318,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
 
       // Only auto-save if there are messages and not currently generating
       const chatState = get().getChatState(chatId);
-      if (!chatState || chatState.chat.storedConversation.messages.length === 0 || chatState.isGenerating) {
+      if (!chatState || !chatState.chat.storedConversation || chatState.chat.storedConversation.messages.length === 0 || chatState.isGenerating) {
         return;
       }
       
@@ -402,7 +403,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         }
         
         // Remove from conversation list
-        get().removeConversationFromList(conversationId);
+        get().removeConversationFromMap(conversationId);
         
         new Notice(t('ui.chat.conversationDeleted'));
         return true;
@@ -476,12 +477,14 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
 
     searchConversations: async (query) => {
       try {
-        const conversations = get().conversationList.items;
+        const conversations = Array.from(get().conversations.values());
         const lowercaseQuery = query.toLowerCase();
         
-        return conversations.filter(conv => 
-          conv.title?.toLowerCase().includes(lowercaseQuery)
-        );
+        return conversations
+          .filter(chat => 
+            chat.storedConversation?.title?.toLowerCase().includes(lowercaseQuery)
+          )
+          .map(chat => chat.meta);
       } catch (error) {
         console.error('Failed to search conversations:', error);
         return [];
@@ -510,7 +513,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
           if (chatState.chat.meta.id === conversationId) {
             set((state) => {
               const chatState = state.chats.loaded.get(chatId);
-              if (chatState) {
+              if (chatState && chatState.chat.storedConversation) {
                 chatState.chat.storedConversation.title = title;
                 chatState.chat.meta.updatedAt = Date.now();
               }
@@ -518,11 +521,20 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
           }
         }
 
-        // Update the conversation list
-        get().updateConversationInList(conversationId, {
-          title: title,
-          updatedAt: Date.now()
-        });
+        // Update the conversation map
+        const existingChat = get().conversations.get(conversationId);
+        if (existingChat && existingChat.storedConversation) {
+          get().updateConversationInMap(conversationId, {
+            storedConversation: {
+              ...existingChat.storedConversation,
+              title: title
+            },
+            meta: {
+              ...existingChat.meta,
+              updatedAt: Date.now()
+            }
+          });
+        }
         
         new Notice(t('ui.chat.conversationTitleUpdated'));
         return true;
@@ -539,11 +551,20 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         const loadedChats = get().chats.loaded;
         for (const [chatId, chatState] of loadedChats) {
           if (chatState.chat.meta.id === conversationId) {
-            return {
+            // If already loaded, update the conversation map with the loaded data
+            const metadata = {
               id: chatState.chat.meta.id,
               filePath: chatState.chat.meta.filePath,
               updatedAt: chatState.chat.meta.updatedAt
             };
+            
+            // Update the conversation in the map with the full data
+            get().updateConversationInMap(conversationId, {
+              meta: metadata,
+              storedConversation: chatState.chat.storedConversation
+            });
+            
+            return metadata;
           }
         }
         
@@ -558,11 +579,34 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
           const storedConversation: StoredConversation = JSON.parse(conversationData);
           const stat = await app.vault.adapter.stat(newFormatPath);
           
-          return {
+          const metadata = {
             id: conversationId,
             filePath: newFormatPath,
             updatedAt: stat?.mtime || 0,
           };
+          
+          // Update the conversation in the map with the loaded metadata
+          get().updateConversationInMap(conversationId, {
+            meta: metadata,
+            storedConversation: {
+              version: storedConversation.version,
+              title: storedConversation.title,
+              isUnread: storedConversation.isUnread,
+              modeId: storedConversation.modeId,
+              titleGenerated: storedConversation.titleGenerated,
+              messages: [], // Don't load full messages for metadata loading
+              costData: storedConversation.costData || {
+                total_cost: 0,
+                total_input_tokens: 0,
+                total_output_tokens: 0,
+                total_cache_write_tokens: 0,
+                total_cache_read_tokens: 0,
+                entries: [],
+              }
+            }
+          });
+          
+          return metadata;
         } catch (error) {
           // New format file doesn't exist, look for old format files
         }
@@ -601,13 +645,35 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
           .replace(/_/g, ' ')
           .replace(/·/g, '.'); // Convert middle dots back to regular dots
 
-        const stat = await app.vault.adapter.stat(newFormatPath);
-
-        return {
+        const stat = await app.vault.adapter.stat(oldFormatFile);
+        const metadata = {
           id: conversationId,
-          filePath: newFormatPath,
+          filePath: oldFormatFile,
           updatedAt: stat?.mtime || 0,
         };
+        
+        // Update the conversation in the map with the extracted metadata
+        get().updateConversationInMap(conversationId, {
+          meta: metadata,
+          storedConversation: {
+            version: CURRENT_SCHEMA_VERSION,
+            title: title,
+            isUnread: isUnread,
+            modeId: DEFAULT_MODE_ID,
+            titleGenerated: false,
+            messages: [], // Don't load full messages for metadata loading
+            costData: {
+              total_cost: 0,
+              total_input_tokens: 0,
+              total_output_tokens: 0,
+              total_cache_write_tokens: 0,
+              total_cache_read_tokens: 0,
+              entries: [],
+            }
+          }
+        });
+
+        return metadata;
       } catch (error) {
         console.error(`Failed to load conversation metadata ${conversationId}:`, error);
         return null;
@@ -618,14 +684,16 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
     refreshConversationList: async () => {
       try {
         const basicInfos = await get().listConversations();
-        const items: ConversationListItem[] = basicInfos.map(info => ({
-          ...info,
-          isMetadataLoaded: false,
-          isFullyLoaded: false
-        }));
         
         set((state) => {
-          state.conversationList.items = items;
+          state.conversations.clear();
+          
+          // Create partial chats for each conversation
+          basicInfos.forEach(info => {
+            const partialChat = createPartialChat(info);
+            state.conversations.set(info.id, partialChat);
+          });
+
           state.conversationList.isLoaded = true;
           state.conversationList.lastRefreshTime = Date.now();
         });
@@ -634,56 +702,62 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
       }
     },
 
-    updateConversationInList: (conversationId: string, updates: Partial<ConversationListItem>) => {
+    updateConversationInMap: (conversationId: string, updates: Partial<Chat>) => {
       set((state) => {
-        const index = state.conversationList.items.findIndex(item => item.id === conversationId);
-        if (index !== -1) {
+        const existingChat = state.conversations.get(conversationId);
+        if (existingChat) {
           // Update existing conversation
-          Object.assign(state.conversationList.items[index], updates);
-        } else {
-          // Add new conversation if it doesn't exist
-          const newItem: ConversationListItem = {
-            id: conversationId,
-            updatedAt: updates.updatedAt || Date.now(),
-            filePath: updates.filePath || '',
-            title: updates.title,
-            isUnread: updates.isUnread,
-            isMetadataLoaded: updates.title !== undefined && updates.isUnread !== undefined,
-            isFullyLoaded: false,
-            ...updates
+          const updatedChat = {
+            ...existingChat,
+            ...updates,
+            meta: {
+              ...existingChat.meta,
+              ...(updates.meta || {})
+            }
           };
-          state.conversationList.items.unshift(newItem); // Add to beginning since it's newest
-        }
-        
-        // If updatedAt was changed, re-sort the list
-        if (updates.updatedAt) {
-          state.conversationList.items.sort((a, b) => b.updatedAt - a.updatedAt);
+          state.conversations.set(conversationId, updatedChat);
+        } else {
+          // Create new conversation if it doesn't exist
+          const newChat: Chat = {
+            meta: {
+              id: conversationId,
+              filePath: updates.meta?.filePath || '',
+              updatedAt: updates.meta?.updatedAt || Date.now()
+            },
+            storedConversation: updates.storedConversation
+          };
+          state.conversations.set(conversationId, newChat);
         }
       });
     },
 
     markConversationMetadataLoaded: (conversationId: string, metadata: ConversationMeta) => {
       set((state) => {
-        const index = state.conversationList.items.findIndex(item => item.id === conversationId);
-        if (index !== -1) {
-          state.conversationList.items[index].isMetadataLoaded = true;
+        const existingChat = state.conversations.get(conversationId);
+        if (existingChat) {
+          // Update the metadata
+          existingChat.meta = metadata;
         }
       });
     },
 
     markConversationFullyLoaded: (conversationId: string) => {
+      // This is now handled by updateConversationInMap when storedConversation is set
+      // No separate action needed since we check for storedConversation existence
+    },
+
+    removeConversationFromMap: (conversationId: string) => {
       set((state) => {
-        const index = state.conversationList.items.findIndex(item => item.id === conversationId);
-        if (index !== -1) {
-          state.conversationList.items[index].isFullyLoaded = true;
-        }
+        state.conversations.delete(conversationId);
       });
     },
 
-    removeConversationFromList: (conversationId: string) => {
-      set((state) => {
-        state.conversationList.items = state.conversationList.items.filter(item => item.id !== conversationId);
-      });
+    getConversationById: (conversationId: string) => {
+      return get().conversations.get(conversationId);
+    },
+
+    getAllConversations: () => {
+      return Array.from(get().conversations.values());
     },
   };
 }; 

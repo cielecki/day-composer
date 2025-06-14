@@ -39,7 +39,7 @@ export const runConversationTurn = async (
 	store.clearLiveToolResults(chatId);
 
 	// Track current mode for system prompt optimization - start with chat's mode or default
-	let currentModeId: string = chatModeId || chatState.activeModeId || DEFAULT_MODE_ID;
+	let currentModeId: string = chatModeId || chatState.chat.storedConversation.modeId || DEFAULT_MODE_ID;
 	let systemPrompt: SystemPromptParts = {
 		staticSection: '',
 		semiDynamicSection: '',

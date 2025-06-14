@@ -100,7 +100,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   const availableModes = usePluginStore(state => state.modes.available);
   
   // Get current mode - use chat-specific mode if available, otherwise default
-  const currentModeId = chatState?.activeModeId || DEFAULT_MODE_ID;
+  const currentModeId = chatState?.chat.storedConversation.modeId || DEFAULT_MODE_ID;
   const currentMode = availableModes[currentModeId];
   
   // Extract individual values from TTS state - updated property names

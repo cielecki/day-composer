@@ -1,7 +1,7 @@
 import type { ImmerStateCreator } from '../store/plugin-store';
-import { Message, ToolResultBlock } from '../types/message';
+import { Message, ToolResultBlock, ContentBlock } from '../types/message';
 import { AttachedImage } from 'src/types/attached-image';
-import { Chat, CURRENT_SCHEMA_VERSION, ChatWithState, InputState } from 'src/utils/chat/conversation';
+import { Chat, CURRENT_SCHEMA_VERSION, ChatWithState, InputState, LoadedChat } from 'src/utils/chat/conversation';
 import { generateChatId } from 'src/utils/chat/generate-conversation-id';
 import { createUserMessage, extractUserMessageContent } from 'src/utils/chat/message-builder';
 import { runConversationTurn } from 'src/utils/chat/conversation-turn';
@@ -13,7 +13,7 @@ import { t } from 'src/i18n';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { ensureContentBlocks, extractTextForTTS } from 'src/utils/chat/content-blocks';
 import { getDefaultLNMode } from 'src/utils/modes/ln-mode-defaults';
-import { ApiUsageData } from 'src/types/cost-tracking';
+import { ApiUsageData, ChatCostData, CostEntry } from 'src/types/cost-tracking';
 import { calculateApiCallCost, calculateChatCostData } from 'src/utils/cost/cost-calculator';
 import { isChatCurrentlyFocused } from 'src/utils/chat/chat-focus-utils';
 
@@ -61,13 +61,13 @@ const createInitialChatWithState = (): ChatWithState => {
           entries: [],
         }
       }
-    },
+    } as LoadedChat, // Cast to LoadedChat since storedConversation is guaranteed to exist
     isGenerating: false,
     editingMessage: null,
     liveToolResults: new Map(),
     abortController: null,
     saveTimeout: null,
-    activeModeId: '',
+
     inputState: {
       text: '',
       attachedImages: []
@@ -229,7 +229,6 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       
       const newChatState = createInitialChatWithState();
       newChatState.chat.meta.id = chatId;
-      newChatState.activeModeId = modeId;
       newChatState.chat.storedConversation.modeId = modeId;
       
       set((state) => {
@@ -378,10 +377,16 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
     }),
     
     setCurrentChat: (chatId: string, chat: Chat) => set((state) => {
+      // Ensure storedConversation exists for loaded chats
+      if (!chat.storedConversation) {
+        console.error(`Cannot load chat ${chatId} - storedConversation is missing`);
+        return;
+      }
+
       // Ensure all messages have IDs when loading conversation
       const messagesWithIds = chat.storedConversation.messages.map(msg => ensureMessageId(msg));
-      const conversationWithIds = {
-        ...chat,
+      const loadedChat: LoadedChat = {
+        meta: chat.meta,
         storedConversation: {
           ...chat.storedConversation,
           messages: messagesWithIds
@@ -395,12 +400,8 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         state.chats.loaded.set(chatId, chatState);
       }
       
-      chatState.chat = conversationWithIds;
+      chatState.chat = loadedChat;
       
-      // CRITICAL: Set the chat's active mode from the stored conversation
-      if (chat.storedConversation.modeId) {
-        chatState.activeModeId = chat.storedConversation.modeId;
-      }
     }),
     
     getCurrentConversationId: (chatId: string) => {
@@ -562,7 +563,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
          }
          
                  const obsidianTools = getObsidianTools();
-        const chatActiveModeId = chatState.activeModeId || DEFAULT_MODE_ID;
+        const chatActiveModeId = chatState.chat.storedConversation.modeId || DEFAULT_MODE_ID;
         const currentActiveMode = get().modes.available[chatActiveModeId];
          const tools = currentActiveMode 
            ? await obsidianTools.getToolsForMode(currentActiveMode)
@@ -712,7 +713,6 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       set((state) => {
         const chatState = state.chats.loaded.get(chatId);
         if (chatState) {
-          chatState.activeModeId = modeId;
           chatState.chat.storedConversation.modeId = modeId;
         }
       });
@@ -720,7 +720,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
 
     getActiveModeForChat: (chatId: string) => {
       const chatState = get().chats.loaded.get(chatId);
-      return chatState?.activeModeId || null;
+      return chatState?.chat.storedConversation.modeId || null;
     },
 
     updateInputState: (chatId: string, inputState: Partial<InputState>) => {

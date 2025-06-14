@@ -146,7 +146,7 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
       
       if (include_metadata) {
         const currentDate = new Date().toLocaleString();
-        const activeModeId = chatState.activeModeId || DEFAULT_MODE_ID;
+        const activeModeId = chatState.chat.storedConversation.modeId || DEFAULT_MODE_ID;
         const activeMode = store.modes.available[activeModeId];
         const modeName = activeMode ? activeMode.name : 'Unknown';
         

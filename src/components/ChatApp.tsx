@@ -62,7 +62,7 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 	const markChatAsRead = usePluginStore(state => state.markChatAsRead);
 
 	// Derive values from store state (no additional hooks)
-	const chatActiveModeId = chatState?.activeModeId || DEFAULT_MODE_ID;
+	const chatActiveModeId = chatState?.chat.storedConversation.modeId || DEFAULT_MODE_ID;
 	const rawConversation = chatState?.chat.storedConversation.messages || [];
 	const isGeneratingResponse = chatState?.isGenerating || false;
 	const editingMessage = chatState?.editingMessage || null;
