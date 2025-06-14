@@ -552,3 +552,8 @@ You'll enjoy a more focused chat history experience:
 - **Conversation history positioning**: Fixed conversation history dropdown appearing off-screen by positioning it correctly relative to the history button
 - **Conversation history display**: Fixed issue where no conversations were showing in the history dropdown due to incorrect search filtering configuration
 - **Mode search positioning**: Improved mode dropdown search placement - search input now appears at the bottom for upward-opening dropdowns, providing better stability and user experience
+
+## [Unreleased]
+
+### Enhanced
+- **Improved transcription UI**: During voice transcription, the input area now shows a dedicated transcription interface with a clear "Transcribing..." indicator and centered stop button. This replaces the confusing spinning button and disabled attachment controls, making the transcription state much more obvious and user-friendly. The transcription overlay now properly contains itself within the input area and uses consistent Lucide icons matching the rest of the interface.

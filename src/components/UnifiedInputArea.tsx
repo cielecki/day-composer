@@ -3,6 +3,7 @@ import { usePluginStore } from "../store/plugin-store";
 import { t } from 'src/i18n';
 import { LucideIcon } from '../components/LucideIcon';
 import { ModeDropdown } from '../components/ModeDropdown';
+import { TranscribingIndicator } from './TranscribingIndicator';
 import { AttachedImage } from 'src/types/attached-image';
 import { TFile } from "obsidian";
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
@@ -32,7 +33,7 @@ export const UnifiedInputArea: React.FC<{
   const isGeneratingSpeech = usePluginStore(state => state.audio.isGeneratingSpeech);
   const isSpeaking = usePluginStore(state => state.audio.isSpeaking);
   const isSpeakingPaused = usePluginStore(state => state.audio.isSpeakingPaused);
-  
+
   // Recording/transcription state - now window/chat specific
   // Fix reactivity: directly subscribe to currentRecordingWindowId to ensure re-renders
   const currentRecordingWindowId = usePluginStore(state => state.audio.currentRecordingWindowId);
@@ -130,28 +131,28 @@ export const UnifiedInputArea: React.FC<{
     ) {
       // Mark this transcription as processed to prevent infinite loops
       processedTranscriptionRef.current = lastTranscription;
-      
+
       const newMessage = message.trim()
         ? `${message} ${lastTranscription}`
         : lastTranscription;
-            
+
       const imagesToSend = [...attachedImages];
       setAttachedImages([]);
-      
+
       setMessage(newMessage);
-      
+
       // Clear the transcription to prevent re-processing
       if (chatId) {
         setLastTranscription(chatId, null);
       }
-      
+
       setTimeout(() => {
         const messageToSend = newMessage;
 
         if (usePluginStore.getState().getChatState(currentChatId)?.isGenerating) {
           return;
         }
-        
+
         if (messageToSend.trim() === "" && imagesToSend.length === 0) {
           return;
         }
@@ -178,8 +179,8 @@ export const UnifiedInputArea: React.FC<{
       const resizeObserver = new ResizeObserver(() => {
         const textarea = textareaRef.current;
         if (textarea && message) {
-              textarea.classList.add("ln-textarea-auto");
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
+          textarea.classList.add("ln-textarea-auto");
+          textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
         }
       });
 
@@ -191,7 +192,7 @@ export const UnifiedInputArea: React.FC<{
   useEffect(() => {
     if (isRecording) {
       setWaveformData(Array(WAVEFORM_HISTORY_LENGTH).fill(0));
-      
+
       setupAudioAnalyzer();
       waveformIntervalRef.current = window.setInterval(() => {
         updateWaveformData();
@@ -304,7 +305,7 @@ export const UnifiedInputArea: React.FC<{
       } else if (usePluginStore.getState().getChatState(currentChatId)?.isGenerating) {
         chatStop(currentChatId);
       }
-      
+
       const success = await recordingStart(windowId);
       if (!success) {
         console.debug('Recording blocked - another window is already recording');
@@ -355,7 +356,7 @@ export const UnifiedInputArea: React.FC<{
           chatStop(chatId);
         }
         audioStop();
-        
+
         setTimeout(() => {
           handleSubmit();
         }, 100);
@@ -449,7 +450,7 @@ export const UnifiedInputArea: React.FC<{
       console.debug("Stopping audio playback before starting recording");
       audioStop();
     }
-    
+
     handleStartRecording();
   };
 
@@ -500,7 +501,7 @@ export const UnifiedInputArea: React.FC<{
       }
     } else {
       const finalMessage = message.trim();
-      
+
       if (finalMessage || attachedImages.length > 0) {
         if (onSendMessage) {
           await onSendMessage(finalMessage, attachedImages);
@@ -602,176 +603,96 @@ export const UnifiedInputArea: React.FC<{
           </div>
         )}
 
-        <div className="input-wrapper">
-          <textarea
-            ref={textareaRef}
-            className={`unified-input-textarea ${isRecording || isTranscribing ? "recording" : ""}`}
-            value={message}
-            onChange={handleTextareaChange}
-            onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
-            placeholder={t("ui.input.placeholder")}
-            rows={1}
-            disabled={isRecording || isTranscribing}
-          />
+        {isTranscribing ? (
+          <TranscribingIndicator onStop={audioStop} />
+        ) : <>
+          <div className="input-wrapper">
+            <textarea
+              ref={textareaRef}
+              className={`unified-input-textarea ${isRecording ? "recording" : ""}`}
+              value={message}
+              onChange={handleTextareaChange}
+              onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
+              placeholder={t("ui.input.placeholder")}
+              rows={1}
+              disabled={isRecording}
+            />
 
-          {isRecording && (
-            <div className="waveform-container">
-              <div className="waveform">
-                {waveformData.map((level, index) => (
-                  <div
-                    key={index}
-                    className="waveform-bar ln-waveform-bar-dynamic"
-                    style={{
-                      height: `${level}%`,
-                      opacity: Math.max(
-                        0.3,
-                        index / WAVEFORM_HISTORY_LENGTH,
-                      ),
-                    }}
-                  />
-                ))}
+            {isRecording && (
+              <div className="waveform-container">
+                <div className="waveform">
+                  {waveformData.map((level, index) => (
+                    <div
+                      key={index}
+                      className="waveform-bar ln-waveform-bar-dynamic"
+                      style={{
+                        height: `${level}%`,
+                        opacity: Math.max(
+                          0.3,
+                          index / WAVEFORM_HISTORY_LENGTH,
+                        ),
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-
-          {isTranscribing && (
-            <div className="transcribing-indicator">
-              {t("ui.transcribing.inProgress")}
-            </div>
-          )}
-        </div>
-
-        <div className="input-controls-bottom">
-          <div className="input-controls-left">
-            {/* Mode dropdown - hide during recording, show but disable during editing */}
-            {!isRecording && !isTranscribing && (
-              <ModeDropdown
-                chatId={chatId}
-                chatActiveModeId={effectiveModeId}
-                activeMode={activeMode}
-                isModeLoading={isModeLoading}
-                isModesLoading={isModesLoading}
-                availableModes={availableModes}
-                onModeSelect={editingMessage ? () => {} : handleModeSwitch} // No-op when editing to preserve original mode
-              />
             )}
-            
-            {isRecording && !isTranscribing && (
-              <button
-                className="input-control-button"
-                onClick={() => recordingStop(windowId)}
-                aria-label={t("ui.recording.cancel")}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            )}
+
+
           </div>
 
-          <div className="input-controls-right">
-            <>
-              {/* Image attachment button - moved to right side */}
-              {!isRecording && (
-                <button
-                  className="input-control-button"
-                  aria-label={t("ui.input.attachImage")}
-                  onClick={() => {
-                    if (fileInputRef.current) {
-                      fileInputRef.current.click();
-                    }
-                  }}
-                  disabled={isTranscribing}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect
-                      x="3"
-                      y="3"
-                      width="18"
-                      height="18"
-                      rx="2"
-                      ry="2"
-                    ></rect>
-                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                    <polyline points="21 15 16 10 5 21"></polyline>
-                  </svg>
-                </button>
-              )}
-
+          <div className="input-controls-bottom">
+            <div className="input-controls-left">
+              {/* Mode dropdown - hide during recording, show but disable during editing */}
               {!isRecording && !isTranscribing && (
-                <button
-                  className="input-control-button primary"
-                  onClick={handleMicrophoneClick}
-                  disabled={!canRecord}
-                  aria-label={t("ui.recording.start")}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                    <line
-                      x1="12"
-                      y1="19"
-                      x2="12"
-                      y2="22"
-                    ></line>
-                  </svg>
-                </button>
+                <ModeDropdown
+                  chatId={chatId}
+                  chatActiveModeId={effectiveModeId}
+                  activeMode={activeMode}
+                  isModeLoading={isModeLoading}
+                  isModesLoading={isModesLoading}
+                  availableModes={availableModes}
+                  onModeSelect={editingMessage ? () => { } : handleModeSwitch} // No-op when editing to preserve original mode
+                />
               )}
 
-              {isTranscribing && (
+              {isRecording && (
                 <button
                   className="input-control-button"
-                  onClick={audioStop}
-                  disabled={false}
+                  onClick={() => recordingStop(windowId)}
                   aria-label={t("ui.recording.cancel")}
                 >
-                  <LucideIcon
-                    name="loader"
-                    className="animate-spin"
-                    size={20}
-                    />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
                 </button>
               )}
-              
-              {isRecording && !isTranscribing && (
-                <>
+            </div>
+
+            <div className="input-controls-right">
+              <>
+                {/* Image attachment button - moved to right side */}
+                {!isRecording && (
                   <button
-                    className="input-control-button primary"
-                    onClick={handleFinalizeRecording}
-                    disabled={false}
-                    aria-label={t("ui.recording.confirm")}
+                    className="input-control-button"
+                    aria-label={t("ui.input.attachImage")}
+                    onClick={() => {
+                      if (fileInputRef.current) {
+                        fileInputRef.current.click();
+                      }
+                    }}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -784,57 +705,123 @@ export const UnifiedInputArea: React.FC<{
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     >
-                      <polyline points="20 6 9 17 4 12"></polyline>
+                      <rect
+                        x="3"
+                        y="3"
+                        width="18"
+                        height="18"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
                     </svg>
                   </button>
-                </>
-              )}
+                )}
 
-              {(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isSpeakingPaused) && !isRecording && (
-                <button
-                  className="input-control-button primary"
-                  onClick={handleStopAll}
-                  aria-label={t("ui.recording.stop")}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    stroke="none"
+                {!isRecording && (
+                  <button
+                    className="input-control-button primary"
+                    onClick={handleMicrophoneClick}
+                    disabled={!canRecord}
+                    aria-label={t("ui.recording.start")}
                   >
-                    <rect x="6" y="6" width="12" height="12" />
-                  </svg>
-                </button>
-              )}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                      <line
+                        x1="12"
+                        y1="19"
+                        x2="12"
+                        y2="22"
+                      ></line>
+                    </svg>
+                  </button>
+                )}
 
-              {!isTranscribing && !isRecording && !(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isSpeakingPaused) && (
-                <button
-                  className="input-control-button primary"
-                  onClick={handleSendButtonClick}
-                  aria-label={editingMessage ? t("ui.input.save") : t("ui.input.send")}
-                  disabled={(message.trim() === "" && attachedImages.length === 0) || !activeMode}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+
+
+                {isRecording && (
+                  <>
+                    <button
+                      className="input-control-button primary"
+                      onClick={handleFinalizeRecording}
+                      disabled={false}
+                      aria-label={t("ui.recording.confirm")}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </button>
+                  </>
+                )}
+
+                {(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isSpeakingPaused) && !isRecording && (
+                  <button
+                    className="input-control-button primary"
+                    onClick={handleStopAll}
+                    aria-label={t("ui.recording.stop")}
                   >
-                    <path d="M22 2L11 13"></path>
-                    <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
-                  </svg>
-                </button>
-              )}
-            </>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      stroke="none"
+                    >
+                      <rect x="6" y="6" width="12" height="12" />
+                    </svg>
+                  </button>
+                )}
+
+                {!isRecording && !(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isSpeakingPaused) && (
+                  <button
+                    className="input-control-button primary"
+                    onClick={handleSendButtonClick}
+                    aria-label={editingMessage ? t("ui.input.save") : t("ui.input.send")}
+                    disabled={(message.trim() === "" && attachedImages.length === 0) || !activeMode}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M22 2L11 13"></path>
+                      <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+                    </svg>
+                  </button>
+                )}
+              </>
+            </div>
           </div>
-        </div>
+        </>}
       </div>
     </div>
   );

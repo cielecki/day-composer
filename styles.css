@@ -210,22 +210,24 @@
   border-radius: 0;
 }
 
-/* Transcribing indicator styles */
-.life-navigator-view .transcribing-indicator {
+/* Transcribing overlay styles */
+.life-navigator-view .transcribing-overlay {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-muted);
+  animation: pulse 1.5s ease-in-out infinite;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  font-weight: 500;
-  color: var(--text-muted);
-  font-size: 14px;
-  animation: pulse 1.5s ease-in-out infinite;
-  
 }
 
 .life-navigator-view .dot-pulse {
@@ -1264,6 +1266,7 @@
 }
 
 .life-navigator-view .unified-input-area {
+  position: relative;
   display: flex;
   flex-direction: column;
   padding: 12px;
@@ -1271,6 +1274,7 @@
   gap: 12px;
   background-color: var(--background-secondary-alt);
   border-radius: 16px;
+  min-height: 132px;
 }
 
 /* Waveform container */
