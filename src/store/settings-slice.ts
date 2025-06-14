@@ -52,6 +52,7 @@ export interface SettingsSlice {
   // API Key validation methods
   validateOpenAIKey: (apiKey: string) => Promise<APIKeyValidationResult>;
   validateAnthropicKey: (apiKey: string) => Promise<APIKeyValidationResult>;
+  validateElevenLabsKey: (apiKey: string) => Promise<APIKeyValidationResult>;
 
   loadSettings: () => Promise<void>;
 }
@@ -232,6 +233,10 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
 
     validateAnthropicKey: async (apiKey) => {
       return await apiKeyValidationService.validateAnthropicKey(apiKey);
+    },
+
+    validateElevenLabsKey: async (apiKey) => {
+      return await apiKeyValidationService.validateElevenLabsKey(apiKey);
     },
 
     // Loading function for settings - replaces loadPluginSettings

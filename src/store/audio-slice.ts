@@ -5,6 +5,7 @@ import { Notice } from 'obsidian';
 import { t } from 'src/i18n';
 import OpenAI from 'openai';
 import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
+import { ElevenLabsService } from '../services/ElevenLabsService';
 
 export type TTSVoice = "alloy" | "ash" | "ballad" | "coral" | "echo" | "fable" | "onyx" | "nova" | "sage" | "shimmer" | "verse";
 export const TTS_VOICES: TTSVoice[] = ['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer', 'verse'];
@@ -17,6 +18,7 @@ interface TTSCache {
     timestamp: number;
     voice: string;
     speed: number;
+    provider: 'openai' | 'elevenlabs';
   };
 }
 
@@ -60,6 +62,37 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
   let mediaRecorder: MediaRecorder | null = null;
   let audioChunks: Blob[] = [];
   
+  // ElevenLabs service instance
+  let elevenLabsServiceRef: ElevenLabsService | null = null;
+
+  // Helper functions for provider detection
+  const getElevenLabsApiKey = (): string | null => {
+    const apiKey = get().getSecret('ELEVENLABS_API_KEY');
+    return apiKey && apiKey.trim().length > 0 ? apiKey : null;
+  };
+
+  const getOpenAIApiKey = (): string | null => {
+    const apiKey = get().getSecret('OPENAI_API_KEY');
+    return apiKey && apiKey.trim().length > 0 ? apiKey : null;
+  };
+
+  const isElevenLabsAvailable = (): boolean => {
+    return getElevenLabsApiKey() !== null;
+  };
+
+  const initializeElevenLabsService = (): ElevenLabsService | null => {
+    const apiKey = getElevenLabsApiKey();
+    if (apiKey) {
+      if (!elevenLabsServiceRef) {
+        console.debug('Initializing ElevenLabs service with API key');
+        elevenLabsServiceRef = new ElevenLabsService(apiKey);
+      }
+      return elevenLabsServiceRef;
+    } else {
+      console.warn('ElevenLabs API key not found');
+      return null;
+    }
+  };
 
 
   const initializeStreamingService = (modeId?: string) => {
@@ -78,8 +111,8 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
     return streamingServiceRef;
   };
 
-  const generateTextHash = (text: string, voice: string, speed: number): string => {
-    const str = `${text}-${voice}-${speed}`;
+  const generateTextHash = (text: string, voice: string, speed: number, provider: 'openai' | 'elevenlabs' = 'openai'): string => {
+    const str = `${provider}-${text}-${voice}-${speed}`;
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
@@ -103,12 +136,13 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
     return null;
   };
 
-  const setCachedAudio = (textHash: string, audioBlob: Blob, voice: string, speed: number) => {
+  const setCachedAudio = (textHash: string, audioBlob: Blob, voice: string, speed: number, provider: 'openai' | 'elevenlabs' = 'openai') => {
     audioCacheRef[textHash] = {
       audioBlob,
       timestamp: Date.now(),
       voice,
-      speed
+      speed,
+      provider
     };
     
     // Clean up old cache entries (keep only 10 most recent)
@@ -208,11 +242,6 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
     
     try {
       const store = get();
-      const openaiApiKey = store.getSecret('OPENAI_API_KEY');
-      if (!openaiApiKey) {
-        throw new Error('OpenAI API key is not configured');
-      }
-      
       const mimeType = recorder.mimeType || 'audio/webm';
       const audioBlob = new Blob(chunks, { type: mimeType });
       
@@ -220,56 +249,79 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         throw new Error('Recording too short or no audio detected');
       }
       
-      const openai = new OpenAI({
-        apiKey: openaiApiKey,
-        dangerouslyAllowBrowser: true,
-      });
-      
-      let fileExtension = 'webm';
-      if (mimeType.includes('mp3')) fileExtension = 'mp3';
-      else if (mimeType.includes('wav')) fileExtension = 'wav';
-      else if (mimeType.includes('mp4')) fileExtension = 'mp4';
-      else if (mimeType.includes('m4a')) fileExtension = 'm4a';
-      
-      const file = new File([audioBlob], `recording.${fileExtension}`, { type: mimeType });
-      
       // Get Obsidian's language setting from localStorage
       const obsidianLang = window.localStorage.getItem('language') || 'en';
       let targetLanguageForApi = obsidianLang;
-      let promptToUse = store.settings.speechToTextPrompt;
-
-      // Fallback logic for prompt
-      if (!promptToUse) {
-        promptToUse = t('settings.prompts.defaultPrompt');
-      }
       
       // Ensure targetLanguageForApi is a 2-letter code if possible
       if (targetLanguageForApi.includes('-')) {
         targetLanguageForApi = targetLanguageForApi.split('-')[0];
       }
 
-      /*
-      const expandedPrompt = (await expandLinks(window.app, promptToUse)).fullContent;
-      const trimmedPrompt = expandedPrompt.length > MAX_AUDIO_PROMPT_LENGTH 
-        ? expandedPrompt.substring(0, Math.floor(MAX_AUDIO_PROMPT_LENGTH / 2)) + "..." + expandedPrompt.substring(expandedPrompt.length - Math.floor(MAX_AUDIO_PROMPT_LENGTH / 2))
-        : expandedPrompt;
+      let transcribedText = '';
 
-      console.debug(`Transcribing audio. Language for API: ${targetLanguageForApi}. Using prompt:`, trimmedPrompt);
-      */
-
-      const transcription = await openai.audio.transcriptions.create({
-        file: file,
-        model: 'whisper-1',
-        prompt: "",
-        language: targetLanguageForApi,
-      }, { signal });
-
-      if (signal.aborted) {
-        return;
+      // Try ElevenLabs first if available
+      if (isElevenLabsAvailable()) {
+        try {
+          console.debug('Using ElevenLabs for speech-to-text transcription');
+          const elevenLabsService = initializeElevenLabsService();
+          if (elevenLabsService) {
+            const result = await elevenLabsService.speechToText(audioBlob, {
+              language: targetLanguageForApi,
+              diarize: false,
+              audio_events: false
+            });
+            
+            if (signal.aborted) {
+              return;
+            }
+            
+            transcribedText = result.text;
+            console.debug('ElevenLabs transcribed text:', transcribedText);
+          }
+        } catch (elevenLabsError) {
+          console.warn('ElevenLabs transcription failed, falling back to OpenAI:', elevenLabsError);
+          // Continue to OpenAI fallback
+        }
       }
 
-      console.debug('Transcribed text:', transcription.text);
-      get().setLastTranscription(chatId, transcription.text);
+      // Fallback to OpenAI if ElevenLabs failed or not available
+      if (!transcribedText) {
+        console.debug('Using OpenAI for speech-to-text transcription');
+        const openaiApiKey = getOpenAIApiKey();
+        if (!openaiApiKey) {
+          throw new Error('No API key available for transcription (OpenAI or ElevenLabs)');
+        }
+        
+        const openai = new OpenAI({
+          apiKey: openaiApiKey,
+          dangerouslyAllowBrowser: true,
+        });
+        
+        let fileExtension = 'webm';
+        if (mimeType.includes('mp3')) fileExtension = 'mp3';
+        else if (mimeType.includes('wav')) fileExtension = 'wav';
+        else if (mimeType.includes('mp4')) fileExtension = 'mp4';
+        else if (mimeType.includes('m4a')) fileExtension = 'm4a';
+        
+        const file = new File([audioBlob], `recording.${fileExtension}`, { type: mimeType });
+
+        const transcription = await openai.audio.transcriptions.create({
+          file: file,
+          model: 'whisper-1',
+          prompt: "",
+          language: targetLanguageForApi,
+        }, { signal });
+
+        if (signal.aborted) {
+          return;
+        }
+
+        transcribedText = transcription.text;
+        console.debug('OpenAI transcribed text:', transcribedText);
+      }
+
+      get().setLastTranscription(chatId, transcribedText);
     } catch (error) {
       
       get().setLastTranscription(chatId, null);
@@ -482,21 +534,25 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         ? (modeVoice as TTSVoice) 
         : 'alloy';
       const speed = (currentMode?.voice_speed ?? defaultMode.voice_speed) || 1.0;
+      const voiceAutoplay = currentMode?.voice_autoplay ?? defaultMode.voice_autoplay;
       
-      console.debug(`TTS using mode '${effectiveModeId}' - Voice: '${voice}', Speed: ${speed}`);
+      console.debug(`TTS using mode '${effectiveModeId}' - Voice: '${voice}', Speed: ${speed}, Autoplay: ${voiceAutoplay}`);
 
-      // Generate cache key with validated parameters
-      const textHash = generateTextHash(text, voice, speed);
+      // Determine provider based on available API keys
+      let provider: 'elevenlabs' | 'openai' = isElevenLabsAvailable() ? 'elevenlabs' : 'openai';
+      
+      // Generate cache key with validated parameters and provider
+      const textHash = generateTextHash(text, voice, speed, provider);
       
       // Check cache first
       const cachedAudio = getCachedAudio(textHash);
       if (cachedAudio) {
-        console.debug('Using cached audio for text');
+        console.debug(`Using cached audio for text (${provider})`);
         return playCachedAudio(cachedAudio, signal);
       }
 
       // No cached audio found, generate new audio
-      console.debug('No cached audio found, generating new audio');
+      console.debug(`No cached audio found, generating new audio using ${provider}`);
       
       try {
         set((state) => {
@@ -505,14 +561,6 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
                 
         // Handle abort signal
         if (signal.aborted) {
-          return;
-        }
-        
-        // Verify we have a valid API key
-        const apiKey = store.getSecret('OPENAI_API_KEY');
-        if (!apiKey) {
-          console.error('No OpenAI API key available for TTS');
-          new Notice(t('errors.audio.noApiKey'));
           return;
         }
         
@@ -525,44 +573,102 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         const maxLength = 4096;
         const textToConvert = text.length > maxLength ? text.substring(0, maxLength) : text;
         
-        console.debug('Creating OpenAI client and sending TTS request');
-        console.debug(`TTS API Call - Voice: '${voice}', Speed: ${speed}, Text Length: ${textToConvert.length}`);
+        let audioBlob: Blob | null = null;
 
-        // Generate audio using fetch API (similar to legacy TTS)
-        const response = await fetch('https://api.openai.com/v1/audio/speech', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini-tts',
-            input: textToConvert,
-            voice: voice,
-            speed: speed,
-            response_format: 'mp3'
-          }),
-          signal: signal
-        });
+        if (provider === 'elevenlabs') {
+          console.debug('Using ElevenLabs for text-to-speech');
+          console.debug(`ElevenLabs TTS API Call - OpenAI Voice: '${voice}', Speed: ${speed}, Text Length: ${textToConvert.length}`);
+          
+          try {
+            const elevenLabsService = initializeElevenLabsService();
+            if (!elevenLabsService) {
+              throw new Error('Failed to initialize ElevenLabs service');
+            }
+            
+            // Map OpenAI voice names to ElevenLabs voice IDs
+            const voiceMapping: Record<string, string> = {
+              'alloy': 'pNInz6obpgDQGcFmaJgB', // Adam - versatile male voice
+              'echo': '21m00Tcm4TlvDq8ikWAM', // Rachel - calm female voice  
+              'fable': 'AZnzlk1XvdvUeBnXmlld', // Domi - strong female voice
+              'onyx': 'VR6AewLTigWG4xSOukaG', // Josh - deep male voice
+              'nova': 'EXAVITQu4vr4xnSDxMaL', // Bella - expressive female voice
+              'shimmer': 'ThT5KcBeYPX3keUQqHPh', // Dorothy - pleasant female voice
+            };
+            
+            // Get ElevenLabs voice ID (fallback to default if mapping not found)
+            const voiceId = voiceMapping[voice] || await elevenLabsService.getDefaultVoiceId();
+            console.debug(`Mapped OpenAI voice '${voice}' to ElevenLabs voice ID: ${voiceId}`);
+            
+            // Convert OpenAI voice settings to ElevenLabs format
+            const elevenLabsOptions = {
+              model_id: 'eleven_multilingual_v2', // Default to high quality
+              voice_settings: {
+                stability: 0.5,
+                similarity_boost: 0.5,
+                style: 0,
+                use_speaker_boost: true,
+              },
+              output_format: 'mp3_44100_128',
+            };
+            
+            audioBlob = await elevenLabsService.textToSpeech(textToConvert, voiceId, elevenLabsOptions);
+            console.debug('ElevenLabs TTS completed successfully');
+          } catch (elevenLabsError) {
+            console.warn('ElevenLabs TTS failed, falling back to OpenAI:', elevenLabsError);
+            // Fall through to OpenAI implementation
+            provider = 'openai';
+          }
+        }
 
-        if (!response.ok) {
-          throw new Error(`TTS API error: ${response.status} ${response.statusText}`);
+        if (provider === 'openai' || !audioBlob) {
+          console.debug('Using OpenAI for text-to-speech');
+          
+          // Verify we have a valid API key
+          const apiKey = getOpenAIApiKey();
+          if (!apiKey) {
+            console.error('No API key available for TTS (OpenAI or ElevenLabs)');
+            new Notice(t('errors.audio.noApiKey'));
+            return;
+          }
+          
+          console.debug(`OpenAI TTS API Call - Voice: '${voice}', Speed: ${speed}, Text Length: ${textToConvert.length}`);
+
+          // Generate audio using fetch API (similar to legacy TTS)
+          const response = await fetch('https://api.openai.com/v1/audio/speech', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini-tts',
+              input: textToConvert,
+              voice: voice,
+              speed: speed,
+              response_format: 'mp3'
+            }),
+            signal: signal
+          });
+
+          if (!response.ok) {
+            throw new Error(`TTS API error: ${response.status} ${response.statusText}`);
+          }
+
+          audioBlob = await response.blob();
+          console.debug('OpenAI TTS completed successfully');
         }
 
         // Check for abort again after API call
         if (signal.aborted) {
           return;
         }
-
-        // Get the response as a blob and cache it
-        const audioBlob = await response.blob();
         
-        // Check for abort again after blob conversion
-        if (signal.aborted) {
-          return;
+        // Ensure we have audio data
+        if (!audioBlob) {
+          throw new Error('Failed to generate audio from both ElevenLabs and OpenAI');
         }
         
-        setCachedAudio(textHash, audioBlob, voice, speed);
+        setCachedAudio(textHash, audioBlob, voice, speed, provider);
 
         // Check for abort again before playing audio
         if (signal.aborted) {

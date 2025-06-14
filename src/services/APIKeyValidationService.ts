@@ -10,6 +10,7 @@ export interface APIKeyValidationResult {
 export interface APIKeyValidationService {
   validateOpenAIKey(apiKey: string): Promise<APIKeyValidationResult>;
   validateAnthropicKey(apiKey: string): Promise<APIKeyValidationResult>;
+  validateElevenLabsKey(apiKey: string): Promise<APIKeyValidationResult>;
 }
 
 class APIKeyValidationServiceImpl implements APIKeyValidationService {
@@ -114,6 +115,22 @@ class APIKeyValidationServiceImpl implements APIKeyValidationService {
     return this.makeRequest('https://api.anthropic.com/v1/models', {
       'x-api-key': trimmedKey,
       'anthropic-version': '2023-06-01',
+      'Content-Type': 'application/json'
+    });
+  }
+
+  async validateElevenLabsKey(apiKey: string): Promise<APIKeyValidationResult> {
+    if (!apiKey || typeof apiKey !== 'string' || !apiKey.trim()) {
+      return { 
+        valid: false, 
+        reason: t('ui.setup.validation.reasons.invalidOrExpired'),
+        error: 'Empty or invalid key format' 
+      };
+    }
+
+    const trimmedKey = apiKey.trim();
+    return this.makeRequest('https://api.elevenlabs.io/v1/voices', {
+      'xi-api-key': trimmedKey,
       'Content-Type': 'application/json'
     });
   }

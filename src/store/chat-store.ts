@@ -590,7 +590,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
            : await obsidianTools.getTools();
 
          console.debug(`[CHAT-STORE] Calling runConversationTurn with chatId: ${chatId}`);
-         await runConversationTurn(tools, newAbortController.signal, chatId, chatActiveModeId);
+         const finalAssistantMessage = await runConversationTurn(tools, newAbortController.signal, chatId, chatActiveModeId);
         
         // Clear abort controller on success
         set((state) => {
@@ -599,6 +599,32 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
             chatState.abortController = null;
           }
         });
+
+        // Handle voice autoplay if a final assistant message was returned
+        if (finalAssistantMessage) {
+          const currentChatState = get().getChatState(chatId);
+          if (currentChatState) {
+            const modeForAutoplay = currentChatState.chat.storedConversation.modeId || DEFAULT_MODE_ID;
+            const modeForSettings = get().modes.available[modeForAutoplay];
+            const voiceAutoplay = modeForSettings?.voice_autoplay ?? true;
+            
+            if (voiceAutoplay) {
+              // Extract text content for TTS
+              const textToSpeak = extractTextForTTS(finalAssistantMessage.content);
+              if (textToSpeak && textToSpeak.trim().length > 0) {
+                // Check if we're not currently recording or already speaking
+                const audioState = get().audio;
+                if (!audioState.currentRecordingWindowId && !audioState.isSpeaking && !audioState.isGeneratingSpeech) {
+                  console.debug(`🔊 Voice autoplay triggered after conversation turn completion for mode '${modeForAutoplay}'`);
+                  // Small delay to ensure UI is updated
+                  setTimeout(() => {
+                    get().speakingStart(textToSpeak, modeForAutoplay);
+                  }, 100);
+                }
+              }
+            }
+          }
+        }
 
       } catch (error) {
         console.error("Error in conversation turn:", error);
