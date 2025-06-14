@@ -584,3 +584,12 @@ You'll enjoy a more focused chat history experience:
 - Fixed Polish translation formatting by removing quotes around numbers in count displays
 - Improved Polish pluralization for better grammar (1 element vs 2-4 elementy vs 5+ elementów)
 - Applied proper Polish pluralization rules to file listings, search results, and UI elements
+
+### Enhanced  
+- **Smarter retry behavior**: Retry button now correctly identifies actual user messages and ignores tool result messages when determining where to retry from. This ensures the retry removes and regenerates the entire block back to the last real user message, creating more natural conversation flow by regenerating complete user-to-assistant exchanges.
+- **Robust mode validation**: Added comprehensive checks throughout the interface to prevent sending messages, editing, or retrying when modes are still loading or unavailable. Voice recording still works normally, but sending is blocked until modes are properly loaded.
+
+### Fixed
+- **Retry error handling**: Fixed crash when retrying conversations where the mode configuration is undefined or missing, ensuring retry works reliably in all scenarios.
+- **UI state consistency**: Retry buttons, send buttons, and edit functionality are now properly disabled when modes aren't available, preventing users from getting into broken states.
+- **Mode safety checks**: Added early validation in conversation flow to prevent API calls when required modes don't exist, improving error handling and user experience.

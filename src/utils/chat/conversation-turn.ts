@@ -11,6 +11,7 @@ import type { ObsidianTool } from "../../obsidian-tools";
 import { usePluginStore } from "../../store/plugin-store";
 import { SystemPromptParts } from "../links/expand-links";
 import { DEFAULT_MODE_ID } from '../modes/ln-mode-defaults';
+import { validateChatMode } from '../modes/mode-validation';
 
 /**
  * Runs a complete conversation turn with the AI, handling tool calls and streaming
@@ -23,10 +24,17 @@ export const runConversationTurn = async (
 ): Promise<Message | null> => {
 	const store = usePluginStore.getState();
 	
-	// Get the specific chat state
+	// Get the specific chat state first
 	const chatState = store.getChatState(chatId);
 	if (!chatState) {
 		console.error(`Chat ${chatId} not found for conversation turn`);
+		return null;
+	}
+	
+	// Validate that modes are loaded and current mode exists
+	const modeValidation = validateChatMode(chatId);
+	if (!modeValidation.isValid) {
+		console.error(`Cannot start conversation turn: ${modeValidation.reason}`);
 		return null;
 	}
 	
@@ -104,9 +112,8 @@ export const runConversationTurn = async (
 					? resolveAutoModel(currentActiveMode || defaultMode)
 					: rawModel;
 					
-				const maxTokens = currentActiveMode.max_tokens ?? defaultMode.max_tokens;
-				const thinkingBudgetTokens = currentActiveMode.thinking_budget_tokens ?? defaultMode.thinking_budget_tokens;
-
+				const maxTokens = currentActiveMode?.max_tokens ?? defaultMode.max_tokens;
+				const thinkingBudgetTokens = currentActiveMode?.thinking_budget_tokens ?? defaultMode.thinking_budget_tokens;
 
 				const cacheControlLong: Anthropic.Beta.Messages.BetaCacheControlEphemeral = {
 					"type": "ephemeral",

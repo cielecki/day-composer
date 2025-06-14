@@ -93,6 +93,18 @@ const FixWithGuideButton: React.FC<{
  */
 const RetryButton: React.FC<{ messageIndex?: number; chatId?: string }> = ({ messageIndex, chatId }) => {
   const { retryFromMessage } = usePluginStore();
+  const isModesLoading = usePluginStore(state => state.modes.isLoading);
+  const availableModes = usePluginStore(state => state.modes.available);
+  const chatState = usePluginStore(state => chatId ? state.getChatState(chatId) : null);
+  
+  // Get current mode - use chat-specific mode if available, otherwise default
+  const currentModeId = chatState?.chat.storedConversation.modeId || DEFAULT_MODE_ID;
+  const currentMode = availableModes[currentModeId];
+  
+  // Don't show retry button if modes are loading or current mode doesn't exist
+  if (isModesLoading || !currentMode) {
+    return null;
+  }
 
   const handleRetryClick = async () => {
     if (messageIndex !== undefined && chatId) {

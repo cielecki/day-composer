@@ -8,6 +8,7 @@ import { AttachedImage } from 'src/types/attached-image';
 import { TFile } from "obsidian";
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
+import { validateChatModeWithLogging } from '../utils/modes/mode-validation';
 
 // Define the number of samples to keep for the waveform (5 seconds at 10 samples per second)
 const WAVEFORM_HISTORY_LENGTH = 120; // 4 seconds at 30 samples per second
@@ -154,6 +155,11 @@ export const UnifiedInputArea: React.FC<{
         }
 
         if (messageToSend.trim() === "" && imagesToSend.length === 0) {
+          return;
+        }
+
+        // Validate that modes are loaded and current mode exists
+        if (!validateChatModeWithLogging(currentChatId, "auto-send message after transcription")) {
           return;
         }
 
@@ -317,6 +323,11 @@ export const UnifiedInputArea: React.FC<{
 
   const handleSubmit = async () => {
     if (!message.trim() && attachedImages.length === 0) return;
+
+    // Validate that modes are loaded and current mode exists
+    if (!validateChatModeWithLogging(chatId || currentChatId, "send message")) {
+      return;
+    }
 
     try {
       const messageToSend = message.trim();
@@ -493,6 +504,11 @@ export const UnifiedInputArea: React.FC<{
     } else if (editingMessage) {
       const messageToSend = message.trim();
       if (messageToSend || attachedImages.length > 0) {
+        // Validate that modes are loaded and current mode exists
+        if (!validateChatModeWithLogging(chatId || currentChatId, "save edit")) {
+          return;
+        }
+
         if (chatId) {
           await editUserMessage(chatId, editingMessage.index, messageToSend, attachedImages);
         }
@@ -503,6 +519,11 @@ export const UnifiedInputArea: React.FC<{
       const finalMessage = message.trim();
 
       if (finalMessage || attachedImages.length > 0) {
+        // Validate that modes are loaded and current mode exists
+        if (!validateChatModeWithLogging(chatId || currentChatId, "send message")) {
+          return;
+        }
+
         if (onSendMessage) {
           await onSendMessage(finalMessage, attachedImages);
         } else if (chatId) {
@@ -749,8 +770,6 @@ export const UnifiedInputArea: React.FC<{
                   </button>
                 )}
 
-
-
                 {isRecording && (
                   <>
                     <button
@@ -800,7 +819,7 @@ export const UnifiedInputArea: React.FC<{
                     className="input-control-button primary"
                     onClick={handleSendButtonClick}
                     aria-label={editingMessage ? t("ui.input.save") : t("ui.input.send")}
-                    disabled={(message.trim() === "" && attachedImages.length === 0) || !activeMode}
+                    disabled={(message.trim() === "" && attachedImages.length === 0) || !activeMode || isModesLoading}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

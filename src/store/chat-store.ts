@@ -563,8 +563,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         return;
       }
       
-      console.debug(`[CHAT-STORE] Chat ${chatId} found, conversation ID: ${chatState.chat.meta.id}`);
-      
+
       try {
         // Create abort controller for this chat
         const newAbortController = new AbortController();
@@ -689,21 +688,76 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         console.error(`Invalid message index for retry: ${messageIndex}`);
         return;
       }
-      
-      // Remove the message at the given index and all messages after it
-      const messagesUpToRetry = currentMessages.slice(0, messageIndex);
-      
-      // Update the conversation without the message and everything after it
-      set((state) => {
-        const chatState = state.chats.loaded.get(chatId);
-        if (chatState) {
-          chatState.chat.storedConversation.messages = messagesUpToRetry;
+
+      // Find the user message that comes BEFORE the clicked message (skip tool-result-only messages)
+      let lastUserMessageBeforeClick = -1;
+      for (let i = messageIndex - 1; i >= 0; i--) {
+        const message = currentMessages[i];
+        if (message.role === 'user') {
+          // Check if this user message contains only tool results (same logic as UI filtering)
+          if (Array.isArray(message.content)) {
+            const contentBlocks = message.content as ContentBlock[];
+            const isOnlyToolResults = contentBlocks.length > 0 && contentBlocks.every(
+              (item) =>
+                typeof item === "object" &&
+                item !== null &&
+                "type" in item &&
+                (item as any).type === "tool_result"
+            );
+            
+            // Skip user messages that contain only tool results - they're not real user messages
+            if (isOnlyToolResults) {
+              continue;
+            }
+          }
+          
+          // This is a real user-authored message
+          lastUserMessageBeforeClick = i;
+          break;
         }
-      });
+      }
+      
+      // If no user message found before the clicked message, fall back to the original behavior
+      if (lastUserMessageBeforeClick === -1) {
+        console.warn('No user message found before clicked message, falling back to original retry behavior');
+        const messagesUpToRetry = currentMessages.slice(0, messageIndex);
+        
+        set((state) => {
+          const chatState = state.chats.loaded.get(chatId);
+          if (chatState) {
+            // Create a completely new array to ensure React detects the change
+            chatState.chat.storedConversation.messages = [...messagesUpToRetry];
+            // Also update the updatedAt timestamp to trigger other effects
+            chatState.chat.meta.updatedAt = Date.now();
+          }
+        });
+      } else {
+        // Remove everything AFTER the user message before the clicked message (keep the user message itself)
+        const messagesUpToAndIncludingUserMessage = currentMessages.slice(0, lastUserMessageBeforeClick + 1);
+        
+        set((state) => {
+          const chatState = state.chats.loaded.get(chatId);
+          if (chatState) {
+            // Create a completely new array to ensure React detects the change
+            chatState.chat.storedConversation.messages = [...messagesUpToAndIncludingUserMessage];
+            // Also update the updatedAt timestamp to trigger other effects
+            chatState.chat.meta.updatedAt = Date.now();
+          }
+        });
+      }
+      
+      // Debug: Log final conversation state after retry logic
+      const finalChatState = get().getChatState(chatId);
+      if (finalChatState) {
+        finalChatState.chat.storedConversation.messages.forEach((msg, idx) => {
+          const hasThinking = Array.isArray(msg.content) && msg.content.some(block => block.type === 'thinking');
+          const hasToolUse = Array.isArray(msg.content) && msg.content.some(block => block.type === 'tool_use');
+        });
+      }
       
       // Trigger debounced autosave after content change
-      get().saveImmediatelyIfNeeded(chatId, true);
-      
+      await get().saveImmediatelyIfNeeded(chatId, true);
+            
       // Retry the conversation
       await get().runConversationTurnWithContext(chatId);
     },
