@@ -61,8 +61,8 @@ When doing anything related to styling, including creating new components, ahead
 
 The following commands trigger specific workflow phases for structured task implementation:
 
-#### "go" Command - Task Disposer
-When the user types "go", execute the task disposer script:
+#### "start" Command - Task Disposer
+When the user types "start", execute the task disposer script:
 
 1. **Run Task Disposer**
    - Execute `node scripts/task-disposer.mjs` to fetch the next available task from the backlog
@@ -126,7 +126,7 @@ When the user types "r", execute the final review using the automated script:
 
 - **Sequential Execution**: Commands must be used in order (go → r → c)
 - **User Approval Required**: Each phase requires explicit user approval before proceeding
-- **Comprehensive Planning**: The "go" command must include thorough research and planning
+- **Comprehensive Planning**: The "start" command must include thorough research and planning
 - **Quality Assurance**: The "r" command ensures code quality and completeness
 - **Clean Commits**: The "c" command creates well-documented commits
 
