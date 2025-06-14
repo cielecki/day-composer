@@ -8,6 +8,7 @@ import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-uti
 import { t } from 'src/i18n';
 import { findTaskByDescription } from "src/utils/tools/note-utils";
 import { appendComment, cleanTodoText } from 'src/utils/tasks/task-utils';
+import { extractFilenameWithoutExtension } from "src/utils/text/string-sanitizer";
 
 const schema = {
   name: "task_uncheck",
@@ -64,7 +65,7 @@ export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
         context.setLabel(t('tools.uncheck.labels.failed', { task: todoDescription }));
         throw new ToolExecutionError(t('errors.tasks.notFound', {
           task: todoDescription,
-          path: filePath
+          name: extractFilenameWithoutExtension(filePath)
         }));
       }
 
@@ -91,8 +92,7 @@ export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
 
       context.setLabel(t('tools.uncheck.labels.success', { task: todoDescription }));
       context.progress(t('tools.uncheck.progress.success', {
-        task: todoDescription,
-        name: filePath
+        task: todoDescription
       }));
     } catch (error) {
       context.setLabel(t('tools.uncheck.labels.failed', { task: todoDescription }));

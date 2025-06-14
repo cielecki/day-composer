@@ -5,6 +5,7 @@ import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { TFile } from "obsidian";
 import { validateModeFile, ModeValidationResult } from '../utils/validation/mode-validation';
 import { validateToolFile, ToolValidationResult } from '../utils/validation/tool-validation';
+import { extractFilenameWithoutExtension } from '../utils/text/string-sanitizer';
 
 /**
  * Analyze content for old special link syntax that could be migrated
@@ -144,25 +145,25 @@ export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
     const { plugin, params } = context;
     const { file_path, type = "auto" } = params;
 
-    context.setLabel(t('tools.modeValidator.labels.inProgress', { filePath: file_path }));
+    context.setLabel(t('tools.modeValidator.labels.inProgress', { fileName: extractFilenameWithoutExtension(file_path) }));
 
     try {
       const file = plugin.app.vault.getAbstractFileByPath(file_path);
       
       if (!file) {
-        context.setLabel(t('tools.modeValidator.labels.failed', { filePath: file_path }));
+        context.setLabel(t('tools.modeValidator.labels.failed', { fileName: extractFilenameWithoutExtension(file_path) }));
         throw new ToolExecutionError(`File not found: ${file_path}`);
       }
       
-      if (!(file instanceof TFile)) {
-        context.setLabel(t('tools.modeValidator.labels.failed', { filePath: file_path }));
-        throw new ToolExecutionError(`Path is not a file: ${file_path}`);
-      }
+              if (!(file instanceof TFile)) {
+          context.setLabel(t('tools.modeValidator.labels.failed', { fileName: extractFilenameWithoutExtension(file_path) }));
+          throw new ToolExecutionError(`Path is not a file: ${file_path}`);
+        }
 
-      if (file.extension !== 'md') {
-        context.setLabel(t('tools.modeValidator.labels.failed', { filePath: file_path }));
-        throw new ToolExecutionError(`Files must be markdown files (.md extension): ${file_path}`);
-      }
+              if (file.extension !== 'md') {
+          context.setLabel(t('tools.modeValidator.labels.failed', { fileName: extractFilenameWithoutExtension(file_path) }));
+          throw new ToolExecutionError(`Files must be markdown files (.md extension): ${file_path}`);
+        }
 
       // Get metadata and content
       const metadata = plugin.app.metadataCache.getFileCache(file);
@@ -179,7 +180,7 @@ export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
         } else if (normalizedTags.includes("ln-tool")) {
           fileType = "tool";
         } else {
-          context.setLabel(t('tools.modeValidator.labels.failed', { filePath: file_path }));
+          context.setLabel(t('tools.modeValidator.labels.failed', { fileName: extractFilenameWithoutExtension(file_path) }));
           throw new ToolExecutionError(`Could not determine file type. File must have 'ln-mode' or 'ln-tool' tag.`);
         }
       }
@@ -224,11 +225,11 @@ export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
       const warningCount = result.issues.filter(issue => issue.severity === 'warning').length;
       
       const labelContent = fileType === "mode" ? t('validation.results.mode.completed', { 
-        filePath: file_path,
+        filePath: extractFilenameWithoutExtension(file_path),
         errorCount,
         warningCount
       }) : t('validation.results.tool.completed', { 
-        filePath: file_path,
+        filePath: extractFilenameWithoutExtension(file_path),
         errorCount,
         warningCount
       });
@@ -305,7 +306,7 @@ export const modeValidatorTool: ObsidianTool<ModeValidatorInput> = {
 
       context.progress(report);
     } catch (error) {
-      context.setLabel(t('tools.modeValidator.labels.failed', { filePath: file_path }));
+      context.setLabel(t('tools.modeValidator.labels.failed', { fileName: extractFilenameWithoutExtension(file_path) }));
       throw error;
     }
   }

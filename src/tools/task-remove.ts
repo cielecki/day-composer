@@ -8,6 +8,7 @@ import { validateTasks } from 'src/utils/tasks/task-validation';
 import { removeTaskFromDocument, formatTask, cleanTodoText } from 'src/utils/tasks/task-utils';
 import { calculateLineNumberForNode, createNavigationTarget } from 'src/utils/tools/line-number-utils';
 import { findTaskByDescription } from "src/utils/tools/note-utils";
+import { extractFilenameWithoutExtension } from "src/utils/text/string-sanitizer";
 
 const schema = {
   name: "task_remove",
@@ -149,8 +150,7 @@ ${originalTaskText}
         
       context.setLabel(t('tools.remove.labels.success', { task: todoText }));
       context.progress(t('tools.remove.progress.success', {
-        task: tasksDescription,
-        name: filePath
+        task: tasksDescription
       }));
     } catch (error) {
       context.setLabel(t('tools.remove.labels.failed', { task: todoText }));

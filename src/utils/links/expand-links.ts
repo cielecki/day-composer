@@ -149,7 +149,7 @@ async function processContentSection(app: App, content: string, visitedPaths: Se
 			const linkFile = resolveLinkToFile(app, linkPath);
 			if (!linkFile) {
 				// Link cannot be resolved - notify user and throw error
-				throw new Error(t('errors.linkExpansion.couldNotResolve', { linkPath }));
+				throw new Error(t('errors.linkExpansion.couldNotResolve', { linkPath: linkPath }));
 			}
 			// If we get here, the file exists but couldn't be processed (e.g., non-markdown file)
 			// Keep the original link in this case

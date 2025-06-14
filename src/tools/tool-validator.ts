@@ -4,6 +4,7 @@ import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { TFile } from "obsidian";
 import { validateToolFile } from '../utils/validation/tool-validation';
 import { t } from 'src/i18n';
+import { extractFilenameWithoutExtension } from '../utils/text/string-sanitizer';
 
 const schema = {
   name: "tool_validator",
@@ -69,7 +70,7 @@ export const toolValidatorTool: ObsidianTool<ToolValidatorInput> = {
 
       // Set completion label with issue counts
       context.setLabel(t('validation.results.tool.completed', { 
-        filePath: tool_path,
+        filePath: extractFilenameWithoutExtension(tool_path),
         errorCount: errors.length,
         warningCount: warnings.length
       }));

@@ -10,6 +10,7 @@ import { validateTasks } from 'src/utils/tasks/task-validation';
 import { moveTaskToPosition } from 'src/utils/tasks/move-task-to-position';
 import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-utils';
 import { findTaskByDescription } from "src/utils/tools/note-utils";
+import { extractFilenameWithoutExtension } from "src/utils/text/string-sanitizer";
 
 const schema = {
   name: "task_abandon",
@@ -153,8 +154,7 @@ export const taskAbandonTool: ObsidianTool<TaskAbandonToolInput> = {
       
       context.setLabel(t('tools.abandon.labels.success', { task: todoText }));
       context.progress(t('tools.abandon.progress.success', {
-        task: tasksDescription,
-        name: filePath
+        task: tasksDescription
       }));
     } catch (error) {
       context.setLabel(t('tools.abandon.labels.failed', { task: todoText }));
