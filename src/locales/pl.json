@@ -469,6 +469,10 @@
       },
       "progress": {
         "success": "Przeniesiono '{{task}}' z '{{source}}' do '{{target}}' na pozycji '{{position}}'"
+      },
+      "tracking": {
+        "movedTo": "przeniesiono do",
+        "from": "z"
       }
     },
     "noteDelete": {

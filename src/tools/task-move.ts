@@ -10,6 +10,7 @@ import { createNavigationTargetsForTasks, createNavigationTarget, findTaskLineNu
 import { t } from 'src/i18n';
 import { findTaskByDescription } from "src/utils/tools/note-utils";
 import { extractFilenameWithoutExtension } from "src/utils/text/string-sanitizer";
+import { isDailyNote } from "../utils/daily-notes/is-daily-note";
 
 const schema = {
   name: "task_move",
@@ -101,17 +102,65 @@ export const taskMoveTool: ObsidianTool<TaskMoveToolInput> = {
         todos.map(todo => ({ todoText: todo.todo_text }))
       );
       
-      // Track tasks that will be moved
-      const movedTasks: Task[] = [];
+      // Track tasks that will be moved and their original versions
+      const originalTasks: Task[] = [];
+      const newTasks: Task[] = [];
+      const targetFileName = extractFilenameWithoutExtension(targetFilePath);
+      const sourceFileName = extractFilenameWithoutExtension(filePath);
+      
+      // Check if source and target are daily notes
+      const isSourceDailyNote = await isDailyNote(plugin.app, filePath);
+      const isTargetDailyNote = await isDailyNote(plugin.app, targetFilePath);
       
       // If we get here, all tasks were validated successfully
       let updatedNote = JSON.parse(JSON.stringify(note));
       
-      // Find all the tasks to move and remove them from the document first
+      // Find all the tasks to move and process them based on daily note status
       for (const todo of todos) {
-        const task = findTaskByDescription(updatedNote, todo.todo_text, (task) => true);
-        updatedNote = removeTaskFromDocument(updatedNote, task);
-        movedTasks.push(task);
+        const originalTask = findTaskByDescription(updatedNote, todo.todo_text, (task) => true);
+        
+        if (isSourceDailyNote) {
+          // Source is a daily note - mark as moved with tracking
+          const sourceTrackingInfo = ` (${t('tools.move.tracking.movedTo')} [[${targetFileName}]])`;
+          
+          originalTask.status = 'moved';
+          
+          // Check if task already has move tracking - if so, accumulate
+          if (originalTask.todoText.includes(`(${t('tools.move.tracking.movedTo')}`)) {
+            // Task has been moved before, append new tracking
+            originalTask.todoText = `${originalTask.todoText}${sourceTrackingInfo}`;
+          } else {
+            // First time being moved
+            originalTask.todoText = `${originalTask.todoText}${sourceTrackingInfo}`;
+          }
+        } else {
+          // Source is not a daily note - remove task completely
+          updatedNote = removeTaskFromDocument(updatedNote, originalTask);
+        }
+        
+        // Create new task for destination
+        let newTaskTodoText = todo.todo_text;
+        
+        if (isTargetDailyNote) {
+          // Target is a daily note - add source tracking
+          const destinationTrackingInfo = ` (${t('tools.move.tracking.from')} [[${sourceFileName}]])`;
+          newTaskTodoText = `${todo.todo_text}${destinationTrackingInfo}`;
+        }
+        // If target is not a daily note, just use original text without tracking
+        
+        const newTask: Task = {
+          type: 'task',
+          status: 'pending', // Always pending in destination
+          todoText: newTaskTodoText,
+          comment: originalTask.comment,
+          lineIndex: -1 // Will be set when inserted
+        };
+        
+        // Only track original task if it wasn't removed
+        if (isSourceDailyNote) {
+          originalTasks.push(originalTask);
+        }
+        newTasks.push(newTask);
       }
       
       // If moving to different file, load target note
@@ -132,9 +181,9 @@ export const taskMoveTool: ObsidianTool<TaskMoveToolInput> = {
         reference_todo_text,
       );
       
-      // Insert all moved tasks at the target position
-      for (let i = 0; i < movedTasks.length; i++) {
-        const task = movedTasks[i];
+      // Insert all new tasks at the target position
+      for (let i = 0; i < newTasks.length; i++) {
+        const task = newTasks[i];
         
         // Insert at the calculated position + i to maintain order
         targetNote = insertTaskAtPosition(
@@ -152,15 +201,22 @@ export const taskMoveTool: ObsidianTool<TaskMoveToolInput> = {
         await updateNote({plugin, filePath, updatedNote: targetNote});
       }
       
-      // Create navigation targets for the moved tasks
-      const navigationTargets = createNavigationTargetsForTasks(
+      // Create navigation targets for destination tasks (always available)
+      const destinationNavigationTargets = createNavigationTargetsForTasks(
         targetNote,
-        movedTasks,
+        newTasks,
         targetFilePath
       );
       
-      // Add navigation targets
-      navigationTargets.forEach(target => context.addNavigationTarget(target));
+      // Create navigation targets for source tasks only if they exist (daily notes only)
+      const sourceNavigationTargets = originalTasks.length > 0 
+        ? createNavigationTargetsForTasks(updatedNote, originalTasks, filePath)
+        : [];
+      
+      // Add all navigation targets
+      [...destinationNavigationTargets, ...sourceNavigationTargets].forEach(target => 
+        context.addNavigationTarget(target)
+      );
       
       // Prepare success message
       const task = todos.length === 1 
