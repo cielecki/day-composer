@@ -47,6 +47,10 @@ export interface ChatWithState {
 	liveToolResults: Map<string, ToolResultBlock>;
 	abortController: AbortController | null;
 	saveTimeout: NodeJS.Timeout | null;
+	// Audio transcription state (chat-specific)
+	isTranscribing: boolean;
+	transcriptionId?: string; // to track multiple transcriptions
+	lastTranscription: string | null;
 	// UI state that should persist with the chat
 	inputState: InputState; // Current input text and attachments
 	hasBackingFile: boolean; // Whether this chat has been saved to a file

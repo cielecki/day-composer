@@ -25,9 +25,8 @@ export interface AudioSlice {
     isSpeaking: boolean;
     isGeneratingSpeech: boolean;
     isSpeakingPaused: boolean;
-    isRecording: boolean;
-    isTranscribing: boolean;
-    lastTranscription: string | null;
+    // Recording coordination (global)
+    currentRecordingWindowId: string | null;
   };
 
   speakingStart: (text: string, modeId?: string) => Promise<void>;
@@ -35,10 +34,17 @@ export interface AudioSlice {
   speakingResume: () => void;
   speakingClearCache: () => void;
 
-  recordingStart: () => Promise<void>;
-  recordingToTranscribing: () => Promise<void>;
+  // Recording coordination
+  recordingStart: (windowId: string) => Promise<boolean>;
+  recordingStop: (windowId: string) => Promise<void>;
+  recordingToTranscribing: (windowId: string, chatId: string) => Promise<void>;
   
+  // Global audio stop
   audioStop: () => Promise<void>;
+  
+  // Recording state queries
+  isRecordingInWindow: (windowId: string) => boolean;
+  canRecordInWindow: (windowId: string) => boolean;
 }
 
 // Create TTS slice - now get() returns full PluginStore type
@@ -194,13 +200,16 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
     });
   };
 
-  const transcribeAudio = async (recorder: MediaRecorder): Promise<void> => {
+  const transcribeAudio = async (chatId: string, recorder: MediaRecorder): Promise<void> => {
     const chunks = audioChunks;
     if (!chunks.length) throw new Error('No audio chunks to transcribe');
     
-    set((state) => {
-      state.audio.isTranscribing = true;
-    });
+    // Generate unique transcription ID
+    const transcriptionId = `transcription-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    // Set transcription state on the specific chat
+    get().setIsTranscribing(chatId, true);
+    get().setTranscriptionId(chatId, transcriptionId);
     
     // Create a new abort controller for transcription
     currentAudioController = new AbortController();
@@ -269,14 +278,10 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
       }
 
       console.debug('Transcribed text:', transcription.text);
-      set((state) => {
-        state.audio.lastTranscription = transcription.text;
-      });
+      get().setLastTranscription(chatId, transcription.text);
     } catch (error) {
       
-      set((state) => {
-        state.audio.lastTranscription = null;
-      });
+      get().setLastTranscription(chatId, null);
       
       // If not aborted, show error notice
       if (!signal.aborted) {
@@ -286,9 +291,8 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
       }
 
     } finally {
-      set((state) => {
-        state.audio.isTranscribing = false;
-      });
+      get().setIsTranscribing(chatId, false);
+      get().setTranscriptionId(chatId, undefined);
       currentAudioController = null;
     }
   };
@@ -298,14 +302,20 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
       isSpeaking: false,
       isGeneratingSpeech: false,
       isSpeakingPaused: false,
-      isRecording: false,
-      isTranscribing: false,
-      lastTranscription: null
+      currentRecordingWindowId: null
     },
     
-    recordingStart: async (): Promise<void> => {
+    recordingStart: async (windowId: string): Promise<boolean> => {
+      // Check if another window is already recording
+      const currentState = get();
+      if (currentState.audio.currentRecordingWindowId && currentState.audio.currentRecordingWindowId !== windowId) {
+        console.debug(`Recording blocked: window ${currentState.audio.currentRecordingWindowId} is already recording`);
+        return false;
+      }
+
       currentAudioController = new AbortController();
       const signal = currentAudioController.signal;
+      
       try {
         audioChunks = [];
         const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -341,21 +351,21 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         
         recorder.addEventListener('stop', async () => {
           set((state) => {
-            state.audio.isRecording = false;
+            state.audio.currentRecordingWindowId = null;
           });
           
-          if (!signal.aborted) {
-            await transcribeAudio(recorder);
-          }
           stream.getTracks().forEach(track => track.stop());
         });
         
         recorder.start();
         mediaRecorder = recorder;
         
+        // Reserve recording for this window
         set((state) => {
-          state.audio.isRecording = true;
+          state.audio.currentRecordingWindowId = windowId;
         });
+        
+        return true;
       } catch (error) {
         console.error('Error starting recording:', error);
         let errorMessage = t('errors.audio.microphone.general');
@@ -365,19 +375,62 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
           else if (error.name === 'NotReadableError') errorMessage = t('errors.audio.microphone.inUse');
         }
         new Notice(errorMessage);
+        
         set((state) => {
-          state.audio.isRecording = false;
+          state.audio.currentRecordingWindowId = null;
         });
+        
+        return false;
       }
     },
 
-    recordingToTranscribing: async (): Promise<void> => {
-      console.debug("Stopping speech-to-text operations");
-      
-      const state = get();
-      if (mediaRecorder && state.audio.isRecording) {
+    recordingStop: async (windowId: string): Promise<void> => {
+      const currentState = get();
+      if (currentState.audio.currentRecordingWindowId !== windowId) {
+        console.debug(`Recording stop ignored: window ${windowId} is not the recording window`);
+        return;
+      }
+
+      if (mediaRecorder) {
         mediaRecorder.stop();
       }
+      
+      if (currentAudioController) {
+        currentAudioController.abort();
+        currentAudioController = null;
+      }
+    },
+
+    recordingToTranscribing: async (windowId: string, chatId: string): Promise<void> => {
+      console.debug("Stopping speech-to-text operations and starting transcription");
+      
+      const currentState = get();
+      if (currentState.audio.currentRecordingWindowId !== windowId) {
+        console.debug(`Recording stop ignored: window ${windowId} is not the recording window`);
+        return;
+      }
+      
+      if (mediaRecorder) {
+        // Stop recording and let the transcription happen in the background
+        const recorder = mediaRecorder;
+        mediaRecorder.stop();
+        
+        // Start transcription in background with the chatId
+        setTimeout(() => {
+          transcribeAudio(chatId, recorder);
+        }, 100);
+      }
+    },
+
+    isRecordingInWindow: (windowId: string): boolean => {
+      const currentState = get();
+      return currentState.audio.currentRecordingWindowId === windowId;
+    },
+
+    canRecordInWindow: (windowId: string): boolean => {
+      const currentState = get();
+      return currentState.audio.currentRecordingWindowId === null || 
+             currentState.audio.currentRecordingWindowId === windowId;
     },
 
     audioStop: async () => {
@@ -396,7 +449,6 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
       }
   
       set((state) => {
-        state.audio.lastTranscription = null;
         state.audio.isSpeaking = false;
         state.audio.isGeneratingSpeech = false;
         state.audio.isSpeakingPaused = false;
@@ -405,7 +457,8 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
     
     // Business Logic Implementation
     speakingStart: async (text: string, modeId?: string): Promise<void> => {
-      if (get().audio.isRecording || get().audio.isTranscribing) {
+      // Don't start TTS if any window is recording
+      if (get().audio.currentRecordingWindowId) {
         return;
       }
 

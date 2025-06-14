@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, KeyboardEvent, useCallback } from "react";
+import React, { useState, useRef, useEffect, KeyboardEvent, useCallback, useMemo } from "react";
 import { usePluginStore } from "../store/plugin-store";
 import { t } from 'src/i18n';
 import { LucideIcon } from '../components/LucideIcon';
@@ -11,31 +11,48 @@ import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
 // Define the number of samples to keep for the waveform (5 seconds at 10 samples per second)
 const WAVEFORM_HISTORY_LENGTH = 120; // 4 seconds at 30 samples per second
 
+// Generate a unique window ID for this component instance
+const generateWindowId = () => `window-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
 export const UnifiedInputArea: React.FC<{
   editingMessage?: { index: number; content: string; images?: AttachedImage[] } | null;
   chatId?: string;
   onSendMessage?: (message: string, images?: AttachedImage[]) => Promise<void>;
 }> = ({ editingMessage, chatId, onSendMessage }) => {
+  // Generate a stable window ID for this component instance
+  const windowId = useMemo(() => generateWindowId(), []);
+
   const getChatState = usePluginStore(state => state.getChatState);
+  const getTranscriptionState = usePluginStore(state => state.getTranscriptionState);
   const chatState = chatId ? getChatState(chatId) : null;
+  const transcriptionState = chatId ? getTranscriptionState(chatId) : null;
   const isGeneratingResponse = chatState?.isGenerating || false;
 
+  // Audio state from global store
   const isGeneratingSpeech = usePluginStore(state => state.audio.isGeneratingSpeech);
   const isSpeaking = usePluginStore(state => state.audio.isSpeaking);
   const isSpeakingPaused = usePluginStore(state => state.audio.isSpeakingPaused);
-  const isRecording = usePluginStore(state => state.audio.isRecording);
-  const isTranscribing = usePluginStore(state => state.audio.isTranscribing);
-  const lastTranscription = usePluginStore(state => state.audio.lastTranscription);
+  
+  // Recording/transcription state - now window/chat specific
+  const isRecordingInWindow = usePluginStore(state => state.isRecordingInWindow);
+  const canRecordInWindow = usePluginStore(state => state.canRecordInWindow);
+  const isRecording = isRecordingInWindow(windowId);
+  const canRecord = canRecordInWindow(windowId);
+  const isTranscribing = transcriptionState?.isTranscribing || false;
+  const lastTranscription = transcriptionState?.lastTranscription || null;
 
   const prevIsTranscribingRef = useRef(isTranscribing);
+  const processedTranscriptionRef = useRef<string | null>(null);
 
   const addUserMessage = usePluginStore(state => state.addUserMessage);
   const editUserMessage = usePluginStore(state => state.editUserMessage);
   const cancelEditingMessage = usePluginStore(state => state.cancelEditingMessage);
   const recordingStart = usePluginStore(state => state.recordingStart);
-  const finalizeRecording = usePluginStore(state => state.recordingToTranscribing);
+  const recordingStop = usePluginStore(state => state.recordingStop);
+  const recordingToTranscribing = usePluginStore(state => state.recordingToTranscribing);
   const audioStop = usePluginStore(state => state.audioStop);
   const chatStop = usePluginStore(state => state.chatStop);
+  const setLastTranscription = usePluginStore(state => state.setLastTranscription);
 
   const currentChatId = chatId || 'default';
 
@@ -104,8 +121,12 @@ export const UnifiedInputArea: React.FC<{
   useEffect(() => {
     if (
       isTranscribing === false &&
-      lastTranscription
+      lastTranscription &&
+      lastTranscription !== processedTranscriptionRef.current
     ) {
+      // Mark this transcription as processed to prevent infinite loops
+      processedTranscriptionRef.current = lastTranscription;
+      
       const newMessage = message.trim()
         ? `${message} ${lastTranscription}`
         : lastTranscription;
@@ -114,6 +135,12 @@ export const UnifiedInputArea: React.FC<{
       setAttachedImages([]);
       
       setMessage(newMessage);
+      
+      // Clear the transcription to prevent re-processing
+      if (chatId) {
+        setLastTranscription(chatId, null);
+      }
+      
       setTimeout(() => {
         const messageToSend = newMessage;
 
@@ -140,7 +167,7 @@ export const UnifiedInputArea: React.FC<{
         setMessage("");
       }, 10);
     }
-  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, isSpeaking, isGeneratingSpeech, message, addUserMessage, editUserMessage, attachedImages, editingMessage, currentChatId]);
+  }, [isTranscribing, lastTranscription, isGeneratingResponse, isRecording, isSpeaking, isGeneratingSpeech, addUserMessage, editUserMessage, attachedImages, editingMessage, currentChatId, chatId, setLastTranscription]);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -274,7 +301,10 @@ export const UnifiedInputArea: React.FC<{
         chatStop(currentChatId);
       }
       
-      await recordingStart();
+      const success = await recordingStart(windowId);
+      if (!success) {
+        console.debug('Recording blocked - another window is already recording');
+      }
     } catch (error) {
       console.error('Failed to start recording:', error);
     }
@@ -423,6 +453,12 @@ export const UnifiedInputArea: React.FC<{
     audioStop();
     if (chatId) {
       chatStop(chatId);
+    }
+  };
+
+  const handleFinalizeRecording = async () => {
+    if (chatId) {
+      await recordingToTranscribing(windowId, chatId);
     }
   };
 
@@ -612,7 +648,7 @@ export const UnifiedInputArea: React.FC<{
             {isRecording && !isTranscribing && (
               <button
                 className="input-control-button"
-                onClick={audioStop}
+                onClick={() => recordingStop(windowId)}
                 aria-label={t("ui.recording.cancel")}
               >
                 <svg
@@ -676,7 +712,7 @@ export const UnifiedInputArea: React.FC<{
                 <button
                   className="input-control-button primary"
                   onClick={handleMicrophoneClick}
-                  disabled={false}
+                  disabled={!canRecord}
                   aria-label={t("ui.recording.start")}
                 >
                   <svg
@@ -721,7 +757,7 @@ export const UnifiedInputArea: React.FC<{
                 <>
                   <button
                     className="input-control-button primary"
-                    onClick={finalizeRecording}
+                    onClick={handleFinalizeRecording}
                     disabled={false}
                     aria-label={t("ui.recording.confirm")}
                   >

@@ -68,6 +68,11 @@ const createInitialChatWithState = (): ChatWithState => {
     abortController: null,
     saveTimeout: null,
 
+    // Audio transcription state (chat-specific)
+    isTranscribing: false,
+    transcriptionId: undefined,
+    lastTranscription: null,
+
     inputState: {
       text: '',
       attachedImages: []
@@ -101,6 +106,12 @@ export interface ChatSlice {
   updateLiveToolResult: (chatId: string, toolId: string, result: ToolResultBlock) => void;
   clearLiveToolResults: (chatId: string) => void;
   setCurrentChat: (chatId: string, chat: Chat) => void;
+  
+  // Per-chat transcription management
+  setIsTranscribing: (chatId: string, transcribing: boolean) => void;
+  setTranscriptionId: (chatId: string, transcriptionId: string | undefined) => void;
+  setLastTranscription: (chatId: string, transcription: string | null) => void;
+  getTranscriptionState: (chatId: string) => { isTranscribing: boolean; transcriptionId?: string; lastTranscription: string | null } | null;
   
   // Per-chat business logic
   addUserMessage: (chatId: string, userMessage: string, images?: AttachedImage[]) => Promise<void>;
@@ -341,6 +352,11 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         chatState.liveToolResults.clear();
         chatState.editingMessage = null;
         chatState.isGenerating = false;
+        
+        // Reset transcription state
+        chatState.isTranscribing = false;
+        chatState.transcriptionId = undefined;
+        chatState.lastTranscription = null;
       });
     },
     
@@ -778,6 +794,38 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       
       // Save to update the filename (remove -U suffix)
       get().saveImmediatelyIfNeeded(chatId, false);
+    },
+
+    // Per-chat transcription management implementations
+    setIsTranscribing: (chatId: string, transcribing: boolean) => set((state) => {
+      const chatState = state.chats.loaded.get(chatId);
+      if (chatState) {
+        chatState.isTranscribing = transcribing;
+      }
+    }),
+
+    setTranscriptionId: (chatId: string, transcriptionId: string | undefined) => set((state) => {
+      const chatState = state.chats.loaded.get(chatId);
+      if (chatState) {
+        chatState.transcriptionId = transcriptionId;
+      }
+    }),
+
+    setLastTranscription: (chatId: string, transcription: string | null) => set((state) => {
+      const chatState = state.chats.loaded.get(chatId);
+      if (chatState) {
+        chatState.lastTranscription = transcription;
+      }
+    }),
+
+    getTranscriptionState: (chatId: string) => {
+      const chatState = get().chats.loaded.get(chatId);
+      if (!chatState) return null;
+      return {
+        isTranscribing: chatState.isTranscribing,
+        transcriptionId: chatState.transcriptionId,
+        lastTranscription: chatState.lastTranscription,
+      };
     },
   }
 }; 

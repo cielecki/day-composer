@@ -95,7 +95,8 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   chatId,
 }) => {
   // Get specific state slices from Zustand store with granular subscriptions
-  const isRecording = usePluginStore(state => state.audio.isRecording);
+  const currentRecordingWindowId = usePluginStore(state => state.audio.currentRecordingWindowId);
+  const isRecording = currentRecordingWindowId !== null;
   const chatState = usePluginStore(state => chatId ? state.getChatState(chatId) : null);
   const availableModes = usePluginStore(state => state.modes.available);
   
