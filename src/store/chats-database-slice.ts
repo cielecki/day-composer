@@ -590,7 +590,7 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
             meta: metadata,
             storedConversation: {
               version: storedConversation.version,
-              title: storedConversation.title,
+              title: storedConversation.title || t('chat.titles.newChat'),
               isUnread: storedConversation.isUnread,
               modeId: storedConversation.modeId,
               titleGenerated: storedConversation.titleGenerated,

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, KeyboardEvent, useCallback } from "
 import { usePluginStore } from "../store/plugin-store";
 import { t } from 'src/i18n';
 import { LucideIcon } from '../components/LucideIcon';
+import { ModeDropdown } from '../components/ModeDropdown';
 import { AttachedImage } from 'src/types/attached-image';
 import { TFile } from "obsidian";
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
@@ -72,10 +73,7 @@ export const UnifiedInputArea: React.FC<{
 
   const [volumeLevel, setVolumeLevel] = useState(0);
 
-  // Mode dropdown state
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const modeIndicatorRef = useRef<HTMLDivElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  // Mode dropdown state - now handled by ModeDropdown component
 
   // Mode-related store access
   const availableModes = usePluginStore(state => state.modes.available);
@@ -85,7 +83,7 @@ export const UnifiedInputArea: React.FC<{
   // Get active mode for this chat
   const chatActiveModeId = chatState?.chat.storedConversation.modeId || DEFAULT_MODE_ID;
   const activeMode = availableModes[chatActiveModeId];
-  const isModeLoading = chatActiveModeId && !availableModes[chatActiveModeId];
+  const isModeLoading = Boolean(chatActiveModeId && !availableModes[chatActiveModeId]);
 
   useEffect(() => {
     if (editingMessage) {
@@ -487,38 +485,14 @@ export const UnifiedInputArea: React.FC<{
     }
   };
 
-  // Mode dropdown handlers
-  const toggleDropdown = useCallback(() => {
-    setDropdownOpen(!dropdownOpen);
-  }, [dropdownOpen]);
-
+  // Mode selection handler
   const handleModeSwitch = useCallback(async (modeId: string) => {
     if (chatId) {
       setActiveModeForChat(chatId, modeId);
+    } else {
+      console.warn('UnifiedInputArea: No chatId provided for mode switch');
     }
-    setDropdownOpen(false);
   }, [setActiveModeForChat, chatId]);
-
-  // Handle clicks outside dropdown to close it
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        modeIndicatorRef.current &&
-        !modeIndicatorRef.current.contains(event.target as Node)
-      ) {
-        setDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [dropdownOpen]);
 
   return (
     <div className="unified-input-container">
@@ -624,151 +598,16 @@ export const UnifiedInputArea: React.FC<{
 
         <div className="input-controls-bottom">
           <div className="input-controls-left">
-            {/* Mode dropdown - compact version */}
-            <div className="ln-relative ln-inline-block">
-              <div
-                className={`ln-mode-indicator ${dropdownOpen ? 'open' : ''}`}
-                onClick={toggleDropdown}
-                ref={modeIndicatorRef}
-              >
-{isModeLoading ? (
-                  <>
-                    <span className="ln-icon-center">
-                      <LucideIcon
-                        name={isModesLoading ? "loader-2" : "clock"}
-                        size={16}
-                        color="var(--text-muted)"
-                        className={isModesLoading ? "animate-spin" : ""}
-                      />
-                    </span>
-                    <span className="ln-mode-name">
-                      {t('ui.mode.loading')}
-                    </span>
-                  </>
-                ) : activeMode ? (
-                  <>
-                    <span className="ln-icon-center">
-                      <LucideIcon
-                        name={activeMode.icon}
-                        size={16}
-                        color={activeMode.icon_color || "var(--text-normal)"}
-                      />
-                    </span>
-                    <span className="ln-mode-name">
-                      {activeMode.name}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span className="ln-icon-center">
-                      <LucideIcon
-                        name="help-circle"
-                        size={16}
-                        color="var(--text-muted)"
-                      />
-                    </span>
-                    <span className="ln-mode-name">
-                      Select mode
-                    </span>
-                  </>
-                )}
-                <span className={`ln-chevron ${dropdownOpen ? 'open' : ''}`}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
-                </span>
-              </div>
-
-              {/* Mode selection dropdown */}
-              {dropdownOpen && (
-                <div
-                  ref={dropdownRef}
-                  className="ln-mode-dropdown"
-                >
-                  {/* Actions - only show when activeMode is loaded */}
-                  {activeMode && (
-                    <>
-                      {!activeMode.path.startsWith(':prebuilt:') && (
-                        <div
-                          className="ln-mode-action-item"
-                          onClick={() => {
-                            if (window.app && activeMode.path) {
-                              const file = window.app.vault.getAbstractFileByPath(activeMode.path);
-                              if (file instanceof TFile) {
-                                window.app.workspace.getLeaf().openFile(file);
-                              }
-                            }
-                            setDropdownOpen(false);
-                          }}
-                        >
-                          <LucideIcon name="external-link" size={14} color="var(--text-normal)" />
-                          {t('ui.mode.openInEditor')}
-                        </div>
-                      )}
-                      <div
-                        className="ln-mode-action-item"
-                        onClick={async () => {
-                          const plugin = LifeNavigatorPlugin.getInstance();
-                          if (plugin && chatActiveModeId) {
-                            await plugin.openSystemPrompt(chatActiveModeId);
-                          }
-                          setDropdownOpen(false);
-                        }}
-                      >
-                        <LucideIcon name="terminal" size={14} color="var(--text-normal)" />
-                        {t('ui.mode.viewSystemPrompt')}
-                      </div>
-
-                      {/* Separator */}
-                      <div className="ln-separator" />
-                    </>
-                  )}
-
-                  {/* "switch to" label */}
-                  <div className="ln-section-label">
-                    {t('ui.mode.switchTo')}
-                  </div>
-
-                  {/* Mode list */}
-                  {Object.keys(availableModes).length > 0 && (
-                    <>
-                      {Object.values(availableModes).map((mode, index) => (
-                        <div
-                          key={index}
-                          className={`ln-mode-list-item ${mode.path === activeMode?.path ? 'active' : ''}`}
-                          onClick={async () => {
-                            await handleModeSwitch(mode.path);
-                          }}
-                        >
-                          {mode.icon && (
-                            <span className="ln-icon-center">
-                              <LucideIcon
-                                name={mode.icon}
-                                size={14}
-                                color={mode.icon_color || "var(--text-normal)"}
-                              />
-                            </span>
-                          )}
-                          <span className="ln-text-sm ln-whitespace-nowrap ln-text-ellipsis">
-                            {mode.name}
-                          </span>
-                        </div>
-                      ))}
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
+            {/* Mode dropdown - using unified component */}
+            <ModeDropdown
+              chatId={chatId}
+              chatActiveModeId={chatActiveModeId}
+              activeMode={activeMode}
+              isModeLoading={isModeLoading}
+              isModesLoading={isModesLoading}
+              availableModes={availableModes}
+              onModeSelect={handleModeSwitch}
+            />
             
             {isRecording && !isTranscribing && (
               <button

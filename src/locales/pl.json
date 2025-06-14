@@ -7,7 +7,7 @@
     "current": "Bieżąca rozmowa",
     "empty": "Rozmowa jest pusta. Rozpocznij konwersację, aby zobaczyć zawartość.",
     "titleGeneration": {
-      "aiPrompt": "Na podstawie tej wymiany rozmowy wygeneruj zwięzły, opisowy tytuł (maksymalnie 3-4 słowa, 30 znaków):",
+      "aiPrompt": "Na podstawie tej wymiany rozmowy wygeneruj zwięzły, opisowy tytuł w języku polskim (maksymalnie 3-4 słowa, 30 znaków):",
       "assistantLabel": "Asystent:",
       "examples": "Przykłady:\n- \"Plany weekendowe\"\n- \"Pomoc z React\"\n- \"Porady treningowe\"\n- \"Porady podróżnicze\"",
       "instructions": "Wygeneruj tytuł, który oddaje główny temat lub intencję. Odpowiedz tylko tytułem, nic więcej.",
@@ -225,6 +225,12 @@
   },
   "text": {
     "currentlySelected": "Aktualnie Zaznaczony Tekst"
+  },
+  "time": {
+    "justNow": "Teraz",
+    "minutesAgo": "{{count}} min temu",
+    "hoursAgo": "{{count}} godz temu",
+    "daysAgo": "{{count}} dni temu"
   },
   "toolApproval": {
     "buttons": {
@@ -637,7 +643,9 @@
     },
     "mode": {
       "loading": "Ładowanie...",
+      "noModesFound": "Nie znaleziono trybów",
       "openInEditor": "Otwórz w edytorze",
+      "searchModes": "Szukaj trybów...",
       "switchTo": "Przełącz na",
       "viewSettings": "Pokaż ustawienia trybu",
       "viewSystemPrompt": "Zobacz prompt systemowy"

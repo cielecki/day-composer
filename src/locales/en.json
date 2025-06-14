@@ -7,7 +7,7 @@
     "current": "Current Chat",
     "empty": "Chat is empty. Start a conversation to see content here.",
     "titleGeneration": {
-      "aiPrompt": "Based on this conversation exchange, generate a concise, descriptive title (maximum 3-4 words, 30 characters):",
+      "aiPrompt": "Based on this conversation exchange, generate a concise, descriptive title in English (maximum 3-4 words, 30 characters):",
       "assistantLabel": "Assistant:",
       "examples": "Examples:\n- \"Weekend Plans\"\n- \"React Help\"\n- \"Workout Tips\"\n- \"Travel Advice\"",
       "instructions": "Generate a title that captures the main topic or intent. Only respond with the title, nothing else.",
@@ -225,6 +225,12 @@
   },
   "text": {
     "currentlySelected": "Currently Selected Text"
+  },
+  "time": {
+    "justNow": "Just now",
+    "minutesAgo": "{{count}} minutes ago",
+    "hoursAgo": "{{count}} hours ago",
+    "daysAgo": "{{count}} days ago"
   },
   "toolApproval": {
     "buttons": {
@@ -637,7 +643,9 @@
     },
     "mode": {
       "loading": "Loading...",
+      "noModesFound": "No modes found",
       "openInEditor": "Open in editor",
+      "searchModes": "Search modes...",
       "switchTo": "Switch to:",
       "viewSettings": "View mode settings",
       "viewSystemPrompt": "View system prompt"

@@ -1,10 +1,13 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Chat, isMetadataLoaded, isFullyLoaded } from 'src/utils/chat/conversation';
 import { LucideIcon } from './LucideIcon';
 import { UnreadIndicator } from './UnreadIndicator';
+import { UnifiedDropdown } from './UnifiedDropdown';
+import { useSearch } from '../hooks/useSearch';
 import { usePluginStore } from '../store/plugin-store';
 import { t } from 'src/i18n';
 import { handleDeleteConversation } from 'src/utils/chat/delete-conversation-handler';
+import { formatRelativeTime } from '../utils/time/format-relative-time';
 
 interface VirtualConversationHistoryDropdownProps {
     onConversationSelect: (conversationId: string) => void;
@@ -29,20 +32,6 @@ interface ConversationItemProps {
 }
 
 const ConversationSkeleton: React.FC<{ updatedAt: number }> = ({ updatedAt }) => {
-    const formatRelativeTime = (timestamp: number) => {
-        const now = new Date();
-        const past = new Date(timestamp);
-        const diffMs = now.getTime() - past.getTime();
-        const diffMins = Math.floor(diffMs / (1000 * 60));
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-        if (diffMins < 1) return 'Just now';
-        if (diffMins < 60) return `${diffMins}m ago`;
-        if (diffHours < 24) return `${diffHours}h ago`;
-        if (diffDays < 7) return `${diffDays}d ago`;
-        return past.toLocaleDateString();
-    };
 
     return (
         <div className="conversation-content">
@@ -103,20 +92,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
     );
     const isGenerating = chatState?.isGenerating || false;
 
-    const formatRelativeTime = (timestamp: number) => {
-        const now = new Date();
-        const past = new Date(timestamp);
-        const diffMs = now.getTime() - past.getTime();
-        const diffMins = Math.floor(diffMs / (1000 * 60));
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-        if (diffMins < 1) return 'Just now';
-        if (diffMins < 60) return `${diffMins}m ago`;
-        if (diffHours < 24) return `${diffHours}h ago`;
-        if (diffDays < 7) return `${diffDays}d ago`;
-        return past.toLocaleDateString();
-    };
 
     // Intersection Observer for lazy loading
     useEffect(() => {
@@ -217,11 +193,8 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
     onToggle,
     currentConversationId
 }) => {
-    const [searchQuery, setSearchQuery] = useState('');
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editTitle, setEditTitle] = useState('');
-    const dropdownRef = useRef<HTMLDivElement>(null);
-    const searchInputRef = useRef<HTMLInputElement>(null);
 
     // Subscribe to global conversation list
     const conversationList = usePluginStore(state => state.conversationList);
@@ -272,28 +245,52 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
                 refreshConversationList();
                 setHasLoadedAllMetadata(false); // Reset when refreshing list
             }
-            // Focus search input when dropdown opens
-            setTimeout(() => {
-                searchInputRef.current?.focus();
-            }, 100);
+            // Focus search input when dropdown opens is now handled by UnifiedDropdown
         }
     }, [isOpen, isLoaded, refreshConversationList]);
 
-    // Debounced search effect - only trigger metadata loading after user stops typing
+    // Use unified search hook with debouncing for metadata loading
+    const search = useSearch(
+        conversationItems,
+        (item: Chat) => {
+            // For skeleton items (without loaded metadata), return a placeholder that won't match searches
+            // This ensures skeletons are included in the base list but excluded from search results
+            if (!isMetadataLoaded(item) || !item.storedConversation?.title) {
+                return ['__SKELETON_ITEM__']; // Special marker that won't match user searches
+            }
+            return [item.storedConversation.title];
+        },
+        { 
+            debounceMs: 300,
+            minQueryLength: 0  // Show all items when no search query
+        }
+    );
+
+    // Trigger metadata loading when search query changes (debounced)
     useEffect(() => {
-        if (!searchQuery.trim() || !isLoaded) return;
-        
-        const timeoutId = setTimeout(() => {
-            loadAllConversationMetadata();
-        }, 300); // 300ms debounce
-        
-        return () => clearTimeout(timeoutId);
-    }, [searchQuery, isLoaded, loadAllConversationMetadata]);
+        if (!search.hasQuery || !isLoaded) return;
+        loadAllConversationMetadata();
+    }, [search.hasQuery, isLoaded, loadAllConversationMetadata]);
 
     const handleLoadMetadata = useCallback(async (conversationId: string) => {
-        await loadConversationMetadata(conversationId);
+        console.debug('ConversationHistoryDropdown: Loading metadata for', conversationId);
+        try {
+            const result = await loadConversationMetadata(conversationId);
+            console.debug('ConversationHistoryDropdown: Metadata loaded for', conversationId, 'result:', result);
+            
+            // Check what the conversation looks like after loading
+            const updatedConversation = getConversationById(conversationId);
+            console.debug('ConversationHistoryDropdown: Updated conversation:', {
+                id: conversationId,
+                hasStoredConversation: !!updatedConversation?.storedConversation,
+                title: updatedConversation?.storedConversation?.title,
+                isMetadataLoaded: updatedConversation ? isMetadataLoaded(updatedConversation) : false
+            });
+        } catch (error) {
+            console.error('ConversationHistoryDropdown: Failed to load metadata for', conversationId, error);
+        }
         // No need to call markConversationMetadataLoaded anymore - loadConversationMetadata does it
-    }, [loadConversationMetadata]);
+    }, [loadConversationMetadata, getConversationById]);
 
     const handleLoadFullChat = useCallback(async (conversationId: string) => {
         // Skip if already loaded
@@ -338,45 +335,49 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
     };
 
     const handleDelete = async (conversationId: string) => {
-        await handleDeleteConversation(conversationId, deleteConversation, refreshConversationList);
+        await handleDeleteConversation(conversationId, deleteConversation);
     };
 
-    // Filter conversations based on search query
-    const filteredConversations = useMemo(() => {
-        if (!searchQuery) return conversationItems;
-        
-        const query = searchQuery.toLowerCase();
-        return conversationItems.filter(item => {
-            // Only include conversations that have metadata loaded
-            if (!isMetadataLoaded(item) || !item.storedConversation?.title) {
-                return false; // Exclude conversations without loaded titles
-            }
-            
-            // Search by title
-            return item.storedConversation.title.toLowerCase().includes(query);
-        });
-    }, [conversationItems, searchQuery]);
+    // Filter conversations based on search state
+    // When not searching: show all conversations (including skeletons)
+    // When searching: only show conversations with loaded metadata that match the search
+    const filteredConversations = search.hasQuery 
+        ? search.filteredItems.filter((item: Chat) => {
+            // When searching, exclude skeleton items since they can't match searches anyway
+            return isMetadataLoaded(item) && item.storedConversation?.title;
+          })
+        : conversationItems; // When not searching, show ALL conversations (including skeletons)
 
-    if (!isOpen) return null;
+    // Debug logging
+    console.debug('ConversationHistoryDropdown debug:', {
+        isOpen,
+        isLoaded,
+        conversationItemsCount: conversationItems.length,
+        filteredConversationsCount: filteredConversations.length,
+        hasQuery: search.hasQuery,
+        sampleItems: conversationItems.slice(0, 3).map(item => ({
+            id: item.meta.id,
+            hasStoredConversation: !!item.storedConversation,
+            title: item.storedConversation?.title,
+            isMetadataLoaded: isMetadataLoaded(item)
+        }))
+    });
 
     return (
-        <div 
-            ref={dropdownRef}
-            className="conversation-history-dropdown"
+        <UnifiedDropdown
+            isOpen={isOpen}
+            onClose={onToggle}
+            trigger={<></>}
+            position="bottom-right"
+            searchable={true}
+            searchPlaceholder={t('ui.chat.historySearchPlaceholder')}
+            onSearch={search.handleSearch}
+            emptyText={search.hasQuery ? t('ui.chat.historyNoResults') : t('ui.chat.historyEmpty')}
+            maxHeight={400}
+            minWidth={300}
+            maxWidth={350}
         >
-            {/* Search Header */}
-            <div className="search-header">
-                <input
-                    ref={searchInputRef}
-                    type="text"
-                    placeholder={t('ui.chat.historySearchPlaceholder')}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="search-input"
-                />
-            </div>
-
-            {/* Conversations List */}
+            {/* Custom content for conversations list */}
             <div className="conversations-list">
                 {!isLoaded ? (
                     <div className="loading-state">
@@ -384,7 +385,7 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
                     </div>
                 ) : filteredConversations.length === 0 ? (
                     <div className="history-empty-state">
-                        {searchQuery ? t('ui.chat.historyNoResults') : t('ui.chat.historyEmpty')}
+                        {search.hasQuery ? t('ui.chat.historyNoResults') : t('ui.chat.historyEmpty')}
                     </div>
                 ) : (
                     filteredConversations.map((item) => (
@@ -406,6 +407,6 @@ export const ConversationHistoryDropdown: React.FC<VirtualConversationHistoryDro
                     ))
                 )}
             </div>
-        </div>
+        </UnifiedDropdown>
     );
 }; 

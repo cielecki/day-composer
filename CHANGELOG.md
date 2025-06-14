@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### 🔧 Technical Improvements
+
+- **Unified dropdown system**: Consolidated three different dropdown implementations (chat history, more options, mode selection) into a single, consistent component system for better maintainability and user experience. All dropdowns now share the same styling, behavior, and accessibility features.
+
+### ✨ Enhanced Search Experience
+
+- **Unified search system**: All search functionality now uses a centralized `useSearch` hook, eliminating code duplication and providing consistent search behavior across all interfaces
+- **Mode search functionality**: You can now search through available modes when switching modes, making it much easier to find the right mode for your task. Action items (like "View system prompt") are hidden during search for cleaner results
+- **Improved conversation search**: Enhanced search functionality in chat history with configurable debouncing and better performance
+- **Consistent search patterns**: All dropdowns now share the same search logic, filtering behavior, and user experience
+
+### 🐛 Bug Fixes
+
+- **Conversation history positioning**: Fixed conversation history dropdown appearing off-screen by positioning it correctly relative to the history button
+- **Conversation history display**: Fixed issue where no conversations were showing in the history dropdown due to incorrect search filtering configuration
+- **Mode search positioning**: Improved mode dropdown search placement - search input now appears at the bottom for upward-opening dropdowns, providing better stability and user experience
+
 ## [0.11.3] - 2025-01-11
 
 ### 🚀 New Chat Menu - Everything You Need in One Place

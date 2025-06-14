@@ -18,6 +18,7 @@ import { t } from 'src/i18n';
 import { UnifiedInputArea } from "./UnifiedInputArea";
 import { SetupFlow } from "./setup/SetupFlow";
 import { ConversationHistoryDropdown } from './ConversationHistoryDropdown';
+import { ChatMenuDropdown } from './ChatMenuDropdown';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { MessageWithId } from '../store/chat-store';
 import { useAutoscroll } from '../hooks/useAutoscroll';
@@ -39,9 +40,6 @@ interface ChatAppProps {
 }
 
 export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
-	const [menuOpen, setMenuOpen] = useState(false);
-	const menuButtonRef = useRef<HTMLButtonElement>(null);
-	const menuRef = useRef<HTMLDivElement>(null);
 	const [conversationHistoryOpen, setConversationHistoryOpen] = useState(false);
 	const conversationHistoryContainerRef = useRef<HTMLDivElement>(null);
 
@@ -335,25 +333,6 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 
 
 
-	// Add useEffect for click-away for the 3-dot menu
-	useEffect(() => {
-		if (!menuOpen) return;
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				menuRef.current &&
-				!menuRef.current.contains(event.target as Node) &&
-				menuButtonRef.current &&
-				!menuButtonRef.current.contains(event.target as Node)
-			) {
-				setMenuOpen(false);
-			}
-		};
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, [menuOpen]);
-
 	// Add useEffect for conversation history dropdown click-away
 	useEffect(() => {
 		if (!conversationHistoryOpen) return;
@@ -543,102 +522,16 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 						)}
 					</div>
 
-					<div className="ln-relative" ref={menuRef}>
-						<button
-							ref={menuButtonRef}
-							className="clickable-icon"
-							aria-label="More options"
-							onClick={() => setMenuOpen(!menuOpen)}
-						>
-							<LucideIcon name="more-horizontal" size={18} />
-						</button>
-
-						{menuOpen && (
-							<div className="ln-chat-menu-dropdown">
-								<div className="ln-chat-menu-item" onClick={async () => {
-									try {
-										const plugin = LifeNavigatorPlugin.getInstance();
-										await plugin.openViewWithStandardBehavior(
-											LIFE_NAVIGATOR_VIEW_TYPE,
-											{ chatId: chatId },
-											undefined,
-											'tab'
-										);
-									} catch (error) {
-										console.error('Failed to open chat in new tab:', error);
-									}
-									setMenuOpen(false);
-								}}>
-									<LucideIcon name="external-link" size={16} />
-									<span>{t('ui.chat.openInNewTab')}</span>
-								</div>
-								<div className="ln-separator" />
-								<div className="ln-chat-menu-item" onClick={async () => {
-									try {
-										const plugin = LifeNavigatorPlugin.getInstance();
-										await plugin.openCostAnalysis(currentConversationMeta?.id || undefined);
-									} catch (error) {
-										console.error('Failed to open cost analysis:', error);
-									}
-									setMenuOpen(false);
-								}}>
-									<LucideIcon name="dollar-sign" size={16} />
-									<span>{t('costAnalysis.menu.viewCosts')}</span>
-								</div>
-								{currentConversationMeta && currentConversationMeta.filePath && (
-									<>
-										<div className="ln-chat-menu-item" onClick={async () => {
-											if (currentConversationMeta?.id) {
-												try {
-													if (currentConversationMeta && currentConversationMeta.filePath) {
-														await revealFileInSystem(currentConversationMeta.filePath);
-													}
-												} catch (error) {
-													console.error('Failed to reveal conversation file:', error);
-												}
-											}
-											setMenuOpen(false);
-										}}>
-											<LucideIcon name="folder-open" size={16} />
-											<span>{PlatformUtils.getRevealLabel()}</span>
-										</div>
-										<div className="ln-chat-menu-item" onClick={async () => {
-											if (currentConversationMeta?.id) {
-												await handleDeleteConversation(currentConversationMeta.id, deleteConversation);
-
-											}
-											setMenuOpen(false);
-										}}>
-											<LucideIcon name="trash-2" size={16} />
-											<span>{t('ui.chat.delete')}</span>
-										</div>
-									</>
-								)}
-								<div className="ln-separator" />
-								<div className="ln-chat-menu-item" onClick={() => {
-									window.open('https://github.com/cielecki/life-navigator', '_blank');
-									setMenuOpen(false);
-								}}>
-									<LucideIcon name="github" size={16} />
-									<span>{t('costAnalysis.menu.githubRepo')}</span>
-								</div>
-								<div className="ln-chat-menu-item" onClick={() => {
-									window.open('https://discord.com/invite/VrxZdr3JWH', '_blank');
-									setMenuOpen(false);
-								}}>
-									<LucideIcon name="message-circle" size={16} />
-									<span>{t('costAnalysis.menu.discordCommunity')}</span>
-								</div>
-								<div className="ln-chat-menu-item" onClick={() => {
-									window.open('https://x.com/mcielecki', '_blank');
-									setMenuOpen(false);
-								}}>
-									<LucideIcon name="user" size={16} />
-									<span>{t('costAnalysis.menu.authorTwitter')}</span>
-								</div>
-							</div>
-						)}
-					</div>
+					<ChatMenuDropdown
+						chatId={chatId}
+						conversationMetaId={currentConversationMeta?.id}
+						conversationFilePath={currentConversationMeta?.filePath}
+						onDelete={async () => {
+							if (currentConversationMeta?.id) {
+								await handleDeleteConversation(currentConversationMeta.id, deleteConversation);
+							}
+						}}
+					/>
 				</div>
 			</div>
 

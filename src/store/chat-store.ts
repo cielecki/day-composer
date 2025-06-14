@@ -714,6 +714,8 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         const chatState = state.chats.loaded.get(chatId);
         if (chatState) {
           chatState.chat.storedConversation.modeId = modeId;
+        } else {
+          console.warn('setActiveModeForChat: Chat state not found for chatId:', chatId);
         }
       });
     },
