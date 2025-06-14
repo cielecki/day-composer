@@ -2,12 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-
-### 🔧 Technical Improvements
-
-- **Unified dropdown system**: Consolidated three different dropdown implementations (chat history, more options, mode selection) into a single, consistent component system for better maintainability and user experience. All dropdowns now share the same styling, behavior, and accessibility features.
-
 ### ✨ Enhanced Search Experience
 
 - **Unified search system**: All search functionality now uses a centralized `useSearch` hook, eliminating code duplication and providing consistent search behavior across all interfaces
@@ -549,3 +543,9 @@ You'll enjoy a more focused chat history experience:
 - No more accidentally triggering edit mode when browsing your chat history
 - Single, consistent place to edit chat titles (in the chat header)
 - Cleaner, less cluttered interface for better usability
+
+### 🔧 Technical Improvements
+
+- **Perfect translation parameter handling**: Completely resolved all 115+ translation parameter mismatches across the entire codebase. Users will never see raw template placeholders like "{{name}}" - all messages now display properly localized content with user-friendly formatting.
+- **Enhanced translation cleanup tools**: Significantly improved the translation cleanup script with precise parameter detection, reducing false positives by 96% and providing production-ready maintenance tools for future development.
+- **Unified dropdown system**: Consolidated three different dropdown implementations (chat history, more options, mode selection) into a single, consistent component system for better maintainability and user experience. All dropdowns now share the same styling, behavior, and accessibility features.

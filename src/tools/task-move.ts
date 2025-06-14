@@ -163,13 +163,13 @@ export const taskMoveTool: ObsidianTool<TaskMoveToolInput> = {
       navigationTargets.forEach(target => context.addNavigationTarget(target));
       
       // Prepare success message
-      const tasksDescription = todos.length === 1 
+      const task = todos.length === 1 
         ? `"${todos[0].todo_text}"` 
         : `${todos.length} ${t('tools.tasks.plural')}`;
         
       context.setLabel(t('tools.move.labels.success', { task: todoText, destination: extractFilenameWithoutExtension(targetFilePath) }));
       context.progress(t('tools.move.progress.success', {
-        task: tasksDescription,
+        task: task,
         source: extractFilenameWithoutExtension(filePath),
         target: extractFilenameWithoutExtension(targetFilePath),
         position

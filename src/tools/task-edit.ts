@@ -125,10 +125,7 @@ export const taskEditTool: ObsidianTool<TaskEditToolInput> = {
       const commentText = params.replacement_comment ? ` with comment` : '';
       
       const resultMessage = t('tools.editTodo.progress.success', {
-        originalTask: original_todo_text,
-        newTask: params.replacement_todo_text,
-        name: filePath,
-        details: `${statusText}${commentText}`
+        task: params.replacement_todo_text
       });
 
       // Add navigation targets

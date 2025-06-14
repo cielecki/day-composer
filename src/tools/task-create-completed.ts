@@ -118,9 +118,7 @@ export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput>
 
       context.setLabel(t('tools.createCompleted.labels.success', { task: todo_text }));
       context.progress(t('tools.createCompleted.progress.success', {
-        task: todo_text,
-        time: ` ${completion_time}`,
-        name: filePath
+        task: todo_text
       }));
     } catch (error) {
       context.setLabel(t('tools.createCompleted.labels.failed', { task: todo_text }));
