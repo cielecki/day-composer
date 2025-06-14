@@ -62,7 +62,7 @@
   },
   "errors": {
     "audio": {
-      "invalidVoice": "Nieprawidłowy Głos",
+      "invalidVoice": "Nieprawidłowy głos: {{voice}}",
       "microphone": {
         "accessDenied": "Dostęp Zabroniony",
         "general": "Ogólny",

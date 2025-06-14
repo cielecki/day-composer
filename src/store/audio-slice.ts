@@ -517,8 +517,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
       } catch (error) {
         console.error('Error during TTS:', error);
         if (!signal.aborted) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error during TTS';
-          new Notice(t('errors.audio.transcriptionFailed', { error: errorMessage }));
+          new Notice(t('errors.audio.transcriptionFailed'));
         }
         throw error;
       } finally {

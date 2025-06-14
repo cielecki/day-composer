@@ -170,8 +170,8 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 		}
 
 		// Display each secret with controls
-		for (const key of secretKeys) {
-			const value = store.settings.secrets[key];
+		for (const secretKey of secretKeys) {
+			const value = store.settings.secrets[secretKey];
 			
 			const secretContainer = this.secretsContainer.createEl('div', {
 				cls: 'setting-item',
@@ -191,7 +191,7 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			// Secret name
 			const nameEl = secretInfo.createEl('div');
 			nameEl.createEl('strong', { 
-				text: key,
+				text: secretKey,
 			});
 
 			// Controls on the right - moved to container level like user tools
@@ -212,7 +212,7 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 				editBtn.appendChild(editIcon);
 			}
 			editBtn.addEventListener('click', () => {
-				this.showEditSecretDialog(key, value || '');
+				this.showEditSecretDialog(secretKey, value || '');
 			});
 
 			// Delete button
@@ -228,13 +228,13 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 				deleteBtn.appendChild(deleteIcon);
 			}
 			deleteBtn.addEventListener('click', async () => {
-				const confirmed = confirm(t('settings.secrets.list.confirmDelete', { key }));
+				const confirmed = confirm(t('settings.secrets.list.confirmDelete', { key: secretKey }));
 				if (confirmed) {
 					const store = getStore();
-					await store.removeSecret(key);
+					await store.removeSecret(secretKey);
 					
 					// Reset tutorial state if relevant API keys are deleted
-					if (key === 'OPENAI_API_KEY') {
+					if (secretKey === 'OPENAI_API_KEY') {
 						// Reset the skipped flag when OpenAI key is deleted
 						store.updateSettings({
 							tutorial: {
@@ -246,7 +246,7 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 				
 				await store.saveSettings();
 					await this.refreshSecretsDisplay();
-					new Notice(t('settings.secrets.list.deleted', { key }));
+					new Notice(t('settings.secrets.list.deleted', { key: secretKey }));
 				}
 			});
 		}

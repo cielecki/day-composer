@@ -6,6 +6,7 @@ import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
+import { extractFilenameWithoutExtension } from "src/utils/text/string-sanitizer";
 
 const schema = {
   name: "file_move",
@@ -48,7 +49,7 @@ export const fileMoveTool: ObsidianTool<FileMoveToolInput> = {
     const { plugin, params } = context;
     const { source_path, destination_path, create_directories = true } = params;
     
-    context.setLabel(t('tools.fileMove.labels.inProgress', { source: source_path, destination: destination_path }));
+    context.setLabel(t('tools.fileMove.labels.inProgress', { source: extractFilenameWithoutExtension(source_path), destination: extractFilenameWithoutExtension(destination_path) }));
 
     try {
       // Normalize paths
@@ -86,7 +87,7 @@ export const fileMoveTool: ObsidianTool<FileMoveToolInput> = {
       }
       
       // Perform the move operation
-              context.progress(t('tools.fileMove.progress.moving', { source: source_path, destination: destination_path }));
+      context.progress(t('tools.fileMove.progress.moving', { source: extractFilenameWithoutExtension(source_path), destination: extractFilenameWithoutExtension(destination_path) }));
       await plugin.app.vault.rename(sourceFile, normalizedDestinationPath);
       
       // Add navigation target to the moved file
@@ -94,10 +95,10 @@ export const fileMoveTool: ObsidianTool<FileMoveToolInput> = {
         filePath: normalizedDestinationPath
       });
       
-      context.setLabel(t('tools.fileMove.labels.success', { source: source_path, destination: destination_path }));
-              context.progress(t('tools.fileMove.progress.completed', { 
-        source: source_path, 
-        destination: destination_path 
+      context.setLabel(t('tools.fileMove.labels.success', { source: extractFilenameWithoutExtension(source_path), destination: extractFilenameWithoutExtension(destination_path) }));
+      context.progress(t('tools.fileMove.progress.completed', { 
+        source: extractFilenameWithoutExtension(source_path), 
+        destination: extractFilenameWithoutExtension(destination_path) 
       }));
       
     } catch (error) {

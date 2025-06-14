@@ -40,7 +40,7 @@ export const libraryReadTool: ObsidianTool<LibraryReadInput> = {
     const { params } = context;
     const { path } = params;
 
-    context.setLabel(t('tools.library.read.labels.inProgress', { path }));
+    context.setLabel(t('tools.library.read.labels.inProgress', { name: extractFilenameWithoutExtension(path) }));
 
     try {
       // Clean up the path
@@ -76,11 +76,11 @@ export const libraryReadTool: ObsidianTool<LibraryReadInput> = {
       formattedContent += content;
 
       // Display the formatted content
-      context.setLabel(t('tools.library.read.labels.completed', { path: extractFilenameWithoutExtension(cleanPath) }));
+      context.setLabel(t('tools.library.read.labels.completed', { name: extractFilenameWithoutExtension(cleanPath) }));
       context.progress(formattedContent);
 
     } catch (error) {
-      context.setLabel(t('tools.library.read.labels.failed', { path }));
+      context.setLabel(t('tools.library.read.labels.failed', { name: extractFilenameWithoutExtension(path) }));
       if (error instanceof ToolExecutionError) {
         throw error;
       }

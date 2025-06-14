@@ -169,7 +169,7 @@ export const conversationSaveTool: ObsidianTool<ConversationSaveToolInput> = {
       });
 
       context.setLabel(t('tools.conversationSave.labels.success', { path: targetPath }));
-      context.progress(t('tools.conversationSave.progress.success', { count: conversation.length, path: targetPath }));
+      context.progress(t('tools.conversationSave.progress.success', { count: conversation.length, name: extractFilenameWithoutExtension(targetPath) }));
       
     } catch (error) {
       context.setLabel(t('tools.conversationSave.labels.failed'));

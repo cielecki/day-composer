@@ -86,21 +86,9 @@ export const ValidationFixButton: React.FC<ValidationFixButtonProps> = ({
 	const getDescriptionText = () => {
 		switch (type) {
 			case 'modes':
-				return invalidModes.length === 1 ? t('validation.fixModes.description.singular', {
-					count: invalidModes.length,
-				}) : (invalidModes.length >= 2 && invalidModes.length <= 4 ? t('validation.fixModes.description.few', {
-					count: invalidModes.length,
-				}) : t('validation.fixModes.description.many', {
-					count: invalidModes.length,
-				}));
+				return invalidModes.length === 1 ? t('validation.fixModes.description.singular') : (invalidModes.length >= 2 && invalidModes.length <= 4 ? t('validation.fixModes.description.few') : t('validation.fixModes.description.many'));
 			case 'tools':
-				return invalidTools.length === 1 ? t('validation.fixTools.description.singular', {
-					count: invalidTools.length,
-				}) : (invalidTools.length >= 2 && invalidTools.length <= 4 ? t('validation.fixTools.description.few', {
-					count: invalidTools.length,
-				}) : t('validation.fixTools.description.many', {
-					count: invalidTools.length,
-				}));
+				return invalidTools.length === 1 ? t('validation.fixTools.description.singular') : (invalidTools.length >= 2 && invalidTools.length <= 4 ? t('validation.fixTools.description.few') : t('validation.fixTools.description.many'));
 			case 'specific-mode':
 				const modeName = modeId ? modeId.split('/').pop()?.replace('.md', '') || modeId : 'This mode';
 				return t('validation.fixSpecificMode.description', {
