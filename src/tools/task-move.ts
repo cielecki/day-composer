@@ -170,8 +170,8 @@ export const taskMoveTool: ObsidianTool<TaskMoveToolInput> = {
       context.setLabel(t('tools.move.labels.success', { task: todoText, destination: extractFilenameWithoutExtension(targetFilePath) }));
       context.progress(t('tools.move.progress.success', {
         task: tasksDescription,
-        source: filePath,
-        target: targetFilePath,
+        source: extractFilenameWithoutExtension(filePath),
+        target: extractFilenameWithoutExtension(targetFilePath),
         position
       }));
     } catch (error) {

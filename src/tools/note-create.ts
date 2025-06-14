@@ -76,7 +76,7 @@ export const noteCreateTool: ObsidianTool<NoteCreateToolInput> = {
       if (auto_version) {
         // Generate a versioned path
         finalPath = await getVersionedPath(path, plugin.app);
-        context.progress(t('tools.createDocument.progress.versionedPath', { originalPath: path, versionedPath: finalPath }));
+        context.progress(t('tools.createDocument.progress.versionedPath', { originalName: extractFilenameWithoutExtension(path), versionedName: extractFilenameWithoutExtension(finalPath) }));
       } else {
         context.setLabel(t('tools.createDocument.labels.failed', { name: filename }));
         throw new ToolExecutionError(`File already exists at ${path}. Set auto_version to true to create a versioned file.`);
@@ -92,6 +92,6 @@ export const noteCreateTool: ObsidianTool<NoteCreateToolInput> = {
     });
 
     context.setLabel(t('tools.createDocument.labels.completed', { name: filename }));
-    context.progress(t('tools.createDocument.progress.success', { path: finalPath }));
+    context.progress(t('tools.createDocument.progress.success', { name: extractFilenameWithoutExtension(finalPath) }));
   }
 };

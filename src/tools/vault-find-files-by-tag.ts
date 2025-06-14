@@ -138,7 +138,7 @@ export const vaultFindFilesByTagTool: ObsidianTool<VaultFindFilesByTagToolInput>
       
       const resultText = resultLines.join('\n');
       
-      context.setLabel(t('tools.findFilesByTag.labels.completed', { tag, count: matchingFiles.length }));
+      context.setLabel(t('tools.findFilesByTag.labels.completed', { tag }));
       context.progress(resultText);
     } catch (error) {
       context.setLabel(t('tools.findFilesByTag.labels.failed', { tag }));

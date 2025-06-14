@@ -82,7 +82,7 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 		const { todos: tasks, path, position, reference_todo_text } = params;
 
 		if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
-			context.setLabel(t('tools.add.labels.failed', { task: '' }));
+			context.setLabel(t('tools.add.labels.failed', { task: '', filename: 'unknown' }));
 			throw new ToolExecutionError("No to-do items provided");
 		}
 
@@ -92,7 +92,7 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 			? `'${truncateText(tasks[0].todo_text, 30)}'` 
 			: `${todoCount} ${t('tools.tasks.plural')}`;
 
-		context.setLabel(t('tools.add.labels.inProgress', { task: taskDescriptionShort }));
+		context.setLabel(t('tools.add.labels.inProgress'));
 
 		const filePath = path ? path : await getDailyNotePath(plugin.app);
 
@@ -168,7 +168,7 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 
 			context.progress(t('tools.add.progress.success', {
 				task: taskDescriptionFull,
-				name: filePath
+				name: extractFilenameWithoutExtension(filePath)
 			}));
 		} catch (error) {
 			const filename = extractFilenameWithoutExtension(filePath);

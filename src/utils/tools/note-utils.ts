@@ -12,6 +12,7 @@ import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { formatMarkdown } from "./format-markdown";
 import { t } from 'src/i18n';
 import { normalizeUnicode } from "../../utils/text/unicode-normalizer";
+import { extractFilenameWithoutExtension } from "../text/string-sanitizer";
 
 export type NoteNode = Task | TextBlock;
 
@@ -94,7 +95,7 @@ export async function readNote({
 
 	if (!exists) {
 		throw new ToolExecutionError(
-			t("errors.files.notFound", { path: filePath })
+			t("errors.files.notFound", { name: extractFilenameWithoutExtension(filePath) })
 		);
 	}
 
@@ -102,7 +103,7 @@ export async function readNote({
 
 	if (!file) {
 		throw new ToolExecutionError(
-			t("errors.files.getFailed", { path: filePath }),
+			t("errors.files.getFailed", { name: extractFilenameWithoutExtension(filePath) }),
 		);
 	}
 
@@ -113,7 +114,7 @@ export async function readNote({
 	} catch (error) {
 		console.error("Error reading file:", error);
 		throw new ToolExecutionError(
-			t("errors.files.getFailed", { path: filePath }),
+			t("errors.files.getFailed", { name: extractFilenameWithoutExtension(filePath) }),
 		);
 	}
 }
@@ -131,7 +132,7 @@ export async function updateNote({
 
 	if (!exists) {
 		throw new ToolExecutionError(
-			t("errors.files.notFound", { path: filePath }),
+			t("errors.files.notFound", { name: extractFilenameWithoutExtension(filePath) }),
 		);
 	}
 
@@ -139,7 +140,7 @@ export async function updateNote({
 
 	if (!file) {
 		throw new ToolExecutionError(
-			t("errors.files.getFailed", { path: filePath }),
+			t("errors.files.getFailed", { name: extractFilenameWithoutExtension(filePath) }),
 		);
 	}
 
@@ -242,13 +243,13 @@ export function findTaskByDescription(
 
 	if (tasks.length === 0) {
 		throw new ToolExecutionError(
-			t("errors.tasks.notFound", { task: taskDescription, path: note.filePath }),
+			t("errors.tasks.notFound", { task: taskDescription, name: extractFilenameWithoutExtension(note.filePath) }),
 		);
 	}
 
 	if (tasks.length > 1) {
 		throw new ToolExecutionError(
-			t("errors.tasks.multipleFound", { task: taskDescription, path: note.filePath }),
+			t("errors.tasks.multipleFound", { task: taskDescription, name: extractFilenameWithoutExtension(note.filePath) }),
 		);
 	}
 

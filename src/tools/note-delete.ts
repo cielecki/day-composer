@@ -7,6 +7,7 @@ import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import i18next from 'i18next';
+import { extractFilenameWithoutExtension } from "src/utils/text/string-sanitizer";
 
 const schema = {
   name: "note_delete",
@@ -71,7 +72,7 @@ export const noteDeleteTool: ObsidianTool<NoteDeleteToolInput> = {
     const { plugin, params } = context;
     const { file_path, confirm_deletion = false } = params;
     
-    context.setLabel(t('tools.noteDelete.labels.inProgress', { path: file_path }));
+    context.setLabel(t('tools.noteDelete.labels.inProgress', { name: extractFilenameWithoutExtension(file_path) }));
 
     try {
       // Safety check - require confirmation
@@ -86,15 +87,15 @@ export const noteDeleteTool: ObsidianTool<NoteDeleteToolInput> = {
       // Check if source file exists
       const sourceExists = await fileExists(normalizedSourcePath, plugin.app);
       if (!sourceExists) {
-        context.setLabel(t('tools.noteDelete.labels.failed', { path: file_path }));
-        throw new ToolExecutionError(t('tools.noteDelete.errors.fileNotFound', { path: file_path }));
+        context.setLabel(t('tools.noteDelete.labels.failed', { name: extractFilenameWithoutExtension(file_path) }));
+        throw new ToolExecutionError(t('tools.noteDelete.errors.fileNotFound', { name: extractFilenameWithoutExtension(file_path) }));
       }
       
       // Get the source file
       const sourceFile = getFile(normalizedSourcePath, plugin.app);
       if (!sourceFile) {
-        context.setLabel(t('tools.noteDelete.labels.failed', { path: file_path }));
-        throw new ToolExecutionError(t('tools.noteDelete.errors.cannotAccess', { path: file_path }));
+        context.setLabel(t('tools.noteDelete.labels.failed', { name: extractFilenameWithoutExtension(file_path) }));
+        throw new ToolExecutionError(t('tools.noteDelete.errors.cannotAccess', { name: extractFilenameWithoutExtension(file_path) }));
       }
       
       // Get trash directory name based on language
@@ -109,7 +110,7 @@ export const noteDeleteTool: ObsidianTool<NoteDeleteToolInput> = {
       const normalizedTrashPath = normalizePath(trashPath);
       
       // Perform the move operation to trash
-              context.progress(t('tools.noteDelete.progress.movingToTrash', { source: file_path, destination: trashPath }));
+              context.progress(t('tools.noteDelete.progress.movingToTrash', { source: extractFilenameWithoutExtension(file_path), destination: trashPath }));
       await plugin.app.vault.rename(sourceFile, normalizedTrashPath);
       
       // Add navigation target to the file in trash
@@ -117,15 +118,14 @@ export const noteDeleteTool: ObsidianTool<NoteDeleteToolInput> = {
         filePath: normalizedTrashPath
       });
       
-      context.setLabel(t('tools.noteDelete.labels.success', { path: file_path, trashDir: trashDirName }));
+      context.setLabel(t('tools.noteDelete.labels.success', { name: extractFilenameWithoutExtension(file_path), trashDir: trashDirName }));
       context.progress(t('tools.noteDelete.progress.completed', { 
-        source: file_path, 
-        destination: trashPath,
+        source: extractFilenameWithoutExtension(file_path), 
         trashDir: trashDirName
       }));
       
     } catch (error) {
-      context.setLabel(t('tools.noteDelete.labels.failed', { path: file_path }));
+      context.setLabel(t('tools.noteDelete.labels.failed', { name: extractFilenameWithoutExtension(file_path) }));
       throw error;
     }
   }

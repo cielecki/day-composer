@@ -121,7 +121,7 @@ export const vaultSearchTool: ObsidianTool<VaultSearchToolInput> = {
         });
       });
 
-      context.setLabel(t('tools.search.labels.completed', { query, count: limitedResults.length }));
+      context.setLabel(t('tools.search.labels.completed', { query }));
       context.progress(resultText);
     } catch (error) {
       context.setLabel(t('tools.search.labels.failed', { query }));
