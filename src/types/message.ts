@@ -63,4 +63,5 @@ export type ContentBlock =
 export interface Message {
 	role: "user" | "assistant";
 	content: ContentBlock[];
+	modeId?: string; // Mode ID associated with this message (context when created)
 }

@@ -78,7 +78,7 @@ export const modeDelegateTool: ObsidianTool<DelegateToModeToolInput> = {
 			if (!targetMode) {
 				throw new Error(`Mode '${mode_id}' not found`);
 			}
-			const taskMessage = createUserMessage(task);
+			const taskMessage = createUserMessage(task, undefined, mode_id);
 			
 			const newConversation = {
 				meta: {

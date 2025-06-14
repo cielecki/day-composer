@@ -570,6 +570,7 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 						isLastMessage={index === filteredConversation.length - 1}
 						isGeneratingResponse={isGeneratingResponse}
 						chatId={chatId}
+						modeId={message.modeId}
 					/>
 				))}
 

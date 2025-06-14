@@ -15,7 +15,7 @@ const WAVEFORM_HISTORY_LENGTH = 120; // 4 seconds at 30 samples per second
 const generateWindowId = () => `window-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 export const UnifiedInputArea: React.FC<{
-  editingMessage?: { index: number; content: string; images?: AttachedImage[] } | null;
+  editingMessage?: { index: number; content: string; images?: AttachedImage[]; modeId?: string } | null;
   chatId?: string;
   onSendMessage?: (message: string, images?: AttachedImage[]) => Promise<void>;
 }> = ({ editingMessage, chatId, onSendMessage }) => {
@@ -34,9 +34,11 @@ export const UnifiedInputArea: React.FC<{
   const isSpeakingPaused = usePluginStore(state => state.audio.isSpeakingPaused);
   
   // Recording/transcription state - now window/chat specific
+  // Fix reactivity: directly subscribe to currentRecordingWindowId to ensure re-renders
+  const currentRecordingWindowId = usePluginStore(state => state.audio.currentRecordingWindowId);
   const isRecordingInWindow = usePluginStore(state => state.isRecordingInWindow);
   const canRecordInWindow = usePluginStore(state => state.canRecordInWindow);
-  const isRecording = isRecordingInWindow(windowId);
+  const isRecording = currentRecordingWindowId === windowId;
   const canRecord = canRecordInWindow(windowId);
   const isTranscribing = transcriptionState?.isTranscribing || false;
   const lastTranscription = transcriptionState?.lastTranscription || null;
@@ -97,10 +99,12 @@ export const UnifiedInputArea: React.FC<{
   const isModesLoading = usePluginStore(state => state.modes.isLoading);
   const setActiveModeForChat = usePluginStore(state => state.setActiveModeForChat);
 
-  // Get active mode for this chat
+  // Get active mode for this chat - use editing message's mode if editing, otherwise chat's current mode
   const chatActiveModeId = chatState?.chat.storedConversation.modeId || DEFAULT_MODE_ID;
-  const activeMode = availableModes[chatActiveModeId];
-  const isModeLoading = Boolean(chatActiveModeId && !availableModes[chatActiveModeId]);
+  const editingModeId = editingMessage?.modeId;
+  const effectiveModeId = editingModeId || chatActiveModeId;
+  const activeMode = availableModes[effectiveModeId];
+  const isModeLoading = Boolean(effectiveModeId && !availableModes[effectiveModeId]);
 
   useEffect(() => {
     if (editingMessage) {
@@ -611,7 +615,7 @@ export const UnifiedInputArea: React.FC<{
             disabled={isRecording || isTranscribing}
           />
 
-          {(isRecording || isTranscribing) && (
+          {isRecording && (
             <div className="waveform-container">
               <div className="waveform">
                 {waveformData.map((level, index) => (
@@ -630,20 +634,28 @@ export const UnifiedInputArea: React.FC<{
               </div>
             </div>
           )}
+
+          {isTranscribing && (
+            <div className="transcribing-indicator">
+              {t("ui.transcribing.inProgress")}
+            </div>
+          )}
         </div>
 
         <div className="input-controls-bottom">
           <div className="input-controls-left">
-            {/* Mode dropdown - using unified component */}
-            <ModeDropdown
-              chatId={chatId}
-              chatActiveModeId={chatActiveModeId}
-              activeMode={activeMode}
-              isModeLoading={isModeLoading}
-              isModesLoading={isModesLoading}
-              availableModes={availableModes}
-              onModeSelect={handleModeSwitch}
-            />
+            {/* Mode dropdown - hide during recording, show but disable during editing */}
+            {!isRecording && !isTranscribing && (
+              <ModeDropdown
+                chatId={chatId}
+                chatActiveModeId={effectiveModeId}
+                activeMode={activeMode}
+                isModeLoading={isModeLoading}
+                isModesLoading={isModesLoading}
+                availableModes={availableModes}
+                onModeSelect={editingMessage ? () => {} : handleModeSwitch} // No-op when editing to preserve original mode
+              />
+            )}
             
             {isRecording && !isTranscribing && (
               <button
@@ -747,7 +759,7 @@ export const UnifiedInputArea: React.FC<{
                 >
                   <LucideIcon
                     name="loader"
-                    className="spinner"
+                    className="animate-spin"
                     size={20}
                     />
                 </button>

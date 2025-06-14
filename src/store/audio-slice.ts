@@ -60,29 +60,20 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
   let mediaRecorder: MediaRecorder | null = null;
   let audioChunks: Blob[] = [];
   
-  const getCurrentTTSSettings = (modeId?: string) => {
+
+
+  const initializeStreamingService = (modeId?: string) => {
+    const apiKey = get().getSecret('OPENAI_API_KEY');
     const state = get();
     const effectiveModeId = modeId || DEFAULT_MODE_ID;
     const currentMode = state.modes.available[effectiveModeId];
     const defaultMode = getDefaultLNMode();
     
-    return {
-      voice: currentMode?.voice ?? defaultMode.voice,
-      instructions: currentMode?.voice_instructions ?? defaultMode.voice_instructions,
-      speed: currentMode?.voice_speed ?? defaultMode.voice_speed,
-    };
-  };
-
-  const initializeStreamingService = (modeId?: string) => {
-    const apiKey = get().getSecret('OPENAI_API_KEY');
-    const settings = getCurrentTTSSettings(modeId);
+    const voice = ((currentMode?.voice ?? defaultMode.voice) as TTSVoice) || 'alloy';
+    const speed = (currentMode?.voice_speed ?? defaultMode.voice_speed) || 1.0;
     
     if (apiKey && !streamingServiceRef) {
-      streamingServiceRef = new TTSStreamingService(
-        apiKey, 
-        (settings.voice as TTSVoice) || 'alloy', 
-        settings.speed || 1.0
-      );
+      streamingServiceRef = new TTSStreamingService(apiKey, voice, speed);
     }
     return streamingServiceRef;
   };
@@ -411,11 +402,14 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
       }
       
       if (mediaRecorder) {
+        // Set transcription state immediately to prevent UI flash
+        get().setIsTranscribing(chatId, true);
+        
         // Stop recording and let the transcription happen in the background
         const recorder = mediaRecorder;
         mediaRecorder.stop();
         
-        // Start transcription in background with the chatId
+        // Wait for MediaRecorder to finish collecting audio chunks before transcribing
         setTimeout(() => {
           transcribeAudio(chatId, recorder);
         }, 100);
@@ -468,12 +462,31 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
       // Now create a new controller for this audio generation
       currentAudioController = new AbortController();
       const signal = currentAudioController.signal;
-      const ttsSettings = getCurrentTTSSettings(modeId);
 
       const store = get();
+      
+      // Get mode settings directly
+      const effectiveModeId = modeId || DEFAULT_MODE_ID;
+      const currentMode = store.modes.available[effectiveModeId];
+      const defaultMode = getDefaultLNMode();
+      
+      // Debug logging for mode resolution
+      if (modeId && !currentMode) {
+        console.warn(`TTS: Mode '${modeId}' not found in available modes, falling back to default`);
+        console.debug('Available mode keys:', Object.keys(store.modes.available));
+      }
 
-      // Generate cache key
-      const textHash = generateTextHash(text, ttsSettings.voice || 'alloy', ttsSettings.speed || 1.0);
+      // Validate TTS settings directly from mode
+      const modeVoice = currentMode?.voice ?? defaultMode.voice;
+      const voice = (modeVoice && TTS_VOICES.includes(modeVoice as TTSVoice)) 
+        ? (modeVoice as TTSVoice) 
+        : 'alloy';
+      const speed = (currentMode?.voice_speed ?? defaultMode.voice_speed) || 1.0;
+      
+      console.debug(`TTS using mode '${effectiveModeId}' - Voice: '${voice}', Speed: ${speed}`);
+
+      // Generate cache key with validated parameters
+      const textHash = generateTextHash(text, voice, speed);
       
       // Check cache first
       const cachedAudio = getCachedAudio(textHash);
@@ -513,15 +526,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         const textToConvert = text.length > maxLength ? text.substring(0, maxLength) : text;
         
         console.debug('Creating OpenAI client and sending TTS request');
-        
-        let voice: TTSVoice = 'alloy';
-        if (ttsSettings.voice) {
-          if (!TTS_VOICES.includes(ttsSettings.voice as TTSVoice)) {
-            new Notice(t('errors.audio.invalidVoice', { voice: ttsSettings.voice }));
-          } else {
-            voice = ttsSettings.voice as TTSVoice;
-          }
-        }
+        console.debug(`TTS API Call - Voice: '${voice}', Speed: ${speed}, Text Length: ${textToConvert.length}`);
 
         // Generate audio using fetch API (similar to legacy TTS)
         const response = await fetch('https://api.openai.com/v1/audio/speech', {
@@ -531,10 +536,10 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'tts-1',
+            model: 'gpt-4o-mini-tts',
             input: textToConvert,
             voice: voice,
-            speed: ttsSettings.speed || 1.0,
+            speed: speed,
             response_format: 'mp3'
           }),
           signal: signal
@@ -557,7 +562,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
           return;
         }
         
-        setCachedAudio(textHash, audioBlob, voice, ttsSettings.speed || 1.0);
+        setCachedAudio(textHash, audioBlob, voice, speed);
 
         // Check for abort again before playing audio
         if (signal.aborted) {

@@ -19,6 +19,7 @@ interface MessageDisplayProps {
   isLastMessage?: boolean;
   isGeneratingResponse?: boolean;
   chatId?: string;
+  modeId?: string; // Mode ID associated with this message
 }
 
 /**
@@ -131,6 +132,7 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
   isLastMessage = false,
   isGeneratingResponse = false,
   chatId,
+  modeId,
 }) => {
   // Get specific state slices from Zustand store with granular subscriptions
   const currentRecordingWindowId = usePluginStore(state => state.audio.currentRecordingWindowId);
@@ -240,8 +242,9 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
         // Otherwise start playing the text
         const textToSpeak = getPlainTextContent(contentBlocksToRender);
         if (textToSpeak) {
-          // Use the chat's specific mode for TTS settings
-          speakingStart(textToSpeak, currentModeId);
+                  // Use the original mode for TTS settings, fallback to current mode if not available
+          const modeForTTS = modeId || currentModeId;
+          speakingStart(textToSpeak, modeForTTS);
         }
       }
     }

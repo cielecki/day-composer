@@ -43,7 +43,7 @@ export interface ChatWithState {
 	chat: LoadedChat; // Use LoadedChat to ensure storedConversation exists
 	// Runtime generation state
 	isGenerating: boolean;
-	editingMessage: { index: number; content: string; images?: AttachedImage[] } | null;
+	editingMessage: { index: number; content: string; images?: AttachedImage[]; modeId?: string } | null;
 	liveToolResults: Map<string, ToolResultBlock>;
 	abortController: AbortController | null;
 	saveTimeout: NodeJS.Timeout | null;

@@ -102,7 +102,7 @@ export interface ChatSlice {
   
   // Per-chat state management
   setIsGenerating: (chatId: string, generating: boolean) => void;
-  setEditingMessage: (chatId: string, editing: { index: number; content: string; images?: AttachedImage[] } | null) => void;
+  setEditingMessage: (chatId: string, editing: { index: number; content: string; images?: AttachedImage[]; modeId?: string } | null) => void;
   updateLiveToolResult: (chatId: string, toolId: string, result: ToolResultBlock) => void;
   clearLiveToolResults: (chatId: string) => void;
   setCurrentChat: (chatId: string, chat: Chat) => void;
@@ -371,7 +371,7 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       }
     }),
     
-    setEditingMessage: (chatId: string, editing: { index: number; content: string; images?: AttachedImage[] } | null) => set((state) => {
+    setEditingMessage: (chatId: string, editing: { index: number; content: string; images?: AttachedImage[]; modeId?: string } | null) => set((state) => {
       const chatState = state.chats.loaded.get(chatId);
       if (chatState) {
         chatState.editingMessage = editing;
@@ -441,8 +441,9 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       // Check if this is the first message
       const isFirstMessage = chatState.chat.storedConversation.messages.length === 0;
 
-      // Create user message
-      const userMessage_ = createUserMessage(userMessage, images);
+      // Create user message with current mode
+      const currentModeId = chatState.chat.storedConversation.modeId || DEFAULT_MODE_ID;
+      const userMessage_ = createUserMessage(userMessage, images, currentModeId);
       
       // Add to conversation
       get().addMessage(chatId, userMessage_);
@@ -503,7 +504,9 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
 
       // Truncate conversation and update the edited message
       const conversationUpToEdit = chatState.chat.storedConversation.messages.slice(0, messageIndex + 1);
-      const newMessage = createUserMessage(newContent, images);
+      // Preserve the original message's modeId when editing
+      const originalModeId = targetMessage.modeId;
+      const newMessage = createUserMessage(newContent, images, originalModeId);
       conversationUpToEdit[messageIndex] = newMessage;
       
       set((state) => {
@@ -543,7 +546,8 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
       get().setEditingMessage(chatId, {
         index: messageIndex,
         content: text,
-        images: images
+        images: images,
+        modeId: targetMessage.modeId // Capture original message's mode
       });
     },
     

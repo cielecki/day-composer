@@ -4,7 +4,7 @@ import { AttachedImage } from 'src/types/attached-image';
 /**
  * Creates a user message with text and optional images
  */
-export const createUserMessage = (userMessage: string, images?: AttachedImage[]): Message => {
+export const createUserMessage = (userMessage: string, images?: AttachedImage[], modeId?: string): Message => {
 	let contentBlocks: ContentBlock[] = [];
 	
 	// Add text block if the message isn't empty
@@ -52,7 +52,7 @@ export const createUserMessage = (userMessage: string, images?: AttachedImage[])
 		contentBlocks = [...contentBlocks, ...imageBlocks];
 	}
 	
-	return { role: "user", content: contentBlocks };
+	return { role: "user", content: contentBlocks, modeId };
 };
 
 /**

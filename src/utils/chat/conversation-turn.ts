@@ -161,7 +161,7 @@ export const runConversationTurn = async (
 				// Set up stream processor callbacks for this specific chat
 				const callbacks: StreamProcessorCallbacks = {
 					onMessageStart: () => {
-						assistantMessage = { role: "assistant", content: [] };
+						assistantMessage = { role: "assistant", content: [], modeId: currentModeId };
 						usePluginStore.getState().addMessage(chatId, assistantMessage);
 					},
 					onMessageUpdate: (message: Message) => {
@@ -170,11 +170,12 @@ export const runConversationTurn = async (
 							console.warn("Invalid message in stream update, skipping");
 							return;
 						}
-						assistantMessage = message;
+											// Ensure the modeId field is preserved during updates
+					assistantMessage = { ...message, modeId: currentModeId };
 						const currentStore = usePluginStore.getState();
 						const currentChatState = currentStore.getChatState(chatId);
 						if (currentChatState && currentChatState.chat.storedConversation.messages.length > 0) {
-							currentStore.updateMessage(chatId, currentChatState.chat.storedConversation.messages.length - 1, message);
+							currentStore.updateMessage(chatId, currentChatState.chat.storedConversation.messages.length - 1, assistantMessage);
 						}
 					},
 					onMessageStop: (finalMessage: Message) => {
@@ -183,13 +184,14 @@ export const runConversationTurn = async (
 							console.warn("Invalid final message in stream stop, skipping");
 							return;
 						}
-						assistantMessage = finalMessage;
+						// Ensure the modeId field is preserved in the final message
+						assistantMessage = { ...finalMessage, modeId: currentModeId };
 						
 						// CRITICAL: Update the final message in the store before saving
 						const currentStore = usePluginStore.getState();
 						const currentChatState = currentStore.getChatState(chatId);
 						if (currentChatState && currentChatState.chat.storedConversation.messages.length > 0) {
-							currentStore.updateMessage(chatId, currentChatState.chat.storedConversation.messages.length - 1, finalMessage);
+							currentStore.updateMessage(chatId, currentChatState.chat.storedConversation.messages.length - 1, assistantMessage);
 						}
 						
 						usePluginStore.getState().saveConversation(chatId);

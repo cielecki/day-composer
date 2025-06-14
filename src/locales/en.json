@@ -656,6 +656,9 @@
       "start": "Start Recording",
       "stop": "Stop"
     },
+    "transcribing": {
+      "inProgress": "Transcribing..."
+    },
     "setup": {
       "anthropicKey": {
         "description": "Anthropic Claude powers the main AI functionality. You'll need an API key to continue.",
