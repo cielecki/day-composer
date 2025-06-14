@@ -39,9 +39,6 @@ interface ChatAppProps {
 }
 
 export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
-	const [dropdownOpen, setDropdownOpen] = useState(false);
-	const modeIndicatorRef = useRef<HTMLDivElement>(null);
-	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const menuButtonRef = useRef<HTMLButtonElement>(null);
 	const menuRef = useRef<HTMLDivElement>(null);
@@ -336,28 +333,7 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 	// Check if the active mode is actually available
 	const isModeLoading = chatActiveModeId && !availableModes[chatActiveModeId];
 
-	const toggleDropdown = useCallback(() => {
-		setDropdownOpen(!dropdownOpen);
-	}, [dropdownOpen]);
 
-	// Handle clicks outside dropdowns and menus to close them
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				dropdownRef.current &&
-				!dropdownRef.current.contains(event.target as Node) &&
-				modeIndicatorRef.current &&
-				!modeIndicatorRef.current.contains(event.target as Node)
-			) {
-				setDropdownOpen(false);
-			}
-		};
-
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, []);
 
 	// Add useEffect for click-away for the 3-dot menu
 	useEffect(() => {
@@ -395,11 +371,7 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 		};
 	}, [conversationHistoryOpen]);
 
-	// Handle mode switching for this specific chat
-	const handleModeSwitch = useCallback(async (modeId: string) => {
-		// Only update this chat's mode - don't affect global mode or other chats
-		setActiveModeForChat(chatId, modeId);
-	}, [setActiveModeForChat, chatId]);
+
 
 	// Handle user message with chat ID
 	const handleAddUserMessage = useCallback(async (message: string, images?: any[]) => {
@@ -520,164 +492,8 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 	return (
 		<div className="life-navigator-view-content">
 			<div className="chat-bar">
-				<div
-					className="chat-bar-title ln-relative ln-overflow-visible"
-				>
-					{/* Flex row for dropdown and new chat button */}
-					<div className="ln-flex ln-items-center ln-gap-1">
-						<div
-							className={`ln-mode-indicator ${dropdownOpen ? 'open' : ''}`}
-							onClick={toggleDropdown}
-							ref={modeIndicatorRef}
-						>
-							{isModeLoading ? (
-								// Loading state - show generic loading with appropriate icon
-								<>
-									<span className="ln-icon-center">
-										<LucideIcon
-											name={isModesLoading ? "loader-2" : "clock"}
-											size={18}
-											color="var(--text-muted)"
-											className={isModesLoading ? "animate-spin" : ""}
-										/>
-									</span>
-									<span className="ln-font-medium ln-text-muted">
-										{t('ui.mode.loading')}
-									</span>
-								</>
-							) : activeMode ? (
-								// Normal state - show loaded mode
-								<>
-									{activeMode.icon && (
-										<span className="ln-icon-center">
-											<LucideIcon
-												name={activeMode.icon}
-												size={18}
-												color={
-													activeMode.icon_color ||
-													"var(--text-normal)"
-												}
-											/>
-										</span>
-									)}
-									<span className="ln-font-medium">
-										{activeMode.name}
-									</span>
-								</>
-							) : (
-								// No mode selected state
-								<>
-									<span className="ln-icon-center">
-										<LucideIcon
-											name="help-circle"
-											size={18}
-											color="var(--text-muted)"
-										/>
-									</span>
-									<span className="ln-font-medium ln-text-muted">
-										Select a mode
-									</span>
-								</>
-							)}
-							<span className={`ln-chevron ln-ml-1 ${dropdownOpen ? 'open' : ''}`}>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<polyline points="6 9 12 15 18 9"></polyline>
-								</svg>
-							</span>
-						</div>
-					</div>
-
-					{/* Mode selection dropdown */}
-					{dropdownOpen && (
-						<div
-							ref={dropdownRef}
-							className="ln-mode-dropdown"
-						>
-							{/* Actions - only show when activeMode is loaded */}
-							{activeMode && (
-								<>
-									{!activeMode.path.startsWith(':prebuilt:') && (
-										<div
-											className="ln-mode-action-item"
-											onClick={() => {
-												if (window.app && activeMode.path) {
-													const file = window.app.vault.getAbstractFileByPath(activeMode.path);
-													if (file instanceof TFile) {
-														window.app.workspace.getLeaf().openFile(file);
-													}
-												}
-												setDropdownOpen(false);
-											}}
-										>
-											<LucideIcon name="external-link" size={16} color="var(--text-normal)" />
-											{t('ui.mode.openInEditor')}
-										</div>
-									)}
-									<div
-										className="ln-mode-action-item"
-										onClick={async () => {
-											const plugin = LifeNavigatorPlugin.getInstance();
-											if (plugin && chatActiveModeId) {
-												await plugin.openSystemPrompt(chatActiveModeId);
-											}
-											setDropdownOpen(false);
-										}}
-									>
-										<LucideIcon name="terminal" size={16} color="var(--text-normal)" />
-										{t('ui.mode.viewSystemPrompt')}
-									</div>
-
-									{/* Separator */}
-									<div className="ln-separator" />
-								</>
-							)}
-
-							{/* "switch to" label */}
-							<div className="ln-section-label">
-								{t('ui.mode.switchTo')}
-							</div>
-
-							{/* Mode list */}
-							{Object.keys(availableModes).length > 0 && (
-								<>
-									{Object.values(availableModes).map((mode, index) => (
-										<div
-											key={index}
-											className={`ln-mode-list-item ${mode.path === activeMode?.path ? 'active' : ''}`}
-											onClick={async () => {
-												await handleModeSwitch(mode.path);
-												setDropdownOpen(false);
-											}}
-										>
-											{mode.icon && (
-												<span className="ln-icon-center">
-													<LucideIcon
-														name={mode.icon}
-														size={16}
-														color={mode.icon_color || "var(--text-normal)"}
-													/>
-												</span>
-											)}
-											<span className="ln-text-sm ln-whitespace-nowrap ln-text-ellipsis">
-												{mode.name}
-											</span>
-										</div>
-									))}
-
-								</>
-							)}
-						</div>
-					)}
+				<div className="chat-bar-title">
+					{/* Title section without mode dropdown */}
 				</div>
 				<div className="chat-bar-actions">
 					<button
@@ -855,14 +671,14 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 				{isGeneratingResponse && <ThinkingMessage status="thinking" />}
 			</div>
 
-			{activeMode && <div className="controls-container">
+			<div className="controls-container">
 				<div className="button-container">
 					<UnifiedInputArea
 						editingMessage={editingMessage}
 						chatId={chatId}
 					/>
 				</div>
-			</div>}
+			</div>
 		</div>
 	);
 };

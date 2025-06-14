@@ -486,3 +486,7 @@ The multi-chat system now works reliably:
 ### Removed
 - **Handover Mode Tool**: Removed the old `handover_mode` tool which switched modes within the same conversation. The new `mode_delegate` tool provides a better approach by creating independent conversations for delegated tasks.
 
+### Enhanced
+- **Auto-save conversations while typing**: Conversations now automatically save as you type or attach images, with a smart 2-second delay that prevents unnecessary saves while you're actively writing. Your work is protected without interrupting your flow.
+### Changed
+- **Improved input area layout**: Moved the mode dropdown to the bottom left of the input area for easier access while typing. The dropdown is now more compact and cursor-like, showing both the mode icon and name. Image attachment button moved to the right side for better logical flow of controls.

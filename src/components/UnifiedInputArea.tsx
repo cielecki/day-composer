@@ -3,6 +3,9 @@ import { usePluginStore } from "../store/plugin-store";
 import { t } from 'src/i18n';
 import { LucideIcon } from '../components/LucideIcon';
 import { AttachedImage } from 'src/types/attached-image';
+import { TFile } from "obsidian";
+import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
+import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
 
 // Define the number of samples to keep for the waveform (5 seconds at 10 samples per second)
 const WAVEFORM_HISTORY_LENGTH = 120; // 4 seconds at 30 samples per second
@@ -68,6 +71,21 @@ export const UnifiedInputArea: React.FC<{
   const waveformIntervalRef = useRef<number | null>(null);
 
   const [volumeLevel, setVolumeLevel] = useState(0);
+
+  // Mode dropdown state
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const modeIndicatorRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Mode-related store access
+  const availableModes = usePluginStore(state => state.modes.available);
+  const isModesLoading = usePluginStore(state => state.modes.isLoading);
+  const setActiveModeForChat = usePluginStore(state => state.setActiveModeForChat);
+
+  // Get active mode for this chat
+  const chatActiveModeId = chatState?.activeModeId || DEFAULT_MODE_ID;
+  const activeMode = availableModes[chatActiveModeId];
+  const isModeLoading = chatActiveModeId && !availableModes[chatActiveModeId];
 
   useEffect(() => {
     if (editingMessage) {
@@ -469,6 +487,39 @@ export const UnifiedInputArea: React.FC<{
     }
   };
 
+  // Mode dropdown handlers
+  const toggleDropdown = useCallback(() => {
+    setDropdownOpen(!dropdownOpen);
+  }, [dropdownOpen]);
+
+  const handleModeSwitch = useCallback(async (modeId: string) => {
+    if (chatId) {
+      setActiveModeForChat(chatId, modeId);
+    }
+    setDropdownOpen(false);
+  }, [setActiveModeForChat, chatId]);
+
+  // Handle clicks outside dropdown to close it
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        modeIndicatorRef.current &&
+        !modeIndicatorRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownOpen]);
+
   return (
     <div className="unified-input-container">
       <input
@@ -573,41 +624,151 @@ export const UnifiedInputArea: React.FC<{
 
         <div className="input-controls-bottom">
           <div className="input-controls-left">
-            {!isRecording && (
-              <button
-                className="input-control-button"
-                aria-label={t("ui.input.attachImage")}
-                onClick={() => {
-                  if (fileInputRef.current) {
-                    fileInputRef.current.click();
-                  }
-                }}
-                disabled={isTranscribing}
+            {/* Mode dropdown - compact version */}
+            <div className="ln-relative ln-inline-block">
+              <div
+                className={`ln-mode-indicator ${dropdownOpen ? 'open' : ''}`}
+                onClick={toggleDropdown}
+                ref={modeIndicatorRef}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+{isModeLoading ? (
+                  <>
+                    <span className="ln-icon-center">
+                      <LucideIcon
+                        name={isModesLoading ? "loader-2" : "clock"}
+                        size={16}
+                        color="var(--text-muted)"
+                        className={isModesLoading ? "animate-spin" : ""}
+                      />
+                    </span>
+                    <span className="ln-mode-name">
+                      {t('ui.mode.loading')}
+                    </span>
+                  </>
+                ) : activeMode ? (
+                  <>
+                    <span className="ln-icon-center">
+                      <LucideIcon
+                        name={activeMode.icon}
+                        size={16}
+                        color={activeMode.icon_color || "var(--text-normal)"}
+                      />
+                    </span>
+                    <span className="ln-mode-name">
+                      {activeMode.name}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="ln-icon-center">
+                      <LucideIcon
+                        name="help-circle"
+                        size={16}
+                        color="var(--text-muted)"
+                      />
+                    </span>
+                    <span className="ln-mode-name">
+                      Select mode
+                    </span>
+                  </>
+                )}
+                <span className={`ln-chevron ${dropdownOpen ? 'open' : ''}`}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </div>
+
+              {/* Mode selection dropdown */}
+              {dropdownOpen && (
+                <div
+                  ref={dropdownRef}
+                  className="ln-mode-dropdown"
                 >
-                  <rect
-                    x="3"
-                    y="3"
-                    width="18"
-                    height="18"
-                    rx="2"
-                    ry="2"
-                  ></rect>
-                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                  <polyline points="21 15 16 10 5 21"></polyline>
-                </svg>
-              </button>
-            )}
+                  {/* Actions - only show when activeMode is loaded */}
+                  {activeMode && (
+                    <>
+                      {!activeMode.path.startsWith(':prebuilt:') && (
+                        <div
+                          className="ln-mode-action-item"
+                          onClick={() => {
+                            if (window.app && activeMode.path) {
+                              const file = window.app.vault.getAbstractFileByPath(activeMode.path);
+                              if (file instanceof TFile) {
+                                window.app.workspace.getLeaf().openFile(file);
+                              }
+                            }
+                            setDropdownOpen(false);
+                          }}
+                        >
+                          <LucideIcon name="external-link" size={14} color="var(--text-normal)" />
+                          {t('ui.mode.openInEditor')}
+                        </div>
+                      )}
+                      <div
+                        className="ln-mode-action-item"
+                        onClick={async () => {
+                          const plugin = LifeNavigatorPlugin.getInstance();
+                          if (plugin && chatActiveModeId) {
+                            await plugin.openSystemPrompt(chatActiveModeId);
+                          }
+                          setDropdownOpen(false);
+                        }}
+                      >
+                        <LucideIcon name="terminal" size={14} color="var(--text-normal)" />
+                        {t('ui.mode.viewSystemPrompt')}
+                      </div>
+
+                      {/* Separator */}
+                      <div className="ln-separator" />
+                    </>
+                  )}
+
+                  {/* "switch to" label */}
+                  <div className="ln-section-label">
+                    {t('ui.mode.switchTo')}
+                  </div>
+
+                  {/* Mode list */}
+                  {Object.keys(availableModes).length > 0 && (
+                    <>
+                      {Object.values(availableModes).map((mode, index) => (
+                        <div
+                          key={index}
+                          className={`ln-mode-list-item ${mode.path === activeMode?.path ? 'active' : ''}`}
+                          onClick={async () => {
+                            await handleModeSwitch(mode.path);
+                          }}
+                        >
+                          {mode.icon && (
+                            <span className="ln-icon-center">
+                              <LucideIcon
+                                name={mode.icon}
+                                size={14}
+                                color={mode.icon_color || "var(--text-normal)"}
+                              />
+                            </span>
+                          )}
+                          <span className="ln-text-sm ln-whitespace-nowrap ln-text-ellipsis">
+                            {mode.name}
+                          </span>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
             
             {isRecording && !isTranscribing && (
               <button
@@ -635,6 +796,43 @@ export const UnifiedInputArea: React.FC<{
 
           <div className="input-controls-right">
             <>
+              {/* Image attachment button - moved to right side */}
+              {!isRecording && (
+                <button
+                  className="input-control-button"
+                  aria-label={t("ui.input.attachImage")}
+                  onClick={() => {
+                    if (fileInputRef.current) {
+                      fileInputRef.current.click();
+                    }
+                  }}
+                  disabled={isTranscribing}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect
+                      x="3"
+                      y="3"
+                      width="18"
+                      height="18"
+                      rx="2"
+                      ry="2"
+                    ></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                </button>
+              )}
+
               {!isRecording && !isTranscribing && (
                 <button
                   className="input-control-button primary"
@@ -729,7 +927,7 @@ export const UnifiedInputArea: React.FC<{
                   className="input-control-button primary"
                   onClick={handleSendButtonClick}
                   aria-label={editingMessage ? t("ui.input.save") : t("ui.input.send")}
-                  disabled={message.trim() === "" && attachedImages.length === 0}
+                  disabled={(message.trim() === "" && attachedImages.length === 0) || !activeMode}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

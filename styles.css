@@ -975,10 +975,13 @@
   transition: all 0.2s ease;
   flex-shrink: 0;
   padding: 0;
+  box-shadow: none;
 }
 
-.life-navigator-view .input-control-button:disabled {
-  opacity: 0.4;
+.life-navigator-view .input-control-button.primary:disabled {
+  opacity: 1.0;
+  background-color: var(--background-modifier-active-hover);
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 
@@ -2536,39 +2539,6 @@
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
-/* Specialized Component Classes */
-.ln-mode-dropdown {
-  position: absolute;
-  top: 38px;
-  left: 0;
-  z-index: 99999;
-  min-width: 240px;
-  max-width: 360px;
-  max-height: 600px;
-  overflow-y: auto;
-  background-color: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-  padding: 4px 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.ln-mode-indicator {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-  position: relative;
-}
-
-.ln-mode-indicator.open {
-  background-color: var(--background-modifier-hover);
-}
 
 .ln-mode-action-item {
   padding: 8px 12px;
@@ -2603,7 +2573,7 @@
 }
 
 .ln-mode-list-item.active {
-  background-color: var(--background-modifier-hover);
+  background: var(--background-modifier-active-hover);
   font-weight: 500;
 }
 
@@ -2635,6 +2605,72 @@
   color: var(--text-muted);
   white-space: normal;
   word-break: break-word;
+}
+
+/* Compact Mode Dropdown Styles */
+.ln-mode-indicator {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  position: relative;
+  border: none;
+  font-size: 14px;
+  min-height: 40px;
+  max-width: 180px;
+  color: var(--text-normal);
+}
+
+.ln-mode-indicator:hover {
+  transform: scale(1.02);
+}
+
+
+.ln-mode-dropdown {
+  position: absolute;
+  bottom: 50px;
+  left: -5;
+  z-index: 99999;
+  min-width: 200px;
+  max-width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ln-chevron {
+  display: flex;
+  align-items: center;
+  margin-left: 2px;
+  transition: transform 0.2s ease;
+  opacity: 0.7;
+}
+
+.ln-chevron.open {
+  transform: rotate(180deg);
+}
+
+.ln-inline-block {
+  display: inline-block;
+}
+
+.ln-mode-name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  font-size: 13px;
 }
 
 /* Modal Styles */

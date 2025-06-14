@@ -730,6 +730,10 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
           Object.assign(chatState.inputState, inputState);
         }
       });
+      
+      // Trigger debounced autosave after input state change
+      const debouncedSave = createDebouncedSave(chatId);
+      debouncedSave();
     },
 
     getInputState: (chatId: string) => {
