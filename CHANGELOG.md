@@ -2,19 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-### ✨ Enhanced Search Experience
-
-- **Unified search system**: All search functionality now uses a centralized `useSearch` hook, eliminating code duplication and providing consistent search behavior across all interfaces
-- **Mode search functionality**: You can now search through available modes when switching modes, making it much easier to find the right mode for your task. Action items (like "View system prompt") are hidden during search for cleaner results
-- **Improved conversation search**: Enhanced search functionality in chat history with configurable debouncing and better performance
-- **Consistent search patterns**: All dropdowns now share the same search logic, filtering behavior, and user experience
-
-### 🐛 Bug Fixes
-
-- **Conversation history positioning**: Fixed conversation history dropdown appearing off-screen by positioning it correctly relative to the history button
-- **Conversation history display**: Fixed issue where no conversations were showing in the history dropdown due to incorrect search filtering configuration
-- **Mode search positioning**: Improved mode dropdown search placement - search input now appears at the bottom for upward-opening dropdowns, providing better stability and user experience
-
 ## [0.11.3] - 2025-01-11
 
 ### 🚀 New Chat Menu - Everything You Need in One Place
@@ -549,3 +536,19 @@ You'll enjoy a more focused chat history experience:
 - **Perfect translation parameter handling**: Completely resolved all 115+ translation parameter mismatches across the entire codebase. Users will never see raw template placeholders like "{{name}}" - all messages now display properly localized content with user-friendly formatting.
 - **Enhanced translation cleanup tools**: Significantly improved the translation cleanup script with precise parameter detection, reducing false positives by 96% and providing production-ready maintenance tools for future development.
 - **Unified dropdown system**: Consolidated three different dropdown implementations (chat history, more options, mode selection) into a single, consistent component system for better maintainability and user experience. All dropdowns now share the same styling, behavior, and accessibility features.
+
+
+### ✨ Enhanced Search Experience
+
+- **Unified search system**: All search functionality now uses a centralized `useSearch` hook, eliminating code duplication and providing consistent search behavior across all interfaces
+- **Mode search functionality**: You can now search through available modes when switching modes, making it much easier to find the right mode for your task. Action items (like "View system prompt") are hidden during search for cleaner results
+- **Improved conversation search**: Enhanced search functionality in chat history with configurable debouncing and better performance
+- **Consistent search patterns**: All dropdowns now share the same search logic, filtering behavior, and user experience
+
+### 🐛 Bug Fixes
+
+- **Help button behavior**: Help button in error messages now creates a new Guide chat instead of changing the current chat's mode, providing cleaner isolation between help and ongoing work
+- **Chat switching persistence**: Fixed issue where switching chats (via new chat button, history, or help button) would revert to the previous chat after refreshing Obsidian
+- **Conversation history positioning**: Fixed conversation history dropdown appearing off-screen by positioning it correctly relative to the history button
+- **Conversation history display**: Fixed issue where no conversations were showing in the history dropdown due to incorrect search filtering configuration
+- **Mode search positioning**: Improved mode dropdown search placement - search input now appears at the bottom for upward-opening dropdowns, providing better stability and user experience

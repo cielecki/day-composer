@@ -130,5 +130,8 @@ export class ChatView extends ItemView {
 		
 		// Update the leaf view to trigger title refresh
 		this.leaf.view = this;
+		
+		// Persist the new chat ID in workspace state so it survives Obsidian refresh
+		this.app.workspace.requestSaveLayout();
 	}
 } 
