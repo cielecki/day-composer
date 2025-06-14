@@ -313,24 +313,11 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
         return null; // Not rendered directly
       case 'error_message': {
         const errorBlock = block as any;
-        const modeName = currentMode?.name || currentModeId || 'unknown mode';
-        const helpPrompt = t('errors.helpPrompt', { 
-          error: errorBlock.text,
-          mode: modeName
-        });
         
         return (
           <div key={`block-${index}`} className="error-message-block">
             <div className="error-message-content">
               <MarkdownRenderer content={errorBlock.text} />
-              <div className="error-message-actions">
-                <RetryButton messageIndex={messageIndex} chatId={chatId} />
-                <FixWithGuideButton 
-                  helpPrompt={helpPrompt}
-                  buttonText={t('errors.helpButton')}
-                  chatId={chatId}
-                />
-              </div>
             </div>
           </div>
         );
@@ -355,9 +342,11 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
 
   const hasTextContent = contentBlocksToRender.some(block => block.type === 'text');
   const isTextContentLast = contentBlocksToRender.length > 0 && contentBlocksToRender[contentBlocksToRender.length - 1].type === 'text';
+  const hasErrorContent = contentBlocksToRender.some(block => block.type === 'error_message');
   const shouldShowUserActions = role === 'user' && contentBlocksToRender.length > 0;
   const shouldShowAssistantActions = role === 'assistant' && isTextContentLast;
-  const shouldShowActions = shouldShowUserActions || shouldShowAssistantActions;
+  const shouldShowErrorActions = hasErrorContent;
+  const shouldShowActions = shouldShowUserActions || shouldShowAssistantActions || shouldShowErrorActions;
 
   return (
     <div className={messageClasses.join(' ')}>
@@ -434,6 +423,28 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
                   )}
                   <RetryButton messageIndex={messageIndex} chatId={chatId} />
                 </>
+              )}
+
+              {/* Error action buttons - shown for non-assistant messages or assistant messages that need help button */}
+              {shouldShowErrorActions && role !== 'assistant' && (
+                <RetryButton messageIndex={messageIndex} chatId={chatId} />
+              )}
+              
+              {/* Help button for any message with errors */}
+              {shouldShowErrorActions && (
+                <FixWithGuideButton 
+                  helpPrompt={(() => {
+                    const errorBlocks = contentBlocksToRender.filter(block => block.type === 'error_message');
+                    const errorText = errorBlocks.map(block => (block as any).text).join('\n');
+                    const modeName = currentMode?.name || currentModeId || 'unknown mode';
+                    return t('errors.helpPrompt', { 
+                      error: errorText,
+                      mode: modeName
+                    });
+                  })()}
+                  buttonText={t('errors.helpButton')}
+                  chatId={chatId}
+                />
               )}
             </>}
           </div>

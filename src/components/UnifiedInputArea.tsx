@@ -83,7 +83,7 @@ export const UnifiedInputArea: React.FC<{
   const setActiveModeForChat = usePluginStore(state => state.setActiveModeForChat);
 
   // Get active mode for this chat
-  const chatActiveModeId = chatState?.activeModeId || DEFAULT_MODE_ID;
+  const chatActiveModeId = chatState?.chat.storedConversation.modeId || DEFAULT_MODE_ID;
   const activeMode = availableModes[chatActiveModeId];
   const isModeLoading = chatActiveModeId && !availableModes[chatActiveModeId];
 
