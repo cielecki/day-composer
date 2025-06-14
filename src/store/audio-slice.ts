@@ -6,6 +6,7 @@ import { t } from 'src/i18n';
 import OpenAI from 'openai';
 import { DEFAULT_MODE_ID } from '../utils/modes/ln-mode-defaults';
 import { ElevenLabsService } from '../services/ElevenLabsService';
+import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 
 export type TTSVoice = "alloy" | "ash" | "ballad" | "coral" | "echo" | "fable" | "onyx" | "nova" | "sage" | "shimmer" | "verse";
 export const TTS_VOICES: TTSVoice[] = ['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer', 'verse'];
@@ -20,6 +21,20 @@ interface TTSCache {
     speed: number;
     provider: 'openai' | 'elevenlabs';
   };
+}
+
+// Whisper transcription quality assessment interface
+interface TranscriptionQuality {
+  confidence: number;
+  isHighQuality: boolean;
+  retryRecommended: boolean;
+}
+
+// Interface for enhanced transcription result
+interface EnhancedTranscriptionResult {
+  text: string;
+  quality: TranscriptionQuality;
+  segments?: any[];
 }
 
 export interface AudioSlice {
@@ -225,6 +240,254 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
     });
   };
 
+  // Utility functions for Whisper prompting improvements
+  const generateContextualPrompt = async (chatId: string, currentModeId: string): Promise<string> => {
+    const store = get();
+    const chatState = store.getChatState(chatId);
+    const currentMode = store.modes.available[currentModeId];
+    
+    // Build contextual prompt parts
+    const promptParts: string[] = [];
+    
+    // 1. Add user-configured base prompt if available
+    const userPrompt = store.settings.speechToTextPrompt;
+    if (userPrompt && userPrompt.trim()) {
+      promptParts.push(userPrompt.trim());
+    }
+    
+    // 2. Generate and add system prompt from current mode (condensed)
+    if (currentMode) {
+      try {
+        const systemPromptParts = await store.getSystemPrompt(currentModeId);
+        if (systemPromptParts.staticSection) {
+          // Extract key context from system prompt (first 300 chars)
+          const systemContext = systemPromptParts.staticSection
+            .replace(/\n+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .substring(0, 300);
+          if (systemContext) {
+            promptParts.push(`Mode context: ${systemContext}`);
+          }
+        }
+      } catch (error) {
+        console.debug('Could not get system prompt for context:', error);
+      }
+    }
+    
+    // 3. Add currently open file and selection context
+    try {
+      const plugin = LifeNavigatorPlugin.getInstance();
+      if (plugin?.app) {
+        // Get current file context
+        const { handleCurrentlyOpenFileLink, handleCurrentlySelectedTextLink } = await import('src/utils/links/special-link-handlers');
+        
+        const currentFileContent = await handleCurrentlyOpenFileLink(plugin.app);
+        if (currentFileContent && !currentFileContent.includes('[No file currently open]')) {
+          // Extract filename and brief content
+          const fileMatch = currentFileContent.match(/file="([^"]+)"/);
+          const fileName = fileMatch ? fileMatch[1].split('/').pop() : 'current file';
+          promptParts.push(`Working on: ${fileName}`);
+        }
+        
+        const selectedText = handleCurrentlySelectedTextLink(plugin.app);
+                 if (selectedText && selectedText.includes('status="selected"')) {
+           // Extract selected text content (first 200 chars)
+           const textMatch = selectedText.match(/<[^>]+status="selected"[^>]*>[\s\S]*?<\/[^>]+>/);
+           if (textMatch && textMatch[0]) {
+             // Extract content between tags
+             const contentMatch = textMatch[0].match(/>([\s\S]*?)</);
+             if (contentMatch && contentMatch[1]) {
+               const selection = contentMatch[1].trim().substring(0, 200);
+               if (selection) {
+                 promptParts.push(`Selected: ${selection}`);
+               }
+             }
+           }
+         }
+      }
+    } catch (error) {
+      console.debug('Could not get current file context:', error);
+    }
+    
+    // 4. Add recent conversation context (last 3 messages for continuity)
+    if (chatState?.chat.storedConversation.messages) {
+      const recentMessages = chatState.chat.storedConversation.messages.slice(-3);
+      const recentContext = recentMessages
+        .map(msg => {
+          if (typeof msg.content === 'string') {
+            return msg.content;
+          } else if (Array.isArray(msg.content)) {
+            return msg.content
+              .filter(block => typeof block === 'object' && block.type === 'text')
+              .map(block => (block as any).text)
+              .join(' ');
+          }
+          return '';
+        })
+        .filter(text => text.trim())
+        .join(' ')
+        .substring(0, 400); // Increased context length
+      
+      if (recentContext) {
+        promptParts.push(`Recent discussion: ${recentContext}`);
+      }
+    }
+    
+    // Join all parts and limit length
+    const fullPrompt = promptParts.join('. ');
+    return fullPrompt.length > MAX_AUDIO_PROMPT_LENGTH 
+      ? fullPrompt.substring(0, MAX_AUDIO_PROMPT_LENGTH - 3) + '...'
+      : fullPrompt;
+  };
+
+  const assessTranscriptionQuality = (result: any): TranscriptionQuality => {
+    // Default quality for simple text responses
+    if (typeof result === 'string' || !result.segments) {
+      return {
+        confidence: 0.8, // Assume reasonable quality for simple responses
+        isHighQuality: true,
+        retryRecommended: false
+      };
+    }
+    
+    // Analyze verbose_json response for quality metrics
+    const segments = result.segments || [];
+    if (segments.length === 0) {
+      return {
+        confidence: 0.0,
+        isHighQuality: false,
+        retryRecommended: true
+      };
+    }
+    
+    // Calculate average confidence from segments
+    const avgLogProb = segments.reduce((sum: number, seg: any) => sum + (seg.avg_logprob || -1.0), 0) / segments.length;
+    const avgNoSpeechProb = segments.reduce((sum: number, seg: any) => sum + (seg.no_speech_prob || 0.5), 0) / segments.length;
+    
+    // Convert log probability to confidence score (rough approximation)
+    const confidence = Math.max(0, Math.min(1, (avgLogProb + 1.0) * 0.8));
+    
+    // Quality thresholds based on research findings
+    const isHighQuality = avgLogProb > -0.5 && avgNoSpeechProb < 0.3 && confidence > 0.6;
+    const retryRecommended = avgLogProb < -1.0 || avgNoSpeechProb > 0.6 || confidence < 0.4;
+    
+    return {
+      confidence,
+      isHighQuality,
+      retryRecommended
+    };
+  };
+
+  const performEnhancedTranscription = async (
+    file: File,
+    targetLanguageForApi: string,
+    chatId: string,
+    currentModeId: string,
+    signal: AbortSignal,
+    maxRetries: number = 2
+  ): Promise<EnhancedTranscriptionResult> => {
+    const openaiApiKey = getOpenAIApiKey();
+    if (!openaiApiKey) {
+      throw new Error('No API key available for transcription');
+    }
+    
+    const openai = new OpenAI({
+      apiKey: openaiApiKey,
+      dangerouslyAllowBrowser: true,
+    });
+    
+    let lastError: Error | null = null;
+    let bestResult: EnhancedTranscriptionResult | null = null;
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      if (signal.aborted) {
+        throw new Error('Transcription aborted');
+      }
+      
+      try {
+        // Generate contextual prompt for this attempt
+        const contextualPrompt = await generateContextualPrompt(chatId, currentModeId);
+        
+        console.debug(`Whisper API attempt ${attempt + 1}/${maxRetries + 1}:`, {
+          prompt: contextualPrompt.substring(0, 100) + '...',
+          language: targetLanguageForApi,
+          fileSize: file.size
+        });
+        
+        // Use verbose_json for quality assessment on first attempt, fallback to json for retries
+        const responseFormat = attempt === 0 ? 'verbose_json' : 'json';
+        
+        const transcription = await openai.audio.transcriptions.create({
+          file: file,
+          model: 'whisper-1',
+          prompt: contextualPrompt,
+          language: targetLanguageForApi,
+          temperature: 0.0, // Deterministic results
+          response_format: responseFormat,
+        }, { signal });
+
+        if (signal.aborted) {
+          throw new Error('Transcription aborted');
+        }
+
+        // Process response based on format
+        let result: EnhancedTranscriptionResult;
+        if (responseFormat === 'verbose_json' && typeof transcription === 'object' && 'segments' in transcription) {
+          result = {
+            text: (transcription as any).text,
+            quality: assessTranscriptionQuality(transcription),
+            segments: (transcription as any).segments
+          };
+        } else {
+          result = {
+            text: typeof transcription === 'string' ? transcription : (transcription as any).text,
+            quality: assessTranscriptionQuality(transcription),
+          };
+        }
+        
+        console.debug(`Whisper transcription attempt ${attempt + 1} result:`, {
+          text: result.text.substring(0, 100) + '...',
+          confidence: result.quality.confidence,
+          isHighQuality: result.quality.isHighQuality
+        });
+        
+        // If this is a high-quality result, return immediately
+        if (result.quality.isHighQuality || attempt === maxRetries) {
+          return result;
+        }
+        
+        // Store best result so far
+        if (!bestResult || result.quality.confidence > bestResult.quality.confidence) {
+          bestResult = result;
+        }
+        
+      } catch (error) {
+        lastError = error as Error;
+        console.warn(`Whisper transcription attempt ${attempt + 1} failed:`, error);
+        
+        // If this is the last attempt, break out of the loop
+        if (attempt === maxRetries) {
+          break;
+        }
+        
+        // Brief delay before retry
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+    
+    // Return best result if we have one, otherwise throw the last error
+    if (bestResult) {
+      console.debug('Returning best transcription result after retries:', {
+        confidence: bestResult.quality.confidence,
+        text: bestResult.text.substring(0, 100) + '...'
+      });
+      return bestResult;
+    }
+    
+    throw lastError || new Error('All transcription attempts failed');
+  };
+
   const transcribeAudio = async (chatId: string, recorder: MediaRecorder): Promise<void> => {
     const chunks = audioChunks;
     if (!chunks.length) throw new Error('No audio chunks to transcribe');
@@ -258,6 +521,10 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         targetLanguageForApi = targetLanguageForApi.split('-')[0];
       }
 
+      // Get current chat's active mode for context
+      const chatState = store.getChatState(chatId);
+      const currentModeId = chatState?.chat.storedConversation.modeId || DEFAULT_MODE_ID;
+
       let transcribedText = '';
 
       // Try ElevenLabs first if available
@@ -285,18 +552,9 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         }
       }
 
-      // Fallback to OpenAI if ElevenLabs failed or not available
+      // Enhanced OpenAI Whisper transcription with contextual prompting
       if (!transcribedText) {
-        console.debug('Using OpenAI for speech-to-text transcription');
-        const openaiApiKey = getOpenAIApiKey();
-        if (!openaiApiKey) {
-          throw new Error('No API key available for transcription (OpenAI or ElevenLabs)');
-        }
-        
-        const openai = new OpenAI({
-          apiKey: openaiApiKey,
-          dangerouslyAllowBrowser: true,
-        });
+        console.debug('Using enhanced OpenAI Whisper transcription with contextual prompting');
         
         let fileExtension = 'webm';
         if (mimeType.includes('mp3')) fileExtension = 'mp3';
@@ -306,19 +564,27 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         
         const file = new File([audioBlob], `recording.${fileExtension}`, { type: mimeType });
 
-        const transcription = await openai.audio.transcriptions.create({
-          file: file,
-          model: 'whisper-1',
-          prompt: "",
-          language: targetLanguageForApi,
-        }, { signal });
-
-        if (signal.aborted) {
-          return;
+        try {
+          const enhancedResult = await performEnhancedTranscription(
+            file,
+            targetLanguageForApi,
+            chatId,
+            currentModeId,
+            signal
+          );
+          
+          transcribedText = enhancedResult.text;
+          
+          console.debug('Enhanced Whisper transcription completed:', {
+            text: transcribedText.substring(0, 100) + '...',
+            confidence: enhancedResult.quality.confidence,
+            quality: enhancedResult.quality.isHighQuality ? 'HIGH' : 'MEDIUM/LOW'
+          });
+          
+        } catch (enhancedError) {
+          console.error('Enhanced transcription failed:', enhancedError);
+          throw enhancedError;
         }
-
-        transcribedText = transcription.text;
-        console.debug('OpenAI transcribed text:', transcribedText);
       }
 
       get().setLastTranscription(chatId, transcribedText);
