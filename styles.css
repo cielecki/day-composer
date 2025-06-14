@@ -57,6 +57,7 @@
   flex-direction: column;
   height: 100%;
   padding: 10px;
+  min-width: 375px;
 }
 
 .life-navigator-view-content {
