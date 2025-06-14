@@ -88,7 +88,6 @@
       "couldNotResolve": "Nie można znaleźć celu linku '{{linkPath}}'"
     },
     "retryButton": "Ponów",
-    "setup": "Błąd konfiguracji: '{{error}}'",
     "startingLifeNavigator": "Błąd uruchamiania Life Navigator",
     "tasks": {
       "insertOutOfBounds": "Nie można wstawić zadania w indeksie '{{index}}': Indeks poza zakresem (dokument ma '{{total}}' elementów)",
@@ -386,8 +385,7 @@
         "progress": {
           "completedFull": "Zadanie pomyślnie przekazane do trybu '{{mode}}': {{task}}. Delegowana rozmowa jest zapisana i można ją znaleźć w historii rozmów.",
           "createdChat": "Utworzono niezależną rozmowę w trybie '{{mode}}'",
-          "processingTask": "Przetwarzanie zadania w trybie '{{mode}}'...",
-          "savedCurrent": "Zapisano bieżącą rozmowę przed przekazaniem"
+          "processingTask": "Przetwarzanie zadania w trybie '{{mode}}'..."
         }
       },
     "editTodo": {
@@ -599,10 +597,7 @@
       "conversationDeleteFailed": "Nie udało się usunąć rozmowy",
       "conversationDeleted": "Rozmowa usunięta",
       "conversationLoadFailed": "Nie udało się wczytać rozmowy",
-      "conversationMetadataNotFound": "Nie znaleziono metadanych rozmowy",
-      "conversationNotFound": "Nie znaleziono rozmowy",
       "conversationTitleUpdateFailed": "Nie udało się zaktualizować tytułu rozmowy",
-      "conversationTitleUpdated": "Tytuł rozmowy zaktualizowany",
       "delete": "Usuń rozmowę",
       "deleteConfirm": "Czy na pewno chcesz usunąć tę rozmowę?",
       "editTitle": "Edytuj tytuł",
@@ -643,7 +638,6 @@
       "speak": "Przeczytaj na głos"
     },
     "modal": {
-      "modeSettings": "Ustawienia trybu: '{{modeName}}'",
       "reloadButton": "Uruchom ponownie Obsidian",
       "reloadRequiredMessageWithVersions": "Wtyczka zaktualizowana z wersji '{{currentVersion}}' do '{{latestVersion}}'.\nCzy chcesz ponownie uruchomić Obsidian, aby zastosować zmiany?",
       "reloadRequiredTitle": "Wymagane ponowne uruchomienie"
@@ -654,7 +648,6 @@
       "openInEditor": "Otwórz w edytorze",
       "searchModes": "Szukaj trybów...",
       "switchTo": "Przełącz na",
-      "viewSettings": "Pokaż ustawienia trybu",
       "viewSystemPrompt": "Zobacz prompt systemowy"
     },
     "recording": {

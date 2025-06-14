@@ -88,7 +88,6 @@
       "couldNotResolve": "Could not resolve link target '{{linkPath}}'"
     },
     "retryButton": "Retry",
-    "setup": "Setup Error: '{{error}}'",
     "startingLifeNavigator": "Error starting Life Navigator",
     "tasks": {
       "insertOutOfBounds": "Cannot insert task at index '{{index}}': Index out of bounds (document has '{{total}}' items)",
@@ -386,8 +385,7 @@
         "progress": {
           "completedFull": "Task successfully delegated to '{{mode}}' mode: {{task}}. The delegated conversation is saved and can be accessed from chat history.",
           "createdChat": "Created independent conversation in '{{mode}}' mode",
-          "processingTask": "Processing task in '{{mode}}' mode...",
-          "savedCurrent": "Saved current conversation before delegation"
+          "processingTask": "Processing task in '{{mode}}' mode..."
         }
       },
     "editTodo": {
@@ -599,10 +597,7 @@
       "conversationDeleteFailed": "Failed to delete conversation",
       "conversationDeleted": "Conversation deleted",
       "conversationLoadFailed": "Failed to load conversation",
-      "conversationMetadataNotFound": "Conversation metadata not found",
-      "conversationNotFound": "Conversation not found",
       "conversationTitleUpdateFailed": "Failed to update conversation title",
-      "conversationTitleUpdated": "Conversation title updated",
       "delete": "Delete Chat",
       "deleteConfirm": "Are you sure you want to delete this conversation?",
       "editTitle": "Edit Title",
@@ -643,7 +638,6 @@
       "speak": "Read aloud"
     },
     "modal": {
-      "modeSettings": "Settings for mode '{{modeName}}'",
       "reloadButton": "Restart Obsidian",
       "reloadRequiredMessageWithVersions": "Plugin updated from version '{{currentVersion}}' to '{{latestVersion}}'.\nWould you like to restart Obsidian to apply changes?",
       "reloadRequiredTitle": "Reload Required"
@@ -654,7 +648,6 @@
       "openInEditor": "Open in editor",
       "searchModes": "Search modes...",
       "switchTo": "Switch to:",
-      "viewSettings": "View mode settings",
       "viewSystemPrompt": "View system prompt"
     },
     "recording": {
