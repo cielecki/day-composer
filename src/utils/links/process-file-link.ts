@@ -32,7 +32,8 @@ export async function processFileLink(
 	// Skip if we've already visited this file (circular reference)
 	if (visitedPaths.has(linkFile.path)) {
 		console.warn(`Circular reference detected for: ${linkFile.path}`);
-		return `[Circular: ${linkText}] 🧭`;
+		const tagName = convertToValidTagName('circular_reference');
+		return `<${tagName} file="${linkFile.path}" link_text="${linkText}" />\n`;
 	}
 
 	// Skip if this is not a markdown file (e.g., images)
@@ -101,7 +102,8 @@ export async function processDirectoryLink(
 	// Skip if we've already visited this directory (circular reference)
 	if (visitedPaths.has(linkFolder.path)) {
 		console.warn(`Circular reference detected for directory: ${linkFolder.path}`);
-		return `[Circular: ${linkText}] 🧭`;
+		const tagName = convertToValidTagName('circular_reference');
+		return `<${tagName} directory="${linkFolder.path}" link_text="${linkText}" />\n`;
 	}
 
 	// Track this directory path as visited
@@ -141,7 +143,8 @@ export async function processDirectoryLink(
 	if (processedContent.length === 0) {
 		// Remove from visited paths since we didn't actually process anything
 		visitedPaths.delete(linkFolder.path);
-		return `[No markdown files found in directory: ${linkFolder.path}]\n`;
+		const tagName = convertToValidTagName('directory_empty');
+		return `<${tagName} path="${linkFolder.path}" />\n`;
 	}
 
 	// Return all processed content without outer wrapper

@@ -6,6 +6,7 @@ import { resolveLinkToFile } from 'src/utils/fs/link-resolver';
 import { t } from 'src/i18n';
 import { parseToolCall } from '../tools/tool-call-parser';
 import { getObsidianTools } from '../../obsidian-tools';
+import { convertToValidTagName } from 'src/utils/text/xml-tag-converter';
 
 /**
  * Interface for the three-part system prompt based on stability
@@ -201,11 +202,14 @@ async function processNewFormatCalls(app: App, content: string, visitedPaths: Se
 			if (expandedContent) {
 				result = result.replace(match[0], expandedContent);
 			} else {
-				result = result.replace(match[0], `[Could not expand: ${linkTarget}]`);
+				const tagName = convertToValidTagName('expansion_error');
+				result = result.replace(match[0], `<${tagName} type="could_not_expand" target="${linkTarget}" />\n`);
 			}
 		} catch (error) {
 			console.error(`Error expanding ${linkTarget}:`, error);
-			result = result.replace(match[0], `[Error expanding ${linkTarget}: ${error.message}]`);
+			const tagName = convertToValidTagName('expansion_error');
+			const errorMessage = error instanceof Error ? error.message : String(error);
+			result = result.replace(match[0], `<${tagName} type="expansion_failed" target="${linkTarget}" message="${errorMessage}" />\n`);
 		}
 	}
 
@@ -237,7 +241,8 @@ async function processNewFormatCalls(app: App, content: string, visitedPaths: Se
 			
 			if (!tool) {
 				console.warn(`Tool not found: ${toolName}`);
-				result = result.replace(match[0], `[Tool not found: ${toolName}]`);
+				const tagName = convertToValidTagName('tool_error');
+				result = result.replace(match[0], `<${tagName} type="not_found" tool="${toolName}" />\n`);
 				continue;
 			}
 			
@@ -248,7 +253,8 @@ async function processNewFormatCalls(app: App, content: string, visitedPaths: Se
 			// Check if tool is safe for link expansion (no side effects)
 			if (tool.sideEffects) {
 				console.warn(`Tool ${toolName} has side effects and cannot be used in link expansion`);
-				result = result.replace(match[0], `[Tool ${toolName} has side effects and cannot be used in link expansion]`);
+				const tagName = convertToValidTagName('tool_error');
+				result = result.replace(match[0], `<${tagName} type="side_effects" tool="${toolName}" message="Tool has side effects and cannot be used in link expansion" />\n`);
 				continue;
 			}
 
@@ -274,11 +280,18 @@ async function processNewFormatCalls(app: App, content: string, visitedPaths: Se
 
 			// Replace with the tool output
 			const toolOutput = progressMessages.join('\n');
-			result = result.replace(match[0], toolOutput || `[${toolName} executed successfully]`);
+			if (toolOutput) {
+				result = result.replace(match[0], toolOutput);
+			} else {
+				const tagName = convertToValidTagName('tool_execution');
+				result = result.replace(match[0], `<${tagName} tool="${toolName}" status="executed_successfully" />\n`);
+			}
 
 		} catch (error) {
 			console.error(`Error processing tool call ${fullMatch}:`, error);
-			result = result.replace(match[0], `[Error processing ${fullMatch}: ${error.message}]`);
+			const tagName = convertToValidTagName('tool_error');
+			const errorMessage = error instanceof Error ? error.message : String(error);
+			result = result.replace(match[0], `<${tagName} type="execution_failed" tool_call="${fullMatch}" message="${errorMessage}" />\n`);
 		}
 	}
 
