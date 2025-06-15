@@ -81,7 +81,7 @@
   font-size: 14px;
   line-height: 1.5;
   color: var(--text-normal);
-  user-select: user;
+  user-select: text;
 }
 
 /* Markdown formatting - targeting standard HTML elements */
@@ -164,7 +164,22 @@
   font-style: italic;
 }
 
+/* Image styling for What's New modal */
+.whats-new-changelog img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 16px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: block;
+  border: 1px solid var(--background-modifier-border);
+}
 
+/* Ensure images don't overflow the modal */
+.whats-new-changelog img {
+  max-width: calc(100% - 8px); /* Account for padding */
+  object-fit: contain;
+}
 
 /* Animation for spinner */
 @keyframes spin {

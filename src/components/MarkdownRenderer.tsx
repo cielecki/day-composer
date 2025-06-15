@@ -2,6 +2,8 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
 
 interface MarkdownRendererProps {
   content: string;
@@ -11,6 +13,7 @@ interface MarkdownRendererProps {
 /**
  * Shared MarkdownRenderer component that handles code blocks and paragraph wrapping correctly
  * to prevent hydration errors from <pre> elements being nested inside <p> elements.
+ * Now supports HTML parsing with rehype-raw for proper image and HTML tag rendering.
  */
 export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ 
   content, 
@@ -20,6 +23,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
     <div className={className}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkBreaks]}
+        rehypePlugins={[rehypeRaw, rehypeSanitize]}
         components={{
           code: ({inline, className, children, ...props}: any) => {
             // Since ReactMarkdown doesn't reliably set the inline parameter,
