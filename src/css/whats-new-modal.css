@@ -1,24 +1,15 @@
 /* What's New Modal Styles */
 
 .whats-new-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  margin-left: calc(var(--size-4-4) * -1);
+  margin-right: calc(var(--size-4-4) * -1);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  padding: 20px;
+  z-index: 0;
 }
 
 .whats-new-modal {
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   max-width: 600px;
   max-height: 80vh;
   width: 100%;
@@ -27,37 +18,14 @@
   overflow: hidden;
 }
 
-/* Header */
-.whats-new-header {
-  display: flex;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--background-modifier-border);
-  flex-shrink: 0;
-}
 
-.whats-new-title-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.whats-new-icon {
-  flex-shrink: 0;
-}
-
-.whats-new-title {
-  margin: 0;
-  color: var(--text-normal);
-  font-size: 18px;
-  font-weight: 600;
-}
 
 /* Content */
 .whats-new-content {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
   min-height: 200px;
 }
 
@@ -113,38 +81,42 @@
   font-size: 14px;
   line-height: 1.5;
   color: var(--text-normal);
-  white-space: pre-wrap;
-  word-wrap: break-word;
+  user-select: user;
 }
 
-/* Markdown formatting */
-.whats-new-h1 {
+/* Markdown formatting - targeting standard HTML elements */
+.whats-new-changelog h1 {
   color: var(--text-normal);
   margin: 24px 0 16px 0;
   font-size: 20px;
   font-weight: bold;
 }
 
-.whats-new-h2 {
-  color: var(--text-normal);
+.whats-new-changelog h2 {
+  color: var(--text-accent);
   margin: 20px 0 12px 0;
   font-size: 18px;
   font-weight: bold;
 }
 
-.whats-new-h3 {
+.whats-new-changelog h3 {
   color: var(--text-normal);
   margin: 16px 0 8px 0;
   font-size: 16px;
   font-weight: bold;
 }
 
-.whats-new-bold {
+.whats-new-changelog p {
+  margin: 8px 0;
+  color: var(--text-normal);
+}
+
+.whats-new-changelog strong {
   color: var(--text-normal);
   font-weight: bold;
 }
 
-.whats-new-code {
+.whats-new-changelog code {
   background: var(--background-secondary);
   padding: 2px 4px;
   border-radius: 3px;
@@ -152,65 +124,47 @@
   font-size: 13px;
 }
 
-.whats-new-link {
+.whats-new-changelog pre {
+  background: var(--background-secondary);
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+.whats-new-changelog pre code {
+  background: none;
+  padding: 0;
+}
+
+.whats-new-changelog a {
   color: var(--interactive-accent);
   text-decoration: none;
 }
 
-.whats-new-link:hover {
+.whats-new-changelog a:hover {
   text-decoration: underline;
 }
 
-/* Footer */
-.whats-new-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-top: 1px solid var(--background-modifier-border);
-  flex-shrink: 0;
-  gap: 16px;
+.whats-new-changelog ul,
+.whats-new-changelog ol {
+  margin: 8px 0;
+  padding-left: 20px;
 }
 
-.whats-new-checkbox-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
+.whats-new-changelog li {
+  margin: 4px 0;
 }
 
-.whats-new-checkbox {
-  margin: 0;
-}
-
-.whats-new-checkbox-label {
-  font-size: 14px;
+.whats-new-changelog blockquote {
+  border-left: 4px solid var(--interactive-accent);
+  padding-left: 16px;
+  margin: 12px 0;
   color: var(--text-muted);
-  cursor: pointer;
-  user-select: none;
-  margin: 0;
+  font-style: italic;
 }
 
-.whats-new-close-button {
-  background: var(--interactive-accent);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
 
-.whats-new-close-button:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-.whats-new-close-button:active {
-  transform: translateY(0);
-}
 
 /* Animation for spinner */
 @keyframes spin {
@@ -221,29 +175,3 @@
 .animate-spin {
   animation: spin 1s linear infinite;
 }
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .whats-new-modal-overlay {
-    padding: 10px;
-  }
-  
-  .whats-new-modal {
-    max-height: 90vh;
-  }
-  
-  .whats-new-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  
-  .whats-new-checkbox-container {
-    width: 100%;
-  }
-  
-  .whats-new-close-button {
-    width: 100%;
-    justify-content: center;
-  }
-} 

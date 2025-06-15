@@ -613,3 +613,6 @@ You'll never miss important updates and new features:
 - Easy access to full changelog history from settings
 - Control over notifications while staying informed
 - Professional presentation of all changes and improvements
+
+
+- **What's New Modal**: React-based modal that displays after plugin updates, showing the latest changelog from GitHub. Features automatic display for new versions, manual access via settings, user control with "don't show again" option, and graceful fallback for network errors. Uses proper React Markdown rendering for beautiful presentation of changelog content.
