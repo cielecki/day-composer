@@ -56,8 +56,11 @@ export interface AudioSlice {
   recordingStop: (windowId: string) => Promise<void>;
   recordingToTranscribing: (windowId: string, chatId: string) => Promise<void>;
   
-  // Global audio stop
+  // Global audio stop (TTS only)
   audioStop: () => Promise<void>;
+  
+  // Transcription stop
+  transcriptionStop: () => Promise<void>;
   
   // Recording state queries
   isRecordingInWindow: (windowId: string) => boolean;
@@ -74,8 +77,9 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
   let audioCacheRef: TTSCache = {};
 
   // Internal refs for recording management
-  let mediaRecorder: MediaRecorder | null = null;
   let audioChunks: Blob[] = [];
+  let mediaRecorder: MediaRecorder | null = null;
+  let currentTranscriptionController: AbortController | null = null;
   
   // ElevenLabs service instance
   let elevenLabsServiceRef: ElevenLabsService | null = null;
@@ -500,8 +504,8 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
     get().setTranscriptionId(chatId, transcriptionId);
     
     // Create a new abort controller for transcription
-    currentAudioController = new AbortController();
-    const signal = currentAudioController.signal;
+    currentTranscriptionController = new AbortController();
+    const signal = currentTranscriptionController.signal;
     
     try {
       const store = get();
@@ -602,7 +606,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
     } finally {
       get().setIsTranscribing(chatId, false);
       get().setTranscriptionId(chatId, undefined);
-      currentAudioController = null;
+      currentTranscriptionController = null;
     }
   };
   
@@ -750,6 +754,7 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         streamingServiceRef.stopStreaming();
       }
       
+      // Only stop TTS operations, not transcription
       if (currentAudioController) {
         currentAudioController.abort();
         currentAudioController = null;
@@ -765,6 +770,14 @@ export const createAudioSlice: ImmerStateCreator<AudioSlice> = (set, get) => {
         state.audio.isGeneratingSpeech = false;
         state.audio.isSpeakingPaused = false;
       });
+    },
+
+    transcriptionStop: async () => {
+      // Stop transcription operations only
+      if (currentTranscriptionController) {
+        currentTranscriptionController.abort();
+        currentTranscriptionController = null;
+      }
     },
     
     // Business Logic Implementation

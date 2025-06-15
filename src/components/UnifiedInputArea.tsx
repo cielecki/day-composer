@@ -55,6 +55,7 @@ export const UnifiedInputArea: React.FC<{
   const recordingStop = usePluginStore(state => state.recordingStop);
   const recordingToTranscribing = usePluginStore(state => state.recordingToTranscribing);
   const audioStop = usePluginStore(state => state.audioStop);
+  const transcriptionStop = usePluginStore(state => state.transcriptionStop);
   const chatStop = usePluginStore(state => state.chatStop);
   const setLastTranscription = usePluginStore(state => state.setLastTranscription);
 
@@ -150,7 +151,11 @@ export const UnifiedInputArea: React.FC<{
       setTimeout(() => {
         const messageToSend = newMessage;
 
-        if (usePluginStore.getState().getChatState(currentChatId)?.isGenerating) {
+        // Check if chat is currently generating
+        const isCurrentlyGenerating = usePluginStore.getState().getChatState(currentChatId)?.isGenerating;
+        
+        if (isCurrentlyGenerating) {
+          console.debug("Chat is generating - transcribed text added to input, will not auto-send until generation completes");
           return;
         }
 
@@ -308,12 +313,6 @@ export const UnifiedInputArea: React.FC<{
 
   const handleStartRecording = async () => {
     try {
-      if (chatId && isGeneratingResponse) {
-        chatStop(chatId);
-      } else if (usePluginStore.getState().getChatState(currentChatId)?.isGenerating) {
-        chatStop(currentChatId);
-      }
-
       const success = await recordingStart(windowId);
       if (!success) {
         console.debug('Recording blocked - another window is already recording');
@@ -626,7 +625,7 @@ export const UnifiedInputArea: React.FC<{
         )}
 
         {isTranscribing ? (
-          <TranscribingIndicator onStop={audioStop} />
+          <TranscribingIndicator onStop={transcriptionStop} />
         ) : <>
           <div className="input-wrapper">
             <textarea
