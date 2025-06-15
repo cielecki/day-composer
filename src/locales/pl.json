@@ -265,21 +265,21 @@
   "tools": {
     "abandon": {
       "labels": {
-        "failed": "Nie udało się porzucić '{{task}}'",
+        "failed": "Nie udało się porzucić '{{task}}' w {{name}}",
         "inProgress": "Porzucanie '{{task}}'...",
         "initial": "Porzucanie zadania ...",
-        "success": "Porzucono '{{task}}'"
+        "success": "Porzucono '{{task}}' w {{name}}"
       },
       "progress": {
-        "success": "Porzucono '{{task}}'"
+        "success": "Porzucono '{{task}}' w '{{filePath}}'"
       }
     },
     "add": {
       "labels": {
-        "failed": "Nie udało się dodać '{{task}}' do '{{filename}}'",
+        "failed": "Nie udało się dodać '{{task}}' do '{{name}}'",
         "inProgress": "Dodawanie zadania...",
         "initial": "Dodawanie zadania ...",
-        "success": "Dodano {{task}} do '{{filename}}'"
+        "success": "Dodano {{task}} do '{{name}}'"
       },
       "progress": {
         "success": "Dodano {{task}} do '{{name}}'"
@@ -287,10 +287,13 @@
     },
     "check": {
       "labels": {
-        "failed": "Nie udało się zaznaczyć '{{task}}'",
+        "failed": "Nie udało się zaznaczyć '{{task}}' w {{name}}",
         "inProgress": "Zaznaczanie '{{task}}' ...",
         "initial": "Zaznaczanie zadania ...",
-        "success": "Zaznaczono '{{task}}'"
+        "success": "Zaznaczono '{{task}}' w {{name}}"
+      },
+      "progress": {
+        "success": "Zaznaczono '{{task}}' w '{{filePath}}'"
       }
     },
     "checkForUpdates": "Sprawdź aktualizacje",
@@ -313,13 +316,13 @@
     },
     "createCompleted": {
       "labels": {
-        "failed": "Nie udało się utworzyć skończonego zadania '{{task}}'",
+        "failed": "Nie udało się utworzyć skończonego zadania '{{task}}' w {{name}}",
         "inProgress": "Tworzenie skończonego zadania '{{task}}'...",
         "initial": "Tworzenie skończonego zadania ...",
-        "success": "Utworzono skończone zadanie '{{task}}'"
+        "success": "Utworzono skończone zadanie '{{task}}' w {{name}}"
       },
       "progress": {
-        "success": "Utworzono skończone zadanie '{{task}}'"
+        "success": "Utworzono skończone zadanie '{{task}}' w '{{filePath}}'"
       }
     },
     "createDocument": {
@@ -398,13 +401,13 @@
     },
     "editTodo": {
       "labels": {
-        "completed": "Edytowano '{{task}}'",
-        "failed": "Nie udało się edytować '{{task}}'",
+        "completed": "Edytowano '{{task}}' w {{name}}",
+        "failed": "Nie udało się edytować '{{task}}' w {{name}}",
         "inProgress": "Edytowanie '{{task}}'...",
         "initial": "Edytowanie zadania ..."
       },
       "progress": {
-        "success": "Edytowano '{{task}}'"
+        "success": "Edytowano '{{task}}' w '{{filePath}}'"
       }
     },
     "fileMove": {
@@ -538,13 +541,13 @@
     },
     "remove": {
       "labels": {
-        "failed": "Nie udało się usunąć zadania '{{task}}'",
+        "failed": "Nie udało się usunąć zadania '{{task}}' z {{name}}",
         "inProgress": "Usuwanie zadania '{{task}}'...",
         "initial": "Usuwanie zadania ...",
-        "success": "Usunięto zadanie '{{task}}'"
+        "success": "Usunięto zadanie '{{task}}' z {{name}}"
       },
       "progress": {
-        "success": "Usunięto zadanie '{{task}}'"
+        "success": "Usunięto '{{task}}' z '{{filePath}}'"
       }
     },
     "resetTutorial": "Resetuj samouczek",
@@ -598,13 +601,13 @@
     },
     "uncheck": {
       "labels": {
-        "failed": "Nie udało się odznaczyć '{{task}}'",
+        "failed": "Nie udało się odznaczyć '{{task}}' w {{name}}",
         "inProgress": "Odznaczanie '{{task}}'...",
         "initial": "Odznaczanie zadania ...",
-        "success": "Odznaczono '{{task}}'"
+        "success": "Odznaczono '{{task}}' w {{name}}"
       },
       "progress": {
-        "success": "Odznaczono '{{task}}'"
+        "success": "Odznaczono '{{task}}' w '{{filePath}}'"
       }
     },
     "urlDownload": {
@@ -650,7 +653,7 @@
     "input": {
       "attachImage": "Załącz obraz",
       "placeholder": "Napisz wiadomość...",
-      "removeFile": "Usuń '{{filename}}'",
+      "removeFile": "Usuń '{{name}}'",
       "save": "Zapisz",
       "send": "Wyślij"
     },
@@ -739,9 +742,9 @@
     "todo": {
       "abandon": "Porzuć zadanie",
       "clickToChange": "Kliknij, aby zmienić status",
-      "noTodos": "Nie znaleziono pasujących zadań w '{{filename}}'",
+      "noTodos": "Nie znaleziono pasujących zadań w '{{name}}'",
       "readOnly": "Tylko do odczytu",
-      "selectedFrom": "Wybrane zadania z '{{filename}}'",
+      "selectedFrom": "Wybrane zadania z '{{name}}'",
       "showMore": {
         "singular": "Pokaż {{count}} więcej element",
         "few": "Pokaż {{count}} więcej elementy",

@@ -265,21 +265,21 @@
   "tools": {
     "abandon": {
       "labels": {
-        "failed": "Failed to abandon '{{task}}'",
+        "failed": "Failed to abandon '{{task}}' in {{name}}",
         "inProgress": "Abandoning '{{task}}'...",
         "initial": "Abandoning task ...",
-        "success": "Abandoned '{{task}}'"
+        "success": "Abandoned '{{task}}' in {{name}}"
       },
       "progress": {
-        "success": "Abandoned '{{task}}'"
+        "success": "Abandoned '{{task}}' in '{{filePath}}'"
       }
     },
     "add": {
       "labels": {
-        "failed": "Failed to add '{{task}}' to '{{filename}}'",
+        "failed": "Failed to add '{{task}}' to '{{name}}'",
         "inProgress": "Adding task...",
         "initial": "Adding task ...",
-        "success": "Added '{{task}}' to '{{filename}}'"
+        "success": "Added '{{task}}' to '{{name}}'"
       },
       "progress": {
         "success": "Added '{{task}}' to '{{name}}'"
@@ -287,10 +287,13 @@
     },
     "check": {
       "labels": {
-        "failed": "Failed to check '{{task}}'",
+        "failed": "Failed to check '{{task}}' in {{name}}",
         "inProgress": "Checking '{{task}}' ...",
         "initial": "Checking task ...",
-        "success": "Checked '{{task}}'"
+        "success": "Checked '{{task}}' in {{name}}"
+      },
+      "progress": {
+        "success": "Checked '{{task}}' in '{{filePath}}'"
       }
     },
     "checkForUpdates": "Check for Updates",
@@ -313,13 +316,13 @@
     },
     "createCompleted": {
       "labels": {
-        "failed": "Failed to create completed '{{task}}'",
+        "failed": "Failed to create completed '{{task}}' in {{name}}",
         "inProgress": "Creating completed '{{task}}'...",
         "initial": "Creating completed task ...",
-        "success": "Created completed '{{task}}'"
+        "success": "Created completed '{{task}}' in {{name}}"
       },
       "progress": {
-        "success": "Created completed '{{task}}'"
+        "success": "Created completed '{{task}}' in '{{filePath}}'"
       }
     },
     "createDocument": {
@@ -398,13 +401,13 @@
     },
     "editTodo": {
       "labels": {
-        "completed": "Edited '{{task}}'",
-        "failed": "Failed to edit '{{task}}'",
+        "completed": "Edited '{{task}}' in {{name}}",
+        "failed": "Failed to edit '{{task}}' in {{name}}",
         "inProgress": "Editing '{{task}}'...",
         "initial": "Editing task ..."
       },
       "progress": {
-        "success": "Edited '{{task}}'"
+        "success": "Edited '{{task}}' in '{{filePath}}'"
       }
     },
     "fileMove": {
@@ -538,13 +541,13 @@
     },
     "remove": {
       "labels": {
-        "failed": "Failed to remove task '{{task}}'",
+        "failed": "Failed to remove task '{{task}}' from {{name}}",
         "inProgress": "Removing task '{{task}}'...",
         "initial": "Removing task ...",
-        "success": "Removed task '{{task}}'"
+        "success": "Removed task '{{task}}' from {{name}}"
       },
       "progress": {
-        "success": "Removed task '{{task}}'"
+        "success": "Removed '{{task}}' from '{{filePath}}'"
       }
     },
     "resetTutorial": "Reset Tutorial",
@@ -598,13 +601,13 @@
     },
     "uncheck": {
       "labels": {
-        "failed": "Failed to uncheck task '{{task}}'",
+        "failed": "Failed to uncheck task '{{task}}' in {{name}}",
         "inProgress": "Unchecking task '{{task}}'...",
         "initial": "Unchecking task ...",
-        "success": "Unchecked task '{{task}}'"
+        "success": "Unchecked task '{{task}}' in {{name}}"
       },
       "progress": {
-        "success": "Unchecked task '{{task}}'"
+        "success": "Unchecked '{{task}}' in '{{filePath}}'"
       }
     },
     "urlDownload": {
@@ -650,7 +653,7 @@
     "input": {
       "attachImage": "Attach Image",
       "placeholder": "Type your message...",
-      "removeFile": "Remove '{{filename}}'",
+      "removeFile": "Remove '{{name}}'",
       "save": "Save",
       "send": "Send"
     },
@@ -739,9 +742,9 @@
     "todo": {
       "abandon": "Abandon task",
       "clickToChange": "Click to change status",
-      "noTodos": "No matching tasks found in '{{filename}}'",
+      "noTodos": "No matching tasks found in '{{name}}'",
       "readOnly": "Read only",
-      "selectedFrom": "Selected tasks from '{{filename}}'",
+      "selectedFrom": "Selected tasks from '{{name}}'",
       "showMore": {
         "singular": "Show {{count}} more item",
         "few": "Show {{count}} more items",

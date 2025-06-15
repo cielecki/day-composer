@@ -11,6 +11,7 @@ import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-uti
 import { t } from 'src/i18n';
 import { findTaskByDescription } from "src/utils/tools/note-utils";
 import { cleanTodoText } from 'src/utils/tasks/task-utils';
+import { extractFilenameWithoutExtension } from 'src/utils/text/string-sanitizer';
 
 
 const schema = {
@@ -71,19 +72,22 @@ export const taskCheckTool: ObsidianTool<TaskCheckToolInput> = {
     const { todos, time } = params;
     
     if (!todos || !Array.isArray(todos) || todos.length === 0) {
-      context.setLabel(t('tools.check.labels.failed', { task: 'todos' }));
+      const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
+      context.setLabel(t('tools.check.labels.failed', { 
+        task: 'todos',
+        name: extractFilenameWithoutExtension(filePath)
+      }));
       throw new ToolExecutionError("No to-do items provided");
     }
 
     const count = todos.length;
     const todoText = count === 1 ? todos[0].todo_text : `${count} todos`;
+    const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
     
     context.setLabel(t('tools.check.labels.inProgress', { task: todoText }));
 
     // Format the current time if provided (common for all tasks)
     const currentTime = getCurrentTime(time);
-    
-    const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
     
     try {
       const note = await readNote({plugin, filePath});
@@ -150,10 +154,21 @@ export const taskCheckTool: ObsidianTool<TaskCheckToolInput> = {
         ? `✅ Checked off: "${checkedTasks[0]}"` 
         : `✅ Checked off ${checkedTasks.length} todos:\n${checkedTasks.map(task => `• ${task}`).join('\n')}`;
 
-      context.setLabel(t('tools.check.labels.success', { task: todoText }));
-      context.progress(resultMessage);
+      context.setLabel(t('tools.check.labels.success', { 
+        task: todoText,
+        name: extractFilenameWithoutExtension(filePath)
+      }));
+      context.progress(t('tools.check.progress.success', {
+        task: checkedTasks.length === 1 
+          ? `"${checkedTasks[0]}"` 
+          : `${checkedTasks.length} ${t('tools.tasks.plural')}`,
+        filePath
+      }));
     } catch (error) {
-      context.setLabel(t('tools.check.labels.failed', { task: todoText }));
+      context.setLabel(t('tools.check.labels.failed', { 
+        task: todoText,
+        name: extractFilenameWithoutExtension(filePath)
+      }));
       throw error;
     }
   }

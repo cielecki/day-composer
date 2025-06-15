@@ -7,6 +7,7 @@ import { validateTasks } from 'src/utils/tasks/task-validation';
 import { removeTaskFromDocument, insertTaskAtPosition, appendComment, cleanTodoText } from 'src/utils/tasks/task-utils';
 import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-utils';
 import { findTaskByDescription } from "src/utils/tools/note-utils";
+import { extractFilenameWithoutExtension } from 'src/utils/text/string-sanitizer';
 
 const schema = {
   name: "task_edit",
@@ -59,11 +60,11 @@ export const taskEditTool: ObsidianTool<TaskEditToolInput> = {
     const { plugin, params } = context;
     const original_todo_text = cleanTodoText(params.original_todo_text);
     const replacement_todo_text = cleanTodoText(params.replacement_todo_text);
+    const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
     
     context.setLabel(t('tools.editTodo.labels.inProgress', { task: original_todo_text }));
     
     try {
-      const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
       const note = await readNote({plugin, filePath});
       
       // Validate that the original task exists
@@ -120,21 +121,22 @@ export const taskEditTool: ObsidianTool<TaskEditToolInput> = {
         filePath
       );
       
-      // Prepare success message
-      const statusText = params.replacement_status ? ` (status: ${params.replacement_status})` : '';
-      const commentText = params.replacement_comment ? ` with comment` : '';
-      
-      const resultMessage = t('tools.editTodo.progress.success', {
-        task: params.replacement_todo_text
-      });
-
       // Add navigation targets
       navigationTargets.forEach(target => context.addNavigationTarget(target));
 
-      context.setLabel(t('tools.editTodo.labels.completed', { task: params.replacement_todo_text }));
-      context.progress(resultMessage);
+      context.setLabel(t('tools.editTodo.labels.completed', { 
+        task: params.replacement_todo_text,
+        name: extractFilenameWithoutExtension(filePath)
+      }));
+      context.progress(t('tools.editTodo.progress.success', {
+        task: params.replacement_todo_text,
+        filePath
+      }));
     } catch (error) {
-      context.setLabel(t('tools.editTodo.labels.failed', { task: original_todo_text }));
+      context.setLabel(t('tools.editTodo.labels.failed', { 
+        task: original_todo_text,
+        name: extractFilenameWithoutExtension(filePath)
+      }));
       throw error;
     }
   }

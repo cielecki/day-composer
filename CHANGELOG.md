@@ -593,3 +593,11 @@ You'll enjoy a more focused chat history experience:
 - **Retry error handling**: Fixed crash when retrying conversations where the mode configuration is undefined or missing, ensuring retry works reliably in all scenarios.
 - **UI state consistency**: Retry buttons, send buttons, and edit functionality are now properly disabled when modes aren't available, preventing users from getting into broken states.
 - **Mode safety checks**: Added early validation in conversation flow to prevent API calls when required modes don't exist, improving error handling and user experience.
+
+### 🎯 Enhanced Task Tool Messages
+
+- **Better location context**: Task tools now provide clear location information in their success messages. When you add, edit, check, abandon, uncheck, or remove tasks, you'll see exactly which file was modified with a smart two-level approach:
+  - **Quick labels** show clean filenames (e.g., "Checked 'buy groceries' in Daily Note") 
+  - **Detailed progress** shows precise paths (e.g., "Checked 'buy groceries' in '2025-01-12 Daily Note.md'")
+  
+  This makes it much easier to track where your task changes are happening, especially when working with multiple files, while keeping the interface clean and readable.

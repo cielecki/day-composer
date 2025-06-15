@@ -50,11 +50,11 @@ export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
     const { plugin, params } = context;
     const todoDescription = cleanTodoText(params.todo_text);
     const comment = params.comment;
+    const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
     
     context.setLabel(t('tools.uncheck.labels.inProgress', { task: todoDescription }));
     
     try {
-      const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
       const note = await readNote({plugin, filePath})
 
       // Find the task
@@ -62,7 +62,10 @@ export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
       
       // Check if task was found
       if (!task) {
-        context.setLabel(t('tools.uncheck.labels.failed', { task: todoDescription }));
+        context.setLabel(t('tools.uncheck.labels.failed', { 
+          task: todoDescription,
+          name: extractFilenameWithoutExtension(filePath)
+        }));
         throw new ToolExecutionError(t('errors.tasks.notFound', {
           task: todoDescription,
           name: extractFilenameWithoutExtension(filePath)
@@ -90,12 +93,19 @@ export const taskUncheckTool: ObsidianTool<TaskUncheckToolInput> = {
       // Add navigation targets
       navigationTargets.forEach(target => context.addNavigationTarget(target));
 
-      context.setLabel(t('tools.uncheck.labels.success', { task: todoDescription }));
+      context.setLabel(t('tools.uncheck.labels.success', { 
+        task: todoDescription,
+        name: extractFilenameWithoutExtension(filePath)
+      }));
       context.progress(t('tools.uncheck.progress.success', {
-        task: todoDescription
+        task: todoDescription,
+        filePath
       }));
     } catch (error) {
-      context.setLabel(t('tools.uncheck.labels.failed', { task: todoDescription }));
+      context.setLabel(t('tools.uncheck.labels.failed', { 
+        task: todoDescription,
+        name: extractFilenameWithoutExtension(filePath)
+      }));
       throw error;
     }
   }

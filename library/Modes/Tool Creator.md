@@ -241,7 +241,7 @@ async function execute(input, { progress, setLabel, addNavigationTarget, plugin 
     
     // Add navigation target
     addNavigationTarget({
-      filePath: filePath
+      filePath
     });
     
     setLabel("Note created");

@@ -599,10 +599,7 @@ export const UnifiedInputArea: React.FC<{
                 <button
                   className="attached-image-remove-circular"
                   onClick={() => handleRemoveImage(image.id)}
-                  aria-label={t("ui.input.removeFile").replace(
-                    "{{filename}}",
-                    image.name,
-                  )}
+                  aria-label={t("ui.input.removeFile", { name: image.name })}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

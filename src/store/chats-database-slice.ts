@@ -355,12 +355,12 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         // Extract metadata from stored conversation
         const app = getApp();
         const conversationsDir = getConversationsDir();
-        const filepath = `${conversationsDir}/${conversationId}.json`;
-        const stat = await app.vault.adapter.stat(filepath);
+        const filePath = `${conversationsDir}/${conversationId}.json`;
+        const stat = await app.vault.adapter.stat(filePath);
 
         const meta: ConversationMeta = {
           id: conversationId,
-          filePath: filepath,
+          filePath,
           updatedAt: stat?.mtime || 0,
         };
 
@@ -390,9 +390,9 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
       try {
         const app = getApp();
         const conversationsDir = getConversationsDir();
-        const filepath = `${conversationsDir}/${conversationId}.json`;
+        const filePath = `${conversationsDir}/${conversationId}.json`;
         
-        await app.vault.adapter.remove(filepath);
+        await app.vault.adapter.remove(filePath);
         
         // If we have any loaded chats with this conversation ID, unload them
         const loadedChats = get().chats.loaded;
@@ -425,15 +425,15 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
         for (const filename of files) {
           try {
             const conversationId = filename.replace('.json', '');
-            const filepath = `${conversationsDir}/${filename}`;
+            const filePath = `${conversationsDir}/${filename}`;
             
             // Get filesystem metadata
-            const stat = await app.vault.adapter.stat(filepath);
+            const stat = await app.vault.adapter.stat(filePath);
             
             // Create conversation metadata
             const meta: ConversationMeta = {
               id: conversationId, // Fallback for old format
-              filePath: filepath,
+              filePath,
               updatedAt: stat?.mtime || 0,
             };
 
@@ -457,14 +457,14 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
       try {
         const app = getApp();
         const conversationsDir = getConversationsDir();
-        const filepath = `${conversationsDir}/${conversationId}.json`;
+        const filePath = `${conversationsDir}/${conversationId}.json`;
         
         // Get filesystem metadata
-        const stat = await app.vault.adapter.stat(filepath);
+        const stat = await app.vault.adapter.stat(filePath);
         
         const meta: ConversationMeta = {
           id: conversationId,
-          filePath: filepath,
+          filePath,
           updatedAt: stat?.mtime || 0,
         };
 
@@ -495,17 +495,17 @@ export const createChatsDatabaseSlice: ImmerStateCreator<ChatsDatabaseSlice> = (
       try {
         const app = getApp();
         const conversationsDir = getConversationsDir();
-        const filepath = `${conversationsDir}/${conversationId}.json`;
+        const filePath = `${conversationsDir}/${conversationId}.json`;
         
         // Read the conversation data
-        const conversationData = await app.vault.adapter.read(filepath);
+        const conversationData = await app.vault.adapter.read(filePath);
         const storedConversation: StoredConversation = JSON.parse(conversationData);
         
         // Update title in stored conversation
         storedConversation.title = title;
         
         // Write back to same file
-        await app.vault.adapter.write(filepath, JSON.stringify(storedConversation, null, 2));
+        await app.vault.adapter.write(filePath, JSON.stringify(storedConversation, null, 2));
         
         // If this conversation is loaded in any chat, update the local state too
         const loadedChats = get().chats.loaded;

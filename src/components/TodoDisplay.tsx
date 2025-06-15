@@ -58,7 +58,7 @@ export const TodoDisplay: React.FC<TodoDisplayProps> = ({
       <div className="todo-list-container">
         <div className="todo-list-empty">
           <LucideIcon name="info" color="var(--text-muted)" />
-          <span>{t('ui.todo.noTodos').replace('{{filename}}', fileName)}</span>
+          <span>{t('ui.todo.noTodos', { filename: fileName })}</span>
         </div>
       </div>
     );
@@ -69,7 +69,7 @@ export const TodoDisplay: React.FC<TodoDisplayProps> = ({
       <div className="todo-list-header">
         <h3>
           <LucideIcon name="list-checks" className="todo-list-icon" color="var(--text-accent)" />
-          <span>{t('ui.todo.selectedFrom').replace('{{filename}}', fileName)}</span>
+          <span>{t('ui.todo.selectedFrom', { filename: fileName })}</span>
         </h3>
       </div>
       

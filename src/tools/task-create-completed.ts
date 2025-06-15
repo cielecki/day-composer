@@ -10,6 +10,7 @@ import { createNavigationTargetsForTasks } from 'src/utils/tools/line-number-uti
 import { appendComment, insertTaskAtPosition, Task } from "src/utils/tasks/task-utils";
 import { cleanTodoText } from 'src/utils/tasks/task-utils';
 import { ToolExecutionError } from "src/types/tool-execution-error";
+import { extractFilenameWithoutExtension } from "src/utils/text/string-sanitizer";
 
 const schema = {
   name: "task_create_completed",
@@ -59,9 +60,11 @@ export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput>
     const comment = params.comment;
     const filePath = params.file_path ? params.file_path : await getDailyNotePath(plugin.app);
 
-
     if (!todo_text) {
-      context.setLabel(t('tools.createCompleted.labels.failed', { task: '' }));
+      context.setLabel(t('tools.createCompleted.labels.failed', { 
+        task: '',
+        name: extractFilenameWithoutExtension(filePath)
+      }));
       throw new ToolExecutionError("No to-do text provided");
     }
 
@@ -116,12 +119,19 @@ export const taskCreateCompletedTool: ObsidianTool<TaskCreateCompletedToolInput>
       // Add navigation targets
       navigationTargets.forEach(target => context.addNavigationTarget(target));
 
-      context.setLabel(t('tools.createCompleted.labels.success', { task: todo_text }));
+      context.setLabel(t('tools.createCompleted.labels.success', { 
+        task: todo_text,
+        name: extractFilenameWithoutExtension(filePath)
+      }));
       context.progress(t('tools.createCompleted.progress.success', {
-        task: todo_text
+        task: todo_text,
+        filePath
       }));
     } catch (error) {
-      context.setLabel(t('tools.createCompleted.labels.failed', { task: todo_text }));
+      context.setLabel(t('tools.createCompleted.labels.failed', { 
+        task: todo_text,
+        name: extractFilenameWithoutExtension(filePath)
+      }));
       throw error;
     }
   }

@@ -82,7 +82,7 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 		const { todos: tasks, path, position, reference_todo_text } = params;
 
 		if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
-			context.setLabel(t('tools.add.labels.failed', { task: '', filename: 'unknown' }));
+			context.setLabel(t('tools.add.labels.failed', { task: '', name: 'unknown' }));
 			throw new ToolExecutionError("No to-do items provided");
 		}
 
@@ -163,7 +163,7 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 				
 			context.setLabel(t('tools.add.labels.success', {
 				task: taskDescriptionShort, 
-				filename: filename 
+				name: filename 
 			}));
 
 			context.progress(t('tools.add.progress.success', {
@@ -174,7 +174,7 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 			const filename = extractFilenameWithoutExtension(filePath);
 			context.setLabel(t('tools.add.labels.failed', {
 				task: taskDescriptionShort, 
-				filename: filename 
+				name: filename 
 			}));
 			throw error;
 		}
