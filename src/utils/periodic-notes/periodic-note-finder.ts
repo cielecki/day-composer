@@ -139,7 +139,6 @@ async function createPeriodicNoteInfo(
   } else {
     // No matching file found
     const expectedFormat = moment(targetDate).format(format);
-    console.warn(`No ${periodType} note found for date: ${expectedFormat}`);
     return {
       dateStr: expectedFormat, // Use expected filename format
       formattedDate: '', // Will be replaced with dateInfo in the tool

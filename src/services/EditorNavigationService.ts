@@ -116,7 +116,7 @@ export class EditorNavigationService {
 			const fileContent = await this.app.vault.read(file);
 			
 			// Try to find the text in the document
-			const foundRange = this.findTextInDocument(fileContent, target.textContent);
+			const foundRange = this.findTextInDocument(fileContent, target.textContent, target.lineRange);
 			if (foundRange) {
 				console.debug('Text-based repositioning successful:', foundRange);
 				return foundRange;
@@ -141,7 +141,8 @@ export class EditorNavigationService {
 	 */
 	private findTextInDocument(
 		content: string, 
-		textContent: TextContent
+		textContent: TextContent,
+		originalLineRange?: { start: number; end: number }
 	): { start: number; end: number } | null {
 		// Try exact match first for short content
 		if (textContent.fullText) {
@@ -153,17 +154,68 @@ export class EditorNavigationService {
 		
 		// Try start/end matching for long content
 		if (textContent.startText && textContent.endText) {
-			const startIndex = content.indexOf(textContent.startText);
-			const endIndex = content.lastIndexOf(textContent.endText);
+			// Find all occurrences of startText and endText
+			const startOccurrences = this.findAllOccurrences(content, textContent.startText);
+			const endOccurrences = this.findAllOccurrences(content, textContent.endText);
 			
-			if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-				const startPos = startIndex;
-				const endPos = endIndex + textContent.endText.length;
-				return this.calculateLineRangeFromIndex(content, startPos, endPos - startPos);
+			// Find all valid pairs (endText after startText)
+			const validPairs: Array<{startPos: number, endPos: number, range: {start: number, end: number}}> = [];
+			
+			for (const startIndex of startOccurrences) {
+				for (const endIndex of endOccurrences) {
+					if (endIndex > startIndex) {
+						const startPos = startIndex;
+						const endPos = endIndex + textContent.endText.length;
+						const range = this.calculateLineRangeFromIndex(content, startPos, endPos - startPos);
+						validPairs.push({ startPos, endPos, range });
+					}
+				}
 			}
+			
+			if (validPairs.length === 0) {
+				return null;
+			}
+			
+			// If we have the original line range, choose the pair closest to it
+			if (originalLineRange) {
+				const originalMidpoint = (originalLineRange.start + originalLineRange.end) / 2;
+				
+				let bestPair = validPairs[0];
+				let bestDistance = Math.abs((bestPair.range.start + bestPair.range.end) / 2 - originalMidpoint);
+				
+				for (const pair of validPairs.slice(1)) {
+					const pairMidpoint = (pair.range.start + pair.range.end) / 2;
+					const distance = Math.abs(pairMidpoint - originalMidpoint);
+					
+					if (distance < bestDistance) {
+						bestDistance = distance;
+						bestPair = pair;
+					}
+				}
+				
+				return bestPair.range;
+			}
+			
+			// If no original line range, return the first valid pair
+			return validPairs[0].range;
 		}
 		
 		return null;
+	}
+
+	/**
+	 * Find all occurrences of a substring in content
+	 */
+	private findAllOccurrences(content: string, searchText: string): number[] {
+		const occurrences: number[] = [];
+		let index = content.indexOf(searchText);
+		
+		while (index !== -1) {
+			occurrences.push(index);
+			index = content.indexOf(searchText, index + 1);
+		}
+		
+		return occurrences;
 	}
 
 	/**

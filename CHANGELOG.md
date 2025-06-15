@@ -631,3 +631,7 @@ You'll never miss important updates and new features:
 - **Schema validation for link expansion**: Fixed critical issue where link expansion was bypassing parameter validation entirely. Tool calls in link expansion (like `` `🧭 periodic_notes(...)` ``) now go through the same schema validation as AI-generated tool calls, properly rejecting invalid parameters like `yearly1111` or malformed units with clear error messages.
 - **Disabled periodic note types error handling**: Fixed confusing behavior where requesting disabled periodic note types (like yearly notes when the plugin is disabled) would silently omit them from results. Now throws a clear error message guiding users to enable the required plugins in their periodic notes settings before using the tool.
 - **Yearly notes date attribute cleanup**: Removed redundant `start_date` and `end_date` attributes from yearly notes since the filename (e.g., `2025.md`) already clearly indicates the year. Other period types retain their date attributes where they provide valuable context (day of week for daily notes, date ranges for weekly/monthly/quarterly notes).
+
+
+### Fixed
+- **Text highlighting accuracy**: Fixed issue where navigation targets with start/end text patterns would incorrectly highlight the wrong occurrence when multiple matches existed in a file. The system now considers the original line range position to choose the closest matching text, ensuring accurate highlighting even when files contain multiple identical patterns (such as multiple "---" separators).
