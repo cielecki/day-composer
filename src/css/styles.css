@@ -3121,16 +3121,6 @@
   min-width: 0;
 }
 
-/* Action items (like the mode dropdown actions) */
-.ln-dropdown-action-item {
-  /* Inherits from .ln-dropdown-item */
-}
-
-/* List items (like mode list items) */
-.ln-dropdown-list-item {
-  /* Inherits from .ln-dropdown-item */
-}
-
 .ln-dropdown-list-item.active {
   background: var(--background-modifier-active-hover);
   font-weight: 500;
