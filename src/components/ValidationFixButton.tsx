@@ -2,6 +2,7 @@ import React from 'react';
 import { usePluginStore } from '../store/plugin-store';
 import { t } from '../i18n';
 import { LucideIcon } from './LucideIcon';
+import { delegateToModeOrCurrentChat, getCurrentChatId } from '../utils/chat/chat-delegation';
 
 interface ValidationFixButtonProps {
 	type: 'modes' | 'tools' | 'specific-mode';
@@ -27,7 +28,7 @@ export const ValidationFixButton: React.FC<ValidationFixButtonProps> = ({
 	if (type === 'tools' && invalidTools.length === 0) return null;
 	if (type === 'specific-mode' && modeId && !invalidModes.includes(modeId)) return null;
 	
-	const handleClick = () => {
+	const handleClick = async () => {
 		// Create appropriate message based on type
 		let message = '';
 		switch (type) {
@@ -65,9 +66,12 @@ export const ValidationFixButton: React.FC<ValidationFixButtonProps> = ({
 				break;
 		}
 		
-		// Send the message - create a new chat with guide mode for this
-		const newChatId = store.createNewChat(':prebuilt:guide');
-		store.addUserMessage(newChatId, message);
+		// Use unified chat delegation - will use current chat if empty, create new if not
+		await delegateToModeOrCurrentChat({
+			targetModeId: ':prebuilt:guide',
+			message: message,
+			currentChatId: getCurrentChatId() || undefined,
+		});
 	};
 	
 	// Get button text based on type

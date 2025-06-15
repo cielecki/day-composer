@@ -10,6 +10,7 @@ import { ToolResultBlock } from '../types/message';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { LIFE_NAVIGATOR_VIEW_TYPE, ChatView } from '../views/chat-view';
+import { delegateToModeOrCurrentChat, getCurrentChatId } from '../utils/chat/chat-delegation';
 
 interface MessageDisplayProps {
   role: 'user' | 'assistant';
@@ -33,47 +34,12 @@ const FixWithGuideButton: React.FC<{
   const store = usePluginStore();
 
     const handleButtonClick = async () => {
-    try {
-      // Save current conversation before creating new chat
-      if (chatId) {
-        await store.saveImmediatelyIfNeeded(chatId, false);
-      }
-      
-      // Create new chat with guide mode
-      const newChatId = store.createNewChat(':prebuilt:guide');
-      
-      // Switch to the new chat first (before adding message to avoid UI conflicts)
-      const plugin = LifeNavigatorPlugin.getInstance();
-      
-      if (!plugin) {
-        console.error('Plugin instance not available');
-        return;
-      }
-      
-      // Try direct updateChatId approach first
-      const activeLeaf = plugin.app.workspace.activeLeaf;
-      
-      if (activeLeaf && activeLeaf.view.getViewType() === LIFE_NAVIGATOR_VIEW_TYPE) {
-        const chatView = activeLeaf.view as ChatView;
-        chatView.updateChatId(newChatId);
-      } else {
-        // Fallback: use plugin's openChatWithConversation method
-        try {
-          await plugin.openChatWithConversation(newChatId, 'current');
-        } catch (error) {
-          console.error('Failed to switch to help chat:', error);
-        }
-      }
-      
-      // Add help message to the new chat after switching
-      try {
-        await store.addUserMessage(newChatId, helpPrompt, []);
-      } catch (error) {
-        console.error('Failed to add help message:', error);
-      }
-    } catch (error) {
-      console.error('Failed to create help chat:', error);
-    }
+    // Use unified chat delegation - will use current chat if empty, create new if not
+    await delegateToModeOrCurrentChat({
+      targetModeId: ':prebuilt:guide',
+      message: helpPrompt,
+      currentChatId: chatId || getCurrentChatId() || undefined,
+    });
   };
 
   return (

@@ -4,6 +4,7 @@ import { getStore } from '../store/plugin-store';
 import { t } from 'src/i18n';
 import { closeCurrentSettingsModal } from '../utils/ui/modal-utils';
 import { getSettingsCommands } from 'src/utils/commands/unified-commands';
+import { delegateToModeOrCurrentChat, getCurrentChatId } from '../utils/chat/chat-delegation';
 
 export class LifeNavigatorSettingTab extends PluginSettingTab {
 	plugin: LifeNavigatorPlugin;
@@ -306,8 +307,6 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 			});
 			
 			fixBtn.addEventListener('click', async () => {
-				// Note: No need to set mode - guide mode is always the default
-							
 				// Format file paths nicely - show first 5 and indicate if there are more
 				const toolPathsFormatted = invalidTools.length <= 5 
 					? invalidTools.join(', ')
@@ -321,12 +320,15 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 					filePaths: toolPathsFormatted,
 				}));
 
-				// Send the fix prompt - create a new chat for this
-				const newChatId = store.createNewChat();
-				store.addUserMessage(newChatId, fixToolsMessage);
-				
-				// Close the settings modal properly
+				// Close the settings modal first
 				closeCurrentSettingsModal();
+
+				// Use unified chat delegation - will use current chat if empty, create new if not
+				await delegateToModeOrCurrentChat({
+					targetModeId: ':prebuilt:guide',
+					message: fixToolsMessage,
+					currentChatId: getCurrentChatId() || undefined,
+				});
 			});
 		}
 		
