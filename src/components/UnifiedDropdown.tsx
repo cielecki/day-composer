@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, ReactNode } from 'react';
+import { Platform } from 'obsidian';
 import { LucideIcon } from './LucideIcon';
 
 export interface DropdownItem {
@@ -106,9 +107,9 @@ export const UnifiedDropdown: React.FC<UnifiedDropdownProps> = ({
     };
   }, [isOpen, onClose, triggerRef]);
 
-  // Focus search input when dropdown opens
+  // Focus search input when dropdown opens (skip on mobile to prevent keyboard popup)
   useEffect(() => {
-    if (isOpen && searchable && searchInputRef.current) {
+    if (isOpen && searchable && searchInputRef.current && !Platform.isMobileApp) {
       setTimeout(() => {
         searchInputRef.current?.focus();
       }, 100);
