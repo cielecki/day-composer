@@ -246,6 +246,16 @@ export const createChatSlice: ImmerStateCreator<ChatSlice> = (set, get) => {
         state.chats.loaded.set(chatId, newChatState);
       });
       
+      // Add the new chat to the global conversation map so it appears in history immediately
+      get().updateConversationInMap(chatId, {
+        meta: {
+          id: chatId,
+          filePath: '',
+          updatedAt: Date.now()
+        },
+        storedConversation: newChatState.chat.storedConversation
+      });
+      
       console.debug(`Created new chat with ID: ${chatId}, mode: ${modeId}`);
       return chatId;
     },

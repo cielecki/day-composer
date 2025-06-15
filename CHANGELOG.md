@@ -635,3 +635,6 @@ You'll never miss important updates and new features:
 
 ### Fixed
 - **Text highlighting accuracy**: Fixed issue where navigation targets with start/end text patterns would incorrectly highlight the wrong occurrence when multiple matches existed in a file. The system now considers the original line range position to choose the closest matching text, ensuring accurate highlighting even when files contain multiple identical patterns (such as multiple "---" separators).
+
+### Fixed
+- **Task delegation switching and visibility**: Fixed delegation functionality where the mode delegate tool wasn't switching to new chats and delegated chats weren't appearing in conversation history. Consolidated duplicate delegation code to use the existing shared delegation utility, ensuring proper chat switching and immediate visibility in chat history.

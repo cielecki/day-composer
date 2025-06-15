@@ -2,9 +2,7 @@ import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import { getStore } from "src/store/plugin-store";
-import { generateChatId } from "src/utils/chat/generate-conversation-id";
-import { CURRENT_SCHEMA_VERSION } from "src/utils/chat/conversation";
-import { createUserMessage } from "src/utils/chat/message-builder";
+import { delegateToModeOrCurrentChat } from "../utils/chat/chat-delegation";
 
 type DelegateToModeToolInput = {
 	mode_id: string;
@@ -32,7 +30,7 @@ export const modeDelegateTool: ObsidianTool<DelegateToModeToolInput> = {
 
 		return {
 			name: "mode_delegate",
-			description: "Delegates a self-contained task to a different AI mode that's better suited to handle it. Creates a new conversation in the specified mode with the given task, and triggers AI processing in the background. The task must include ALL relevant context since the new conversation is completely independent. This is fire-and-forget delegation - the original conversation continues independently while the delegated task is processed.",
+			description: "Delegates a self-contained task to a different AI mode that's better suited to handle it. Creates a new conversation in the specified mode with the given task, switches to the new chat, and triggers AI processing. The task must include ALL relevant context since the new conversation is completely independent. This allows you to hand off specialized work to the most appropriate mode.",
 			input_schema: {
 				type: "object",
 				properties: {
@@ -59,7 +57,7 @@ export const modeDelegateTool: ObsidianTool<DelegateToModeToolInput> = {
 		return t('tools.modeDelegate.labels.initial');
 	},
 	execute: async (context: ToolExecutionContext<DelegateToModeToolInput>): Promise<void> => {
-		const { params } = context;
+		const { params, chatId } = context;
 		const { mode_id, task, title } = params;
 		const store = getStore();
 
@@ -68,61 +66,28 @@ export const modeDelegateTool: ObsidianTool<DelegateToModeToolInput> = {
 		const targetMode = modes.find(mode => mode.path === mode_id);
 		const targetModeName = targetMode?.name || mode_id;
 
+		// Validate that the target mode exists
+		if (!targetMode) {
+			throw new Error(`Mode '${mode_id}' not found`);
+		}
+
 		context.setLabel(t('tools.modeDelegate.labels.inProgress', { mode: targetModeName }));
+		context.progress(t('tools.modeDelegate.progress.processingTask', { mode: targetModeName }));
 
-		// Create new conversation with the delegated task
-		const newChatId = generateChatId();
-		
 		try {
-			// Validate that the target mode exists
-			if (!targetMode) {
-				throw new Error(`Mode '${mode_id}' not found`);
-			}
-			const taskMessage = createUserMessage(task, undefined, mode_id);
-			
-			const newConversation = {
-				meta: {
-					id: newChatId,
-					title: title || t('chat.titles.newChat'),
-					filePath: '',
-					updatedAt: Date.now()
-				},
-				storedConversation: {
-					version: CURRENT_SCHEMA_VERSION,
-					title: title || t('chat.titles.newChat'),
-					isUnread: false, // New conversations start as read
-					modeId: mode_id, // Set the correct mode
-					titleGenerated: !title, // If no title provided, allow auto-generation
-					messages: [taskMessage],
-					costData: {
-						total_cost: 0,
-						total_input_tokens: 0,
-						total_output_tokens: 0,
-						total_cache_write_tokens: 0,
-						total_cache_read_tokens: 0,
-						entries: [],
-					}
-				}
-			};
+			// Use the existing delegation utility which handles all the complexity:
+			// - Creates new chat if current has messages, or reuses current if empty
+			// - Switches to the target chat
+			// - Adds the message and triggers AI processing
+			// - Ensures the chat appears in history
+			const targetChatId = await delegateToModeOrCurrentChat({
+				targetModeId: mode_id,
+				message: task,
+				currentChatId: chatId,
+				title: title,
+				forceNewChat: true // Always create new chat for delegation tool
+			});
 
-			// Load the new conversation into a temporary chat slot
-			store.setCurrentChat(newChatId, newConversation);
-			store.setActiveModeForChat(newChatId, mode_id);
-			
-			context.progress(t('tools.modeDelegate.progress.processingTask', { mode: targetModeName }));
-			
-			// Process the AI response in the background
-			// This will add the AI response to the conversation
-			await store.runConversationTurnWithContext(newChatId);
-			
-			// Save the completed conversation with AI response
-			await store.saveConversation(newChatId);
-			
-			context.progress(t('tools.modeDelegate.progress.createdChat', { mode: targetModeName }));
-			
-			// Clean up the temporary chat from memory (but keep the saved file)
-			await store.unloadChat(newChatId);
-			
 			context.setLabel(t('tools.modeDelegate.labels.completed', { mode: targetModeName }));
 			context.progress(t('tools.modeDelegate.progress.completedFull', { 
 				mode: targetModeName, 
@@ -130,15 +95,6 @@ export const modeDelegateTool: ObsidianTool<DelegateToModeToolInput> = {
 			}));
 
 		} catch (error) {
-			// Clean up any temporary chat that might have been created
-			try {
-				if (store.getChatState(newChatId)) {
-					await store.unloadChat(newChatId);
-				}
-			} catch (cleanupError) {
-				console.error('Failed to clean up temporary chat after delegation error:', cleanupError);
-			}
-			
 			context.setLabel(t('tools.modeDelegate.labels.failed', { mode: targetModeName }));
 			throw error;
 		}
