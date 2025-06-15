@@ -6,23 +6,20 @@ The Life Navigator plugin provides tool calls that can be used to dynamically re
 
 ### Daily Notes
 
-#### Single Daily Note
-Format: `` `🧭 daily_note(offset)` ``
-- `offset` is the number of days offset from today
-- Positive numbers refer to future dates
-- Negative numbers refer to past dates
-- `0` refers to today
+#### Periodic Notes
+Format: `` `🧭 periodic_notes(types=["daily"], start_date={offset: X, unit: "days"}, end_date={offset: Y, unit: "days"})` ``
 
-Example: `` `🧭 daily_note(-1)` `` expands to yesterday's daily note
+**Purpose**: Automatically references periodic notes (daily, weekly, monthly, quarterly, yearly) within a flexible date range.
 
-#### Daily Note Range
-Format: `` `🧭 daily_notes(start_offset, end_offset)` ``
-- `start_offset` and `end_offset` are the number of days offset from today
-- Both values can be positive (future) or negative (past)
-- The range is inclusive of both start and end dates
-- The start date must be less than or equal to the end date
+**Parameters**:
+- `types`: Array of period types to include (["daily"], ["weekly"], ["monthly"], ["quarterly"], ["yearly"], or combinations)
+- `start_date`: Start date as offset object with `offset` (number) and `unit` ("days", "months", "years")
+- `end_date`: End date as offset object with `offset` (number) and `unit` ("days", "months", "years")
 
-Example: `` `🧭 daily_notes(-7, 0)` `` expands to the last 7 days of daily notes
+**Examples**:
+- `` `🧭 periodic_notes(types=["daily"], start_date={offset: -1, unit: "days"}, end_date={offset: -1, unit: "days"})` `` - Yesterday's daily note
+- `` `🧭 periodic_notes(types=["daily"], start_date={offset: -7, unit: "days"}, end_date={offset: 0, unit: "days"})` `` - Last 7 days of daily notes
+- `` `🧭 periodic_notes(types=["daily", "weekly"], start_date={offset: -1, unit: "months"}, end_date={offset: 0, unit: "days"})` `` - Daily and weekly notes from last month to today
 
 ### Current Date and Time
 Format: `` `🧭 current_date_time()` ``
@@ -47,16 +44,19 @@ Expands to the current chat session.
 
 ## Examples
 
-### Daily Notes
+### Periodic Notes
 ```markdown
 # Yesterday's Notes
-`🧭 daily_note(-1)`
+`🧭 periodic_notes(types=["daily"], start_date={offset: -1, unit: "days"}, end_date={offset: -1, unit: "days"})`
 
 # Last Week's Notes
-`🧭 daily_notes(-7, 0)`
+`🧭 periodic_notes(types=["daily"], start_date={offset: -7, unit: "days"}, end_date={offset: 0, unit: "days"})`
 
 # Next Week's Notes
-`🧭 daily_notes(1, 7)`
+`🧭 periodic_notes(types=["daily"], start_date={offset: 1, unit: "days"}, end_date={offset: 7, unit: "days"})`
+
+# Combined Daily and Weekly Notes
+`🧭 periodic_notes(types=["daily", "weekly"], start_date={offset: -1, unit: "months"}, end_date={offset: 0, unit: "days"})`
 ```
 
 ### Current Information
@@ -82,7 +82,7 @@ This creates a powerful hierarchical structure:
 - From a main mode, you can use `` `🧭 expand` [[Index]] `` to include an index file
 - The index can link to multiple sub-files using `` `🧭 expand` [[About Me]] ``, `` `🧭 expand` [[Relationships]] ``, etc.
 - Each sub-file can include even more specific documents
-- Tool calls like `` `🧭 daily_note(0)` `` provide dynamic, date-based content
+- Tool calls like `` `🧭 periodic_notes(types=["daily"], start_date={offset: 0, unit: "days"}, end_date={offset: 0, unit: "days"})` `` provide dynamic, date-based content
 
 This system enables you to:
 1. Organize information in a modular way

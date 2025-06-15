@@ -16,17 +16,17 @@ function analyzeContentForMigrations(content: string): { migrationOpportunities:
   
   // Migration patterns: old syntax -> new syntax (with backticks)
   const migrations = [
-    // Day note links: [[ln-day-note-(X)]] 🧭 -> `🧭 daily_note(X)`
+    // Old day note links: [[ln-day-note-(X)]] 🧭 -> `🧭 periodic_notes(types=["daily"], start_date={offset: X, unit: "days"}, end_date={offset: X, unit: "days"})`
     {
       pattern: /\[\[ln-day-note-\(([+-]?\d+)\)\]\]\s*🧭/g,
-      replacement: '`🧭 daily_note($1)`',
-      description: 'day note links'
+      replacement: '`🧭 periodic_notes(types=["daily"], start_date={offset: $1, unit: "days"}, end_date={offset: $1, unit: "days"})`',
+      description: 'old day note links'
     },
-    // Day note range links: [[ln-day-note-(X:Y)]] 🧭 -> `🧭 daily_notes(X, Y)`
+    // Old day note range links: [[ln-day-note-(X:Y)]] 🧭 -> `🧭 periodic_notes(types=["daily"], start_date={offset: X, unit: "days"}, end_date={offset: Y, unit: "days"})`
     {
       pattern: /\[\[ln-day-note-\(([+-]?\d+):([+-]?\d+)\)\]\]\s*🧭/g,
-      replacement: '`🧭 daily_notes($1, $2)`',
-      description: 'day note range links'
+      replacement: '`🧭 periodic_notes(types=["daily"], start_date={offset: $1, unit: "days"}, end_date={offset: $2, unit: "days"})`',
+      description: 'old day note range links'
     },
     // Current date and time: [[ln-current-date-and-time]] 🧭 -> `🧭 current_date_time()`
     {

@@ -375,13 +375,13 @@ export async function validateModeFile(
 						// Range format
 						const rangeMatch = linkText.match(/\[\[ln-day-note-\(([+-]?\d+):([+-]?\d+)\)\]\]/);
 						if (rangeMatch) {
-							replacement = `🧭 daily_notes(${rangeMatch[1]}, ${rangeMatch[2]})`;
+							replacement = `🧭 periodic_notes(types=["daily"], start_date={offset: ${rangeMatch[1]}, unit: "days"}, end_date={offset: ${rangeMatch[2]}, unit: "days"})`;
 						}
 					} else {
 						// Single day format
 						const dayMatch = linkText.match(/\[\[ln-day-note-\(([+-]?\d+)\)\]\]/);
 						if (dayMatch) {
-							replacement = `🧭 daily_note(${dayMatch[1]})`;
+							replacement = `🧭 periodic_notes(types=["daily"], start_date={offset: ${dayMatch[1]}, unit: "days"}, end_date={offset: ${dayMatch[1]}, unit: "days"})`;
 						}
 					}
 				} else if (linkText.includes('ln-current-date-and-time')) {

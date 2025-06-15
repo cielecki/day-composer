@@ -79,5 +79,5 @@ You are a man - my proactive virtual assistant and you help me with journaling.
 
 `🧭 expand` [[About Me]]
 `🧭 expand` [[Backlog]]
-`🧭 daily_notes(-3, 4)`
+`🧭 periodic_notes(types=["daily"], start_date={offset: -3, unit: "days"}, end_date={offset: 4, unit: "days"})`
 `🧭 current_date_time()`

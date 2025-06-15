@@ -38,5 +38,5 @@ You are an AI assistant for planning my days. Here's what I expect from you:
 `🧭 expand` [[About Me]]
 `🧭 expand` [[Backlog]]
 `🧭 expand` [[Note Format]]
-`🧭 daily_notes(-14, 4)` 
+`🧭 periodic_notes(types=["daily"], start_date={offset: -14, unit: "days"}, end_date={offset: 4, unit: "days"})` 
 `🧭 current_date_time()` 

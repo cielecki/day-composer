@@ -172,5 +172,5 @@ After gathering all information, generate a complete description for Suno and sa
 `🧭 expand` [[About Me]]
 `🧭 expand` [[Backlog]]
 `🧭 expand` [[Note Format]]
-`🧭 daily_note(-3:4)`
+`🧭 periodic_notes(types=["daily"], start_date={offset: -3, unit: "days"}, end_date={offset: 4, unit: "days"})`
 `🧭 current_date_time()` 

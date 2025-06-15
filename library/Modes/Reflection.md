@@ -38,5 +38,5 @@ Your goal is to positively influence me.
 `🧭 expand` [[About Me]]
 `🧭 expand` [[Backlog]]
 `🧭 expand` [[Note Format]]
-`🧭 daily_notes(-30, 0)`
+`🧭 periodic_notes(types=["daily"], start_date={offset: -30, unit: "days"}, end_date={offset: 0, unit: "days"})`
 `🧭 current_date_time()` 

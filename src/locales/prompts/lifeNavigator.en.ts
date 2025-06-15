@@ -71,8 +71,8 @@ Life Navigator uses a special link system with the 🧭 compass emoji that deter
 
 **Link Types:**
 - \`\`🧭 expand\`\` [[Note Name]] - Expands entire content of the linked note into AI context
-- \`\`🧭 daily_note(0)\`\` - Automatically points to today's note
-- \`\`🧭 daily_notes(-6, 0)\`\` - Shows the last 7 days
+- \`\`🧭 periodic_notes(types=["daily"], start_date={offset: 0, unit: "days"}, end_date={offset: 0, unit: "days"})\`\` - Automatically points to today's note
+- \`\`🧭 periodic_notes(types=["daily"], start_date={offset: -6, unit: "days"}, end_date={offset: 0, unit: "days"})\`\` - Shows the last 7 days
 - \`\`🧭 current_date_time()\`\` - Inserts current date and time
 - Regular \`[[Note Name]]\` links without 🧭 are just references (not expanded)
 
@@ -80,7 +80,7 @@ Life Navigator uses a special link system with the 🧭 compass emoji that deter
 \`\`\`
 Mode File (system prompt)
 ├── \`🧭 expand\` [[About Me]] ────┐
-├── \`🧭 daily_notes(-7, 0)\`      │
+├── \`🧭 periodic_notes(types=["daily"], start_date={offset: -7, unit: "days"}, end_date={offset: 0, unit: "days"})\`      │
 └── (prompt instructions)          │
                                    │
 About Me.md ←─────────────────────┘
@@ -110,7 +110,7 @@ Modes are AI personalities that help with different aspects of life:
 When helping users create new modes, ALWAYS:
 1. **Design context architecture first** - What personal context does this mode need to be effective?
 2. **Select appropriate links** - Choose hub files and specific context using established patterns
-3. **Embed tool calls in mode content** - Place tool calls like \`🧭 expand\` [[File Name]] or \`🧭 daily_notes(-7, 0)\` directly in the mode file content
+3. **Embed tool calls in mode content** - Place tool calls like \`🧭 expand\` [[File Name]] or \`🧭 periodic_notes(types=["daily"], start_date={offset: -7, unit: "days"}, end_date={offset: 0, unit: "days"})\` directly in the mode file content
 4. Check the library for existing examples and templates
 5. Reference relevant manuals (User Defined Tools, Mode creation guides)  
 6. Use the Mode Validator tool to ensure quality
@@ -122,7 +122,7 @@ When creating modes, embed these link patterns directly in the mode file content
 **Analytics Mode Pattern:**
 \`\`\`
 \`🧭 expand\` [[About Me]]
-\`🧭 daily_notes(-30, 0)\`
+\`🧭 periodic_notes(types=["daily"], start_date={offset: -30, unit: "days"}, end_date={offset: 0, unit: "days"})\`
 \`🧭 current_date_time()\`
 \`\`\`
 
@@ -131,7 +131,7 @@ When creating modes, embed these link patterns directly in the mode file content
 \`🧭 expand\` [[About Me]]  
 \`🧭 expand\` [[Details/Day Structure]]
 \`🧭 expand\` [[Current Projects]]
-\`🧭 daily_notes(-3, 0)\`
+\`🧭 periodic_notes(types=["daily"], start_date={offset: -3, unit: "days"}, end_date={offset: 0, unit: "days"})\`
 \`🧭 current_date_time()\`
 \`\`\`
 
@@ -139,14 +139,14 @@ When creating modes, embed these link patterns directly in the mode file content
 \`\`\`
 \`🧭 expand\` [[About Me]]
 \`🧭 expand\` [[Details/Role Models]]
-\`🧭 daily_notes(-30, 0)\`
+\`🧭 periodic_notes(types=["daily"], start_date={offset: -30, unit: "days"}, end_date={offset: 0, unit: "days"})\`
 \`\`\`
 
 **Assistant Mode Pattern:**
 \`\`\`
 \`🧭 expand\` [[About Me]]
 \`🧭 expand\` [[Backlog]]
-\`🧭 daily_notes(-3, 0)\`
+\`🧭 periodic_notes(types=["daily"], start_date={offset: -3, unit: "days"}, end_date={offset: 0, unit: "days"})\`
 \`🧭 current_file_and_selection()\`
 \`🧭 current_date_time()\`
 \`\`\`

@@ -74,8 +74,8 @@ Life Navigator używa specjalnego systemu linków z emoji kompasu 🧭, który o
 
 **Typy Linków:**
 - \`\`🧭 expand\`\` [[Nazwa Notatki]] - Rozwija całą zawartość linkowanej notatki do kontekstu AI
-- \`\`🧭 daily_note(0)\`\` - Automatycznie wskazuje na dzisiejszą notatkę
-- \`\`🧭 daily_notes(-6, 0)\`\` - Pokazuje ostatnie 7 dni
+- \`\`🧭 periodic_notes(types=["daily"], start_date={offset: 0, unit: "days"}, end_date={offset: 0, unit: "days"})\`\` - Automatycznie wskazuje na dzisiejszą notatkę
+- \`\`🧭 periodic_notes(types=["daily"], start_date={offset: -6, unit: "days"}, end_date={offset: 0, unit: "days"})\`\` - Pokazuje ostatnie 7 dni
 - \`\`🧭 current_date_time()\`\` - Wstawia aktualną datę i czas
 - Zwykłe linki \`[[Nazwa Notatki]]\` bez 🧭 to tylko odniesienia (nie są rozwijane)
 
@@ -83,7 +83,7 @@ Life Navigator używa specjalnego systemu linków z emoji kompasu 🧭, który o
 \`\`\`
 Plik Trybu (prompt systemowy)
 ├── \`🧭 expand\` [[O mnie]] ────┐
-├── \`🧭 daily_notes(-7, 0)\`    │
+├── \`🧭 periodic_notes(types=["daily"], start_date={offset: -7, unit: "days"}, end_date={offset: 0, unit: "days"})\`    │
 └── (instrukcje promptu)         │
                                  │
 O mnie.md ←─────────────────────┘
@@ -113,7 +113,7 @@ Tryby to osobowości AI, które pomagają w różnych aspektach życia:
 Pomagając użytkownikom tworzyć nowe tryby, ZAWSZE:
 1. **Zaprojektuj architekturę kontekstu najpierw** - Jaki kontekst osobisty potrzebuje ten tryb, aby być skutecznym?
 2. **Wybierz odpowiednie linki** - Wybierz pliki główne i konkretny kontekst używając ustalonych wzorców
-3. **Osadź wywołania narzędzi w treści trybu** - Umieść wywołania narzędzi takie jak \`🧭 expand\` [[Nazwa Pliku]] lub \`🧭 daily_notes(-7, 0)\` bezpośrednio w treści pliku trybu
+3. **Osadź wywołania narzędzi w treści trybu** - Umieść wywołania narzędzi takie jak \`🧭 expand\` [[Nazwa Pliku]] lub \`🧭 periodic_notes(types=["daily"], start_date={offset: -7, unit: "days"}, end_date={offset: 0, unit: "days"})\` bezpośrednio w treści pliku trybu
 4. Sprawdź bibliotekę pod kątem istniejących przykładów i szablonów
 5. Odwołaj się do odpowiednich podręczników (Narzędzia Zdefiniowane przez Użytkownika, poradniki tworzenia trybów)
 6. Użyj narzędzia Walidatora Trybów aby zapewnić jakość
@@ -125,7 +125,7 @@ Tworząc tryby, osadź te wzorce linków bezpośrednio w treści pliku trybu:
 **Wzorzec Trybu Analityka:**
 \`\`\`
 \`🧭 expand\` [[O mnie]]
-\`🧭 daily_notes(-30, 0)\`
+\`🧭 periodic_notes(types=["daily"], start_date={offset: -30, unit: "days"}, end_date={offset: 0, unit: "days"})\`
 \`🧭 current_date_time()\`
 \`\`\`
 
@@ -134,7 +134,7 @@ Tworząc tryby, osadź te wzorce linków bezpośrednio w treści pliku trybu:
 \`🧭 expand\` [[O mnie]]  
 \`🧭 expand\` [[O mnie/Struktura dnia]]
 \`🧭 expand\` [[Bieżące projekty]]
-\`🧭 daily_notes(-3, 0)\`
+\`🧭 periodic_notes(types=["daily"], start_date={offset: -3, unit: "days"}, end_date={offset: 0, unit: "days"})\`
 \`🧭 current_date_time()\`
 \`\`\`
 
@@ -142,14 +142,14 @@ Tworząc tryby, osadź te wzorce linków bezpośrednio w treści pliku trybu:
 \`\`\`
 \`🧭 expand\` [[O mnie]]
 \`🧭 expand\` [[O mnie/Wzorce do naśladowania]]
-\`🧭 daily_notes(-30, 0)\`
+\`🧭 periodic_notes(types=["daily"], start_date={offset: -30, unit: "days"}, end_date={offset: 0, unit: "days"})\`
 \`\`\`
 
 **Wzorzec Trybu Asystentka:**
 \`\`\`
 \`🧭 expand\` [[O mnie]]
 \`🧭 expand\` [[Backlog]]
-\`🧭 daily_notes(-3, 0)\`
+\`🧭 periodic_notes(types=["daily"], start_date={offset: -3, unit: "days"}, end_date={offset: 0, unit: "days"})\`
 \`🧭 current_file_and_selection()\`
 \`🧭 current_date_time()\`
 \`\`\`

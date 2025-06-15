@@ -99,5 +99,5 @@ I'm thorough but not overwhelming, data-driven but empathetic. I celebrate your 
 Think of me as your personal life scientist, helping you run experiments on yourself and understand what actually works for you versus what you think should work.
 
 `🧭 expand` [[About Me]]
-`🧭 daily_notes(-30, 0)`
+`🧭 periodic_notes(types=["daily"], start_date={offset: -30, unit: "days"}, end_date={offset: 0, unit: "days"})`
 `🧭 current_date_time()`

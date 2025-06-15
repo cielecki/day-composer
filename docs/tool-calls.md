@@ -54,7 +54,7 @@ Tools are marked with a `sideEffects` property:
 
 - **Safe tools** (`sideEffects: false`): Can be executed during link expansion
   - `🧭 current_date_time()` - Gets current date/time
-  - `🧭 daily_note()` / `🧭 daily_notes()` - Reads daily notes
+  - `🧭 periodic_notes()` - Reads periodic notes (daily, weekly, monthly, quarterly, yearly)
   - `🧭 current_file_and_selection()` - Gets content of currently open file and selected text
   - `🧭 current_chat()` - Gets current chat conversation content
   - `🧭 note_read()` - Reads file content
@@ -84,10 +84,10 @@ Use the `🧭 tools_list()` tool to discover available tools:
 Today is `🧭 current_date_time()`
 
 Yesterday's notes:
-`🧭 daily_note(-1)`
+`🧭 periodic_notes(types=["daily"], start_date={offset: -1, unit: "days"}, end_date={offset: -1, unit: "days"})`
 
 Last week's notes:
-`🧭 daily_notes(-7, 0)`
+`🧭 periodic_notes(types=["daily"], start_date={offset: -7, unit: "days"}, end_date={offset: 0, unit: "days"})`
 ```
 
 ### Read and Process Notes
@@ -128,9 +128,9 @@ The new tool call system replaces old special links. **⚠️ BREAKING CHANGE: O
 | ❌ Old Special Link (No Longer Works) | ✅ New Tool Call |
 |---------------------------------------|------------------|
 | `[[ln-current-date-and-time]] 🧭` | `` `🧭 current_date_time()` `` |
-| `[[ln-day-note-(-1)]] 🧭` | `` `🧭 daily_note(-1)` `` |
-| `[[ln-day-note-(0)]] 🧭` | `` `🧭 daily_note(0)` `` |
-| `[[ln-day-note-(-7:0)]] 🧭` | `` `🧭 daily_notes(-7, 0)` `` |
+| `[[ln-day-note-(-1)]] 🧭` | `` `🧭 periodic_notes(types=["daily"], start_date={offset: -1, unit: "days"}, end_date={offset: -1, unit: "days"})` `` |
+| `[[ln-day-note-(0)]] 🧭` | `` `🧭 periodic_notes(types=["daily"], start_date={offset: 0, unit: "days"}, end_date={offset: 0, unit: "days"})` `` |
+| `[[ln-day-note-(-7:0)]] 🧭` | `` `🧭 periodic_notes(types=["daily"], start_date={offset: -7, unit: "days"}, end_date={offset: 0, unit: "days"})` `` |
 | `[[ln-currently-open-file]] 🧭` | `` `🧭 current_file_and_selection()` `` |
 | `[[ln-current-chat]] 🧭` | `` `🧭 current_chat()` `` |
 | `[[ln-currently-selected-text]] 🧭` | `` `🧭 current_file_and_selection()` `` |
