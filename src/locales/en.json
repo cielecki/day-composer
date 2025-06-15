@@ -121,6 +121,29 @@
       "linkText": "View changelog on GitHub"
     }
   },
+  "periods": {
+    "daily": {
+      "singular": "daily",
+      "plural": "daily"
+    },
+    "weekly": {
+      "singular": "weekly", 
+      "plural": "weekly"
+    },
+    "monthly": {
+      "singular": "monthly",
+      "plural": "monthly"
+    },
+    "quarterly": {
+      "singular": "quarterly",
+      "plural": "quarterly"
+    },
+    "yearly": {
+      "singular": "yearly",
+      "plural": "yearly"
+    },
+    "rangeLabel": "{{types}} notes from {{range}}"
+  },
   "prebuiltModes": {
     "lifeNavigator": {
       "mainDescription": "Main Description",
@@ -371,27 +394,23 @@
     },
     "currentFileAndSelection": {
       "labels": {
-        "completed": "Retrieved current file and selection context",
+        "completed": "Retrieved current file and selection",
         "failed": "Failed to get current file and selection",
         "inProgress": "Getting current file and selection...",
         "initial": "Getting current file and selection ..."
       }
     },
-    "dailyNotes": {
+    "periodicNotes": {
       "labels": {
-        "completed": "Retrieved {{found}}/{{total}} daily notes from '{{range}}'",
-        "failed": "Failed to get daily notes ('{{start}}' to '{{end}}')",
-        "inProgress": "Getting daily notes ('{{start}}' to '{{end}}')...",
-        "initial": "Getting daily notes range ..."
-      }
-    },
-    "dayNote": {
-      "labels": {
-        "completed": "Retrieved daily note for '{{date}}'",
-        "failed": "Failed to get daily note (offset: '{{offset}}')",
-        "inProgress": "Getting daily note (offset: '{{offset}}')...",
-        "initial": "Getting daily note ...",
-        "notFound": "Daily note not found for '{{date}}'"
+        "initial": "Periodic Notes",
+        "inProgress": "Retrieving {{types}} notes for {{range}}...",
+        "completed": "{{summary}} found in {{range}}",
+        "noResults": "No {{types}} notes found for {{range}}",
+        "failed": "Failed to retrieve {{types}} notes"
+      },
+      "progress": {
+        "disabledTypes": "Note: {{types}} notes are not enabled in periodic notes settings",
+        "noResults": "No {{types}} notes found for {{range}}"
       }
     },
     "periodicNotesInfo": {

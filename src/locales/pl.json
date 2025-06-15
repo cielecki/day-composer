@@ -121,6 +121,29 @@
       "linkText": "Zobacz listę zmian na GitHub"
     }
   },
+  "periods": {
+    "daily": {
+      "singular": "dzienne",
+      "plural": "dzienne"
+    },
+    "weekly": {
+      "singular": "tygodniowe",
+      "plural": "tygodniowe"
+    },
+    "monthly": {
+      "singular": "miesięczne",
+      "plural": "miesięczne"
+    },
+    "quarterly": {
+      "singular": "kwartalne",
+      "plural": "kwartalne"
+    },
+    "yearly": {
+      "singular": "roczne",
+      "plural": "roczne"
+    },
+    "rangeLabel": "notatki {{types}} z {{range}}"
+  },
   "prebuiltModes": {
     "lifeNavigator": {
       "mainDescription": "Główny opis",
@@ -374,24 +397,20 @@
         "completed": "Pobrano aktualny plik i kontekst zaznaczenia",
         "failed": "Nie udało się pobrać aktualnego pliku i zaznaczenia",
         "inProgress": "Pobieram aktualny plik i zaznaczenie...",
-        "initial": "Pobieranie obecnego pliku i zaznaczenia ..."
+        "initial": "Pobieranie bieżącego pliku i zaznaczenia ..."
       }
     },
-    "dailyNotes": {
+    "periodicNotes": {
       "labels": {
-        "completed": "Pobrano {{found}}/{{total}} dziennych notatek z '{{range}}'",
-        "failed": "Nie udało się pobrać dziennych notatek ('{{start}}' do '{{end}}')",
-        "inProgress": "Pobieranie dziennych notatek ('{{start}}' do '{{end}}')...",
-        "initial": "Pobieranie zakresu dziennych notatek ..."
-      }
-    },
-    "dayNote": {
-      "labels": {
-        "completed": "Pobrano dzienną notatkę dla '{{date}}'",
-        "failed": "Nie udało się pobrać dziennej notatki (przesunięcie: '{{offset}}')",
-        "inProgress": "Pobieranie dziennej notatki (przesunięcie: '{{offset}}')...",
-        "initial": "Pobieranie dziennej notatki ...",
-        "notFound": "Nie znaleziono dziennej notatki"
+        "initial": "Notatki Okresowe",
+        "inProgress": "Pobieranie notatek {{types}} dla {{range}}...",
+        "completed": "{{summary}} znaleziono w {{range}}",
+        "noResults": "Nie znaleziono notatek {{types}} dla {{range}}",
+        "failed": "Nie udało się pobrać notatek {{types}}"
+      },
+      "progress": {
+        "disabledTypes": "Uwaga: notatki {{types}} nie są włączone w ustawieniach notatek okresowych",
+        "noResults": "Nie znaleziono notatek {{types}} dla {{range}}"
       }
     },
     "periodicNotesInfo": {
