@@ -43,7 +43,7 @@ Expands to the current chat session.
 3. The expansion process is recursive - any tool calls within expanded content will also be expanded
 4. Circular references are prevented by tracking visited paths
 5. Only tools without side effects can be used in automatic link expansion
-6. Regular wiki links can still be expanded using: `` `🧭 expand` [[File Name]] ``
+6. Regular wiki links can be expanded using: `` `🧭 expand` [[File Name]] `` or `` `🧭 expand` [[Directory Name]] ``
 
 ## Examples
 
@@ -70,6 +70,8 @@ Current chat: `🧭 current_chat()`
 ```markdown
 `🧭 expand` [[About Me]]
 `🧭 expand` [[Project Notes]]
+`🧭 expand` [[Info]]
+`🧭 expand` [[Details]]
 ```
 
 ## Purpose and Structure
@@ -109,9 +111,44 @@ Regular wiki links can be expanded using the expand tool:
 
 ```markdown
 `🧭 expand` [[Note Title]]
+`🧭 expand` [[Directory Name]]
 ```
 
-This will include the full content of "Note Title" in your query context.
+This will include the full content of "Note Title" in your query context. 
+
+### Directory Expansion
+
+The expand tool now supports entire directories:
+
+```markdown
+`🧭 expand` [[Info]]
+`🧭 expand` [[Projects]]
+```
+
+When you expand a directory:
+- All markdown files (.md) directly in the directory are included (subdirectories are ignored)
+- Files are processed alphabetically for consistent output
+- Each file's content is wrapped in XML-like tags for clear structure
+- No outer directory wrapper - files are output directly
+- Recursive expansion works within each file's content (for any tool calls within the file)
+- Circular references are prevented across all files
+
+**Example Output Structure:**
+```xml
+<About_Me file="Info/About Me.md">
+  [Content of About Me.md]
+</About_Me>
+
+<Goals file="Info/Goals.md">
+  [Content of Goals.md]
+</Goals>
+
+<Notes file="Info/Notes.md">
+  [Content of Notes.md]
+</Notes>
+```
+
+**Note:** Only files directly in the `Info` directory are included. Files in subdirectories like `Info/Projects/` would need to be expanded separately with `🧭 expand` [[Projects]].
 
 ## HTML Comment Filtering
 

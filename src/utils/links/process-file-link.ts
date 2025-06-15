@@ -1,5 +1,5 @@
-import { App } from "obsidian";
-import { resolveLinkToFile } from 'src/utils/fs/link-resolver';
+import { App, TFile, TFolder } from "obsidian";
+import { resolveLinkToFile, resolveLinkToFolder } from 'src/utils/fs/link-resolver';
 import { convertToValidTagName } from 'src/utils/text/xml-tag-converter';
 import { expandLinks } from "./expand-links";
 
@@ -74,4 +74,76 @@ export async function processFileLink(
 		const tagName = convertToValidTagName(linkText);
 		return `<${tagName} file="${linkFile.path}">\n\n${tabbedContent}\n\n</${tagName}>\n`;
 	}
+}
+
+/**
+ * Process a directory link and return its expanded content
+ * @param app The Obsidian App instance
+ * @param linkPath The path to the directory to process
+ * @param linkText The display text for the link
+ * @param visitedPaths Set of already visited paths to prevent circular references
+ * @returns The expanded content or null if the directory couldn't be processed
+ */
+export async function processDirectoryLink(
+	app: App,
+	linkPath: string,
+	linkText: string,
+	visitedPaths: Set<string>): Promise<string | null> {
+	// Try to resolve the link as a directory
+	const linkFolder = resolveLinkToFolder(app, linkPath);
+
+	// Skip if link can't be resolved
+	if (!linkFolder) {
+		console.warn(`Could not resolve directory link target: ${linkPath}`);
+		return null;
+	}
+
+	// Skip if we've already visited this directory (circular reference)
+	if (visitedPaths.has(linkFolder.path)) {
+		console.warn(`Circular reference detected for directory: ${linkFolder.path}`);
+		return `[Circular: ${linkText}] 🧭`;
+	}
+
+	// Track this directory path as visited
+	visitedPaths.add(linkFolder.path);
+
+	// Get all markdown files in the directory (not subdirectories)
+	const markdownFiles = linkFolder.children.filter(
+		(child): child is TFile => child instanceof TFile && child.extension === 'md'
+	);
+
+	// Sort files alphabetically for consistent output
+	markdownFiles.sort((a, b) => a.name.localeCompare(b.name));
+
+	const processedContent: string[] = [];
+
+	// Process each markdown file in the directory
+	for (const file of markdownFiles) {
+		try {
+			const expandedContent = await processFileLink(
+				app,
+				file.path,
+				file.basename,
+				visitedPaths,
+				false // Not a day note
+			);
+			
+			if (expandedContent) {
+				processedContent.push(expandedContent);
+			}
+		} catch (error) {
+			console.warn(`Error processing file ${file.path} in directory ${linkFolder.path}:`, error);
+			processedContent.push(`<${convertToValidTagName(file.basename)} file="${file.path}">\n\n  [Error processing file: ${error.message}]\n\n</${convertToValidTagName(file.basename)}>\n`);
+		}
+	}
+
+	// If no content was processed, indicate empty directory
+	if (processedContent.length === 0) {
+		// Remove from visited paths since we didn't actually process anything
+		visitedPaths.delete(linkFolder.path);
+		return `[No markdown files found in directory: ${linkFolder.path}]\n`;
+	}
+
+	// Return all processed content without outer wrapper
+	return processedContent.join('\n');
 }

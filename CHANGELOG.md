@@ -601,3 +601,6 @@ You'll enjoy a more focused chat history experience:
   - **Detailed progress** shows precise paths (e.g., "Checked 'buy groceries' in '2025-01-12 Daily Note.md'")
   
   This makes it much easier to track where your task changes are happening, especially when working with multiple files, while keeping the interface clean and readable.
+
+### Added
+- **Directory expansion support**: The `🧭 expand` tool now supports expanding entire directories, not just individual files. Use `🧭 expand` [[Directory Name]] to include all markdown files directly in the specified directory (subdirectories are not processed recursively). Each file is wrapped in XML-like tags with metadata, and files are processed alphabetically for consistent output.

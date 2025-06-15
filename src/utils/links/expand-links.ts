@@ -1,7 +1,7 @@
 import { App, Notice } from "obsidian";
 import { removeTopLevelHtmlComments } from 'src/utils/text/html-comment-remover';
 // Old special link handlers are no longer used - only new format tools are supported
-import { processFileLink } from "./process-file-link";
+import { processFileLink, processDirectoryLink } from "./process-file-link";
 import { resolveLinkToFile } from 'src/utils/fs/link-resolver';
 import { t } from 'src/i18n';
 import { parseToolCall } from '../tools/tool-call-parser';
@@ -140,8 +140,14 @@ async function processContentSection(app: App, content: string, visitedPaths: Se
 			[linkPath, linkText] = linkText.split("|", 2);
 		}
 
-		// Handle regular file links using the common processing function
-		const expandedContent = await processFileLink(app, linkPath, linkText, visitedPaths);
+		// Handle regular file/directory links using the common processing functions
+		let expandedContent = await processFileLink(app, linkPath, linkText, visitedPaths);
+		
+		// If file processing failed, try directory processing
+		if (!expandedContent) {
+			expandedContent = await processDirectoryLink(app, linkPath, linkText, visitedPaths);
+		}
+		
 		if (expandedContent) {
 			result = result.replace(match[0], expandedContent);
 		} else {
@@ -184,7 +190,14 @@ async function processNewFormatCalls(app: App, content: string, visitedPaths: Se
 		const linkTarget = match[1];
 		
 		try {
-			const expandedContent = await processFileLink(app, linkTarget, linkTarget, visitedPaths);
+			// First, try to process as a file
+			let expandedContent = await processFileLink(app, linkTarget, linkTarget, visitedPaths);
+			
+			// If file processing failed, try to process as a directory
+			if (!expandedContent) {
+				expandedContent = await processDirectoryLink(app, linkTarget, linkTarget, visitedPaths);
+			}
+			
 			if (expandedContent) {
 				result = result.replace(match[0], expandedContent);
 			} else {
