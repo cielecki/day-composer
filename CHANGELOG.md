@@ -34,6 +34,8 @@
 - **Ultra-fast responses** (75ms vs 500ms+)
 - **99 languages** for speech recognition
 
+<img width="725" alt="image" src="https://github.com/user-attachments/assets/7d5ba79f-9bdf-4a1b-ab06-15892047a7bd" />
+
 *Requires ElevenLabs API key. Falls back to OpenAI if unavailable.*
 
 ### ✨ Interface Polish
