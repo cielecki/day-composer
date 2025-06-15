@@ -3,6 +3,7 @@
 ### 🚀 Multiple Conversations Running Simultaneously
 
 **Work on multiple tasks at once without switching contexts:**
+
 <img width="1048" alt="image" src="https://github.com/user-attachments/assets/3e706415-d17a-4b9e-947e-2cb304b04ab4" />
 
 - **Parallel chats**: Open multiple Life Navigator windows and have different conversations running independently
