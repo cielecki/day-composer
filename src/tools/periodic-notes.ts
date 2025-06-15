@@ -1,9 +1,10 @@
+import { TFile } from "obsidian";
 import { ObsidianTool } from "../obsidian-tools";
 import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import { handlePeriodicNotesRange } from '../utils/periodic-notes/periodic-note-finder';
-import { processFileLink } from '../utils/links/process-file-link';
-import { PeriodType, FlexibleDate, OffsetUnit, translatePeriodTypes, translatePeriodType } from '../utils/periodic-notes/periodic-note-calculator';
+import { expandLinks } from '../utils/links/expand-links';
+import { PeriodType, FlexibleDate, OffsetUnit, translatePeriodTypes, translatePeriodType, getFolderForPeriod, isPeriodTypeEnabled } from '../utils/periodic-notes/periodic-note-calculator';
 
 const schema = {
   name: "periodic_notes",
@@ -94,6 +95,15 @@ export const periodicNotesTool: ObsidianTool<PeriodicNotesInput> = {
     const { plugin, params } = context;
     const { types, start_date, end_date } = params;
 
+    // Validate that all requested period types are enabled
+    const disabledTypes = types.filter(type => !isPeriodTypeEnabled(type));
+    if (disabledTypes.length > 0) {
+      const disabledTypesDisplay = translatePeriodTypes(disabledTypes);
+      throw new Error(t('tools.periodicNotes.errors.disabledTypes', { 
+        types: disabledTypesDisplay 
+      }));
+    }
+
     // Create display strings for the parameters using translations
     const typesDisplay = translatePeriodTypes(types);
     
@@ -123,19 +133,6 @@ export const periodicNotesTool: ObsidianTool<PeriodicNotesInput> = {
         end_date
       );
       
-      // Check if any types were disabled
-      const requestedTypes = types;
-      const enabledTypes = rangeInfo.types;
-      const disabledTypes = requestedTypes.filter(type => !enabledTypes.includes(type));
-      
-      if (disabledTypes.length > 0) {
-        const disabledTypesDisplay = translatePeriodTypes(disabledTypes);
-        const disabledTypesMsg = t('tools.periodicNotes.progress.disabledTypes', { 
-          types: disabledTypesDisplay 
-        });
-        context.progress(disabledTypesMsg);
-      }
-      
       if (rangeInfo.notes.length > 0) {
         // Process each individual periodic note
         let combinedContent = '';
@@ -144,36 +141,82 @@ export const periodicNotesTool: ObsidianTool<PeriodicNotesInput> = {
         
         for (const noteInfo of rangeInfo.notes) {
           if (noteInfo.found) {
-            const expandedContent = await processFileLink(
-              plugin.app,
-              noteInfo.linkPath,
-              `${noteInfo.dateStr} (${noteInfo.descriptiveLabel})`,
-              new Set(), // Empty visited paths set
-              true, // This is a periodic note (similar to day note)
-              { formattedDate: noteInfo.formattedDate, descriptiveLabel: noteInfo.descriptiveLabel }
-            );
+            // For found notes, we need to handle the content expansion ourselves to use proper periodic note tags
+            // linkPath now contains the full path without .md extension
+            const linkFile = plugin.app.vault.getAbstractFileByPath(noteInfo.linkPath + '.md');
             
-            if (expandedContent) {
-              combinedContent += expandedContent + '\n\n';
-              foundCount++;
-              
-              // Track counts by type
-              foundByType[noteInfo.period] = (foundByType[noteInfo.period] || 0) + 1;
-              
-              // Add navigation target for each found note
-              context.addNavigationTarget({
-                filePath: noteInfo.linkPath + '.md'
-              });
+            if (linkFile && linkFile instanceof TFile) {
+              try {
+                // Read the file content
+                const linkedContent = await plugin.app.vault.read(linkFile);
+                
+                // Process frontmatter and extract just the content section
+                const frontmatterMatch = linkedContent.match(
+                  /^---\n([\s\S]*?)\n---\n([\s\S]*)$/
+                );
+                const contentToExpand = frontmatterMatch
+                  ? frontmatterMatch[2].trim()
+                  : linkedContent.trim();
+                
+                // Recursively expand any links in the linked content
+                const expandedSystemPrompt = await expandLinks(
+                  plugin.app,
+                  contentToExpand,
+                  new Set() // Empty visited paths set
+                );
+                
+                const expandedLinkedContent = expandedSystemPrompt.fullContent;
+                const tabbedContent = expandedLinkedContent.split('\n').map((line: string) => '  ' + line).join('\n');
+                
+                // Build date attributes for found notes
+                let dateAttributes = '';
+                if (noteInfo.dateInfo?.date) {
+                  dateAttributes = `date="${noteInfo.dateInfo.date}"`;
+                } else if (noteInfo.dateInfo?.startDate && noteInfo.dateInfo?.endDate) {
+                  dateAttributes = `start_date="${noteInfo.dateInfo.startDate}" end_date="${noteInfo.dateInfo.endDate}"`;
+                }
+                
+                // Create the properly formatted periodic note content
+                combinedContent += `<${noteInfo.period}_note ${dateAttributes} file="${linkFile.path}" label="${noteInfo.descriptiveLabel}" >\n\n${tabbedContent}\n\n</${noteInfo.period}_note>\n\n`;
+                foundCount++;
+                
+                // Track counts by type
+                foundByType[noteInfo.period] = (foundByType[noteInfo.period] || 0) + 1;
+                
+                // Add navigation target for each found note
+                context.addNavigationTarget({
+                  filePath: linkFile.path
+                });
+              } catch (error) {
+                console.warn(`Error processing periodic note ${noteInfo.linkPath}:`, error);
+                // Fall back to a simple marker if we can't process the content
+                combinedContent += `<${noteInfo.period}_note_error file="${noteInfo.linkPath}.md" label="${noteInfo.descriptiveLabel}" error="${error.message}" />\n\n`;
+              }
+            } else {
+              console.warn(`Could not resolve periodic note file: ${noteInfo.linkPath}`);
+              // Add debug info to help troubleshoot
+              combinedContent += `<${noteInfo.period}_note_missing_file linkPath="${noteInfo.linkPath}" label="${noteInfo.descriptiveLabel}" debug="file_not_found" />\n\n`;
             }
           } else {
-            // Add individual marker for missing note using consistent XML format
-            combinedContent += `<${noteInfo.period}_note_missing date="${noteInfo.dateStr}" label="${noteInfo.descriptiveLabel}" />\n\n`;
+            // Add individual marker for missing note using consistent XML format with same parameters as found notes
+            // For missing notes, use the expected filename (dateStr) as the file reference
+            const expectedFilePath = `${noteInfo.dateStr}.md`;
+            
+            // Build complete date attributes for missing notes
+            let dateAttributes = '';
+            if (noteInfo.dateInfo?.date) {
+              dateAttributes = `date="${noteInfo.dateInfo.date}"`;
+            } else if (noteInfo.dateInfo?.startDate && noteInfo.dateInfo?.endDate) {
+              dateAttributes = `start_date="${noteInfo.dateInfo.startDate}" end_date="${noteInfo.dateInfo.endDate}"`;
+            }
+            
+            combinedContent += `<${noteInfo.period}_note_missing ${dateAttributes} file="${expectedFilePath}" label="${noteInfo.descriptiveLabel}" />\n\n`;
           }
         }
         
         // Generate summary by type using translations
         const summaryParts: string[] = [];
-        for (const type of enabledTypes) {
+        for (const type of types) {
           const found = foundByType[type] || 0;
           const total = rangeInfo.notes.filter(n => n.period === type).length;
           if (total > 0) {

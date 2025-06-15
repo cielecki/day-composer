@@ -1,25 +1,11 @@
-import { App, Notice } from "obsidian";
+import { App } from "obsidian";
 import { removeTopLevelHtmlComments } from 'src/utils/text/html-comment-remover';
-// Old special link handlers are no longer used - only new format tools are supported
 import { processFileLink, processDirectoryLink } from "./process-file-link";
 import { resolveLinkToFile } from 'src/utils/fs/link-resolver';
 import { t } from 'src/i18n';
 import { parseToolCall } from '../tools/tool-call-parser';
-import { getObsidianTools } from '../../obsidian-tools';
+import { getObsidianTools, NavigationTarget } from '../../obsidian-tools';
 import { convertToValidTagName } from 'src/utils/text/xml-tag-converter';
-
-/**
- * Format tool call error as XML
- * @param errorType The type of error (e.g., 'tool_not_found', 'side_effects')
- * @param toolName The name of the tool
- * @param message The error message
- * @returns XML formatted error
- */
-function formatToolCallError(errorType: string, message: string, toolName?: string): string {
-	const errorTagName = convertToValidTagName(errorType);
-	const escapedMessage = message.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-	return `<${errorTagName} ${toolName ? `tool="${toolName}"` : ''}>${escapedMessage}</${errorTagName}>`;
-}
 
 /**
  * Interface for the three-part system prompt based on stability
@@ -257,29 +243,31 @@ async function processNewFormatCalls(app: App, content: string, visitedPaths: Se
 			throw new Error(t('errors.linkExpansion.toolHasSideEffects', { toolName }));
 		}
 
-		// Execute the tool
+		// Execute the tool through the proper validation flow
 		const progressMessages: string[] = [];
+		const navigationTargets: NavigationTarget[] = [];
 		
-		const context = {
-			plugin: { app }, // Minimal plugin-like object
-			params: parameters,
-			signal: new AbortController().signal,
-			progress: (message: string) => {
+		const toolResult = await obsidianTools.processToolCall(
+			toolName,
+			parameters,
+			new AbortController().signal,
+			'link-expansion', // chatId for link expansion
+			(message: string) => {
 				progressMessages.push(message);
 			},
-			addNavigationTarget: () => {
-				// Navigation targets are not supported in link expansion
-			},
-			setLabel: () => {
-				// Label updates are not supported in link expansion
+			(target: NavigationTarget) => {
+				navigationTargets.push(target);
 			}
-		};
+		);
 
-		await tool.execute(context as any);
+		// Handle tool execution result
+		if (toolResult.isError) {
+			throw new Error(toolResult.result);
+		}
 
 		// Replace with the tool output
-		const toolOutput = progressMessages.join('\n');
-		if (toolOutput) {
+		const toolOutput = toolResult.result;
+		if (toolOutput && toolOutput !== `${toolName} completed successfully`) {
 			result = result.replace(match[0], toolOutput);
 		} else {
 			const tagName = convertToValidTagName('tool_execution');

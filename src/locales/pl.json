@@ -87,7 +87,7 @@
       "couldNotExpand": "Nie można rozwinąć: {{linkTarget}}",
       "toolNotFound": "Narzędzie '{{toolName}}' nie zostało znalezione",
       "toolHasSideEffects": "Narzędzie '{{toolName}}' ma efekty uboczne i nie może być używane w rozszerzaniu linków",
-      "systemPromptGenerationFailed": "Generowanie monitu systemowego nie powiodło się: {{error}}. Sprawdź plik trybu i upewnij się, że wszystkie połączone pliki istnieją.",
+      "systemPromptGenerationFailed": "Generowanie monitu systemowego nie powiodło się:\n\n`{{error}}`.\n\nSprawdź plik trybu i upewnij się, że wszystkie połączone pliki istnieją.",
       "expandedLinksInFile": "Rozszerzono linki Life Navigator w: {{path}}"
     },
     "retryButton": "Ponów",
@@ -426,6 +426,9 @@
       "progress": {
         "disabledTypes": "Uwaga: notatki {{types}} nie są włączone w ustawieniach notatek okresowych",
         "noResults": "Nie znaleziono notatek {{types}} dla {{range}}"
+      },
+      "errors": {
+        "disabledTypes": "Następujące typy notatek okresowych nie są włączone: {{types}}. Proszę włączyć je w ustawieniach wtyczki notatek okresowych przed użyciem tego narzędzia."
       }
     },
     "periodicNotesInfo": {

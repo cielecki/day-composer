@@ -87,7 +87,7 @@
       "couldNotExpand": "Could not expand: {{linkTarget}}",
       "toolNotFound": "Tool '{{toolName}}' not found",
       "toolHasSideEffects": "Tool '{{toolName}' has side effects and cannot be used in link expansion",
-      "systemPromptGenerationFailed": "System prompt generation failed: {{error}}. Please check your mode file and ensure all linked files exist.",
+      "systemPromptGenerationFailed": "System prompt generation failed:\n\n`{{error}}`.\n\nPlease check your mode file and ensure all linked files exist.",
       "expandedLinksInFile": "Expanded Life Navigator links in: {{path}}"
     },
     "retryButton": "Retry",
@@ -426,6 +426,9 @@
       "progress": {
         "disabledTypes": "Note: {{types}} notes are not enabled in periodic notes settings",
         "noResults": "No {{types}} notes found for {{range}}"
+      },
+      "errors": {
+        "disabledTypes": "The following periodic note types are not enabled: {{types}}. Please enable them in your periodic notes plugin settings before using this tool."
       }
     },
     "periodicNotesInfo": {

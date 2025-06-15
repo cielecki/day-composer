@@ -1,5 +1,6 @@
 import { App, TFile, normalizePath } from "obsidian";
 import { getPeriodicNotesSettings } from './get-periodic-notes-settings';
+import { findDailyNotesByDate } from '../daily-notes/daily-note-finder';
 import {
   PeriodType,
   FlexibleDate,
@@ -70,40 +71,84 @@ async function createPeriodicNoteInfo(
 ): Promise<PeriodicNoteInfo> {
   const format = getDateFormatForPeriod(periodType, settings);
   
-  // Format dates for display and searching
-  const dateStr = moment(targetDate).format(format);
-  const formattedDate = moment(targetDate).format(`${format} dddd`);
+  // Generate date information for AI based on period type
+  const momentDate = moment(targetDate);
+  let dateInfo: { date?: string; startDate?: string; endDate?: string } = {};
+  
+  switch (periodType) {
+    case 'daily':
+      // Day of the week in user's language
+      dateInfo.date = momentDate.format('dddd');
+      break;
+    case 'weekly':
+      // Start and end date of the week (using ISO week - Monday to Sunday)
+      const weekStart = momentDate.clone().startOf('isoWeek');
+      const weekEnd = momentDate.clone().endOf('isoWeek');
+      dateInfo.startDate = weekStart.format('YYYY-MM-DD');
+      dateInfo.endDate = weekEnd.format('YYYY-MM-DD');
+      break;
+    case 'quarterly':
+      // Start and end date of the quarter
+      const quarterStart = momentDate.clone().startOf('quarter');
+      const quarterEnd = momentDate.clone().endOf('quarter');
+      dateInfo.startDate = quarterStart.format('YYYY-MM-DD');
+      dateInfo.endDate = quarterEnd.format('YYYY-MM-DD');
+      break;
+    case 'monthly':
+      // Start and end date of the month
+      const monthStart = momentDate.clone().startOf('month');
+      const monthEnd = momentDate.clone().endOf('month');
+      dateInfo.startDate = monthStart.format('YYYY-MM-DD');
+      dateInfo.endDate = monthEnd.format('YYYY-MM-DD');
+      break;
+    case 'yearly':
+      // For yearly notes, the filename (e.g., "2025.md") is sufficient - no additional date attributes needed
+      break;
+    default:
+      break;
+  }
   
   // Generate descriptive label
   const descriptiveLabel = generateDescriptiveLabel(periodType, targetDate, referenceDate);
   
-  // Find matching files
-  const matchingFiles = findPeriodicNotesByDate(app, periodType, targetDate, settings);
+  // Find matching files - use our improved daily note finder for daily notes
+  let matchingFiles: TFile[];
+  if (periodType === 'daily') {
+    // Use our improved daily note finder that respects Daily Notes settings
+    const dateStrForDailyNotes = moment(targetDate).format('YYYY-MM-DD');
+    matchingFiles = await findDailyNotesByDate(app, dateStrForDailyNotes);
+  } else {
+    // Use the standard periodic notes finder for other types
+    matchingFiles = findPeriodicNotesByDate(app, periodType, targetDate, settings);
+  }
   
   if (matchingFiles.length >= 1) {
     // Use the first matching file
-    const linkPath = matchingFiles[0].basename;
+    const linkPath = matchingFiles[0].path.replace(/\.md$/, ''); // Remove .md extension for link path
     
     return {
-      dateStr,
-      formattedDate,
+      dateStr: matchingFiles[0].basename, // Use actual filename as date
+      formattedDate: '', // Will be replaced with dateInfo in the tool
       descriptiveLabel,
       linkPath,
       found: true,
       period: periodType,
-      targetDate
+      targetDate,
+      dateInfo // Add the new date information
     };
   } else {
     // No matching file found
-    console.warn(`No ${periodType} note found for date: ${dateStr}`);
+    const expectedFormat = moment(targetDate).format(format);
+    console.warn(`No ${periodType} note found for date: ${expectedFormat}`);
     return {
-      dateStr,
-      formattedDate,
+      dateStr: expectedFormat, // Use expected filename format
+      formattedDate: '', // Will be replaced with dateInfo in the tool
       descriptiveLabel,
       linkPath: "",
       found: false,
       period: periodType,
-      targetDate
+      targetDate,
+      dateInfo // Add the new date information
     };
   }
 }

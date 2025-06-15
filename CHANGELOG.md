@@ -620,7 +620,14 @@ You'll never miss important updates and new features:
 ### Enhanced
 - **Unified command system for chat and settings**: Both the chat dropdown menu and settings "Life Navigator Actions" now use the same Obsidian commands system. All actions (Star on GitHub, Join Community, Follow Author, Check Updates, What's New) are now available as commands that can be triggered from multiple places and appear in both the chat dropdown and settings. The chat dropdown includes helpful tooltips showing what each action does, and the reset tutorial action remains available only in settings as requested.
 
-## Unreleased
-
 ### Fixed
 - **Input area auto-resize**: Fixed textarea not shrinking when text is deleted. The unified input area now properly resizes both up and down as you type or delete content, maintaining a maximum height of 150px while automatically adjusting to content size changes.
+
+### Fixed
+- **Daily Notes recognition with complex folder formats**: Fixed periodic notes system to properly handle Daily Notes with folder-based date formats (like `YYYY/MM/YYYY-MM-DD`) that create nested directory structures. The system now correctly finds files at paths like `Logs/2025/06/2025-06-14.md` instead of looking for files with slashes in the filename.
+- **Periodic notes XML formatting**: Fixed malformed XML attributes in periodic note output (was showing `date="date="Saturday""`, now shows `date="Saturday"`). Improved content expansion to use proper periodic note tags (`daily_note`, `weekly_note`, etc.) instead of generic daily note tags.
+- **Week start consistency**: Standardized weekly periodic notes to use ISO weeks (Monday to Sunday) regardless of system locale, ensuring consistent week calculations across different operating systems and language settings.
+- **Missing date attributes for monthly and yearly notes**: Monthly and yearly periodic notes now include proper `start_date` and `end_date` attributes in their XML output, providing complete date context for AI consumption just like weekly and quarterly notes.
+- **Schema validation for link expansion**: Fixed critical issue where link expansion was bypassing parameter validation entirely. Tool calls in link expansion (like `` `🧭 periodic_notes(...)` ``) now go through the same schema validation as AI-generated tool calls, properly rejecting invalid parameters like `yearly1111` or malformed units with clear error messages.
+- **Disabled periodic note types error handling**: Fixed confusing behavior where requesting disabled periodic note types (like yearly notes when the plugin is disabled) would silently omit them from results. Now throws a clear error message guiding users to enable the required plugins in their periodic notes settings before using the tool.
+- **Yearly notes date attribute cleanup**: Removed redundant `start_date` and `end_date` attributes from yearly notes since the filename (e.g., `2025.md`) already clearly indicates the year. Other period types retain their date attributes where they provide valuable context (day of week for daily notes, date ranges for weekly/monthly/quarterly notes).

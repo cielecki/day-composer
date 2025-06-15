@@ -22,6 +22,7 @@ export interface PeriodicNoteInfo {
   found: boolean;
   period: PeriodType;
   targetDate: Date;
+  dateInfo?: { date?: string; startDate?: string; endDate?: string };
 }
 
 export interface PeriodicNotesRangeInfo {
@@ -106,8 +107,8 @@ export function findPeriodsInRange(
       break;
       
     case 'weekly':
-      current = moment(startDate).startOf('week');
-      while (current.isSameOrBefore(end, 'week')) {
+      current = moment(startDate).startOf('isoWeek');
+      while (current.isSameOrBefore(end, 'isoWeek')) {
         periods.push(current.toDate());
         current.add(1, 'week');
       }
@@ -171,7 +172,7 @@ export function generateDescriptiveLabel(
       break;
     case 'weekly':
       diffAmount = target.diff(ref, 'weeks');
-      isCurrent = target.isSame(ref, 'week');
+      isCurrent = target.isSame(ref, 'isoWeek');
       break;
     case 'monthly':
       diffAmount = target.diff(ref, 'months');
