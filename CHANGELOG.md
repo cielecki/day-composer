@@ -3,6 +3,8 @@
 ### 🚀 Multiple Conversations Running Simultaneously
 
 **Work on multiple tasks at once without switching contexts:**
+<img width="379" alt="image" src="https://github.com/user-attachments/assets/04152abb-ac6f-4040-b58f-9b53368ea3e6" />
+<img width="1048" alt="image" src="https://github.com/user-attachments/assets/3e706415-d17a-4b9e-947e-2cb304b04ab4" />
 
 - **Parallel chats**: Open multiple Life Navigator windows and have different conversations running independently
 - **Background processing**: Start a research task in one chat while planning your day in another
@@ -10,6 +12,8 @@
 - **Flexible workspace**: Open chats in any Obsidian panel or floating window
 
 ### 📝 Weekly, Monthly & Quarterly Notes Support
+
+<img width="594" alt="image" src="https://github.com/user-attachments/assets/78ff17cf-0276-46f3-a68d-204004442b56" />
 
 **Life Navigator now works with the Periodic Notes plugin:**
 
@@ -24,8 +28,13 @@
 - **Smart handoffs**: AI can create new chats with different modes when another mode would be better suited for a task
 - **Fire and forget**: Delegated tasks run in separate chats without interrupting your current conversation
 - **Automatic switching**: New delegated chats open automatically so you can see the results
+- **Automatic updates of old format**: AI can detect old format of modes and tools and repair it
+
+<img width="342" alt="image" src="https://github.com/user-attachments/assets/336c6f95-3535-4ac1-8675-fa182eef2125" />
 
 ### 🎙️ ElevenLabs Voice (Experimental)
+
+<img width="725" alt="image" src="https://github.com/user-attachments/assets/7d5ba79f-9bdf-4a1b-ab06-15892047a7bd" />
 
 **Optional premium voice upgrade for advanced users:**
 
@@ -34,14 +43,15 @@
 - **Ultra-fast responses** (75ms vs 500ms+)
 - **99 languages** for speech recognition
 
-<img width="725" alt="image" src="https://github.com/user-attachments/assets/7d5ba79f-9bdf-4a1b-ab06-15892047a7bd" />
-
 *Requires ElevenLabs API key. Falls back to OpenAI if unavailable.*
 
 ### ✨ Interface Polish
 
 - **Editable chat titles**: Click any chat title to rename it
 - **Better mode selector**: Mode dropdown moved closer to the input area
+
+<img width="379" alt="image" src="https://github.com/user-attachments/assets/baaa24d6-7bcb-40a7-9b41-89b89291ba4d" />
+
 - **Improved task navigation**: Click task results to jump to the exact location in your notes
 - **What's New modal**: See changelog after updates
 - **Audio stop button**: Pause audio playback mid-sentence with a dedicated stop button
