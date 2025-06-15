@@ -1,11 +1,12 @@
 
 ## Life Navigator Style Guidelines
 
-- Always check if there are maybe existing styles in styles.css that you can reuse
-- If not maybe you can make an existing style more general and reusable
+- Always check if there are existing styles in the appropriate CSS file that you can reuse
+- If not, maybe you can make an existing style more general and reusable
 - Never do inline styles, always use classes
 - Favour general classes akin to tailwind rather than specific ones to a specific button or element
-- Prefer simplicity we want to keep the size of styles.css in check
+- Prefer simplicity - we want to keep the size of our CSS files in check
+- **Multi-file structure**: We use separate CSS files for different components/views - check the file organization section for details
 
 ### Core Principles
 
@@ -64,36 +65,73 @@ Follow this order of preference:
 
 ### 4. File Organization
 
-#### Structure
+#### Multi-File Structure
+The project uses a multi-file CSS architecture for better organization and maintainability:
+
+```
+src/
+├── styles.css              # Main entry point with imports
+└── css/
+    ├── setup.css           # Setup screen styles
+    ├── system-prompt-view.css  # System prompt view styles
+    ├── cost-analysis-view.css  # Cost analysis view styles
+    └── life-navigator-view.css # Main life navigator view styles
+```
+
+#### Main Entry Point (src/styles.css)
 ```css
-/* 1. CSS Variables & Design Tokens */
+/* Life Navigator Plugin Styles */
+
+@import "./css/setup.css";
+@import "./css/system-prompt-view.css";
+@import "./css/cost-analysis-view.css";
+@import "./css/life-navigator-view.css";
+```
+
+#### Component File Structure
+Each CSS file should follow this internal organization:
+
+```css
+/* 1. CSS Variables & Design Tokens (if needed) */
 :root { ... }
 
-/* 2. Base Styles */
-* { ... }
+/* 2. Component Base Styles */
+.component-name {
+    /* Base component styles */
+}
 
-/* 3. Utility Classes */
-.ln-flex { ... }
-.ln-gap-2 { ... }
+/* 3. Component Variants */
+.component-name-primary { ... }
+.component-name-secondary { ... }
 
-/* 4. Component Base Classes */
-.ln-button { ... }
-.ln-card { ... }
+/* 4. Component States */
+.component-name:hover { ... }
+.component-name:disabled { ... }
 
-/* 5. Component Variants */
-.ln-button-primary { ... }
-.ln-card-elevated { ... }
-
-/* 6. Complex Components */
-.ln-modal { ... }
-.ln-dropdown { ... }
-
-/* 7. Legacy/Override Styles (minimize) */
-.life-navigator-view .legacy-selector { ... }
-
-/* 8. Responsive Overrides */
-@media (max-width: 768px) { ... }
+/* 5. Responsive Overrides */
+@media (max-width: 768px) {
+    .component-name { ... }
+}
 ```
+
+#### When to Create New CSS Files
+
+**Create a new CSS file when:**
+- Building a new major view/component (e.g., `new-feature-view.css`)
+- Component styles exceed 200+ lines
+- Styles are logically separate from existing components
+- Multiple developers work on the same component
+
+**Add to existing files when:**
+- Minor variations of existing components
+- Utility classes that are widely used
+- Small helper styles (under 50 lines)
+
+#### File Naming Conventions
+- Use kebab-case: `cost-analysis-view.css`
+- Include component/view name: `{component-name}.css`
+- For views: `{view-name}-view.css`
+- For utilities: `utilities.css` or `helpers.css`
 
 ### 5. Utility-First Approach
 
@@ -258,12 +296,38 @@ Only create component classes when:
    - Use CSS variables for spacing, colors, fonts
    - Follow the established scales
 
-### 10. Refactoring Guidelines
+### 10. Multi-File Development Workflow
+
+#### Adding Styles to Existing Components
+1. **Identify the correct file** - Find the CSS file that contains related styles
+2. **Follow file organization** - Add styles in the appropriate section within the file
+3. **Check for existing patterns** - Look for similar components in the same file
+4. **Test imports** - Ensure your changes appear (styles.css imports the file)
+
+#### Creating New Component CSS Files
+1. **Create the file** in `src/css/` directory
+2. **Add to imports** in `src/styles.css`:
+   ```css
+   @import "./css/your-new-component.css";
+   ```
+3. **Follow naming conventions** - Use kebab-case and descriptive names
+4. **Include file header comment**:
+   ```css
+   /* Your Component Name Styles */
+   ```
+
+#### Development Best Practices
+- **Hot reload works** - Changes to any CSS file trigger rebuild
+- **Import order matters** - Place specific imports after general ones
+- **Scope your styles** - Use appropriate class prefixes to avoid conflicts
+- **Document complex components** - Add comments for non-obvious styling decisions
+
+### 11. Refactoring Guidelines
 
 #### Phase 1: Add Utilities (Safe)
 Add new utility classes without changing existing styles:
 ```css
-/* Add these without breaking existing code */  
+/* Add these to appropriate CSS file without breaking existing code */  
 .ln-flex { display: flex; }
 .ln-gap-2 { gap: 8px; }
 .ln-p-3 { padding: 12px; }
@@ -272,21 +336,23 @@ Add new utility classes without changing existing styles:
 #### Phase 2: Component Refactoring
 Replace complex selectors with component classes:
 ```css
-/* Before */
+/* Before (in life-navigator-view.css) */
 .life-navigator-view .some-complex .nested-selector {
   /* 10 lines of styles */
 }
 
-/* After */
+/* After (in appropriate component file) */
 .ln-card {
   /* Same styles but reusable */
 }
 ```
 
-#### Phase 3: Cleanup
-Remove unused styles and consolidate duplicates.
+#### Phase 3: File Organization
+- Move related styles to appropriate component files
+- Remove unused styles and consolidate duplicates
+- Update imports in styles.css if needed
 
-### 11. Common Patterns
+### 12. Common Patterns
 
 #### Modal Structure
 ```html
@@ -324,7 +390,7 @@ Remove unused styles and consolidate duplicates.
 </div>
 ```
 
-### 12. Performance Considerations
+### 13. Performance Considerations
 
 1. **Minimize CSS bundle size**
    - Remove unused styles
@@ -340,7 +406,7 @@ Remove unused styles and consolidate duplicates.
    - Reduced bundle size
    - Dynamic updates
 
-### 13. Tools & Automation
+### 14. Tools & Automation
 
 #### Recommended Practices
 - Use CSS linting to enforce conventions
