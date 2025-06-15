@@ -6,6 +6,7 @@ import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
 import { LIFE_NAVIGATOR_VIEW_TYPE } from '../views/chat-view';
 import { revealFileInSystem } from 'src/utils/chat/reveal-file-handler';
 import { PlatformUtils } from 'src/utils/platform';
+import { getChatDropdownCommands } from 'src/utils/commands/unified-commands';
 
 interface ChatMenuDropdownProps {
   chatId: string;
@@ -98,39 +99,32 @@ export const ChatMenuDropdown: React.FC<ChatMenuDropdownProps> = ({
     );
   }
 
-  // Add community/external links
-  menuItems.push(
-    {
-      id: 'separator-2',
-      label: '',
-      onClick: () => {},
-      type: 'separator'
-    },
-    {
-      id: 'github',
-      label: t('costAnalysis.menu.githubRepo'),
-      icon: 'github',
-      onClick: () => {
-        window.open('https://github.com/cielecki/life-navigator', '_blank');
+  // Add separator before unified commands
+  menuItems.push({
+    id: 'separator-2',
+    label: '',
+    onClick: () => {},
+    type: 'separator'
+  });
+
+  // Add unified commands for chat dropdown
+  const unifiedCommands = getChatDropdownCommands();
+  unifiedCommands.forEach(command => {
+    menuItems.push({
+      id: command.id,
+      label: command.name,
+      icon: command.icon,
+      tooltip: command.description, // Add tooltip support
+      onClick: async () => {
+        try {
+          // @ts-ignore - Execute the Obsidian command
+          await (window.app as any).commands.executeCommandById(command.id);
+        } catch (error) {
+          console.error(`Failed to execute command ${command.id}:`, error);
+        }
       }
-    },
-    {
-      id: 'discord',
-      label: t('costAnalysis.menu.discordCommunity'),
-      icon: 'message-circle',
-      onClick: () => {
-        window.open('https://discord.com/invite/VrxZdr3JWH', '_blank');
-      }
-    },
-    {
-      id: 'twitter',
-      label: t('costAnalysis.menu.authorTwitter'),
-      icon: 'user',
-      onClick: () => {
-        window.open('https://x.com/mcielecki', '_blank');
-      }
-    }
-  );
+    });
+  });
 
   const renderTrigger = () => (
     <button

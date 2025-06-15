@@ -10,6 +10,7 @@ export interface DropdownItem {
   className?: string;
   disabled?: boolean;
   type?: 'action' | 'item' | 'separator';
+  tooltip?: string;
 }
 
 export interface DropdownSection {
@@ -139,6 +140,7 @@ export const UnifiedDropdown: React.FC<UnifiedDropdownProps> = ({
       <div
         key={item.id}
         className={`ln-dropdown-item ${item.type === 'action' ? 'ln-dropdown-action-item' : 'ln-dropdown-list-item'} ${item.className || ''} ${item.disabled ? 'disabled' : ''}`}
+        title={item.tooltip} // Add tooltip support
         onClick={item.disabled ? undefined : () => {
           item.onClick();
           onClose();

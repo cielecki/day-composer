@@ -216,6 +216,45 @@ export class LifeNavigatorPlugin extends Plugin {
 			}
 		});
 
+		// Add command to show What's New modal
+		this.addCommand({
+			id: 'show-whats-new',
+			name: t('commands.whatsNew.name'),
+			callback: () => {
+				const modal = new WhatsNewModalWrapper(this.app, () => {
+					// No specific action needed when modal closes
+				});
+				modal.open();
+			}
+		});
+
+		// Add command to open GitHub repository
+		this.addCommand({
+			id: 'open-github',
+			name: t('commands.github.name'),
+			callback: () => {
+				window.open('https://github.com/cielecki/life-navigator', '_blank');
+			}
+		});
+
+		// Add command to open Discord community
+		this.addCommand({
+			id: 'open-discord',
+			name: t('commands.discord.name'),
+			callback: () => {
+				window.open('https://discord.com/invite/VrxZdr3JWH', '_blank');
+			}
+		});
+
+		// Add command to open author's Twitter
+		this.addCommand({
+			id: 'open-twitter',
+			name: t('commands.twitter.name'),
+			callback: () => {
+				window.open('https://x.com/mcielecki', '_blank');
+			}
+		});
+
 		// Add a ribbon icon for the Life Navigator
 		this.addRibbonIcon("compass", t("tools.openLifeNavigator"), async (evt: MouseEvent) => {
 			console.debug("Starting Life Navigator session");

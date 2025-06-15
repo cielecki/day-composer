@@ -3,7 +3,7 @@ import { App, PluginSettingTab, Setting, Notice, Modal, getIcon } from 'obsidian
 import { getStore } from '../store/plugin-store';
 import { t } from 'src/i18n';
 import { closeCurrentSettingsModal } from '../utils/ui/modal-utils';
-import { WhatsNewModalWrapper } from './WhatsNewModalWrapper';
+import { getSettingsCommands } from 'src/utils/commands/unified-commands';
 
 export class LifeNavigatorSettingTab extends PluginSettingTab {
 	plugin: LifeNavigatorPlugin;
@@ -65,69 +65,33 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 		// === LIFE NAVIGATOR ACTIONS ===
 		containerEl.createEl('h2', { text: t('settings.actions.title') });
 
-		// Check Updates button
-		new Setting(containerEl)
-			.setName(t('settings.actions.checkUpdates.name'))
-			.setDesc(t('settings.actions.checkUpdates.desc'))
-			.addButton(button => {
-				button
-					.setButtonText(t('settings.actions.checkUpdates.button'))
-					.onClick(async () => {
-						button.setButtonText('Checking...');
-						button.setDisabled(true);
+		// Get unified commands for settings and create buttons dynamically
+		const settingsCommands = getSettingsCommands();
+		settingsCommands.forEach(command => {
+			new Setting(containerEl)
+				.setName(command.name)
+				.setDesc(command.description)
+				.addButton(button => {
+					button
+						.setButtonText(command.name)
+						.onClick(async () => {
+							const originalText = button.buttonEl.textContent;
+							button.setButtonText('...');
+							button.setDisabled(true);
 
-						try {
-							// Execute the check for updates command
-							// @ts-ignore
-							await (this.app as any).commands.executeCommandById('life-navigator:check-for-updates');
-						} catch (error) {
-							console.error('Error checking for updates:', error);
-						} finally {
-							button.setButtonText(t('settings.actions.checkUpdates.button'));
-							button.setDisabled(false);
-						}
-					});
-			});
-
-		// Reset Tutorial button
-		new Setting(containerEl)
-			.setName(t('settings.actions.resetTutorial.name'))
-			.setDesc(t('settings.actions.resetTutorial.desc'))
-			.addButton(button => {
-				button
-					.setButtonText(t('settings.actions.resetTutorial.button'))
-					.onClick(async () => {
-						button.setButtonText('Resetting...');
-						button.setDisabled(true);
-
-						try {
-							// Execute the reset tutorial command
-							// @ts-ignore
-							await (this.app as any).commands.executeCommandById('life-navigator:reset-tutorial');
-						} catch (error) {
-							console.error('Error resetting tutorial:', error);
-						} finally {
-							button.setButtonText(t('settings.actions.resetTutorial.button'));
-							button.setDisabled(false);
-						}
-					});
-			});
-
-		// What's New button
-		new Setting(containerEl)
-			.setName(t('settings.actions.whatsNew.name'))
-			.setDesc(t('settings.actions.whatsNew.desc'))
-			.addButton(button => {
-				button
-					.setButtonText(t('settings.actions.whatsNew.button'))
-					.onClick(() => {
-						const modal = new WhatsNewModalWrapper(this.app, () => {
-							// Close settings modal when What's New modal is closed
-							closeCurrentSettingsModal();
+							try {
+								// Execute the unified command
+								// @ts-ignore
+								await (this.app as any).commands.executeCommandById(command.id);
+							} catch (error) {
+								console.error(`Error executing command ${command.id}:`, error);
+							} finally {
+								button.setButtonText(originalText || command.name);
+								button.setDisabled(false);
+							}
 						});
-						modal.open();
-					});
-			});
+				});
+		});
 
 		// Advanced section
 		containerEl.createEl('h2', {text: t('settings.advanced.title'), attr: { style: 'margin-top: 2em;' } });

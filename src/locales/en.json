@@ -42,9 +42,6 @@
     },
     "loading": "Loading conversation data...",
     "menu": {
-      "authorTwitter": "Follow Author",
-      "discordCommunity": "Join Community",
-      "githubRepo": "Star on GitHub",
       "viewCosts": "View Costs"
     },
     "refreshTooltip": "Refresh cost data",
@@ -152,24 +149,37 @@
       "voiceInstructions": "Speak in a helpful, conversational tone. Keep responses concise but thorough. When recommending content, briefly explain why it's a good fit. Ask follow-up questions to better understand user needs."
     }
   },
+  "commands": {
+    "checkUpdates": {
+      "name": "Check for Updates",
+      "desc": "Check if there's a newer version of Life Navigator available and download it automatically."
+    },
+    "resetTutorial": {
+      "name": "Reset Tutorial",
+      "desc": "Reset the setup tutorial and onboarding flow. This will show the setup screens again next time you open Life Navigator."
+    },
+    "whatsNew": {
+      "name": "What's New",
+      "desc": "View the latest changes and features in Life Navigator from the changelog."
+    },
+    "github": {
+      "name": "Star on GitHub",
+      "desc": "Open the Life Navigator repository on GitHub to star it and view the source code."
+    },
+    "discord": {
+      "name": "Join Community",
+      "desc": "Join the Life Navigator Discord community to get help and share feedback."
+    },
+    "twitter": {
+      "name": "Follow Author",
+      "desc": "Follow the Life Navigator author on Twitter for updates and announcements."
+    }
+  },
   "settings": {
     "actions": {
-      "checkUpdates": {
-        "button": "Check for Updates",
-        "desc": "Check if there's a newer version of Life Navigator available and download it automatically.",
-        "name": "Check for Updates"
-      },
       "resetTutorial": {
-        "button": "Reset Tutorial",
-        "desc": "Reset the setup tutorial and onboarding flow. This will show the setup screens again next time you open Life Navigator.",
         "error": "Failed to reset tutorial: '{{error}}'",
-        "name": "Reset Tutorial",
         "success": "Tutorial has been reset successfully"
-      },
-      "whatsNew": {
-        "button": "View What's New",
-        "desc": "View the latest changes and features in Life Navigator from the changelog.",
-        "name": "What's New"
       },
       "title": "Life Navigator Actions"
     },

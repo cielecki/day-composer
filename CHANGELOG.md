@@ -616,3 +616,6 @@ You'll never miss important updates and new features:
 
 
 - **What's New Modal**: React-based modal that displays after plugin updates, showing the latest changelog from GitHub. Features automatic display for new versions, manual access via settings, user control with "don't show again" option, and graceful fallback for network errors. Uses proper React Markdown rendering for beautiful presentation of changelog content.
+
+### Enhanced
+- **Unified command system for chat and settings**: Both the chat dropdown menu and settings "Life Navigator Actions" now use the same Obsidian commands system. All actions (Star on GitHub, Join Community, Follow Author, Check Updates, What's New) are now available as commands that can be triggered from multiple places and appear in both the chat dropdown and settings. The chat dropdown includes helpful tooltips showing what each action does, and the reset tutorial action remains available only in settings as requested.

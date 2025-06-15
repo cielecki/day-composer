@@ -42,9 +42,6 @@
     },
     "loading": "Ładowanie danych rozmowy...",
     "menu": {
-      "authorTwitter": "Obserwuj autora",
-      "discordCommunity": "Dołącz do społeczności",
-      "githubRepo": "Ogwiazdkuj na GitHubie",
       "viewCosts": "Pokaż koszty"
     },
     "refreshTooltip": "Odśwież dane kosztów",
@@ -152,24 +149,37 @@
       "voiceInstructions": "Mów pomocnym, konwersacyjnym tonem. Utrzymuj odpowiedzi zwięzłe ale dokładne. Rekomendując treści, krótko wyjaśnij dlaczego są dobrym wyborem. Zadawaj pytania uzupełniające, aby lepiej zrozumieć potrzeby użytkownika."
     }
   },
+  "commands": {
+    "checkUpdates": {
+      "name": "Sprawdź aktualizacje",
+      "desc": "Sprawdź, czy dostępna jest nowsza wersja Life Navigator i pobierz ją automatycznie."
+    },
+    "resetTutorial": {
+      "name": "Resetuj tutorial",
+      "desc": "Resetuj tutorial konfiguracji i proces wdrażania. Spowoduje to ponowne wyświetlenie ekranów konfiguracji przy następnym otwarciu Life Navigator."
+    },
+    "whatsNew": {
+      "name": "Co nowego",
+      "desc": "Zobacz najnowsze zmiany i funkcje w Life Navigator z listy zmian."
+    },
+    "github": {
+      "name": "Gwiazdka na GitHub",
+      "desc": "Otwórz repozytorium Life Navigator na GitHub, aby oznaczyć gwiazdką i wyświetlić kod źródłowy."
+    },
+    "discord": {
+      "name": "Dołącz do społeczności",
+      "desc": "Dołącz do społeczności Discord Life Navigator, aby uzyskać pomoc i podzielić się opinią."
+    },
+    "twitter": {
+      "name": "Obserwuj autora",
+      "desc": "Obserwuj autora Life Navigator na Twitterze, aby otrzymywać aktualizacje i ogłoszenia."
+    }
+  },
   "settings": {
     "actions": {
-      "checkUpdates": {
-        "button": "Sprawdź aktualizacje",
-        "desc": "Sprawdź, czy dostępna jest nowsza wersja Life Navigator i pobierz ją automatycznie.",
-        "name": "Sprawdź aktualizacje"
-      },
       "resetTutorial": {
-        "button": "Resetuj tutorial",
-        "desc": "Resetuj tutorial konfiguracji i proces wdrażania. Spowoduje to ponowne wyświetlenie ekranów konfiguracji przy następnym otwarciu Life Navigator.",
         "error": "Nie udało się zresetować tutoriala: '{{error}}'",
-        "name": "Resetuj tutorial",
         "success": "Tutorial został pomyślnie zresetowany"
-      },
-      "whatsNew": {
-        "button": "Zobacz co nowego",
-        "desc": "Zobacz najnowsze zmiany i funkcje w Life Navigator z listy zmian.",
-        "name": "Co nowego"
       },
       "title": "Akcje Life Navigator"
     },
