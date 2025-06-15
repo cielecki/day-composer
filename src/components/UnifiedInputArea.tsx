@@ -4,6 +4,7 @@ import { t } from 'src/i18n';
 import { LucideIcon } from '../components/LucideIcon';
 import { ModeDropdown } from '../components/ModeDropdown';
 import { TranscribingIndicator } from './TranscribingIndicator';
+import { RecordingIndicator } from './RecordingIndicator';
 import { AttachedImage } from 'src/types/attached-image';
 import { TFile } from "obsidian";
 import { LifeNavigatorPlugin } from '../LifeNavigatorPlugin';
@@ -641,23 +642,9 @@ export const UnifiedInputArea: React.FC<{
             />
 
             {isRecording && (
-              <div className="waveform-container">
-                <div className="waveform">
-                  {waveformData.map((level, index) => (
-                    <div
-                      key={index}
-                      className="waveform-bar ln-waveform-bar-dynamic"
-                      style={{
-                        height: `${level}%`,
-                        opacity: Math.max(
-                          0.3,
-                          index / WAVEFORM_HISTORY_LENGTH,
-                        ),
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
+              <RecordingIndicator 
+                waveformData={waveformData}
+              />
             )}
 
 
@@ -771,31 +758,31 @@ export const UnifiedInputArea: React.FC<{
                 )}
 
                 {isRecording && (
-                  <>
-                    <button
-                      className="input-control-button primary"
-                      onClick={handleFinalizeRecording}
-                      disabled={false}
-                      aria-label={t("ui.recording.confirm")}
+                  <button
+                    className="input-control-button primary"
+                    onClick={handleFinalizeRecording}
+                    disabled={false}
+                    aria-label={t("ui.recording.confirm")}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                    </button>
-                  </>
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </button>
                 )}
 
-                {(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isSpeakingPaused) && !isRecording && (
+
+
+                {isGeneratingResponse && !isRecording && (
                   <button
                     className="input-control-button primary"
                     onClick={handleStopAll}
@@ -814,7 +801,7 @@ export const UnifiedInputArea: React.FC<{
                   </button>
                 )}
 
-                {!isRecording && !(isGeneratingResponse || isSpeaking || isGeneratingSpeech || isSpeakingPaused) && (
+                {!isRecording && !isGeneratingResponse && (
                   <button
                     className="input-control-button primary"
                     onClick={handleSendButtonClick}

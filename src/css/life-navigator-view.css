@@ -1216,6 +1216,7 @@
     background-color: transparent;
     border-radius: 8px;
     padding: 0px;
+    padding-top: 10px;
   }
   
   /* Editing header styles */

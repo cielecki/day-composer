@@ -430,6 +430,17 @@ export const MessageDisplay: React.FC<MessageDisplayProps> = ({
                           <LucideIcon name="volume-2" size={18} />
                         )}
                       </button>
+
+                      {/* Stop button - shown when audio is in any active state */}
+                      {(isPaused || isSpeaking || isGeneratingSpeech) && (
+                        <button 
+                          className="clickable-icon" 
+                          onClick={handleStopMessage}
+                          aria-label={t('ui.message.stopAudio')}
+                        >
+                          <LucideIcon name="square" size={18} />
+                        </button>
+                      )}
                     </>
                   )}
                   {hasTextContent && (

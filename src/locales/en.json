@@ -676,6 +676,9 @@
     "attachments": {
       "pastedImage": "Pasted image"
     },
+    "audio": {
+      "stop": "Stop audio"
+    },
     "chat": {
       "cancelEdit": "Cancel edit",
       "conversationDeleteFailed": "Failed to delete conversation",
@@ -719,7 +722,8 @@
       "pauseAudio": "Pause audio",
       "recordingInProgress": "Recording in progress",
       "resumeAudio": "Resume audio",
-      "speak": "Read aloud"
+      "speak": "Read aloud",
+      "stopAudio": "Stop audio"
     },
     "modal": {
       "reloadButton": "Restart Obsidian",
