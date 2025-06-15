@@ -1,4 +1,58 @@
-## Version 0.11.3 - January 11, 2025
+## Version 0.12.1 - June 15, 2025
+
+### 🚀 Multiple Conversations Running Simultaneously
+
+**Work on multiple tasks at once without switching contexts:**
+
+- **Parallel chats**: Open multiple Life Navigator windows and have different conversations running independently
+- **Background processing**: Start a research task in one chat while planning your day in another
+- **Smart notifications**: Unread indicators show which chats have new messages
+- **Flexible workspace**: Open chats in any Obsidian panel or floating window
+
+### 📝 Weekly, Monthly & Quarterly Notes Support
+
+**Life Navigator now works with the Periodic Notes plugin:**
+
+- **Beyond daily notes**: AI can now read your weekly reviews, monthly goals, and quarterly plans
+- **Automatic detection**: Works with your existing Periodic Notes setup
+- **Easy migration**: Existing modes will be automatically updated to use the new syntax
+
+### 🤝 AI Task Delegation
+
+**Your AI can now delegate tasks to other modes:**
+
+- **Smart handoffs**: AI can create new chats with different modes when another mode would be better suited for a task
+- **Fire and forget**: Delegated tasks run in separate chats without interrupting your current conversation
+- **Automatic switching**: New delegated chats open automatically so you can see the results
+
+### 🎙️ ElevenLabs Voice (Experimental)
+
+**Optional premium voice upgrade for advanced users:**
+
+- **3,000+ voices** vs the standard 11 voices
+- **32+ languages** with native pronunciation
+- **Ultra-fast responses** (75ms vs 500ms+)
+- **99 languages** for speech recognition
+
+*Requires ElevenLabs API key. Falls back to OpenAI if unavailable.*
+
+### ✨ Interface Polish
+
+- **Editable chat titles**: Click any chat title to rename it
+- **Better mode selector**: Mode dropdown moved closer to the input area
+- **Improved task navigation**: Click task results to jump to the exact location in your notes
+- **What's New modal**: See changelog after updates
+- **Audio stop button**: Pause audio playback mid-sentence with a dedicated stop button
+- **Smarter voice recording**: Record voice messages even while AI is responding - no more waiting
+- **Better task feedback**: Task operations now show exactly which file was modified
+- **Enhanced text highlighting**: More accurate highlighting when jumping to specific content in files
+- **Directory expansion**: Use `🧭 expand` with folder names to include all files in a directory
+- **Improved help flow**: Help buttons now create new Guide chats instead of interrupting your current conversation
+- **Better Polish language support**: Proper pluralization and cleaner number displays for Polish users
+
+---
+
+## Version 0.11.3 - June 11, 2025
 
 **Life Navigator now includes a context menu in your chat interface that puts all new features at your fingertips:**
 
@@ -48,7 +102,7 @@ These improvements work automatically in the background - you don't need to chan
 - Improved parameter validation system for integer values
 - Better data integrity validation for cached responses
 
-## Version 0.11.0 - January 8, 2025
+## Version 0.11.0 - June 8, 2025
 
 ### ⚠️ IMPORTANT: Breaking Changes - Action Required
 
@@ -482,159 +536,3 @@ The multi-chat system now works reliably:
 - **Auto-save conversations while typing**: Conversations now automatically save as you type or attach images, with a smart 2-second delay that prevents unnecessary saves while you're actively writing. Your work is protected without interrupting your flow.
 ### Changed
 - **Improved input area layout**: Moved the mode dropdown to the bottom left of the input area for easier access while typing. The dropdown is now more compact and cursor-like, showing both the mode icon and name. Image attachment button moved to the right side for better logical flow of controls.
-
-
-## Upcoming Features
-
-### 🎙️ Premium Audio Experience with ElevenLabs Integration
-
-**Life Navigator now supports ElevenLabs for dramatically improved voice quality and language support:**
-
-- **Superior voice quality**: Access to over 3,000 natural-sounding voices compared to OpenAI's 11 voices
-- **Extensive language support**: Enjoy text-to-speech in 32+ languages with native pronunciation and speech-to-text in 99 languages
-- **Ultra-low latency**: Experience near-instant voice responses with ElevenLabs' Flash technology (~75ms response time)
-- **Advanced speech recognition**: Benefit from enhanced speech-to-text with speaker identification and precise timestamps
-- **Seamless integration**: Simply add your ElevenLabs API key and Life Navigator automatically uses the premium service
-- **Smart fallback**: If ElevenLabs is unavailable, the system gracefully falls back to OpenAI without interruption
-- **Voice preference preservation**: Your existing OpenAI voice preferences are automatically mapped to similar high-quality ElevenLabs voices
-
-### 🎯 What This Means for You
-
-You'll enjoy a significantly enhanced audio experience:
-- More natural, human-like voice responses that are easier to listen to
-- Better pronunciation and accent support for international users
-- Faster voice generation for more responsive conversations
-- Higher quality speech recognition that better understands your voice
-- Zero setup complexity - just add your API key and everything works automatically
-- No risk of service interruption - OpenAI remains as your reliable backup
-
-### 🚀 Interactive Chat Titles - Edit Your Conversations On-the-Go
-
-**Your chat titles are now fully interactive and editable, with mobile-optimized design:**
-
-- **Click to edit**: Simply click on any chat title to edit it inline with responsive touch targets
-- **Unread indicator**: See which conversations have new messages with a clear visual indicator
-- **Menu option**: Access "Edit Title" from the chat options menu for alternative editing
-- **Mobile-friendly**: Large touch targets (44px+) and responsive design ensure smooth editing on any device
-- **Keyboard shortcuts**: Press Enter to save or Escape to cancel your edits
-- **Auto-focus**: When editing starts, text is automatically selected for quick replacement
-
-### 🎯 What This Means for You
-
-You'll now have better control over organizing your conversations:
-- Personalize chat titles to remember what each conversation was about
-- Quickly identify unread conversations at a glance
-- Seamless editing experience across desktop and mobile devices
-- Consistent with modern app design patterns you're already familiar with
-
-
-### 🎯 Simplified Chat History Interface
-
-**Removed edit functionality from chat history dropdown for a cleaner, more focused experience:**
-
-- **Streamlined history view**: Chat history dropdown now focuses purely on browsing and selecting conversations
-- **One place to edit**: Title editing is now exclusively available from the chat header, providing a consistent editing experience
-- **Cleaner interface**: Removed edit buttons and inline editing from chat history items, reducing visual clutter and preventing accidental edits
-- **Header-based editing**: All title editing capabilities remain fully functional through the chat app header's inline editing and dropdown menu
-
-### 🎯 What This Means for You
-
-You'll enjoy a more focused chat history experience:
-- Chat history dropdown is now dedicated to finding and switching between conversations
-- No more accidentally triggering edit mode when browsing your chat history
-- Single, consistent place to edit chat titles (in the chat header)
-- Cleaner, less cluttered interface for better usability
-
-### 🔧 Technical Improvements
-
-- **Perfect translation parameter handling**: Completely resolved all 115+ translation parameter mismatches across the entire codebase. Users will never see raw template placeholders like "{{name}}" - all messages now display properly localized content with user-friendly formatting.
-- **Enhanced translation cleanup tools**: Significantly improved the translation cleanup script with precise parameter detection, reducing false positives by 96% and providing production-ready maintenance tools for future development.
-- **Unified dropdown system**: Consolidated three different dropdown implementations (chat history, more options, mode selection) into a single, consistent component system for better maintainability and user experience. All dropdowns now share the same styling, behavior, and accessibility features.
-
-
-### ✨ Enhanced Search Experience
-
-- **Unified search system**: All search functionality now uses a centralized `useSearch` hook, eliminating code duplication and providing consistent search behavior across all interfaces
-- **Mode search functionality**: You can now search through available modes when switching modes, making it much easier to find the right mode for your task. Action items (like "View system prompt") are hidden during search for cleaner results
-- **Improved conversation search**: Enhanced search functionality in chat history with configurable debouncing and better performance
-- **Consistent search patterns**: All dropdowns now share the same search logic, filtering behavior, and user experience
-
-### 🐛 Bug Fixes
-
-- **Help button behavior**: Help button in error messages now creates a new Guide chat instead of changing the current chat's mode, providing cleaner isolation between help and ongoing work
-- **Chat switching persistence**: Fixed issue where switching chats (via new chat button, history, or help button) would revert to the previous chat after refreshing Obsidian
-- **Conversation history positioning**: Fixed conversation history dropdown appearing off-screen by positioning it correctly relative to the history button
-- **Conversation history display**: Fixed issue where no conversations were showing in the history dropdown due to incorrect search filtering configuration
-- **Mode search positioning**: Improved mode dropdown search placement - search input now appears at the bottom for upward-opening dropdowns, providing better stability and user experience
-
-### Enhanced
-- **Improved transcription UI**: During voice transcription, the input area now shows a dedicated transcription interface with a clear "Transcribing..." indicator and centered stop button. This replaces the confusing spinning button and disabled attachment controls, making the transcription state much more obvious and user-friendly. The transcription overlay now properly contains itself within the input area and uses consistent Lucide icons matching the rest of the interface.
-
-### Fixed
-- Fixed Polish translation formatting by removing quotes around numbers in count displays
-- Improved Polish pluralization for better grammar (1 element vs 2-4 elementy vs 5+ elementów)
-- Applied proper Polish pluralization rules to file listings, search results, and UI elements
-
-### Enhanced  
-- **Smarter retry behavior**: Retry button now correctly identifies actual user messages and ignores tool result messages when determining where to retry from. This ensures the retry removes and regenerates the entire block back to the last real user message, creating more natural conversation flow by regenerating complete user-to-assistant exchanges.
-- **Robust mode validation**: Added comprehensive checks throughout the interface to prevent sending messages, editing, or retrying when modes are still loading or unavailable. Voice recording still works normally, but sending is blocked until modes are properly loaded.
-
-### Fixed
-- **Retry error handling**: Fixed crash when retrying conversations where the mode configuration is undefined or missing, ensuring retry works reliably in all scenarios.
-- **UI state consistency**: Retry buttons, send buttons, and edit functionality are now properly disabled when modes aren't available, preventing users from getting into broken states.
-- **Mode safety checks**: Added early validation in conversation flow to prevent API calls when required modes don't exist, improving error handling and user experience.
-
-### 🎯 Enhanced Task Tool Messages
-
-- **Better location context**: Task tools now provide clear location information in their success messages. When you add, edit, check, abandon, uncheck, or remove tasks, you'll see exactly which file was modified with a smart two-level approach:
-  - **Quick labels** show clean filenames (e.g., "Checked 'buy groceries' in Daily Note") 
-  - **Detailed progress** shows precise paths (e.g., "Checked 'buy groceries' in '2025-01-12 Daily Note.md'")
-  
-  This makes it much easier to track where your task changes are happening, especially when working with multiple files, while keeping the interface clean and readable.
-
-### Added
-- **Directory expansion support**: The `🧭 expand` tool now supports expanding entire directories, not just individual files. Use `🧭 expand` [[Directory Name]] to include all markdown files directly in the specified directory (subdirectories are not processed recursively). Each file is wrapped in XML-like tags with metadata, and files are processed alphabetically for consistent output.
-
-### 📱 "What's New" Modal - Stay Updated with Latest Features
-
-**Life Navigator now shows you what's new after updates with a dedicated changelog modal:**
-
-- **Automatic display**: Modal appears automatically after plugin updates, showing you all the latest changes and features
-- **GitHub integration**: Fetches the complete changelog directly from GitHub for always up-to-date information
-- **User control**: "Don't show again for this version" option lets you control when you see the modal
-- **Manual access**: View changelog anytime through the new "What's New" button in settings
-- **Beautiful presentation**: Properly formatted changelog with markdown rendering and easy-to-read styling
-- **Graceful fallback**: Direct link to GitHub changelog if network issues occur
-
-### 🎯 What This Means for You
-
-You'll never miss important updates and new features:
-- Stay informed about new capabilities as soon as you update
-- Easy access to full changelog history from settings
-- Control over notifications while staying informed
-- Professional presentation of all changes and improvements
-
-
-- **What's New Modal**: React-based modal that displays after plugin updates, showing the latest changelog from GitHub. Features automatic display for new versions, manual access via settings, user control with "don't show again" option, and graceful fallback for network errors. Uses proper React Markdown rendering for beautiful presentation of changelog content.
-
-### Enhanced
-- **Unified command system for chat and settings**: Both the chat dropdown menu and settings "Life Navigator Actions" now use the same Obsidian commands system. All actions (Star on GitHub, Join Community, Follow Author, Check Updates, What's New) are now available as commands that can be triggered from multiple places and appear in both the chat dropdown and settings. The chat dropdown includes helpful tooltips showing what each action does, and the reset tutorial action remains available only in settings as requested.
-
-### Fixed
-- **Input area auto-resize**: Fixed textarea not shrinking when text is deleted. The unified input area now properly resizes both up and down as you type or delete content, maintaining a maximum height of 150px while automatically adjusting to content size changes.
-
-### Fixed
-- **Daily Notes recognition with complex folder formats**: Fixed periodic notes system to properly handle Daily Notes with folder-based date formats (like `YYYY/MM/YYYY-MM-DD`) that create nested directory structures. The system now correctly finds files at paths like `Logs/2025/06/2025-06-14.md` instead of looking for files with slashes in the filename.
-- **Periodic notes XML formatting**: Fixed malformed XML attributes in periodic note output (was showing `date="date="Saturday""`, now shows `date="Saturday"`). Improved content expansion to use proper periodic note tags (`daily_note`, `weekly_note`, etc.) instead of generic daily note tags.
-- **Week start consistency**: Standardized weekly periodic notes to use ISO weeks (Monday to Sunday) regardless of system locale, ensuring consistent week calculations across different operating systems and language settings.
-- **Missing date attributes for monthly and yearly notes**: Monthly and yearly periodic notes now include proper `start_date` and `end_date` attributes in their XML output, providing complete date context for AI consumption just like weekly and quarterly notes.
-- **Schema validation for link expansion**: Fixed critical issue where link expansion was bypassing parameter validation entirely. Tool calls in link expansion (like `` `🧭 periodic_notes(...)` ``) now go through the same schema validation as AI-generated tool calls, properly rejecting invalid parameters like `yearly1111` or malformed units with clear error messages.
-- **Disabled periodic note types error handling**: Fixed confusing behavior where requesting disabled periodic note types (like yearly notes when the plugin is disabled) would silently omit them from results. Now throws a clear error message guiding users to enable the required plugins in their periodic notes settings before using the tool.
-- **Yearly notes date attribute cleanup**: Removed redundant `start_date` and `end_date` attributes from yearly notes since the filename (e.g., `2025.md`) already clearly indicates the year. Other period types retain their date attributes where they provide valuable context (day of week for daily notes, date ranges for weekly/monthly/quarterly notes).
-
-
-### Fixed
-- **Text highlighting accuracy**: Fixed issue where navigation targets with start/end text patterns would incorrectly highlight the wrong occurrence when multiple matches existed in a file. The system now considers the original line range position to choose the closest matching text, ensuring accurate highlighting even when files contain multiple identical patterns (such as multiple "---" separators).
-
-### Fixed
-- **Task delegation switching and visibility**: Fixed delegation functionality where the mode delegate tool wasn't switching to new chats and delegated chats weren't appearing in conversation history. Consolidated duplicate delegation code to use the existing shared delegation utility, ensuring proper chat switching and immediate visibility in chat history.
