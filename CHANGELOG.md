@@ -13,8 +13,6 @@
 
 ### 📝 Weekly, Monthly & Quarterly Notes Support
 
-<img width="594" alt="image" src="https://github.com/user-attachments/assets/78ff17cf-0276-46f3-a68d-204004442b56" />
-
 **Life Navigator now works with the Periodic Notes plugin:**
 
 - **Beyond daily notes**: AI can now read your weekly reviews, monthly goals, and quarterly plans
