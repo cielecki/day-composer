@@ -55,6 +55,7 @@ export class LifeNavigatorPlugin extends Plugin {
 				this.app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
 					if (leaf.view.getViewType() === viewType && matcher(leaf)) {
 						resultLeaf = leaf;
+						this.app.workspace.revealLeaf(leaf);
 						return false; // Stop iteration
 					}
 				});
@@ -90,6 +91,7 @@ export class LifeNavigatorPlugin extends Plugin {
 
 			// Set as active
 			this.app.workspace.setActiveLeaf(targetLeaf);
+			this.app.workspace.revealLeaf(targetLeaf);
 			
 			return targetLeaf;
 
