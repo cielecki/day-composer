@@ -9,6 +9,19 @@ import { getObsidianTools } from '../../obsidian-tools';
 import { convertToValidTagName } from 'src/utils/text/xml-tag-converter';
 
 /**
+ * Format tool call error as XML
+ * @param errorType The type of error (e.g., 'tool_not_found', 'side_effects')
+ * @param toolName The name of the tool
+ * @param message The error message
+ * @returns XML formatted error
+ */
+function formatToolCallError(errorType: string, message: string, toolName?: string): string {
+	const errorTagName = convertToValidTagName(errorType);
+	const escapedMessage = message.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	return `<${errorTagName} ${toolName ? `tool="${toolName}"` : ''}>${escapedMessage}</${errorTagName}>`;
+}
+
+/**
  * Interface for the three-part system prompt based on stability
  */
 export interface SystemPromptParts {
@@ -202,14 +215,13 @@ async function processNewFormatCalls(app: App, content: string, visitedPaths: Se
 			if (expandedContent) {
 				result = result.replace(match[0], expandedContent);
 			} else {
-				const tagName = convertToValidTagName('expansion_error');
-				result = result.replace(match[0], `<${tagName} type="could_not_expand" target="${linkTarget}" />\n`);
+				const errorXml = formatToolCallError('expansion_error', `Could not expand: ${linkTarget}`);
+				result = result.replace(match[0], errorXml);
 			}
 		} catch (error) {
 			console.error(`Error expanding ${linkTarget}:`, error);
-			const tagName = convertToValidTagName('expansion_error');
-			const errorMessage = error instanceof Error ? error.message : String(error);
-			result = result.replace(match[0], `<${tagName} type="expansion_failed" target="${linkTarget}" message="${errorMessage}" />\n`);
+			const errorXml = formatToolCallError('expansion_error', `Error expanding ${linkTarget}: ${error.message}`);
+			result = result.replace(match[0], errorXml);
 		}
 	}
 
@@ -241,8 +253,8 @@ async function processNewFormatCalls(app: App, content: string, visitedPaths: Se
 			
 			if (!tool) {
 				console.warn(`Tool not found: ${toolName}`);
-				const tagName = convertToValidTagName('tool_error');
-				result = result.replace(match[0], `<${tagName} type="not_found" tool="${toolName}" />\n`);
+				const errorXml = formatToolCallError('tool_not_found', `Tool '${toolName}' not found`, toolName);
+				result = result.replace(match[0], errorXml);
 				continue;
 			}
 			
@@ -253,8 +265,8 @@ async function processNewFormatCalls(app: App, content: string, visitedPaths: Se
 			// Check if tool is safe for link expansion (no side effects)
 			if (tool.sideEffects) {
 				console.warn(`Tool ${toolName} has side effects and cannot be used in link expansion`);
-				const tagName = convertToValidTagName('tool_error');
-				result = result.replace(match[0], `<${tagName} type="side_effects" tool="${toolName}" message="Tool has side effects and cannot be used in link expansion" />\n`);
+				const errorXml = formatToolCallError('side_effects', `Tool '${toolName}' has side effects and cannot be used in link expansion`, toolName);
+				result = result.replace(match[0], errorXml);
 				continue;
 			}
 
@@ -289,9 +301,9 @@ async function processNewFormatCalls(app: App, content: string, visitedPaths: Se
 
 		} catch (error) {
 			console.error(`Error processing tool call ${fullMatch}:`, error);
-			const tagName = convertToValidTagName('tool_error');
-			const errorMessage = error instanceof Error ? error.message : String(error);
-			result = result.replace(match[0], `<${tagName} type="execution_failed" tool_call="${fullMatch}" message="${errorMessage}" />\n`);
+			const toolName = fullMatch.match(/🧭\s+([a-zA-Z_][a-zA-Z0-9_]*)/)?.[1] || 'unknown';
+			const errorXml = formatToolCallError('processing_error', `Error processing ${fullMatch}: ${error.message}`, toolName);
+			result = result.replace(match[0], errorXml);
 		}
 	}
 
