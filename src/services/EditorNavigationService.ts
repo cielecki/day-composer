@@ -130,31 +130,48 @@ export class EditorNavigationService {
 				// If the range is empty or invalid, expand it to include at least one character
 				// This can happen with empty lines or single-character lines
 				to = Math.max(from + 1, doc.length);
-				console.debug(`Adjusted empty range: from=${from}, to=${to}`);
 			}
 
-			console.debug(`Highlighting lines ${startLine}-${endLine} (positions ${from}-${to})`);
-
-			// Clear any existing highlights first
-			editorView.dispatch({
-				effects: clearHighlight.of(null)
-			});
-
-			// Add decoration-based highlighting for better mobile visibility
-			editorView.dispatch({
-				effects: addHighlight.of({from, to})
-			});
-
-			// Set selection and scroll to ensure visibility
-			// Use proper scrollIntoView with options for better positioning
-			const scrollOptions = this.getScrollOptions();
+			// CRITICAL FIX: Force full document rendering to fix CodeMirror 6 viewport issue
+			const viewState = (editorView as any).viewState;
+			const wasInPrintMode = viewState.printing;
 			
-			editorView.dispatch({
-				//selection: { head: from, anchor: to },
-				effects: [
-					// Use EditorView.scrollIntoView with proper positioning
-					EditorView.scrollIntoView(from, scrollOptions)
-				]
+			// Force printing mode to render all content
+			viewState.printing = true;
+			editorView.requestMeasure();
+			
+			// Wait for the full document to render, then apply highlighting
+			await new Promise(resolve => {
+				requestAnimationFrame(() => {
+					requestAnimationFrame(() => {
+						// Clear any existing highlights first
+						editorView.dispatch({
+							effects: clearHighlight.of(null)
+						});
+
+						// Add decoration-based highlighting
+						editorView.dispatch({
+							effects: addHighlight.of({from, to})
+						});
+
+						// Set selection and scroll to ensure visibility
+						// Handle mobile-specific selection issues
+						if (this.isMobile()) {
+							this.handleMobileSelection(editorView, from, to);
+						} else {
+							editorView.dispatch({
+								selection: { head: from, anchor: to },
+								effects: [EditorView.scrollIntoView(from, this.getScrollOptions())]
+							});
+						}
+
+						// Restore printing mode
+						viewState.printing = wasInPrintMode;
+						editorView.requestMeasure();
+						
+						resolve(void 0);
+					});
+				});
 			});
 
 			// On mobile, add additional scroll handling to ensure visibility
@@ -172,8 +189,7 @@ export class EditorNavigationService {
 			const timeout = setTimeout(() => {
 				try {
 					editorView.dispatch({
-						effects: clearHighlight.of(null),
-						//selection: { head: from, anchor: from }
+						effects: clearHighlight.of(null)
 					});
 					this.highlightTimeouts.delete(editorView);
 				} catch (error) {
