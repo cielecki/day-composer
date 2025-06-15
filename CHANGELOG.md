@@ -1,10 +1,4 @@
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-## [0.11.3] - 2025-01-11
-
-### 🚀 New Chat Menu - Everything You Need in One Place
+## Version 0.11.3 - January 11, 2025
 
 **Life Navigator now includes a context menu in your chat interface that puts all new features at your fingertips:**
 
@@ -33,7 +27,7 @@ You'll enjoy a more streamlined experience with:
 - A smoother, more intuitive setup process
 - Reliable access to library content that matches your version
 
-## [0.11.2] - 2025-01-10
+## Version 0.11.2 - January 10, 2025
 
 ### 🚀 Performance & Reliability Improvements
 
@@ -54,7 +48,7 @@ These improvements work automatically in the background - you don't need to chan
 - Improved parameter validation system for integer values
 - Better data integrity validation for cached responses
 
-## [0.11.0] - 2025-01-08
+## Version 0.11.0 - January 8, 2025
 
 ### ⚠️ IMPORTANT: Breaking Changes - Action Required
 
@@ -156,7 +150,7 @@ Have your ai use `` `🧭 tools_list()` `` to see all available tools for your c
 
 **Ready to Upgrade?** Life Navigator will guide you through the process. Look for the fix buttons and let the AI help you migrate your content to the new, more powerful format!
 
-## [0.10.6] - 2025-06-06
+## Version 0.10.6 - June 6, 2025
 
 ### Added
 - **Safe note deletion**: New note_delete tool provides safe deletion by moving files to a Trash/Śmietnik directory instead of permanent deletion. Creates trash directory automatically and handles duplicate filenames by adding numbers.
@@ -190,7 +184,7 @@ Have your ai use `` `🧭 tools_list()` `` to see all available tools for your c
 - **Guide Mode Intelligence**: Now emphasizes library exploration, provides development guidance, and offers clear A/B/C choices for next steps
 - **Library Organization**: Updated index with development documentation and Analytics mode for better discoverability
 
-## [0.10.4] - 2025-06-05
+## Version 0.10.4 - June 5, 2025
 
 ### Fixed
 - **Message validation cutting off conversations**: Fixed critical issue where the last assistant and user messages weren't being sent to AI when conversations contained incomplete tool calls or thinking blocks earlier in the conversation. Now properly skips problematic messages while preserving valid messages at the end of conversations.
@@ -208,7 +202,7 @@ Have your ai use `` `🧭 tools_list()` `` to see all available tools for your c
 ### Fixed
 - **Improved comment indentation**: Task tools now consistently use proper comment indentation.
 
-## [0.10.2] - 2025-06-05
+## Version 0.10.2 - June 5, 2025
 
 ### Added
 - **Smart text selection**: Easily share any text you've highlighted with the AI using the new `[[ln-currently-selected-text]] 🔎` link. Perfect for editing specific parts of text.
@@ -221,7 +215,7 @@ Have your ai use `` `🧭 tools_list()` `` to see all available tools for your c
 - **Remembers your preferences**: Your selected mode now stays active when you restart the app - no more having to reselect your favorite mode every time.
 - **Perfect conversation flow**: Switching between conversations or starting new messages now works smoothly without any conflicts or interruptions.
 
-## [0.10.1] - 2025-06-04
+## Version 0.10.1 - June 4, 2025
 
 ### Fixed
 - **Task organization**: Completed tasks now stay organized together instead of appearing in random places
@@ -232,7 +226,7 @@ Have your ai use `` `🧭 tools_list()` `` to see all available tools for your c
 - **Language consistency**: All dropdown messages and search boxes now properly show in your selected language
 - **Error messages**: Task-related error messages now appear in Polish when you have Polish selected
 
-## [0.10.0] - 2025-06-04
+## Version 0.10.0 - June 4, 2025
 
 ### Added
 - **LifeNavigator mode**: New built-in mode that helps guide you and gives instructions. It's always available and can't be deleted.
@@ -263,7 +257,7 @@ Have your ai use `` `🧭 tools_list()` `` to see all available tools for your c
 - **Built-in specialized tools**: YouTube transcripts, image generation, and deep research are now available as downloadable tools instead of being built-in. This makes the core plugin simpler while keeping all the functionality.
 - **Manual mode creation**: The "New Mode" button is removed - ask the AI to create modes for you instead
 
-## [0.9.3] - 2025-06-02
+## Version 0.9.3 - June 2, 2025
 
 ### Added
 - **Better audio controls**: You can now pause and resume audio playback instead of having to stop and restart. Audio remembers exactly where you left off. Audio is also cached so replaying the same message is instant.
@@ -272,7 +266,7 @@ Have your ai use `` `🧭 tools_list()` `` to see all available tools for your c
 - **Mobile text highlighting**: Much better highlighting on phones and tablets, especially iPhones. Text now highlights properly and scrolls to the right position on your screen.
 - **Polish language completeness**: Fixed missing Polish translations for task actions - everything now shows in Polish when you have Polish selected.
 
-## [0.9.0] - 2025-06-01
+## Version 0.9.0 - June 1, 2025
 
 ### Added
 
@@ -295,7 +289,7 @@ Have your ai use `` `🧭 tools_list()` `` to see all available tools for your c
 - **Conversation history**: Save, search, and return to past conversations. Edit titles, add tags, and continue where you left off
 - **Cleaner AI context**: Improved how AI processes your notes for better responses
 
-## [0.7.4] - 2025-05-26
+## Version 0.7.4 - May 26, 2025
 
 ### Changed
 - **English Starter Kit Recreated**: Completely recreated the English starter kit by translating from the Polish version. All content has been thoroughly translated including filenames, with key translations like "Ziomal" → "Bro" and "O mnie" → "About Me". The English starter kit now matches the comprehensive structure and content of the Polish version.
@@ -304,7 +298,7 @@ Have your ai use `` `🧭 tools_list()` `` to see all available tools for your c
 - **Chat Autoscroll During Agent Response**: Fixed autoscroll functionality to properly scroll to bottom while agent is typing/streaming responses, ensuring users can always see the latest content being generated. Optimized to prevent double-scrolling by using MutationObserver during streaming and conversation-based scrolling otherwise.
 - **Starter Kit Directory Creation**: Fixed starter kit creation to handle existing directories by automatically generating unique names (e.g., "Starter Kit v0.4 2", "Starter Kit v0.4 3") instead of failing when a directory already exists
 
-## [0.6.13] - 2025-05-25
+## Version 0.6.13 - May 25, 2025
 
 ### Added
 - **Edit Todo Tool**: New `edit_todo` tool allows editing existing todo items
@@ -330,7 +324,7 @@ Have your ai use `` `🧭 tools_list()` `` to see all available tools for your c
 - **Recording Input Behavior**: Input field and placeholder are now completely hidden during voice recording and transcription, image preview area is hidden during transcription, and image editing (paste, attach, remove) is disabled during recording and transcription
 - **Mobile Usage Example Pills**: Improved styling and visibility of usage example buttons (pills) on mobile devices with better contrast, touch-friendly sizing, proper Obsidian theme integration, and enhanced accessibility features
 
-## [0.6.12] - 2025-05-23
+## Version 0.6.12 - May 25, 2025
 
 ### Changed
 - Showing mic and send button at the same time
@@ -343,7 +337,7 @@ Have your ai use `` `🧭 tools_list()` `` to see all available tools for your c
 - Removing empty messages so chat can continue
 - Skipping current mode in handover options
 
-## [0.6.11] - 2025-05-23
+## Version 0.6.11 - May 23, 2025
 
 ### Added
 - **Tool Filtering for Modes**: New configuration options for controlling which tools are available in each mode
@@ -364,7 +358,7 @@ change: enforce thinking in claude, as it's needed for handover to work
 ### Fixed
 - **Fixed multi-line comment indentation**: When todos are checked off or completed with multi-line comments, all lines are now properly indented with 4 spaces instead of only the first line
 
-## [0.6.10] - 2025-05-22
+## Version 0.6.10 - May 22, 2025
 
 ### Added
 - Added persistence of active mode between plugin sessions
@@ -388,7 +382,7 @@ change: enforce thinking in claude, as it's needed for handover to work
   - Improved error message format for missing files
 - Fixed styling issues for non-dark mode users with better theme variable usage
 
-## [0.6.7] - 2025-05-22
+## Version 0.6.7 - May 22, 2025
 
 ### Added
 - Added `ln-currently-open-file` special link to embed content from the currently open file
@@ -397,9 +391,7 @@ change: enforce thinking in claude, as it's needed for handover to work
 ### Changed
 - Standardized naming from "Starter Pack" to "Starter Kit" throughout the codebase for consistency
 
-## [0.6.6] - 2025-05-22
-
-## [Unreleased]
+## Version 0.6.6 - May 22, 2025
 
 ### 🚀 Performance Improvements
 
@@ -492,7 +484,7 @@ The multi-chat system now works reliably:
 - **Improved input area layout**: Moved the mode dropdown to the bottom left of the input area for easier access while typing. The dropdown is now more compact and cursor-like, showing both the mode icon and name. Image attachment button moved to the right side for better logical flow of controls.
 
 
-## [Unreleased]
+## Upcoming Features
 
 ### 🎙️ Premium Audio Experience with ElevenLabs Integration
 
@@ -575,8 +567,6 @@ You'll enjoy a more focused chat history experience:
 - **Conversation history display**: Fixed issue where no conversations were showing in the history dropdown due to incorrect search filtering configuration
 - **Mode search positioning**: Improved mode dropdown search placement - search input now appears at the bottom for upward-opening dropdowns, providing better stability and user experience
 
-## [Unreleased]
-
 ### Enhanced
 - **Improved transcription UI**: During voice transcription, the input area now shows a dedicated transcription interface with a clear "Transcribing..." indicator and centered stop button. This replaces the confusing spinning button and disabled attachment controls, making the transcription state much more obvious and user-friendly. The transcription overlay now properly contains itself within the input area and uses consistent Lucide icons matching the rest of the interface.
 
@@ -604,3 +594,22 @@ You'll enjoy a more focused chat history experience:
 
 ### Added
 - **Directory expansion support**: The `🧭 expand` tool now supports expanding entire directories, not just individual files. Use `🧭 expand` [[Directory Name]] to include all markdown files directly in the specified directory (subdirectories are not processed recursively). Each file is wrapped in XML-like tags with metadata, and files are processed alphabetically for consistent output.
+
+### 📱 "What's New" Modal - Stay Updated with Latest Features
+
+**Life Navigator now shows you what's new after updates with a dedicated changelog modal:**
+
+- **Automatic display**: Modal appears automatically after plugin updates, showing you all the latest changes and features
+- **GitHub integration**: Fetches the complete changelog directly from GitHub for always up-to-date information
+- **User control**: "Don't show again for this version" option lets you control when you see the modal
+- **Manual access**: View changelog anytime through the new "What's New" button in settings
+- **Beautiful presentation**: Properly formatted changelog with markdown rendering and easy-to-read styling
+- **Graceful fallback**: Direct link to GitHub changelog if network issues occur
+
+### 🎯 What This Means for You
+
+You'll never miss important updates and new features:
+- Stay informed about new capabilities as soon as you update
+- Easy access to full changelog history from settings
+- Control over notifications while staying informed
+- Professional presentation of all changes and improvements

@@ -1,5 +1,5 @@
 When making changes to the code:
-- After performing fixes also modify CHANGELOG.md (add to unreleased section) and general documentation in docs/ and library/Docs/. Note that changelog is cumulative so dont replace content there - add stuff.
+- After performing fixes also modify CHANGELOG.md (add to unreleased section at the end of the file) and general documentation in docs/ and library/Docs/. Note that changelog is cumulative so dont replace content there - add stuff.
 - **Before adding to CHANGELOG.md, check if the current changes are already documented there. If they are:**
   - For CHANGELOG.md: Only add if it's a genuinely new feature/fix not already listed in the unreleased section. If the feature/fix is already there, you may update details but don't add duplicate entries
   - Read both files first to understand the current implementation scope before adding new content
