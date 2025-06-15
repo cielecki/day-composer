@@ -24,6 +24,7 @@ export interface SettingsSlice {
     speechToTextPrompt: string;
     tutorial: TutorialSettings;
     isLoading: boolean;
+    lastViewedWhatsNewVersion?: string;
   };
   
   // Actions - moved and expanded from LifeNavigatorSettings class
@@ -48,6 +49,10 @@ export interface SettingsSlice {
   // Backward compatibility getters/setters
   getObsidianLanguageConfigured: () => boolean;
   setObsidianLanguageConfigured: (value: boolean) => void;
+  
+  // What's New version tracking
+  getLastViewedWhatsNewVersion: () => string | undefined;
+  setLastViewedWhatsNewVersion: (version: string) => Promise<void>;
 
   // API Key validation methods
   validateOpenAIKey: (apiKey: string) => Promise<APIKeyValidationResult>;
@@ -225,6 +230,19 @@ export const createSettingsSlice: ImmerStateCreator<SettingsSlice> = (set, get) 
     setObsidianLanguageConfigured: (value) => set((state) => {
       state.settings.tutorial.obsidianLanguageConfigured = value;
     }),
+
+    // What's New version tracking methods
+    getLastViewedWhatsNewVersion: () => {
+      const state = get();
+      return state.settings.lastViewedWhatsNewVersion;
+    },
+
+    setLastViewedWhatsNewVersion: async (version) => {
+      set((state) => {
+        state.settings.lastViewedWhatsNewVersion = version;
+      });
+      await get().saveSettings();
+    },
 
     // API Key validation methods
     validateOpenAIKey: async (apiKey) => {

@@ -1,6 +1,7 @@
 {
   "buttons": {
-    "cancel": "Anuluj"
+    "cancel": "Anuluj",
+    "close": "Zamknij"
   },
   "chat": {
     "assistantMessage": "wiadomość asystenta",
@@ -110,6 +111,16 @@
     "pluginUpToDate": "Life Navigator jest aktualny (wersja '{{version}}')",
     "updateAvailable": "Dostępna aktualizacja! Wersja '{{latestVersion}}' jest teraz dostępna (masz '{{currentVersion}}')"
   },
+  "whatsNew": {
+    "title": "Co nowego w Life Navigator",
+    "loading": "Ładowanie listy zmian...",
+    "dontShowAgain": "Nie pokazuj ponownie dla tej wersji",
+    "error": {
+      "title": "Nie udało się załadować listy zmian",
+      "message": "Nie można pobrać najnowszej listy zmian z GitHub. Sprawdź połączenie internetowe.",
+      "linkText": "Zobacz listę zmian na GitHub"
+    }
+  },
   "prebuiltModes": {
     "lifeNavigator": {
       "mainDescription": "Główny opis",
@@ -131,6 +142,11 @@
         "error": "Nie udało się zresetować tutoriala: '{{error}}'",
         "name": "Resetuj tutorial",
         "success": "Tutorial został pomyślnie zresetowany"
+      },
+      "whatsNew": {
+        "button": "Zobacz co nowego",
+        "desc": "Zobacz najnowsze zmiany i funkcje w Life Navigator z listy zmian.",
+        "name": "Co nowego"
       },
       "title": "Akcje Life Navigator"
     },

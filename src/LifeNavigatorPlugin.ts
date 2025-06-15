@@ -5,6 +5,7 @@ import { ChatView, LIFE_NAVIGATOR_VIEW_TYPE } from './views/chat-view';
 import { CostAnalysisView, COST_ANALYSIS_VIEW_TYPE } from './views/cost-analysis-view';
 import { SystemPromptView, SYSTEM_PROMPT_VIEW_TYPE, SystemPromptViewState } from './views/system-prompt-view';
 import { checkForAvailableUpdate, checkForUpdatesOnStartup } from './utils/auto-update/auto-update';
+import { WhatsNewModalWrapper } from './components/WhatsNewModalWrapper';
 import { getObsidianTools, resetObsidianTools } from './obsidian-tools';
 import { LifeNavigatorSettingTab } from './components/LifeNavigatorSettingTab';
 import { UserDefinedToolManager } from './services/UserDefinedToolManager';
@@ -343,6 +344,9 @@ export class LifeNavigatorPlugin extends Plugin {
 		// Check for updates on startup
 		await checkForUpdatesOnStartup(this);
 
+		// Check if we should show "What's New" modal
+		await this.checkAndShowWhatsNew();
+
 		// Initialize with a default chat if none exists
 		const store = usePluginStore.getState();
 		const loaded = store.chats.loaded;
@@ -500,5 +504,46 @@ export class LifeNavigatorPlugin extends Plugin {
 			console.error(`Error opening chat with conversation ${conversationId}:`, error);
 			new Notice(t('ui.chat.conversationLoadFailed'));
 		}
+	}
+
+	// Check if we should show the "What's New" modal
+	private async checkAndShowWhatsNew() {
+		try {
+			const store = getStore();
+			const currentVersion = this.manifest.version;
+			const lastViewedVersion = store.getLastViewedWhatsNewVersion();
+
+			// Show modal if user hasn't seen this version's changes
+			if (!lastViewedVersion || this.compareVersions(currentVersion, lastViewedVersion) > 0) {
+				// Delay showing modal slightly to let the UI settle
+				setTimeout(() => {
+					const modal = new WhatsNewModalWrapper(this.app);
+					modal.open();
+				}, 1000);
+			}
+		} catch (error) {
+			console.debug('Error checking for What\'s New modal:', error);
+			// Fail silently to avoid interrupting startup
+		}
+	}
+
+	// Simple version comparison function
+	private compareVersions(a: string, b: string): number {
+		const parseVersion = (version: string) => {
+			return version.split('.').map(v => parseInt(v, 10));
+		};
+		
+		const versionA = parseVersion(a);
+		const versionB = parseVersion(b);
+		
+		for (let i = 0; i < Math.max(versionA.length, versionB.length); i++) {
+			const numA = versionA[i] || 0;
+			const numB = versionB[i] || 0;
+			
+			if (numA > numB) return 1;
+			if (numA < numB) return -1;
+		}
+		
+		return 0;
 	}
 }

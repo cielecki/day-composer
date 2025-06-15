@@ -1,6 +1,7 @@
 {
   "buttons": {
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "close": "Close"
   },
   "chat": {
     "assistantMessage": "assistant message",
@@ -110,6 +111,16 @@
     "pluginUpToDate": "Life Navigator is up to date (version '{{version}}')",
     "updateAvailable": "Update available! Version '{{latestVersion}}' is now available (you have '{{currentVersion}}')"
   },
+  "whatsNew": {
+    "title": "What's New in Life Navigator",
+    "loading": "Loading changelog...",
+    "dontShowAgain": "Don't show again for this version",
+    "error": {
+      "title": "Failed to Load Changelog",
+      "message": "Unable to fetch the latest changelog from GitHub. Please check your internet connection.",
+      "linkText": "View changelog on GitHub"
+    }
+  },
   "prebuiltModes": {
     "lifeNavigator": {
       "mainDescription": "Main Description",
@@ -131,6 +142,11 @@
         "error": "Failed to reset tutorial: '{{error}}'",
         "name": "Reset Tutorial",
         "success": "Tutorial has been reset successfully"
+      },
+      "whatsNew": {
+        "button": "View What's New",
+        "desc": "View the latest changes and features in Life Navigator from the changelog.",
+        "name": "What's New"
       },
       "title": "Life Navigator Actions"
     },

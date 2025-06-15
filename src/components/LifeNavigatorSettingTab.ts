@@ -3,6 +3,7 @@ import { App, PluginSettingTab, Setting, Notice, Modal, getIcon } from 'obsidian
 import { getStore } from '../store/plugin-store';
 import { t } from 'src/i18n';
 import { closeCurrentSettingsModal } from '../utils/ui/modal-utils';
+import { WhatsNewModalWrapper } from './WhatsNewModalWrapper';
 
 export class LifeNavigatorSettingTab extends PluginSettingTab {
 	plugin: LifeNavigatorPlugin;
@@ -109,6 +110,22 @@ export class LifeNavigatorSettingTab extends PluginSettingTab {
 							button.setButtonText(t('settings.actions.resetTutorial.button'));
 							button.setDisabled(false);
 						}
+					});
+			});
+
+		// What's New button
+		new Setting(containerEl)
+			.setName(t('settings.actions.whatsNew.name'))
+			.setDesc(t('settings.actions.whatsNew.desc'))
+			.addButton(button => {
+				button
+					.setButtonText(t('settings.actions.whatsNew.button'))
+					.onClick(() => {
+						const modal = new WhatsNewModalWrapper(this.app, () => {
+							// Close settings modal when What's New modal is closed
+							closeCurrentSettingsModal();
+						});
+						modal.open();
 					});
 			});
 
