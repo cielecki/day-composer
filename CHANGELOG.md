@@ -619,3 +619,8 @@ You'll never miss important updates and new features:
 
 ### Enhanced
 - **Unified command system for chat and settings**: Both the chat dropdown menu and settings "Life Navigator Actions" now use the same Obsidian commands system. All actions (Star on GitHub, Join Community, Follow Author, Check Updates, What's New) are now available as commands that can be triggered from multiple places and appear in both the chat dropdown and settings. The chat dropdown includes helpful tooltips showing what each action does, and the reset tutorial action remains available only in settings as requested.
+
+## Unreleased
+
+### Fixed
+- **Input area auto-resize**: Fixed textarea not shrinking when text is deleted. The unified input area now properly resizes both up and down as you type or delete content, maintaining a maximum height of 150px while automatically adjusting to content size changes.

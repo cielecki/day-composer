@@ -184,8 +184,10 @@ export const UnifiedInputArea: React.FC<{
     if (textareaRef.current) {
       const resizeObserver = new ResizeObserver(() => {
         const textarea = textareaRef.current;
-        if (textarea && message) {
+        if (textarea) {
           textarea.classList.add("ln-textarea-auto");
+          // Reset height to auto to get the proper scrollHeight
+          textarea.style.height = 'auto';
           textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
         }
       });
@@ -384,6 +386,8 @@ export const UnifiedInputArea: React.FC<{
 
     const textarea = e.target;
     textarea.classList.add("ln-textarea-auto");
+    // Reset height to auto to get the proper scrollHeight
+    textarea.style.height = 'auto';
     textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
   };
 
