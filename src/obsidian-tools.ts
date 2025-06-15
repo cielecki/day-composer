@@ -28,6 +28,7 @@ import { toolsListTool } from './tools/tools-list';
 import { currentDateTimeTool } from './tools/current-date-time';
 import { dailyNoteTool } from './tools/day-note';
 import { dailyNotesTool } from './tools/daily-notes';
+import { periodicNotesInfoTool } from './tools/periodic-notes-info';
 import { currentChatTool } from './tools/current-chat';
 import { currentFileAndSelectionTool } from './tools/current-file-and-selection';
 import { modeDelegateTool } from './tools/mode-delegate';
@@ -114,6 +115,7 @@ export class ObsidianTools {
 		currentDateTimeTool,
 		dailyNoteTool,
 		dailyNotesTool,
+		periodicNotesInfoTool,
 		currentChatTool,
 		currentFileAndSelectionTool,
 		modeDelegateTool,

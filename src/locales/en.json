@@ -90,7 +90,7 @@
     "retryButton": "Retry",
     "startingLifeNavigator": "Error starting Life Navigator",
     "tasks": {
-              "insertOutOfBounds": "Cannot insert task at index {{index}}: Index out of bounds (document has {{total}} items)",
+      "insertOutOfBounds": "Cannot insert task at index {{index}}: Index out of bounds (document has {{total}} items)",
       "multipleFound": "Multiple tasks found with description '{{task}}' in '{{name}}'. Please make your task description more specific.",
       "notFound": "To-do item '{{task}}' not found in '{{name}}'. If the task is in another file, please specify it in the file_name parameter.",
       "removeNotFound": "Task '{{task}}' not found in document"
@@ -375,19 +375,27 @@
         "notFound": "Daily note not found for '{{date}}'"
       }
     },
-          "modeDelegate": {
-        "labels": {
-          "completed": "Task delegated to '{{mode}}' mode",
-          "failed": "Failed to delegate task to '{{mode}}' mode",
-          "inProgress": "Delegating task to '{{mode}}' mode...",
-          "initial": "Delegating task to specialized mode ..."
-        },
-        "progress": {
-          "completedFull": "Task successfully delegated to '{{mode}}' mode: {{task}}. The delegated conversation is saved and can be accessed from chat history.",
-          "createdChat": "Created independent conversation in '{{mode}}' mode",
-          "processingTask": "Processing task in '{{mode}}' mode..."
-        }
+    "periodicNotesInfo": {
+      "labels": {
+        "completed": "Retrieved periodic notes configuration",
+        "failed": "Failed to get periodic notes information",
+        "inProgress": "Getting periodic notes configuration...",
+        "initial": "Getting periodic notes info ..."
+      }
+    },
+    "modeDelegate": {
+      "labels": {
+        "completed": "Task delegated to '{{mode}}' mode",
+        "failed": "Failed to delegate task to '{{mode}}' mode",
+        "inProgress": "Delegating task to '{{mode}}' mode...",
+        "initial": "Delegating task to specialized mode ..."
       },
+      "progress": {
+        "completedFull": "Task successfully delegated to '{{mode}}' mode: {{task}}. The delegated conversation is saved and can be accessed from chat history.",
+        "createdChat": "Created independent conversation in '{{mode}}' mode",
+        "processingTask": "Processing task in '{{mode}}' mode..."
+      }
+    },
     "editTodo": {
       "labels": {
         "completed": "Edited '{{task}}'",

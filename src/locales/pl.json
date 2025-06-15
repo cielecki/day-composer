@@ -375,19 +375,27 @@
         "notFound": "Nie znaleziono dziennej notatki"
       }
     },
-          "modeDelegate": {
-        "labels": {
-          "completed": "Zadanie przekazane do trybu '{{mode}}'",
-          "failed": "Nie udało się przekazać zadania do trybu '{{mode}}'",
-          "inProgress": "Przekazywanie zadania do trybu '{{mode}}'...",
-          "initial": "Przekazywanie zadania do specjalistycznego trybu ..."
-        },
-        "progress": {
-          "completedFull": "Zadanie pomyślnie przekazane do trybu '{{mode}}': {{task}}. Delegowana rozmowa jest zapisana i można ją znaleźć w historii rozmów.",
-          "createdChat": "Utworzono niezależną rozmowę w trybie '{{mode}}'",
-          "processingTask": "Przetwarzanie zadania w trybie '{{mode}}'..."
-        }
+    "periodicNotesInfo": {
+      "labels": {
+        "completed": "Pobrano konfigurację notatek okresowych",
+        "failed": "Nie udało się pobrać informacji o notatkach okresowych",
+        "inProgress": "Pobieranie konfiguracji notatek okresowych...",
+        "initial": "Pobieranie informacji o notatkach okresowych ..."
+      }
+    },
+    "modeDelegate": {
+      "labels": {
+        "completed": "Zadanie przekazane do trybu '{{mode}}'",
+        "failed": "Nie udało się przekazać zadania do trybu '{{mode}}'",
+        "inProgress": "Przekazywanie zadania do trybu '{{mode}}'...",
+        "initial": "Przekazywanie zadania do specjalistycznego trybu ..."
       },
+      "progress": {
+        "completedFull": "Zadanie pomyślnie przekazane do trybu '{{mode}}': {{task}}. Delegowana rozmowa jest zapisana i można ją znaleźć w historii rozmów.",
+        "createdChat": "Utworzono niezależną rozmowę w trybie '{{mode}}'",
+        "processingTask": "Przetwarzanie zadania w trybie '{{mode}}'..."
+      }
+    },
     "editTodo": {
       "labels": {
         "completed": "Edytowano '{{task}}'",
@@ -422,7 +430,7 @@
       "labels": {
         "completed": {
           "singular": "Znaleziono {{count}} element w '{{name}}'",
-          "few": "Znaleziono {{count}} elementy w '{{name}}'", 
+          "few": "Znaleziono {{count}} elementy w '{{name}}'",
           "many": "Znaleziono {{count}} elementów w '{{name}}'"
         },
         "failed": "Nie udało się znaleźć zawartości w '{{name}}'",
