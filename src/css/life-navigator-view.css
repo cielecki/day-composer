@@ -57,7 +57,7 @@
     flex-direction: column;
     height: 100%;
     padding: 10px;
-    min-width: 375px;
+    min-width: 350px;
   }
   
   .life-navigator-view-content {
@@ -105,14 +105,6 @@
   
   .life-navigator-view .message-content {
     user-select: text;
-  }
-  
-  .life-navigator-view .button-container {
-    flex: 0 0 auto;
-    display: flex;
-    justify-content: center;
-    margin: 16px 0;
-    align-items: center;
   }
   
   /* Record Button Styles */
@@ -1223,7 +1215,7 @@
     margin: 0 auto;
     background-color: transparent;
     border-radius: 8px;
-    padding: 20px;
+    padding: 0px;
   }
   
   /* Editing header styles */

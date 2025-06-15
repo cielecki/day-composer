@@ -585,12 +585,10 @@ export const ChatApp: React.FC<ChatAppProps> = ({ chatId }) => {
 			</div>
 
 			<div className="controls-container">
-				<div className="button-container">
-					<UnifiedInputArea
-						editingMessage={editingMessage}
-						chatId={chatId}
-					/>
-				</div>
+				<UnifiedInputArea
+					editingMessage={editingMessage}
+					chatId={chatId}
+				/>
 			</div>
 		</div>
 	);
