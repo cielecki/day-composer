@@ -272,8 +272,8 @@
   },
   "tasks": {
     "format": {
-      "abandonedAt": " (abandoned at '{{time}}')",
-      "completedAt": " (completed at '{{time}}')"
+      "abandonedAt": " (abandoned at {{time}})",
+      "completedAt": " (completed at {{time}})"
     }
   },
   "text": {
