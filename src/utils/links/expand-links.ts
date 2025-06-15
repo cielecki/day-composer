@@ -203,25 +203,19 @@ async function processNewFormatCalls(app: App, content: string, visitedPaths: Se
 		const match = expandMatches[i];
 		const linkTarget = match[1];
 		
-		try {
-			// First, try to process as a file
-			let expandedContent = await processFileLink(app, linkTarget, linkTarget, visitedPaths);
-			
-			// If file processing failed, try to process as a directory
-			if (!expandedContent) {
-				expandedContent = await processDirectoryLink(app, linkTarget, linkTarget, visitedPaths);
-			}
-			
-			if (expandedContent) {
-				result = result.replace(match[0], expandedContent);
-			} else {
-				const errorXml = formatToolCallError('expansion_error', `Could not expand: ${linkTarget}`);
-				result = result.replace(match[0], errorXml);
-			}
-		} catch (error) {
-			console.error(`Error expanding ${linkTarget}:`, error);
-			const errorXml = formatToolCallError('expansion_error', `Error expanding ${linkTarget}: ${error.message}`);
-			result = result.replace(match[0], errorXml);
+		// First, try to process as a file
+		let expandedContent = await processFileLink(app, linkTarget, linkTarget, visitedPaths);
+		
+		// If file processing failed, try to process as a directory
+		if (!expandedContent) {
+			expandedContent = await processDirectoryLink(app, linkTarget, linkTarget, visitedPaths);
+		}
+		
+		if (expandedContent) {
+			result = result.replace(match[0], expandedContent);
+		} else {
+			// Could not expand - throw error to let caller handle
+			throw new Error(t('errors.linkExpansion.couldNotExpand', { linkTarget }));
 		}
 	}
 
@@ -239,73 +233,59 @@ async function processNewFormatCalls(app: App, content: string, visitedPaths: Se
 		const match = toolMatches[i];
 		const fullMatch = match[0];
 
-		try {
-			// Parse the tool call (remove backticks for parsing)
-			const toolCallContent = fullMatch.slice(1, -1); // Remove backticks
-			
-			// First parse to get the tool name
-			const initialParseResult = parseToolCall(toolCallContent);
-			const { toolName } = initialParseResult;
+		// Parse the tool call (remove backticks for parsing)
+		const toolCallContent = fullMatch.slice(1, -1); // Remove backticks
+		
+		// First parse to get the tool name
+		const initialParseResult = parseToolCall(toolCallContent);
+		const { toolName } = initialParseResult;
 
-			// Get the tool
-			const obsidianTools = getObsidianTools();
-			const tool = await obsidianTools.getToolByName(toolName);
-			
-			if (!tool) {
-				console.warn(`Tool not found: ${toolName}`);
-				const errorXml = formatToolCallError('tool_not_found', `Tool '${toolName}' not found`, toolName);
-				result = result.replace(match[0], errorXml);
-				continue;
+		// Get the tool
+		const obsidianTools = getObsidianTools();
+		const tool = await obsidianTools.getToolByName(toolName);
+		
+		if (!tool) {
+			throw new Error(t('errors.linkExpansion.toolNotFound', { toolName }));
+		}
+		
+		// Re-parse with tool schema for proper parameter mapping
+		const parseResult = parseToolCall(toolCallContent, tool.specification);
+		const { parameters } = parseResult;
+
+		// Check if tool is safe for link expansion (no side effects)
+		if (tool.sideEffects) {
+			throw new Error(t('errors.linkExpansion.toolHasSideEffects', { toolName }));
+		}
+
+		// Execute the tool
+		const progressMessages: string[] = [];
+		
+		const context = {
+			plugin: { app }, // Minimal plugin-like object
+			params: parameters,
+			signal: new AbortController().signal,
+			progress: (message: string) => {
+				progressMessages.push(message);
+			},
+			addNavigationTarget: () => {
+				// Navigation targets are not supported in link expansion
+			},
+			setLabel: () => {
+				// Label updates are not supported in link expansion
 			}
-			
-			// Re-parse with tool schema for proper parameter mapping
-			const parseResult = parseToolCall(toolCallContent, tool.specification);
-			const { parameters } = parseResult;
+		};
 
-			// Check if tool is safe for link expansion (no side effects)
-			if (tool.sideEffects) {
-				console.warn(`Tool ${toolName} has side effects and cannot be used in link expansion`);
-				const errorXml = formatToolCallError('side_effects', `Tool '${toolName}' has side effects and cannot be used in link expansion`, toolName);
-				result = result.replace(match[0], errorXml);
-				continue;
-			}
+		await tool.execute(context as any);
 
-			// Execute the tool
-			const progressMessages: string[] = [];
-			
-			const context = {
-				plugin: { app }, // Minimal plugin-like object
-				params: parameters,
-				signal: new AbortController().signal,
-				progress: (message: string) => {
-					progressMessages.push(message);
-				},
-				addNavigationTarget: () => {
-					// Navigation targets are not supported in link expansion
-				},
-				setLabel: () => {
-					// Label updates are not supported in link expansion
-				}
-			};
-
-			await tool.execute(context as any);
-
-			// Replace with the tool output
-			const toolOutput = progressMessages.join('\n');
-			if (toolOutput) {
-				result = result.replace(match[0], toolOutput);
-			} else {
-				const tagName = convertToValidTagName('tool_execution');
-				result = result.replace(match[0], `<${tagName} tool="${toolName}" status="executed_successfully" />\n`);
-			}
-
-		} catch (error) {
-			console.error(`Error processing tool call ${fullMatch}:`, error);
-			const toolName = fullMatch.match(/🧭\s+([a-zA-Z_][a-zA-Z0-9_]*)/)?.[1] || 'unknown';
-			const errorXml = formatToolCallError('processing_error', `Error processing ${fullMatch}: ${error.message}`, toolName);
-			result = result.replace(match[0], errorXml);
+		// Replace with the tool output
+		const toolOutput = progressMessages.join('\n');
+		if (toolOutput) {
+			result = result.replace(match[0], toolOutput);
+		} else {
+			const tagName = convertToValidTagName('tool_execution');
+			result = result.replace(match[0], `<${tagName} tool="${toolName}" status="executed_successfully" />\n`);
 		}
 	}
 
-		return result;
+	return result;
 } 

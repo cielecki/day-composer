@@ -83,7 +83,12 @@
     "helpButton": "Pomoc",
     "helpPrompt": "Napotkałem błąd podczas używania trybu '{{mode}}':\n'''{{error}}'''\nCzy możesz mi pomóc?",
     "linkExpansion": {
-      "couldNotResolve": "Nie można znaleźć celu linku '{{linkPath}}'"
+      "couldNotResolve": "Nie można znaleźć celu linku '{{linkPath}}'",
+      "couldNotExpand": "Nie można rozwinąć: {{linkTarget}}",
+      "toolNotFound": "Narzędzie '{{toolName}}' nie zostało znalezione",
+      "toolHasSideEffects": "Narzędzie '{{toolName}}' ma efekty uboczne i nie może być używane w rozszerzaniu linków",
+      "systemPromptGenerationFailed": "Generowanie monitu systemowego nie powiodło się: {{error}}. Sprawdź plik trybu i upewnij się, że wszystkie połączone pliki istnieją.",
+      "expandedLinksInFile": "Rozszerzono linki Life Navigator w: {{path}}"
     },
     "retryButton": "Ponów",
     "startingLifeNavigator": "Błąd uruchamiania Life Navigator",

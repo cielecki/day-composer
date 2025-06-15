@@ -12,6 +12,7 @@ import { usePluginStore } from "../../store/plugin-store";
 import { SystemPromptParts } from "../links/expand-links";
 import { DEFAULT_MODE_ID } from '../modes/ln-mode-defaults';
 import { validateChatMode } from '../modes/mode-validation';
+import { t } from '../../i18n';
 
 /**
  * Runs a complete conversation turn with the AI, handling tool calls and streaming
@@ -99,10 +100,27 @@ export const runConversationTurn = async (
 				if (!systemPromptCalculated || currentModeId !== activeModeId) {
 					currentModeId = activeModeId;
 					
-					// Generate system prompt
-					systemPrompt = await currentStore.getSystemPrompt(currentModeId);
-					
-					systemPromptCalculated = true;
+					try {
+						// Generate system prompt
+						systemPrompt = await currentStore.getSystemPrompt(currentModeId);
+						systemPromptCalculated = true;
+					} catch (error) {
+						// Handle link expansion errors by adding error message to chat
+						const errorMessage = error instanceof Error ? error.message : String(error);
+						console.error('System prompt generation failed:', error);
+						
+						const errorMessageBlock: Message = {
+							role: "assistant",
+							content: [{
+								type: "error_message",
+								text: t('errors.linkExpansion.systemPromptGenerationFailed', { error: errorMessage })
+							}]
+						};
+						
+						store.addMessage(chatId, errorMessageBlock);
+						store.setIsGenerating(chatId, false);
+						return null;
+					}
 				}
 				
 				const rawModel = currentActiveMode?.model ?? defaultMode.model;

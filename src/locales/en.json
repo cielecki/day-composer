@@ -83,7 +83,12 @@
     "helpButton": "Help",
     "helpPrompt": "I got an error while using '{{mode}}' mode:\n'''{{error}}'''\nCan you help me?",
     "linkExpansion": {
-      "couldNotResolve": "Could not resolve link target '{{linkPath}}'"
+      "couldNotResolve": "Could not resolve link target '{{linkPath}}'",
+      "couldNotExpand": "Could not expand: {{linkTarget}}",
+      "toolNotFound": "Tool '{{toolName}}' not found",
+      "toolHasSideEffects": "Tool '{{toolName}' has side effects and cannot be used in link expansion",
+      "systemPromptGenerationFailed": "System prompt generation failed: {{error}}. Please check your mode file and ensure all linked files exist.",
+      "expandedLinksInFile": "Expanded Life Navigator links in: {{path}}"
     },
     "retryButton": "Retry",
     "startingLifeNavigator": "Error starting Life Navigator",

@@ -61,14 +61,8 @@ export const noteReadTool: ObsidianTool<NoteReadToolInput> = {
       
       // Expand Life Navigator links if requested
       if (expand_links) {
-        try {
-          content = (await expandLinks(plugin.app, content)).fullContent;
-          context.progress(`Expanded Life Navigator links in: ${path}`);
-        } catch (error) {
-          // If link expansion fails, continue with original content but log warning
-          console.warn(`Failed to expand links in ${path}:`, error);
-          context.progress(`Warning: Failed to expand some links in: ${path}`);
-        }
+        content = (await expandLinks(plugin.app, content)).fullContent;
+        context.progress(t('errors.linkExpansion.expandedLinksInFile', { path }));
       }
       
       // Add navigation target
