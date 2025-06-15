@@ -1,0 +1,305 @@
+
+/* Cost Analysis View Styles */
+.cost-analysis-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+    background-color: var(--background-primary);
+    user-select: text;
+  }
+  
+  .cost-analysis-view .react-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .cost-analysis-view .cost-analysis-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  .cost-analysis-view .cost-analysis-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--background-modifier-border);
+    margin-bottom: 24px;
+  }
+  
+  .cost-analysis-view .cost-analysis-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-normal);
+  }
+  
+  
+  .cost-analysis-view .cost-analysis-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 16px;
+    color: var(--text-muted);
+  }
+  
+  .cost-analysis-view .cost-analysis-content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .cost-analysis-view .cost-overview-section {
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  
+  .cost-analysis-view .cost-overview-section h2 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-normal);
+  }
+  
+  .cost-analysis-view .cost-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  
+  .cost-analysis-view .cost-overview-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px;
+    background-color: var(--background-primary);
+    border-radius: 6px;
+    border: 1px solid var(--background-modifier-border);
+  }
+  
+  .cost-analysis-view .cost-overview-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .cost-analysis-view .cost-overview-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-normal);
+  }
+  
+  .cost-analysis-view .cost-overview-value.total-cost {
+    color: var(--text-accent);
+  }
+  
+  .cost-analysis-view .conversation-selector-section {
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  
+  .cost-analysis-view .conversation-selector-section h2 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-normal);
+  }
+  
+  .cost-analysis-view .conversation-selector {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 6px;
+    color: var(--text-normal);
+    font-size: 14px;
+  }
+  
+  .cost-analysis-view .conversation-selector:focus {
+    outline: none;
+    border-color: var(--interactive-accent);
+    box-shadow: 0 0 0 2px var(--interactive-accent-hover);
+  }
+  
+  .cost-analysis-view .conversation-summary-section {
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  
+  .cost-analysis-view .conversation-summary-section h3 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-normal);
+  }
+  
+  .cost-analysis-view .conversation-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  
+  .cost-analysis-view .conversation-summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px;
+    background-color: var(--background-primary);
+    border-radius: 6px;
+    border: 1px solid var(--background-modifier-border);
+  }
+  
+  .cost-analysis-view .conversation-summary-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .cost-analysis-view .conversation-summary-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-normal);
+  }
+  
+  .cost-analysis-view .conversation-summary-value.total-cost {
+    color: var(--text-accent);
+  }
+  
+  .cost-analysis-view .api-calls-section {
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  
+  .cost-analysis-view .api-calls-section h3 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-normal);
+  }
+  
+  .cost-analysis-view .api-calls-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .cost-analysis-view .api-call-entry {
+    background-color: var(--background-primary);
+    border-radius: 6px;
+    border: 1px solid var(--background-modifier-border);
+    padding: 16px;
+  }
+  
+  .cost-analysis-view .api-call-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  
+  .cost-analysis-view .api-call-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .cost-analysis-view .api-call-model {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-normal);
+  }
+  
+  .cost-analysis-view .api-call-time {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  
+  .cost-analysis-view .api-call-duration {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  
+  .cost-analysis-view .api-call-total {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-accent);
+  }
+  
+  .cost-analysis-view .api-call-details {
+    padding-top: 12px;
+    border-top: 1px solid var(--background-modifier-border);
+  }
+  
+  .cost-analysis-view .api-call-tokens {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .cost-analysis-view .api-call-token-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+  
+  .cost-analysis-view .api-call-token-label {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  
+  .cost-analysis-view .api-call-token-value {
+    color: var(--text-normal);
+    font-family: var(--font-monospace);
+  }
+  
+  .cost-analysis-view .cost-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 16px;
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px;
+  }
+  
+  .cost-analysis-view .cost-empty-state h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-normal);
+  }
+  
+  .cost-analysis-view .cost-empty-state p {
+    margin: 0;
+    font-size: 14px;
+    max-width: 400px;
+  }
+  
+  .cost-analysis-view .animate-spin {
+    animation: spin 1s linear infinite;
+  }
