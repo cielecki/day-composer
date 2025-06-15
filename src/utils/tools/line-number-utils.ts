@@ -1,6 +1,6 @@
 import { Note } from 'src/utils/tools/note-utils';
 import { Task } from 'src/utils/tasks/task-utils';
-import { NavigationTarget } from "../../obsidian-tools";
+import { NavigationTarget, TextContent } from "../../obsidian-tools";
 
 /**
  * Calculate the line number (1-based) for a node at the given index in a note
@@ -174,4 +174,103 @@ export function createNavigationTarget(
       ? { start: lineNumbers[0], end: lineNumbers[0] }
       : { start: Math.min(...lineNumbers), end: Math.max(...lineNumbers) },
   };
+}
+
+/**
+ * Create a text preview by truncating to specified length and cleaning up
+ * @param text The text to create a preview from
+ * @param maxLength Maximum length of the preview
+ * @returns Truncated and cleaned preview text
+ */
+export function createTextPreview(text: string, maxLength: number = 100): string {
+  if (!text) return '';
+  
+  // Remove excessive whitespace and normalize line breaks
+  const cleanText = text.replace(/\s+/g, ' ').trim();
+  
+  if (cleanText.length <= maxLength) {
+    return cleanText;
+  }
+  
+  // Find a good breaking point (prefer word boundaries)
+  const truncated = cleanText.substring(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(' ');
+  
+  if (lastSpace > maxLength * 0.7) {
+    return truncated.substring(0, lastSpace) + '...';
+  }
+  
+  return truncated + '...';
+}
+
+/**
+ * Extract text content from file content for a given line range
+ * @param fileContent The full file content
+ * @param lineRange The line range to extract text from
+ * @returns TextContent object with appropriate text storage strategy
+ */
+export function extractTextContentForRange(
+  fileContent: string, 
+  lineRange: { start: number; end: number }
+): TextContent | undefined {
+  if (!fileContent || !lineRange) {
+    return undefined;
+  }
+
+  const lines = fileContent.split('\n');
+  const startIndex = Math.max(0, lineRange.start - 1);
+  const endIndex = Math.min(lines.length - 1, lineRange.end - 1);
+  
+  if (startIndex > endIndex || startIndex >= lines.length) {
+    return undefined;
+  }
+  
+  const selectedLines = lines.slice(startIndex, endIndex + 1);
+  const fullText = selectedLines.join('\n');
+  
+  // For short content (6 lines or less), store full text
+  if (selectedLines.length <= 6) {
+    return {
+      fullText,
+      preview: createTextPreview(fullText, 100),
+      characterCount: fullText.length,
+      lineCount: selectedLines.length
+    };
+  }
+  
+  // For long content, store start and end portions (first and last 3 lines)
+  const startText = selectedLines.slice(0, 3).join('\n');
+  const endText = selectedLines.slice(-3).join('\n');
+  
+  return {
+    startText,
+    endText,
+    preview: createTextPreview(startText + '...' + endText, 100),
+    characterCount: fullText.length,
+    lineCount: selectedLines.length
+  };
+}
+
+/**
+ * Create enhanced navigation target with text content
+ * @param filePath The file path
+ * @param lineRange The line range
+ * @param fileContent Optional file content for text extraction
+ * @returns NavigationTarget with text content if available
+ */
+export function createNavigationTargetWithContent(
+  filePath: string,
+  lineRange: { start: number; end: number },
+  fileContent?: string
+): NavigationTarget {
+  const target: NavigationTarget = {
+    filePath,
+    lineRange
+  };
+  
+  if (fileContent) {
+    target.textContent = extractTextContentForRange(fileContent, lineRange);
+  }
+  
+  return target;
 } 

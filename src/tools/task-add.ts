@@ -1,5 +1,6 @@
 import { createFile } from "../utils/fs/create-file";
 import { fileExists } from "../utils/fs/file-exists";
+import { TFile } from 'obsidian';
 import { Task } from 'src/utils/tasks/task-utils';
 import { ToolExecutionError } from 'src/types/tool-execution-error';
 import { ObsidianTool } from 'src/obsidian-tools';
@@ -11,7 +12,7 @@ import {
 } from 'src/utils/tools/note-utils';
 import { getDailyNotePath } from 'src/utils/daily-notes/get-daily-note-path';
 import { insertTaskAtPosition } from 'src/utils/tasks/task-utils';
-import { calculateLineNumberForNode, createNavigationTarget } from 'src/utils/tools/line-number-utils';
+import { calculateLineNumberForNode, createNavigationTargetWithContent } from 'src/utils/tools/line-number-utils';
 import { extractFilenameWithoutExtension, truncateText } from 'src/utils/text/string-sanitizer';
 import { t } from 'src/i18n';
 import { cleanTodoText } from 'src/utils/tasks/task-utils';
@@ -147,10 +148,21 @@ export const taskAddTool: ObsidianTool<TaskAddToolInput> = {
 				lineNumbers.push(calculateLineNumberForNode(updatedNote, insertionIndex + i));
 			}
 
-			// Create navigation target
-			const navigationTarget = createNavigationTarget(
+			// Create enhanced navigation target with text content
+			const lineRange = lineNumbers.length === 1 
+				? { start: lineNumbers[0], end: lineNumbers[0] }
+				: { start: Math.min(...lineNumbers), end: Math.max(...lineNumbers) };
+
+			// Get the file for reading content
+			const vaultFile = plugin.app.vault.getAbstractFileByPath(filePath);
+			const fileContent = (vaultFile instanceof TFile) 
+				? await plugin.app.vault.read(vaultFile) 
+				: undefined;
+
+			const navigationTarget = createNavigationTargetWithContent(
 				filePath,
-				lineNumbers
+				lineRange,
+				fileContent // Include file content for text extraction
 			);
 
 			context.addNavigationTarget(navigationTarget);

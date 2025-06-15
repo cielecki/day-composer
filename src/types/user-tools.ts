@@ -15,10 +15,23 @@ export interface UserToolSchema {
 	required?: string[];
 }
 
+// Text content information for navigation targets
+export interface TextContent {
+	// For exact matching and repositioning
+	fullText?: string;           // Complete text (for short segments)
+	startText?: string;          // First 3 lines (for long segments)  
+	endText?: string;            // Last 3 lines (for long segments)
+	// Metadata for display and validation
+	preview?: string;            // Truncated preview for UI display
+	characterCount?: number;     // Length validation
+	lineCount?: number;          // Number of lines spanned
+}
+
 // Navigation target interface (avoiding circular dependency)
 export interface NavigationTarget {
 	filePath: string;
 	lineRange?: { start: number; end: number };
+	textContent?: TextContent;
 }
 
 export interface UserDefinedTool {

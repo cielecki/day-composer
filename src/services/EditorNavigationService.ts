@@ -1,7 +1,7 @@
 import { App, MarkdownView, TFile } from 'obsidian';
 import { EditorView, Decoration, DecorationSet } from '@codemirror/view';
 import { StateField, StateEffect, Extension } from '@codemirror/state';
-import { NavigationTarget } from '../obsidian-tools';
+import { NavigationTarget, TextContent } from '../obsidian-tools';
 
 // Effect to add highlighting
 const addHighlight = StateEffect.define<{from: number, to: number}>({
@@ -83,12 +83,143 @@ export class EditorNavigationService {
 			const leaf = this.app.workspace.getLeaf(false);
 			await leaf.openFile(file);
 
-			// If we have a line range, highlight it
+			// If we have a line range, try to highlight it
 			if (target.lineRange) {
-				await this.highlightLines(target.lineRange.start, target.lineRange.end);
+				// Try text-based repositioning if available and line-based fails
+				const repositionedRange = await this.resolveTargetPosition(target, file);
+				if (repositionedRange) {
+					await this.highlightLines(repositionedRange.start, repositionedRange.end);
+				} else {
+					// Fallback to original line range
+					await this.highlightLines(target.lineRange.start, target.lineRange.end);
+				}
 			}
 		} catch (error) {
 			console.error('Error navigating to target:', error);
+		}
+	}
+
+	/**
+	 * Resolve target position using text content if available
+	 */
+	private async resolveTargetPosition(
+		target: NavigationTarget, 
+		file: TFile
+	): Promise<{ start: number; end: number } | null> {
+		// If no text content available, return null to use original line range
+		if (!target.textContent) {
+			return null;
+		}
+
+		try {
+			// Read the current file content
+			const fileContent = await this.app.vault.read(file);
+			
+			// Try to find the text in the document
+			const foundRange = this.findTextInDocument(fileContent, target.textContent);
+			if (foundRange) {
+				console.debug('Text-based repositioning successful:', foundRange);
+				return foundRange;
+			}
+			
+			// If text-based search failed, verify if line-based is still valid
+			if (target.lineRange && this.isLineRangeValid(fileContent, target.lineRange, target.textContent)) {
+				console.debug('Line-based position still valid');
+				return target.lineRange;
+			}
+			
+			console.debug('Text-based repositioning failed, using fallback');
+			return null;
+		} catch (error) {
+			console.error('Error resolving target position:', error);
+			return null;
+		}
+	}
+
+	/**
+	 * Find text content in document and return line range
+	 */
+	private findTextInDocument(
+		content: string, 
+		textContent: TextContent
+	): { start: number; end: number } | null {
+		// Try exact match first for short content
+		if (textContent.fullText) {
+			const index = content.indexOf(textContent.fullText);
+			if (index !== -1) {
+				return this.calculateLineRangeFromIndex(content, index, textContent.fullText.length);
+			}
+		}
+		
+		// Try start/end matching for long content
+		if (textContent.startText && textContent.endText) {
+			const startIndex = content.indexOf(textContent.startText);
+			const endIndex = content.lastIndexOf(textContent.endText);
+			
+			if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+				const startPos = startIndex;
+				const endPos = endIndex + textContent.endText.length;
+				return this.calculateLineRangeFromIndex(content, startPos, endPos - startPos);
+			}
+		}
+		
+		return null;
+	}
+
+	/**
+	 * Calculate line range from character index and length
+	 */
+	private calculateLineRangeFromIndex(
+		content: string, 
+		index: number, 
+		length: number
+	): { start: number; end: number } {
+		const beforeText = content.substring(0, index);
+		const selectedText = content.substring(index, index + length);
+		
+		const startLine = beforeText.split('\n').length;
+		const endLine = startLine + selectedText.split('\n').length - 1;
+		
+		return { start: startLine, end: endLine };
+	}
+
+	/**
+	 * Check if line range is still valid by comparing with expected text content
+	 */
+	private isLineRangeValid(
+		content: string, 
+		lineRange: { start: number; end: number }, 
+		textContent: TextContent
+	): boolean {
+		try {
+			const lines = content.split('\n');
+			const startIndex = Math.max(0, lineRange.start - 1);
+			const endIndex = Math.min(lines.length - 1, lineRange.end - 1);
+			
+			if (startIndex > endIndex || startIndex >= lines.length) {
+				return false;
+			}
+			
+			const currentText = lines.slice(startIndex, endIndex + 1).join('\n');
+			
+			// Check if current text matches expected content
+			if (textContent.fullText) {
+				return currentText === textContent.fullText;
+			}
+			
+			if (textContent.startText && textContent.endText) {
+				const currentLines = currentText.split('\n');
+				const currentStartText = currentLines.slice(0, 3).join('\n');
+				const currentEndText = currentLines.slice(-3).join('\n');
+				
+				return currentStartText === textContent.startText && 
+					   currentEndText === textContent.endText;
+			}
+			
+			return false;
+		} catch (error) {
+			console.error('Error validating line range:', error);
+			return false;
 		}
 	}
 

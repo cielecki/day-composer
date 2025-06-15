@@ -1,6 +1,6 @@
 import { readFile } from "../utils/fs/read-file";
 import { getFile } from "../utils/fs/get-file";
-import { ObsidianTool } from "../obsidian-tools";
+import { ObsidianTool, NavigationTarget } from "../obsidian-tools";
 import { ToolExecutionContext } from 'src/types/tool-execution-context';
 import { t } from 'src/i18n';
 import { extractFilenameWithoutExtension } from "src/utils/text/string-sanitizer";
@@ -334,11 +334,50 @@ export const noteEditTool: ObsidianTool<NoteEditToolInput> = {
       const diffOutput = createPatch(path, originalContent, currentContent, '', '', { context: 5 });
       const { minLine, maxLine } = parseLineRangeFromDiff(diffOutput);
       
-      // Create navigation target with the line range from diff
-      context.addNavigationTarget({
+      // Create enhanced navigation target with text content
+      const navigationTarget: NavigationTarget = {
         filePath: path,
         lineRange: { start: minLine, end: maxLine }
-      });
+      };
+
+      // Extract text content for the changed lines
+      try {
+        const lines = currentContent.split('\n');
+        const startIndex = Math.max(0, minLine - 1);
+        const endIndex = Math.min(lines.length - 1, maxLine - 1);
+        const changedText = lines.slice(startIndex, endIndex + 1).join('\n');
+
+        if (changedText.trim()) {
+          // For short changes, store full text
+          if (endIndex - startIndex + 1 <= 6) {
+            navigationTarget.textContent = {
+              fullText: changedText,
+              preview: changedText.length > 100 ? changedText.substring(0, 100) + '...' : changedText,
+              characterCount: changedText.length,
+              lineCount: endIndex - startIndex + 1
+            };
+          } else {
+            // For long changes, store start and end portions
+            const changedLines = changedText.split('\n');
+            const startText = changedLines.slice(0, 3).join('\n');
+            const endText = changedLines.slice(-3).join('\n');
+            
+            navigationTarget.textContent = {
+              startText,
+              endText,
+              preview: (startText + '...' + endText).length > 100 
+                ? (startText + '...' + endText).substring(0, 100) + '...' 
+                : startText + '...' + endText,
+              characterCount: changedText.length,
+              lineCount: changedLines.length
+            };
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to extract text content for navigation target:', error);
+      }
+
+      context.addNavigationTarget(navigationTarget);
       
       // Remove the header lines (first 4 lines) to keep just the actual diff
       const diffLines = diffOutput.split('\n');
