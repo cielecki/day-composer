@@ -1,0 +1,6 @@
+/* Life Navigator Plugin Styles */
+
+@import "./css/setup.css";
+@import "./css/system-prompt-view.css";
+@import "./css/cost-analysis-view.css";
+@import "./css/life-navigator-view.css"; 
